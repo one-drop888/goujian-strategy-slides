@@ -1,0 +1,33 @@
+{
+  "id": "sales",
+  "name": "Sales Performance",
+  "purpose": "Sales reviews, funnel and channel performance",
+  "canvas": "wide",
+  "background": "FFFFFF",
+  "font": {
+    "latin": "Noto Sans",
+    "cjk": "Noto Sans CJK SC",
+    "title_size": 28,
+    "body_size": 19
+  },
+  "colors": {
+    "text": "202124",
+    "muted": "6B7280",
+    "accent": "0057B8",
+    "accent_soft": "EAF3FF",
+    "panel": "F6F8FB",
+    "line": "D9E0EA"
+  },
+  "style": {
+    "density": "medium-high",
+    "margin_x": 0.75,
+    "title_rule": "accent",
+    "table_header": "soft",
+    "table_banding": false,
+    "metric_style": "panel",
+    "chart_grid": "none",
+    "cover_treatment": "editorial",
+    "table_size": 16,
+    "chart_size": 14
+  }
+}

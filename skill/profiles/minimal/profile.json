@@ -1,0 +1,33 @@
+{
+  "id": "minimal",
+  "name": "Minimal",
+  "purpose": "Simple decision decks with sparse content",
+  "canvas": "wide",
+  "background": "FFFFFF",
+  "font": {
+    "latin": "Noto Sans",
+    "cjk": "Noto Sans CJK SC",
+    "title_size": 30,
+    "body_size": 20
+  },
+  "colors": {
+    "text": "18181B",
+    "muted": "71717A",
+    "accent": "18181B",
+    "accent_soft": "F4F4F5",
+    "panel": "FAFAFA",
+    "line": "E4E4E7"
+  },
+  "style": {
+    "density": "low",
+    "margin_x": 0.9,
+    "title_rule": "none",
+    "table_header": "soft",
+    "table_banding": false,
+    "metric_style": "open",
+    "chart_grid": "none",
+    "cover_treatment": "editorial",
+    "table_size": 16,
+    "chart_size": 14
+  }
+}

@@ -1,0 +1,42 @@
+const assert=require('node:assert/strict');
+const fs=require('fs');
+const path=require('path');
+const {validateDeck,schemaErrors}=require('../core/schema/validate');
+const {resolveSlide}=require('../core/composition/resolver');
+const {chooseStoryline}=require('../core/planner');
+const {loadProfile}=require('../core/style/profile-loader');
+const {resolveStyle}=require('../core/style/resolve-style');
+const root=path.resolve(__dirname,'..');
+const deck=slide=>({title:'Test',slides:[slide]});
+const invalid=(slide,pattern)=>assert.match(validateDeck(deck(slide)).join('\n'),pattern);
+assert.deepEqual(validateDeck(deck({type:'key-message',title:'Decision',statement:'Proceed with the measured pilot.'})),[]);
+invalid({type:'chart',title:'Trend',series:[{labels:['A'],values:[1,2]}]},/matching lengths/);
+invalid({type:'chart',title:'Trend',series:[{labels:['A'],values:['2']}]},/must be number/);
+invalid({type:'chart',title:'Trend',series:[{labels:['A'],values:[1]}],axisMin:2},/zero|hide/);
+invalid({type:'kpi',title:'Metrics',items:Array(6).fill({label:'A',value:1})},/capacity/);
+invalid({type:'table',title:'Detail',headers:['A','B'],rows:[[1]]},/rectangular/);
+invalid({type:'matrix',title:'Position',items:[{title:'Unknown'}]},/explicit x and y/);
+invalid({type:'comparison',title:'Compare',columns:[{heading:'A',points:Array(7).fill('x')}]},/at most 6/);
+invalid({type:'waterfall',title:'Bridge',series:[{labels:['A'],values:[1]}]},/No faithful V1 renderer/);
+invalid({type:'key-message',title:'Decision',statement:'X',composition:'typo'},/unknown composition/);
+invalid({type:'key-message',title:'Decision',statement:'X',renderer:'chart'},/override/);
+invalid({type:'architecture',title:'Design',layers:[{title:'Empty',items:[]}]},/1–5/);
+invalid({type:'funnel',title:'Stages',items:[{title:'A',value:10},{title:'B',value:20}]},/must not increase/);
+assert.throws(()=>resolveSlide({type:'bubble'},root),/No faithful/);
+assert.equal(chooseStoryline('VOC 访谈'), 'voc-analysis');
+assert.equal(chooseStoryline('unrecognized brief'),'executive-business-review');
+const reg=name=>JSON.parse(fs.readFileSync(path.join(root,'skill',name,'registry.json')));
+for(const name of ['archetypes','compositions','storylines','templates']) {
+ const r=reg(name), items=r[name];assert.equal(r.count,items.length);assert.equal(new Set(items.map(x=>x.id)).size,items.length);
+}
+const ids=new Set(reg('archetypes').archetypes.map(x=>x.id));
+for(const s of reg('storylines').storylines)for(const id of s.recommended_sequence)assert(ids.has(id),id);
+for(const c of reg('compositions').compositions)assert.deepEqual(schemaErrors('composition',c),[]);
+const signatures=[];
+for(const id of fs.readdirSync(path.join(root,'skill/profiles'))) {
+ const p=loadProfile(id,root);assert.deepEqual(schemaErrors('profile',p),[]);
+ const s=resolveStyle(p);signatures.push(JSON.stringify({font:s.font,layout:s.layout,style:s.style}));
+}
+assert.equal(new Set(signatures).size,15,'Profiles must differ beyond color');
+assert(schemaErrors('profile',{...loadProfile('minimal',root),canvas:'standard'}).length);
+console.log('PASS: schema boundaries, routing, capacities, planner and profile differentiation');

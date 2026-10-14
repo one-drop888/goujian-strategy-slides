@@ -1,0 +1,13 @@
+{
+  "pptx_sha256": "cd44b44b545cf7c9e6546e824f4410e42e37d6d5abb155bb4c1a1c88d7891992",
+  "reviewer": "Codex vision-agent review; no independent human approval",
+  "status": "PASS",
+  "slides_reviewed": [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "notes": "Reviewed all 5 pages in montage and final corrected slide 4 at full size. Matrix labels, native table, four-stage explanation and qualitative scorecard are readable; missing numerical results are shown as dashes."
+}

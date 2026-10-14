@@ -1,0 +1,111 @@
+{
+  "title": "营销战役：内容供给不是瓶颈，关键是把传播节奏连接到转化路径",
+  "storyline": "marketing-campaign",
+  "profile": "marketing",
+  "lang": "zh-CN",
+  "footer": "Illustrative synthetic data · 示例数据，不代表真实经营结论",
+  "slides": [
+    {
+      "type": "cover",
+      "title": "营销战役规划"
+    },
+    {
+      "type": "audience-strategy",
+      "title": "不同受众的核心障碍不同，统一内容只会稀释传播效率",
+      "columns": [
+        {
+          "heading": "高意向",
+          "points": [
+            "需要证据",
+            "需要明确差异",
+            "需要行动入口"
+          ]
+        },
+        {
+          "heading": "潜在人群",
+          "points": [
+            "需要场景理解",
+            "需要价值感知",
+            "需要社会证明"
+          ]
+        },
+        {
+          "heading": "泛兴趣",
+          "points": [
+            "需要话题钩子",
+            "需要低理解成本"
+          ]
+        }
+      ],
+      "source": "Illustrative synthetic example / 示例数据"
+    },
+    {
+      "type": "process",
+      "title": "传播节奏按“话题→价值→证据→行动”设计，而不是素材随机发布",
+      "items": [
+        {
+          "title": "话题"
+        },
+        {
+          "title": "价值解释"
+        },
+        {
+          "title": "证据强化"
+        },
+        {
+          "title": "行动转化"
+        }
+      ],
+      "source": "Illustrative synthetic example / 示例数据"
+    },
+    {
+      "type": "funnel",
+      "title": "复盘指标必须覆盖从注意到行动的完整链条",
+      "items": [
+        {
+          "title": "曝光",
+          "value": "100%"
+        },
+        {
+          "title": "有效观看",
+          "value": "42%"
+        },
+        {
+          "title": "互动",
+          "value": "9%"
+        },
+        {
+          "title": "留资",
+          "value": "2.1%"
+        }
+      ],
+      "source": "Illustrative synthetic example / 示例数据"
+    },
+    {
+      "type": "action-plan",
+      "title": "每一阶段只保留一个主要内容目标和一个主要转化指标",
+      "items": [
+        {
+          "title": "第一阶段：建立话题",
+          "owner": "内容",
+          "time": "W1",
+          "status": "计划"
+        },
+        {
+          "title": "第二阶段：解释价值",
+          "owner": "产品内容",
+          "time": "W2",
+          "status": "计划"
+        },
+        {
+          "title": "第三阶段：推动体验",
+          "owner": "线索运营",
+          "time": "W3",
+          "status": "计划"
+        }
+      ],
+      "source": "Illustrative synthetic example / 示例数据"
+    }
+  ],
+  "brand": "构见 · GOUJIAN / MARKETING"
+}

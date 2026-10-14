@@ -1,0 +1,33 @@
+{
+  "id": "marketing",
+  "name": "Marketing Narrative",
+  "purpose": "Campaigns, launch and audience strategy",
+  "canvas": "wide",
+  "background": "FFFFFF",
+  "font": {
+    "latin": "Noto Sans",
+    "cjk": "Noto Sans CJK SC",
+    "title_size": 30,
+    "body_size": 19
+  },
+  "colors": {
+    "text": "202124",
+    "muted": "737373",
+    "accent": "E65A35",
+    "accent_soft": "FFF1EC",
+    "panel": "F8F7F5",
+    "line": "DEDAD4"
+  },
+  "style": {
+    "density": "medium",
+    "margin_x": 0.8,
+    "title_rule": "accent",
+    "table_header": "soft",
+    "table_banding": false,
+    "metric_style": "panel",
+    "chart_grid": "none",
+    "cover_treatment": "band",
+    "table_size": 16,
+    "chart_size": 14
+  }
+}

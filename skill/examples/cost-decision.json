@@ -1,0 +1,133 @@
+{
+  "title": "成本决策：真正应削减的是低价值复杂度，而不是所有费用同比例压降",
+  "storyline": "cost-reduction",
+  "profile": "finance",
+  "lang": "zh-CN",
+  "footer": "Illustrative synthetic data · 示例数据，不代表真实经营结论",
+  "slides": [
+    {
+      "type": "cover",
+      "title": "年度成本优化决策"
+    },
+    {
+      "type": "cost-structure",
+      "title": "成本高度集中在少数资源项，平均压降会错过真正杠杆",
+      "series": [
+        {
+          "name": "年度成本",
+          "labels": [
+            "开发人力",
+            "云资源",
+            "第三方服务",
+            "运营工具",
+            "其他"
+          ],
+          "values": [
+            310,
+            145,
+            62,
+            28,
+            18
+          ]
+        }
+      ],
+      "unit": "万元",
+      "period": "年度",
+      "source": "Illustrative synthetic example / 示例数据",
+      "insight": "前两项占比超过80%，应优先做结构拆解。"
+    },
+    {
+      "type": "benchmark",
+      "title": "费用合理性必须同时看市场基准、实际利用率和业务价值",
+      "columns": [
+        {
+          "heading": "市场基准",
+          "points": [
+            "同类开发人天",
+            "云资源单价",
+            "SaaS单价"
+          ]
+        },
+        {
+          "heading": "内部利用率",
+          "points": [
+            "CPU/存储利用",
+            "需求使用率",
+            "闲置资源"
+          ]
+        },
+        {
+          "heading": "业务价值",
+          "points": [
+            "收入/转化贡献",
+            "必要合规能力",
+            "战略必需"
+          ]
+        }
+      ],
+      "source": "Illustrative synthetic example / 示例数据"
+    },
+    {
+      "type": "driver-tree",
+      "title": "高成本通常由“重复建设、低利用率、需求颗粒度失控”共同造成",
+      "root": "年度成本偏高",
+      "items": [
+        {
+          "title": "人力",
+          "children": [
+            "重复需求",
+            "低复用",
+            "估算偏宽"
+          ]
+        },
+        {
+          "title": "云资源",
+          "children": [
+            "规格过配",
+            "闲置",
+            "环境重复"
+          ]
+        },
+        {
+          "title": "治理",
+          "children": [
+            "缺少归因",
+            "缺少预算门槛"
+          ]
+        }
+      ],
+      "source": "Illustrative synthetic example / 示例数据"
+    },
+    {
+      "type": "portfolio",
+      "title": "降本动作按“立即取消、优化配置、重构能力”三档推进",
+      "items": [
+        {
+          "title": "闲置资源下线",
+          "status": "立即",
+          "highlight": true
+        },
+        {
+          "title": "规格与峰值重配",
+          "status": "30天"
+        },
+        {
+          "title": "重复能力合并",
+          "status": "季度"
+        },
+        {
+          "title": "需求ROI门槛",
+          "status": "机制化"
+        }
+      ],
+      "source": "Illustrative synthetic example / 示例数据"
+    },
+    {
+      "type": "decision",
+      "title": "建议先完成成本归因与利用率审计，再确定压降目标，避免“省了钱却损失关键能力”",
+      "statement": "降本目标应该来自结构优化后的可实现空间，而不是先定比例再找项目。",
+      "source": "Illustrative synthetic example / 示例数据"
+    }
+  ],
+  "brand": "构见 · GOUJIAN / FINANCE"
+}

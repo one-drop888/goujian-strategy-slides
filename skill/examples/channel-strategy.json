@@ -1,0 +1,151 @@
+{
+  "title": "渠道战略：从“覆盖优先”转向“触点效率与城市质量”",
+  "storyline": "channel-strategy",
+  "profile": "strategy",
+  "lang": "zh-CN",
+  "footer": "Illustrative synthetic data · 示例数据，不代表真实经营结论",
+  "slides": [
+    {
+      "type": "cover",
+      "title": "渠道战略规划",
+      "subtitle": "覆盖完成后，下一阶段竞争来自触点效率"
+    },
+    {
+      "type": "key-message",
+      "title": "核心城市基础覆盖已经形成，继续同质扩点的边际收益快速下降",
+      "statement": "下一阶段不是“更多门店”，而是“更高质量触点 + 更高单点产出”。",
+      "source": "Illustrative synthetic example / 示例数据"
+    },
+    {
+      "type": "benchmark",
+      "title": "领先品牌的差异不再是门店数量，而是核心商圈触点密度与体验质量",
+      "columns": [
+        {
+          "heading": "传统豪华",
+          "points": [
+            "中心店面积大",
+            "覆盖半径大",
+            "触点相对少"
+          ]
+        },
+        {
+          "heading": "新豪华",
+          "points": [
+            "核心商圈多触点",
+            "场景化体验",
+            "轻重资产组合"
+          ]
+        }
+      ],
+      "source": "Illustrative synthetic example / 示例数据"
+    },
+    {
+      "type": "competitive-landscape",
+      "title": "高潜城市应优先提升触点质量，低覆盖城市再补基础网络",
+      "xLabel": "覆盖完整度",
+      "yLabel": "市场潜力",
+      "items": [
+        {
+          "title": "A类城市",
+          "x": 0.82,
+          "y": 0.86
+        },
+        {
+          "title": "B类城市",
+          "x": 0.48,
+          "y": 0.78
+        },
+        {
+          "title": "C类城市",
+          "x": 0.72,
+          "y": 0.38
+        },
+        {
+          "title": "D类城市",
+          "x": 0.3,
+          "y": 0.32
+        }
+      ],
+      "source": "Illustrative synthetic example / 示例数据"
+    },
+    {
+      "type": "portfolio",
+      "title": "渠道动作应分成“提效、加密、补空白”三类而非统一扩张",
+      "items": [
+        {
+          "title": "核心店提效",
+          "status": "优先",
+          "note": "提升单店线索与成交效率",
+          "highlight": true
+        },
+        {
+          "title": "核心商圈加密",
+          "status": "选择性",
+          "note": "轻量触点补充高频场景"
+        },
+        {
+          "title": "空白城市补点",
+          "status": "基础",
+          "note": "满足最低服务半径"
+        }
+      ],
+      "source": "Illustrative synthetic example / 示例数据"
+    },
+    {
+      "type": "roadmap",
+      "title": "未来三个阶段先完成模型验证，再按城市类型滚动复制",
+      "lanes": [
+        {
+          "title": "模型",
+          "phases": [
+            {
+              "title": "样板店验证"
+            },
+            {
+              "title": "模型校准"
+            },
+            {
+              "title": "规模复制"
+            }
+          ]
+        },
+        {
+          "title": "城市",
+          "phases": [
+            {
+              "title": "A类城市"
+            },
+            {
+              "title": "B类城市"
+            },
+            {
+              "title": "长尾优化"
+            }
+          ]
+        },
+        {
+          "title": "指标",
+          "phases": [
+            {
+              "title": "触点效率"
+            },
+            {
+              "title": "单店产出"
+            },
+            {
+              "title": "网络ROI"
+            }
+          ]
+        }
+      ],
+      "source": "Illustrative synthetic example / 示例数据"
+    },
+    {
+      "type": "decision",
+      "title": "决策重点不是“批多少店”，而是是否同意按城市类型采用不同渠道模型",
+      "statement": "建议批准分层渠道模型，并用单点产出与触点效率作为新增网络的前置门槛。",
+      "source": "Illustrative synthetic example / 示例数据"
+    }
+  ],
+  "brand": "构见 · GOUJIAN / STRATEGY"
+}

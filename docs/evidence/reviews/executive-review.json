@@ -1,0 +1,16 @@
+{
+  "pptx_sha256": "6c6ec465db5be06b86f70a9c599bf13fa8b8263fea6a9e119109d80a7f68935c",
+  "reviewer": "Codex vision-agent review; no independent human approval",
+  "status": "PASS",
+  "slides_reviewed": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+  ],
+  "notes": "Reviewed all 8 pages in the final montage and full-size trend/KPI pages during iteration. Clear target variance, indexed same-baseline trend, diagnosis and owned actions. No obvious clipping observed."
+}

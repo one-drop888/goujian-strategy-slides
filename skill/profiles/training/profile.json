@@ -1,0 +1,33 @@
+{
+  "id": "training",
+  "name": "Training Clear",
+  "purpose": "Training, playbooks and enablement",
+  "canvas": "wide",
+  "background": "FFFFFF",
+  "font": {
+    "latin": "Noto Sans",
+    "cjk": "Noto Sans CJK SC",
+    "title_size": 30,
+    "body_size": 21
+  },
+  "colors": {
+    "text": "1F2937",
+    "muted": "6B7280",
+    "accent": "0E7490",
+    "accent_soft": "ECFEFF",
+    "panel": "F6FAFB",
+    "line": "CDE7EC"
+  },
+  "style": {
+    "density": "medium",
+    "margin_x": 0.8,
+    "title_rule": "line",
+    "table_header": "soft",
+    "table_banding": true,
+    "metric_style": "panel",
+    "chart_grid": "light",
+    "cover_treatment": "band",
+    "table_size": 16,
+    "chart_size": 14
+  }
+}

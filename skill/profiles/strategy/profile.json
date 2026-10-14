@@ -1,0 +1,33 @@
+{
+  "id": "strategy",
+  "name": "Strategy Executive",
+  "purpose": "Strategic choices, portfolios and roadmaps",
+  "canvas": "wide",
+  "background": "FFFFFF",
+  "font": {
+    "latin": "Noto Sans",
+    "cjk": "Noto Sans CJK SC",
+    "title_size": 28,
+    "body_size": 19
+  },
+  "colors": {
+    "text": "17212B",
+    "muted": "526373",
+    "accent": "176B87",
+    "accent_soft": "EAF3F7",
+    "panel": "F5F8F7",
+    "line": "D5E0E6"
+  },
+  "style": {
+    "density": "medium-high",
+    "margin_x": 0.78,
+    "title_rule": "accent",
+    "table_header": "solid",
+    "table_banding": false,
+    "metric_style": "open",
+    "chart_grid": "light",
+    "cover_treatment": "editorial",
+    "table_size": 16,
+    "chart_size": 14
+  }
+}

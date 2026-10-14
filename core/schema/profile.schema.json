@@ -1,0 +1,152 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "profile.schema.json",
+  "title": "Visual Profile",
+  "type": "object",
+  "required": [
+    "id",
+    "font",
+    "colors"
+  ],
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "purpose": {
+      "type": "string"
+    },
+    "canvas": {
+      "enum": [
+        "wide"
+      ]
+    },
+    "background": {
+      "type": "string",
+      "pattern": "^[0-9A-Fa-f]{6}$"
+    },
+    "font": {
+      "type": "object",
+      "required": [
+        "latin",
+        "cjk"
+      ],
+      "additionalProperties": true,
+      "properties": {
+        "latin": {
+          "type": "string",
+          "minLength": 1
+        },
+        "cjk": {
+          "type": "string",
+          "minLength": 1
+        },
+        "title_size": {
+          "type": "number",
+          "minimum": 18,
+          "maximum": 44
+        },
+        "body_size": {
+          "type": "number",
+          "minimum": 12,
+          "maximum": 28
+        }
+      }
+    },
+    "colors": {
+      "type": "object",
+      "required": [
+        "text",
+        "muted",
+        "accent",
+        "accent_soft",
+        "panel",
+        "line"
+      ],
+      "additionalProperties": true,
+      "properties": {
+        "text": {
+          "type": "string",
+          "pattern": "^[0-9A-Fa-f]{6}$"
+        },
+        "muted": {
+          "type": "string",
+          "pattern": "^[0-9A-Fa-f]{6}$"
+        },
+        "accent": {
+          "type": "string",
+          "pattern": "^[0-9A-Fa-f]{6}$"
+        },
+        "accent_soft": {
+          "type": "string",
+          "pattern": "^[0-9A-Fa-f]{6}$"
+        },
+        "panel": {
+          "type": "string",
+          "pattern": "^[0-9A-Fa-f]{6}$"
+        },
+        "line": {
+          "type": "string",
+          "pattern": "^[0-9A-Fa-f]{6}$"
+        }
+      }
+    },
+    "style": {
+      "type": "object",
+      "properties": {
+        "margin_x": {
+          "type": "number",
+          "minimum": 0.45,
+          "maximum": 1.1
+        },
+        "title_rule": {
+          "enum": [
+            "line",
+            "accent",
+            "none"
+          ]
+        },
+        "table_header": {
+          "enum": [
+            "soft",
+            "solid"
+          ]
+        },
+        "table_banding": {
+          "type": "boolean"
+        },
+        "metric_style": {
+          "enum": [
+            "open",
+            "panel"
+          ]
+        },
+        "chart_grid": {
+          "enum": [
+            "light",
+            "none"
+          ]
+        },
+        "cover_treatment": {
+          "enum": [
+            "editorial",
+            "band"
+          ]
+        },
+        "table_size": {
+          "type": "number",
+          "minimum": 12,
+          "maximum": 20
+        },
+        "chart_size": {
+          "type": "number",
+          "minimum": 10,
+          "maximum": 18
+        }
+      }
+    }
+  },
+  "additionalProperties": true
+}

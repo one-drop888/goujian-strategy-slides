@@ -1,0 +1,33 @@
+{
+  "id": "corporate",
+  "name": "Corporate Neutral",
+  "purpose": "General internal and external business decks",
+  "canvas": "wide",
+  "background": "FFFFFF",
+  "font": {
+    "latin": "Noto Sans",
+    "cjk": "Noto Sans CJK SC",
+    "title_size": 29,
+    "body_size": 19
+  },
+  "colors": {
+    "text": "1F2937",
+    "muted": "6B7280",
+    "accent": "234A78",
+    "accent_soft": "EEF3F8",
+    "panel": "F7F8FA",
+    "line": "D6DAE1"
+  },
+  "style": {
+    "density": "medium",
+    "margin_x": 0.78,
+    "title_rule": "line",
+    "table_header": "solid",
+    "table_banding": true,
+    "metric_style": "panel",
+    "chart_grid": "light",
+    "cover_treatment": "band",
+    "table_size": 16,
+    "chart_size": 14
+  }
+}

@@ -1,0 +1,121 @@
+{
+  "version": "1.0.0",
+  "count": 23,
+  "compositions": [
+    {
+      "id": "cover-hero",
+      "purpose": "Cover with one dominant thesis and restrained metadata",
+      "renderer": "cover"
+    },
+    {
+      "id": "section-divider",
+      "purpose": "Section divider / chapter reset",
+      "renderer": "section"
+    },
+    {
+      "id": "message-focus",
+      "purpose": "Single conclusion / decision / recommendation",
+      "renderer": "statement"
+    },
+    {
+      "id": "summary-grid",
+      "purpose": "Executive summary with 3-5 concise findings",
+      "renderer": "summary"
+    },
+    {
+      "id": "metric-strip",
+      "purpose": "1-5 headline metrics",
+      "renderer": "kpi"
+    },
+    {
+      "id": "scorecard-table",
+      "purpose": "Metrics with status/target/variance",
+      "renderer": "scorecard"
+    },
+    {
+      "id": "compare-2",
+      "purpose": "Two-side comparison / before-after",
+      "renderer": "comparison"
+    },
+    {
+      "id": "compare-multi",
+      "purpose": "2-4 comparable options or segments",
+      "renderer": "comparison"
+    },
+    {
+      "id": "flow-horizontal",
+      "purpose": "Sequential process / customer path",
+      "renderer": "process"
+    },
+    {
+      "id": "funnel-stages",
+      "purpose": "Conversion or staged attrition",
+      "renderer": "funnel"
+    },
+    {
+      "id": "timeline-horizontal",
+      "purpose": "Chronology / milestones",
+      "renderer": "timeline"
+    },
+    {
+      "id": "roadmap-lanes",
+      "purpose": "Time x workstream implementation plan",
+      "renderer": "roadmap"
+    },
+    {
+      "id": "matrix-2x2",
+      "purpose": "Two-axis decision matrix / priority",
+      "renderer": "matrix"
+    },
+    {
+      "id": "tree-hierarchy",
+      "purpose": "Driver tree / org / decomposition",
+      "renderer": "hierarchy"
+    },
+    {
+      "id": "chart-with-insight",
+      "purpose": "Primary chart plus interpretation panel",
+      "renderer": "chart"
+    },
+    {
+      "id": "chart-full",
+      "purpose": "Full-width analytical chart",
+      "renderer": "chart"
+    },
+    {
+      "id": "table-detail",
+      "purpose": "Precise lookup / benchmark / feature table",
+      "renderer": "table"
+    },
+    {
+      "id": "action-register",
+      "purpose": "Actions with owner/timing/status",
+      "renderer": "action"
+    },
+    {
+      "id": "risk-register",
+      "purpose": "Risk / issue register or heatmap",
+      "renderer": "risk"
+    },
+    {
+      "id": "evidence-split",
+      "purpose": "Evidence/quote/image plus interpretation",
+      "renderer": "evidence"
+    },
+    {
+      "id": "architecture-map",
+      "purpose": "System/relationship/operating model",
+      "renderer": "architecture"
+    },
+    {
+      "id": "portfolio-board",
+      "purpose": "Initiative or option portfolio",
+      "renderer": "portfolio"
+    },
+    {
+      "id": "pyramid-stack",
+      "purpose": "Hierarchy / strategy / capability stack",
+      "renderer": "pyramid"
+    }
+  ]
+}

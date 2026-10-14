@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "composition.schema.json",
+  "title": "Composition",
+  "type": "object",
+  "required": [
+    "id",
+    "purpose",
+    "renderer"
+  ],
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "purpose": {
+      "type": "string"
+    },
+    "renderer": {
+      "type": "string"
+    }
+  },
+  "additionalProperties": true
+}

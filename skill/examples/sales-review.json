@@ -1,0 +1,113 @@
+{
+  "title": "销售漏斗：问题集中在到店后的体验转化，而不是线索供给不足",
+  "storyline": "sales-funnel",
+  "profile": "sales",
+  "lang": "zh-CN",
+  "footer": "Illustrative synthetic data · 示例数据，不代表真实经营结论",
+  "slides": [
+    {
+      "type": "cover",
+      "title": "销售漏斗诊断",
+      "subtitle": "从线索供给转向过程转化"
+    },
+    {
+      "type": "sales-funnel",
+      "title": "线索→到店损失68%，到店→试驾仍有48%的改善空间",
+      "items": [
+        {
+          "title": "有效线索",
+          "value": "10,000"
+        },
+        {
+          "title": "到店",
+          "value": "3,200"
+        },
+        {
+          "title": "试驾",
+          "value": "1,650"
+        },
+        {
+          "title": "报价",
+          "value": "980"
+        },
+        {
+          "title": "成交",
+          "value": "420"
+        }
+      ],
+      "source": "Illustrative synthetic example / 示例数据"
+    },
+    {
+      "type": "regional-performance",
+      "title": "高表现区域并非线索更多，而是试驾率和二次跟进更稳定",
+      "columns": [
+        {
+          "heading": "区域 A",
+          "points": [
+            "到店率 32%",
+            "试驾率 61%",
+            "48h复联 84%"
+          ]
+        },
+        {
+          "heading": "区域 B",
+          "points": [
+            "到店率 31%",
+            "试驾率 43%",
+            "48h复联 52%"
+          ]
+        }
+      ],
+      "source": "Illustrative synthetic example / 示例数据"
+    },
+    {
+      "type": "win-loss",
+      "title": "成交样本更早确认核心需求，流失样本更容易陷入参数堆砌",
+      "columns": [
+        {
+          "heading": "成交",
+          "points": [
+            "先问场景",
+            "核心卖点≤3",
+            "明确下一步"
+          ]
+        },
+        {
+          "heading": "流失",
+          "points": [
+            "参数先行",
+            "信息量过大",
+            "下一步模糊"
+          ]
+        }
+      ],
+      "source": "Illustrative synthetic example / 示例数据"
+    },
+    {
+      "type": "action-plan",
+      "title": "优先重做试驾前后两个动作，而不是增加新的销售任务",
+      "items": [
+        {
+          "title": "试驾前需求卡",
+          "owner": "销售培训",
+          "time": "2周",
+          "status": "设计"
+        },
+        {
+          "title": "试驾后24h跟进模板",
+          "owner": "销售运营",
+          "time": "2周",
+          "status": "设计"
+        },
+        {
+          "title": "区域抽检与复盘",
+          "owner": "区域经理",
+          "time": "每周",
+          "status": "常态"
+        }
+      ],
+      "source": "Illustrative synthetic example / 示例数据"
+    }
+  ],
+  "brand": "构见 · GOUJIAN / SALES"
+}

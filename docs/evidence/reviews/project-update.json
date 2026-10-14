@@ -1,0 +1,13 @@
+{
+  "pptx_sha256": "9711f1b7e579d3758c0e8bec83e2be7c52c9c7af475688c70f255a3979a91bb0",
+  "reviewer": "Codex vision-agent review; no independent human approval",
+  "status": "PASS",
+  "slides_reviewed": [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "notes": "Reviewed all 5 pages in montage. Summary, roadmap, risk table and decision vary appropriately; Chinese title wrapping is readable."
+}

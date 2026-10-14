@@ -1,0 +1,181 @@
+{
+  "title": "AI Agent 方案：模型负责理解与生成，确定性系统负责权限、状态与验收",
+  "storyline": "ai-agent-proposal",
+  "profile": "product-tech",
+  "lang": "zh-CN",
+  "footer": "Illustrative synthetic data · 示例数据，不代表真实经营结论",
+  "slides": [
+    {
+      "type": "cover",
+      "title": "企业 AI Agent 技术方案"
+    },
+    {
+      "type": "key-message",
+      "title": "真正可生产化的 Agent 不是“模型更聪明”，而是模型与确定性控制面职责清晰",
+      "statement": "LLM 负责认知弹性；权限、状态、审计、数据写入和验收必须由可验证系统控制。",
+      "source": "Illustrative synthetic example / 示例数据"
+    },
+    {
+      "type": "architecture",
+      "title": "整体架构分为上下文、Agent、工具、治理和证据五层",
+      "layers": [
+        {
+          "title": "Context",
+          "items": [
+            {
+              "title": "Knowledge"
+            },
+            {
+              "title": "Memory"
+            },
+            {
+              "title": "Workspace"
+            }
+          ]
+        },
+        {
+          "title": "Agent",
+          "items": [
+            {
+              "title": "Planner"
+            },
+            {
+              "title": "Executor"
+            }
+          ]
+        },
+        {
+          "title": "Tools",
+          "items": [
+            {
+              "title": "API"
+            },
+            {
+              "title": "Browser"
+            },
+            {
+              "title": "Files"
+            }
+          ]
+        },
+        {
+          "title": "Governance",
+          "items": [
+            {
+              "title": "Policy"
+            },
+            {
+              "title": "Auth"
+            },
+            {
+              "title": "Audit"
+            }
+          ],
+          "highlight": true
+        },
+        {
+          "title": "Evidence",
+          "items": [
+            {
+              "title": "Artifacts"
+            },
+            {
+              "title": "QA"
+            }
+          ]
+        }
+      ],
+      "source": "Illustrative synthetic example / 示例数据"
+    },
+    {
+      "type": "before-after",
+      "title": "Agent 化的价值不是减少一步操作，而是把跨系统任务变成可恢复工作流",
+      "before": {
+        "heading": "Before",
+        "points": [
+          "人工跨系统复制",
+          "状态依赖个人记忆",
+          "失败后重新开始"
+        ]
+      },
+      "after": {
+        "heading": "After",
+        "points": [
+          "统一上下文",
+          "状态可恢复",
+          "证据链可审计"
+        ]
+      },
+      "source": "Illustrative synthetic example / 示例数据"
+    },
+    {
+      "type": "risk",
+      "title": "生产风险主要来自越权、错误写入和“看起来成功”的静默失败",
+      "items": [
+        {
+          "title": "越权调用",
+          "likelihood": "中",
+          "impact": "高",
+          "mitigation": "Policy + scoped auth",
+          "owner": "平台"
+        },
+        {
+          "title": "错误写入",
+          "likelihood": "中",
+          "impact": "高",
+          "mitigation": "审批/幂等/回滚",
+          "owner": "应用"
+        },
+        {
+          "title": "静默失败",
+          "likelihood": "高",
+          "impact": "中",
+          "mitigation": "证据型验收",
+          "owner": "QA"
+        }
+      ],
+      "source": "Illustrative synthetic example / 示例数据"
+    },
+    {
+      "type": "roadmap",
+      "title": "先做高频、可验收任务，再逐步扩大自治范围",
+      "lanes": [
+        {
+          "title": "Phase 1",
+          "phases": [
+            {
+              "title": "只读问答"
+            },
+            {
+              "title": "辅助生成"
+            }
+          ]
+        },
+        {
+          "title": "Phase 2",
+          "phases": [
+            {
+              "title": "受控写入"
+            },
+            {
+              "title": "多步工作流"
+            }
+          ]
+        },
+        {
+          "title": "Phase 3",
+          "phases": [
+            {
+              "title": "跨系统自治"
+            },
+            {
+              "title": "持续优化"
+            }
+          ]
+        }
+      ],
+      "source": "Illustrative synthetic example / 示例数据"
+    }
+  ],
+  "brand": "构见 · GOUJIAN / PRODUCT-TECH"
+}

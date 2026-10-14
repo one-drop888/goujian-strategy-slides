@@ -1,0 +1,33 @@
+{
+  "id": "finance",
+  "name": "Finance Analytical",
+  "purpose": "Budgets, investment cases and financial reviews",
+  "canvas": "wide",
+  "background": "FFFFFF",
+  "font": {
+    "latin": "Noto Sans",
+    "cjk": "Noto Sans CJK SC",
+    "title_size": 26,
+    "body_size": 17
+  },
+  "colors": {
+    "text": "182230",
+    "muted": "667085",
+    "accent": "1570EF",
+    "accent_soft": "EFF8FF",
+    "panel": "F8FAFC",
+    "line": "D0D5DD"
+  },
+  "style": {
+    "density": "high",
+    "margin_x": 0.65,
+    "title_rule": "line",
+    "table_header": "solid",
+    "table_banding": true,
+    "metric_style": "open",
+    "chart_grid": "light",
+    "cover_treatment": "editorial",
+    "table_size": 14,
+    "chart_size": 12
+  }
+}

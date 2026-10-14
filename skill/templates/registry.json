@@ -1,0 +1,156 @@
+{
+  "version": "1.0.0",
+  "count": 15,
+  "templates": [
+    {
+      "id": "executive-review",
+      "name": "Executive Review",
+      "storyline": "quarterly-review",
+      "default_profile": "executive-dense",
+      "recommended_slide_range": [
+        7,
+        12
+      ]
+    },
+    {
+      "id": "board-report",
+      "name": "Board / Leadership Report",
+      "storyline": "executive-business-review",
+      "default_profile": "executive-clean",
+      "recommended_slide_range": [
+        6,
+        10
+      ]
+    },
+    {
+      "id": "strategy",
+      "name": "Strategy Proposal",
+      "storyline": "strategy-proposal",
+      "default_profile": "strategy",
+      "recommended_slide_range": [
+        8,
+        14
+      ]
+    },
+    {
+      "id": "channel-strategy",
+      "name": "Channel Strategy",
+      "storyline": "channel-strategy",
+      "default_profile": "strategy",
+      "recommended_slide_range": [
+        7,
+        12
+      ]
+    },
+    {
+      "id": "project-update",
+      "name": "Project Update",
+      "storyline": "project-update",
+      "default_profile": "executive-clean",
+      "recommended_slide_range": [
+        5,
+        9
+      ]
+    },
+    {
+      "id": "research-insight",
+      "name": "Research / VOC Insight",
+      "storyline": "research-insight",
+      "default_profile": "research",
+      "recommended_slide_range": [
+        6,
+        12
+      ]
+    },
+    {
+      "id": "sales-review",
+      "name": "Sales Review",
+      "storyline": "sales-review",
+      "default_profile": "sales",
+      "recommended_slide_range": [
+        6,
+        11
+      ]
+    },
+    {
+      "id": "marketing-campaign",
+      "name": "Marketing Campaign",
+      "storyline": "marketing-campaign",
+      "default_profile": "marketing",
+      "recommended_slide_range": [
+        6,
+        12
+      ]
+    },
+    {
+      "id": "product-launch",
+      "name": "Product Launch",
+      "storyline": "product-launch",
+      "default_profile": "launch",
+      "recommended_slide_range": [
+        6,
+        12
+      ]
+    },
+    {
+      "id": "technical-proposal",
+      "name": "Technical / AI Proposal",
+      "storyline": "technical-proposal",
+      "default_profile": "product-tech",
+      "recommended_slide_range": [
+        6,
+        12
+      ]
+    },
+    {
+      "id": "training",
+      "name": "Training / Enablement",
+      "storyline": "training",
+      "default_profile": "training",
+      "recommended_slide_range": [
+        8,
+        18
+      ]
+    },
+    {
+      "id": "business-case",
+      "name": "Business / Investment Case",
+      "storyline": "business-case",
+      "default_profile": "finance",
+      "recommended_slide_range": [
+        6,
+        11
+      ]
+    },
+    {
+      "id": "cost-reduction",
+      "name": "Cost Reduction",
+      "storyline": "cost-reduction",
+      "default_profile": "finance",
+      "recommended_slide_range": [
+        6,
+        10
+      ]
+    },
+    {
+      "id": "organization-design",
+      "name": "Organization Design",
+      "storyline": "organization-design",
+      "default_profile": "consulting",
+      "recommended_slide_range": [
+        6,
+        11
+      ]
+    },
+    {
+      "id": "decision-deck",
+      "name": "Decision Deck",
+      "storyline": "strategy-proposal",
+      "default_profile": "executive-clean",
+      "recommended_slide_range": [
+        4,
+        7
+      ]
+    }
+  ]
+}

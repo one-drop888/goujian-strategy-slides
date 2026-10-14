@@ -1,0 +1,40 @@
+# Quality and validation
+
+V1 separates executed checks from visual judgment.
+
+| Check | What it checks | What it does not prove |
+|---|---|---|
+| Spec | Executed JSON Schema, semantic payloads, count limits, title/evidence heuristics | Source truth, causality, good storytelling |
+| Geometry | Shapes, pictures and graphic-frame bounding boxes; major peer intersections | Text fitting, rotated/grouped geometry, all overlap intent |
+| Fonts | Explicit slide/chart/theme families compared with Fontconfig | Glyph coverage, embedding, recipient font availability |
+| Render | Isolated LibreOffice conversion, fresh PDF/PNGs, matching page count | Identical Microsoft PowerPoint rendering |
+| Montage | Ordered thumbnail artifact | Visual approval |
+| Visual review | Reviewer record bound to PPTX hash and all slide numbers | Automated or infallible aesthetic judgment |
+
+Missing optional tools report `UNAVAILABLE`; checks not attempted report `NOT_RUN`; notes yield `PASS_WITH_NOTES`. Any `FAIL` makes the quality gate exit nonzero. A successful process exit with notes is not a complete visual pass.
+
+```bash
+python3 skill/scripts/quality_gate.py out/deck.pptx --spec deck.json --out out/qa.json --render-dir out/render
+```
+
+Inspect montage and relevant full-size pages. Record a JSON review only after inspection:
+
+```json
+{
+  "pptx_sha256": "replace-with-the-actual-64-character-file-hash",
+  "reviewer": "reviewer identity",
+  "status": "PASS",
+  "slides_reviewed": [1, 2, 3],
+  "notes": "Observed title hierarchy, correct chart units, readable table and Chinese text; no clipping observed."
+}
+```
+
+```bash
+python3 skill/scripts/quality_gate.py out/deck.pptx --spec deck.json --out out/qa-reviewed.json --render-dir out/render --visual-review review.json
+```
+
+Do not reuse a review after rebuilding. A digest or slide-coverage mismatch fails. The record remains a reviewer attestation; anyone can write JSON, so it is not a cryptographic proof of actual visual inspection.
+
+Render jobs use separate LibreOffice profiles and timeouts. Stale slide PNGs are replaced only after a new conversion succeeds. Pillow is imported only by the rendering path; missing Pillow does not break core geometry/font QA.
+
+Regression tests include graphic-frame overflow, unavailable font/render tools, source-overwrite prevention, stale visual attestation, unsupported chart semantics, mismatched/non-numeric data, missing coordinates and over-capacity input.

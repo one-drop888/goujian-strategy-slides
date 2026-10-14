@@ -1,0 +1,15 @@
+# Third-party notices
+
+Goujian source is licensed under Apache-2.0. Dependencies are installed through the committed npm lockfile; their own licenses continue to apply.
+
+- **PptxGenJS 4.0.0** — MIT; editable PowerPoint generation.
+- **Ajv 8.20.0** — MIT; Draft 2020-12 JSON Schema validation.
+- **image-size 2.0.4** — MIT; transitive dependency override to avoid known denial-of-service vulnerabilities in older parsers. Native chart/table/shape regression tests pass with this lockfile.
+- Other transitive dependencies retain the notices delivered in their packages.
+- **Pillow** — optional rendering/montage dependency, governed by its own license.
+- **LibreOffice / Poppler / Fontconfig** — optional external system tools, not vendored by this repository.
+- **Noto fonts** — referenced font families, not distributed or embedded. Install from an official font distribution under its supplied license.
+
+[External benchmark references](docs/EXTERNAL_BENCHMARK.md) were read for evaluation only. This final optimization copied no reference code, commercial templates or copyrighted visual assets. In particular, a public repository's accessibility does not make its content permissively licensed.
+
+The input candidate described earlier inspiration from presentation-skill patterns. That historical statement is not treated as a verified license inventory. Future contributions must preserve provenance and include notices before adding third-party code or assets.

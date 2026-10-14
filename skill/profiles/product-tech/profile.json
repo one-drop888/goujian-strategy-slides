@@ -1,0 +1,33 @@
+{
+  "id": "product-tech",
+  "name": "Product & Technology",
+  "purpose": "Product strategy, architecture and system design",
+  "canvas": "wide",
+  "background": "FAFBFC",
+  "font": {
+    "latin": "Noto Sans",
+    "cjk": "Noto Sans CJK SC",
+    "title_size": 28,
+    "body_size": 18
+  },
+  "colors": {
+    "text": "111827",
+    "muted": "64748B",
+    "accent": "2563EB",
+    "accent_soft": "EAF1FF",
+    "panel": "F1F5F9",
+    "line": "CBD5E1"
+  },
+  "style": {
+    "density": "medium",
+    "margin_x": 0.75,
+    "title_rule": "accent",
+    "table_header": "solid",
+    "table_banding": true,
+    "metric_style": "open",
+    "chart_grid": "light",
+    "cover_treatment": "band",
+    "table_size": 14,
+    "chart_size": 12
+  }
+}

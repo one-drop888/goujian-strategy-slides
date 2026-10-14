@@ -1,0 +1,13 @@
+{
+  "pptx_sha256": "7eae2fab7e049b3ca070bb3ab15653f20fa3b5ba27d3362b6044a3e2628ebb21",
+  "reviewer": "Codex vision-agent review; no independent human approval",
+  "status": "PASS",
+  "slides_reviewed": [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "notes": "Reviewed all 5 pages in montage. Funnel values and retention correspond to the data; corrected title identifies the largest loss. Comparison and action pages remain distinct."
+}

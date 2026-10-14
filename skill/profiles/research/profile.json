@@ -1,0 +1,33 @@
+{
+  "id": "research",
+  "name": "Research Evidence",
+  "purpose": "Research, VOC and insight reports",
+  "canvas": "wide",
+  "background": "FFFFFF",
+  "font": {
+    "latin": "Noto Sans",
+    "cjk": "Noto Sans CJK SC",
+    "title_size": 26,
+    "body_size": 18
+  },
+  "colors": {
+    "text": "1F2937",
+    "muted": "53665E",
+    "accent": "496A63",
+    "accent_soft": "EAF1EE",
+    "panel": "F1F5F3",
+    "line": "D6E1DB"
+  },
+  "style": {
+    "density": "high",
+    "margin_x": 0.7,
+    "title_rule": "line",
+    "table_header": "soft",
+    "table_banding": true,
+    "metric_style": "open",
+    "chart_grid": "none",
+    "cover_treatment": "editorial",
+    "table_size": 14,
+    "chart_size": 12
+  }
+}

@@ -1,0 +1,620 @@
+{
+  "version": "1.0.0",
+  "count": 28,
+  "storylines": [
+    {
+      "id": "executive-business-review",
+      "name": "Executive Business Review",
+      "triggers": [
+        "经营复盘",
+        "business review",
+        "management review"
+      ],
+      "recommended_sequence": [
+        "executive-summary",
+        "kpi-dashboard",
+        "variance",
+        "root-cause",
+        "action-plan",
+        "risk"
+      ],
+      "management_questions": [
+        "What changed?",
+        "Where is the gap?",
+        "Why?",
+        "What will we do?"
+      ]
+    },
+    {
+      "id": "operating-review",
+      "name": "Operating Review",
+      "triggers": [
+        "运营复盘",
+        "operating review"
+      ],
+      "recommended_sequence": [
+        "executive-summary",
+        "scorecard",
+        "decomposition",
+        "issue",
+        "action-plan",
+        "roadmap-kpi"
+      ],
+      "management_questions": [
+        "Are operations on track?",
+        "Which workstream deviates?",
+        "What intervention is required?"
+      ]
+    },
+    {
+      "id": "monthly-review",
+      "name": "Monthly Review",
+      "triggers": [
+        "月度复盘",
+        "monthly review"
+      ],
+      "recommended_sequence": [
+        "executive-summary",
+        "kpi-dashboard",
+        "trend",
+        "variance",
+        "action-plan"
+      ],
+      "management_questions": [
+        "What changed this month?",
+        "What is structural vs temporary?",
+        "What changes next month?"
+      ]
+    },
+    {
+      "id": "quarterly-review",
+      "name": "Quarterly Review",
+      "triggers": [
+        "季度经营",
+        "quarterly review"
+      ],
+      "recommended_sequence": [
+        "executive-summary",
+        "kpi-dashboard",
+        "decomposition",
+        "benchmark",
+        "root-cause",
+        "action-plan",
+        "roadmap"
+      ],
+      "management_questions": [
+        "Did the quarter deliver?",
+        "What explains performance?",
+        "What changes next quarter?"
+      ]
+    },
+    {
+      "id": "annual-review",
+      "name": "Annual Review",
+      "triggers": [
+        "年度总结",
+        "annual review"
+      ],
+      "recommended_sequence": [
+        "executive-summary",
+        "big-number",
+        "trend",
+        "benchmark",
+        "case-study",
+        "roadmap"
+      ],
+      "management_questions": [
+        "What did the year prove?",
+        "What changed structurally?",
+        "What is next?"
+      ]
+    },
+    {
+      "id": "strategy-proposal",
+      "name": "Strategy Proposal",
+      "triggers": [
+        "战略规划",
+        "strategy"
+      ],
+      "recommended_sequence": [
+        "key-message",
+        "benchmark",
+        "root-cause",
+        "option-assessment",
+        "strategy-map",
+        "portfolio",
+        "roadmap",
+        "decision"
+      ],
+      "management_questions": [
+        "Why change now?",
+        "What is the core tension?",
+        "What choice should be made?",
+        "How will it land?"
+      ]
+    },
+    {
+      "id": "growth-strategy",
+      "name": "Growth Strategy",
+      "triggers": [
+        "增长战略",
+        "growth strategy"
+      ],
+      "recommended_sequence": [
+        "executive-summary",
+        "segmentation",
+        "funnel",
+        "driver-tree",
+        "portfolio",
+        "roadmap-kpi"
+      ],
+      "management_questions": [
+        "Where can growth come from?",
+        "Which driver matters most?",
+        "What portfolio should be funded?"
+      ]
+    },
+    {
+      "id": "channel-strategy",
+      "name": "Channel Strategy",
+      "triggers": [
+        "渠道战略",
+        "channel strategy",
+        "dealer"
+      ],
+      "recommended_sequence": [
+        "executive-summary",
+        "map",
+        "benchmark",
+        "segmentation",
+        "portfolio",
+        "roadmap",
+        "action-plan"
+      ],
+      "management_questions": [
+        "Where are coverage gaps?",
+        "Where is marginal value highest?",
+        "How should expansion and efficiency balance?"
+      ]
+    },
+    {
+      "id": "project-kickoff",
+      "name": "Project Kickoff",
+      "triggers": [
+        "项目启动",
+        "kickoff"
+      ],
+      "recommended_sequence": [
+        "key-message",
+        "target-operating-model",
+        "roadmap",
+        "organization",
+        "risk",
+        "action-plan"
+      ],
+      "management_questions": [
+        "What are we solving?",
+        "Who owns what?",
+        "What does success look like?"
+      ]
+    },
+    {
+      "id": "project-update",
+      "name": "Project Update",
+      "triggers": [
+        "项目进展",
+        "project update"
+      ],
+      "recommended_sequence": [
+        "executive-summary",
+        "roadmap-kpi",
+        "milestone",
+        "issue",
+        "decision",
+        "action-plan"
+      ],
+      "management_questions": [
+        "Are we on track?",
+        "What changed?",
+        "What needs decision or support?"
+      ]
+    },
+    {
+      "id": "project-retrospective",
+      "name": "Project Retrospective",
+      "triggers": [
+        "项目复盘",
+        "retrospective"
+      ],
+      "recommended_sequence": [
+        "executive-summary",
+        "timeline",
+        "before-after",
+        "root-cause",
+        "case-study",
+        "recommendation"
+      ],
+      "management_questions": [
+        "What happened?",
+        "What worked or failed?",
+        "What should change next time?"
+      ]
+    },
+    {
+      "id": "research-insight",
+      "name": "Research Insight",
+      "triggers": [
+        "调研",
+        "用户研究",
+        "research insight"
+      ],
+      "recommended_sequence": [
+        "key-message",
+        "research-method",
+        "distribution",
+        "segmentation",
+        "evidence-quote",
+        "root-cause",
+        "recommendation"
+      ],
+      "management_questions": [
+        "What does evidence say?",
+        "How reliable is the sample?",
+        "What does it imply?"
+      ]
+    },
+    {
+      "id": "voc-analysis",
+      "name": "VOC Analysis",
+      "triggers": [
+        "VOC",
+        "录音抽检",
+        "访谈"
+      ],
+      "recommended_sequence": [
+        "research-method",
+        "segmentation",
+        "distribution",
+        "evidence-quote",
+        "driver-tree",
+        "recommendation"
+      ],
+      "management_questions": [
+        "What are customers saying?",
+        "How frequent is it?",
+        "How does it differ by segment?",
+        "What should change?"
+      ]
+    },
+    {
+      "id": "competitive-analysis",
+      "name": "Competitive Analysis",
+      "triggers": [
+        "竞品分析",
+        "competitive"
+      ],
+      "recommended_sequence": [
+        "executive-summary",
+        "competitive-landscape",
+        "benchmark",
+        "feature-matrix",
+        "win-loss",
+        "recommendation"
+      ],
+      "management_questions": [
+        "Where do we win or lose?",
+        "Is the gap material?",
+        "How should we respond?"
+      ]
+    },
+    {
+      "id": "data-analysis",
+      "name": "Data Analysis",
+      "triggers": [
+        "数据分析",
+        "diagnostic analysis"
+      ],
+      "recommended_sequence": [
+        "key-message",
+        "trend",
+        "decomposition",
+        "segmentation",
+        "distribution",
+        "driver-tree",
+        "recommendation"
+      ],
+      "management_questions": [
+        "What pattern exists?",
+        "What drives it?",
+        "What action follows?"
+      ]
+    },
+    {
+      "id": "sales-review",
+      "name": "Sales Review",
+      "triggers": [
+        "销售复盘",
+        "sales review"
+      ],
+      "recommended_sequence": [
+        "executive-summary",
+        "kpi-dashboard",
+        "sales-funnel",
+        "regional-performance",
+        "win-loss",
+        "action-plan"
+      ],
+      "management_questions": [
+        "Where is the sales gap?",
+        "Which stage/region explains it?",
+        "What action changes conversion?"
+      ]
+    },
+    {
+      "id": "sales-funnel",
+      "name": "Sales Funnel",
+      "triggers": [
+        "线索转化",
+        "销售漏斗",
+        "lead conversion"
+      ],
+      "recommended_sequence": [
+        "key-message",
+        "funnel",
+        "segmentation",
+        "cohort",
+        "driver-tree",
+        "action-plan"
+      ],
+      "management_questions": [
+        "Where is leakage?",
+        "For whom?",
+        "Why?",
+        "What intervention changes it?"
+      ]
+    },
+    {
+      "id": "marketing-campaign",
+      "name": "Marketing Campaign",
+      "triggers": [
+        "营销战役",
+        "campaign"
+      ],
+      "recommended_sequence": [
+        "key-message",
+        "audience-strategy",
+        "customer-journey",
+        "process",
+        "funnel",
+        "scorecard",
+        "action-plan"
+      ],
+      "management_questions": [
+        "Who are we changing?",
+        "What message and channel?",
+        "How does attention convert?"
+      ]
+    },
+    {
+      "id": "product-launch",
+      "name": "Product Launch",
+      "triggers": [
+        "新品上市",
+        "launch"
+      ],
+      "recommended_sequence": [
+        "key-message",
+        "product-positioning",
+        "feature-matrix",
+        "customer-journey",
+        "roadmap",
+        "scorecard"
+      ],
+      "management_questions": [
+        "Why this product?",
+        "Why now?",
+        "Why us?",
+        "How do launch actions connect to outcomes?"
+      ]
+    },
+    {
+      "id": "product-strategy",
+      "name": "Product Strategy",
+      "triggers": [
+        "产品战略",
+        "product strategy"
+      ],
+      "recommended_sequence": [
+        "executive-summary",
+        "segmentation",
+        "benchmark",
+        "product-positioning",
+        "portfolio",
+        "roadmap",
+        "decision"
+      ],
+      "management_questions": [
+        "Whom should the product serve?",
+        "Which problems matter?",
+        "What should be built/not built?"
+      ]
+    },
+    {
+      "id": "technical-proposal",
+      "name": "Technical Proposal",
+      "triggers": [
+        "技术方案",
+        "架构",
+        "system proposal"
+      ],
+      "recommended_sequence": [
+        "key-message",
+        "architecture",
+        "process",
+        "option-assessment",
+        "roadmap",
+        "risk",
+        "decision"
+      ],
+      "management_questions": [
+        "What problem must the system solve?",
+        "What architecture is appropriate?",
+        "What trade-off is accepted?"
+      ]
+    },
+    {
+      "id": "ai-agent-proposal",
+      "name": "AI / Agent Proposal",
+      "triggers": [
+        "AI Agent",
+        "智能体",
+        "agent proposal"
+      ],
+      "recommended_sequence": [
+        "key-message",
+        "architecture",
+        "process",
+        "before-after",
+        "business-case",
+        "risk",
+        "roadmap"
+      ],
+      "management_questions": [
+        "Where does AI create leverage?",
+        "What remains deterministic?",
+        "How is quality and governance controlled?"
+      ]
+    },
+    {
+      "id": "training",
+      "name": "Training / Enablement",
+      "triggers": [
+        "培训",
+        "training",
+        "赋能"
+      ],
+      "recommended_sequence": [
+        "key-message",
+        "framework",
+        "process",
+        "case-study",
+        "before-after",
+        "checklist",
+        "closing"
+      ],
+      "management_questions": [
+        "What must learners understand?",
+        "How should they act?",
+        "How is mastery checked?"
+      ]
+    },
+    {
+      "id": "business-case",
+      "name": "Business Case",
+      "triggers": [
+        "商业论证",
+        "business case",
+        "ROI"
+      ],
+      "recommended_sequence": [
+        "executive-summary",
+        "baseline",
+        "option-assessment",
+        "waterfall",
+        "scenario-analysis",
+        "risk",
+        "decision"
+      ],
+      "management_questions": [
+        "Is the investment justified?",
+        "What assumptions matter?",
+        "What downside is acceptable?"
+      ]
+    },
+    {
+      "id": "budget-review",
+      "name": "Budget Review",
+      "triggers": [
+        "预算",
+        "budget review"
+      ],
+      "recommended_sequence": [
+        "executive-summary",
+        "variance",
+        "waterfall",
+        "cost-structure",
+        "scenario-analysis",
+        "action-plan"
+      ],
+      "management_questions": [
+        "Where is variance?",
+        "What is controllable?",
+        "What decision is needed?"
+      ]
+    },
+    {
+      "id": "cost-reduction",
+      "name": "Cost Reduction",
+      "triggers": [
+        "降本",
+        "cost reduction"
+      ],
+      "recommended_sequence": [
+        "key-message",
+        "cost-structure",
+        "benchmark",
+        "driver-tree",
+        "portfolio",
+        "waterfall",
+        "action-plan"
+      ],
+      "management_questions": [
+        "Where is cost concentrated?",
+        "What can change without damaging outcomes?",
+        "How much is realizable?"
+      ]
+    },
+    {
+      "id": "risk-review",
+      "name": "Risk Review",
+      "triggers": [
+        "风险复盘",
+        "risk review"
+      ],
+      "recommended_sequence": [
+        "executive-summary",
+        "risk",
+        "heatmap",
+        "scenario-analysis",
+        "mitigation-plan",
+        "decision"
+      ],
+      "management_questions": [
+        "What can go wrong?",
+        "How likely and severe?",
+        "What mitigation changes exposure?"
+      ]
+    },
+    {
+      "id": "organization-design",
+      "name": "Organization Design",
+      "triggers": [
+        "组织设计",
+        "organization design"
+      ],
+      "recommended_sequence": [
+        "key-message",
+        "organization",
+        "capability-model",
+        "before-after",
+        "target-operating-model",
+        "roadmap"
+      ],
+      "management_questions": [
+        "What work must the organization perform?",
+        "Where are capability gaps?",
+        "What structure enables the strategy?"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "pptx_sha256": "fd139db4183c6a0e2fee87f3f9814d5cd6e75aa92a72d6e871324e702031fe69",
+  "reviewer": "Codex vision-agent review; no independent human approval",
+  "status": "PASS",
+  "slides_reviewed": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6
+  ],
+  "notes": "Reviewed all 6 pages in montage. Four-step framework, illustrative quote, checklist and conclusion are legible. The case-study semantic remains a disclosed partial quote/interpretation layout."
+}

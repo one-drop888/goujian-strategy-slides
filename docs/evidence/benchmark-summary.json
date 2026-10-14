@@ -1,0 +1,265 @@
+{
+  "review_date": "2026-10-14",
+  "environment": {
+    "os": "Linux",
+    "node": "24.18.0",
+    "npm": "11.19.1",
+    "python": "3.14.4",
+    "libreoffice": "26.2.6.3",
+    "poppler": "26.05.0",
+    "fonts": [
+      "Noto Sans",
+      "Noto Sans CJK SC"
+    ]
+  },
+  "scenarios": [
+    {
+      "scenario": "channel-strategy",
+      "slides": 7,
+      "profile": "strategy",
+      "storyline": "channel-strategy",
+      "compositions": [
+        "cover-hero",
+        "message-focus",
+        "compare-multi",
+        "matrix-2x2",
+        "portfolio-board",
+        "roadmap-lanes"
+      ],
+      "pptx_sha256": "197e966ac46f8278e7d5fbcb67a4d1d0ef89e6290ceb6bc049de8cd51b03b7e7",
+      "status": "PASS",
+      "checks": {
+        "spec": "PASS",
+        "geometry": "PASS",
+        "fonts": "PASS",
+        "render": "PASS",
+        "visual_review": "PASS"
+      },
+      "visual_record": "reviews/channel-strategy.json",
+      "evidence_note": "Render/geometry/font statuses from the executed final benchmark QA; visual record separately checked by quality_gate.py against this PPTX hash and page count. No PPTX rebuild between rendering and review."
+    },
+    {
+      "scenario": "cost-decision",
+      "slides": 6,
+      "profile": "finance",
+      "storyline": "cost-reduction",
+      "compositions": [
+        "cover-hero",
+        "chart-with-insight",
+        "compare-multi",
+        "tree-hierarchy",
+        "portfolio-board",
+        "message-focus"
+      ],
+      "pptx_sha256": "a5ea7f1d952c7a292b77fafda6cbe456792a5e9567d17998d23605e78ff64e54",
+      "status": "PASS",
+      "checks": {
+        "spec": "PASS",
+        "geometry": "PASS",
+        "fonts": "PASS",
+        "render": "PASS",
+        "visual_review": "PASS"
+      },
+      "visual_record": "reviews/cost-decision.json",
+      "evidence_note": "Render/geometry/font statuses from the executed final benchmark QA; visual record separately checked by quality_gate.py against this PPTX hash and page count. No PPTX rebuild between rendering and review."
+    },
+    {
+      "scenario": "executive-review",
+      "slides": 8,
+      "profile": "executive-dense",
+      "storyline": "quarterly-review",
+      "compositions": [
+        "cover-hero",
+        "summary-grid",
+        "metric-strip",
+        "chart-with-insight",
+        "compare-multi",
+        "tree-hierarchy",
+        "action-register",
+        "risk-register"
+      ],
+      "pptx_sha256": "6c6ec465db5be06b86f70a9c599bf13fa8b8263fea6a9e119109d80a7f68935c",
+      "status": "PASS",
+      "checks": {
+        "spec": "PASS",
+        "geometry": "PASS",
+        "fonts": "PASS",
+        "render": "PASS",
+        "visual_review": "PASS"
+      },
+      "visual_record": "reviews/executive-review.json",
+      "evidence_note": "Render/geometry/font statuses from the executed final benchmark QA; visual record separately checked by quality_gate.py against this PPTX hash and page count. No PPTX rebuild between rendering and review."
+    },
+    {
+      "scenario": "marketing-campaign",
+      "slides": 5,
+      "profile": "marketing",
+      "storyline": "marketing-campaign",
+      "compositions": [
+        "cover-hero",
+        "compare-multi",
+        "flow-horizontal",
+        "funnel-stages",
+        "action-register"
+      ],
+      "pptx_sha256": "2d0b3a60252a8d01640af633ffde2e92c49ba114b46fccbdfcc91eeaff2f3203",
+      "status": "PASS",
+      "checks": {
+        "spec": "PASS",
+        "geometry": "PASS",
+        "fonts": "PASS",
+        "render": "PASS",
+        "visual_review": "PASS"
+      },
+      "visual_record": "reviews/marketing-campaign.json",
+      "evidence_note": "Render/geometry/font statuses from the executed final benchmark QA; visual record separately checked by quality_gate.py against this PPTX hash and page count. No PPTX rebuild between rendering and review."
+    },
+    {
+      "scenario": "product-launch",
+      "slides": 5,
+      "profile": "launch",
+      "storyline": "product-launch",
+      "compositions": [
+        "cover-hero",
+        "matrix-2x2",
+        "table-detail",
+        "flow-horizontal",
+        "scorecard-table"
+      ],
+      "pptx_sha256": "cd44b44b545cf7c9e6546e824f4410e42e37d6d5abb155bb4c1a1c88d7891992",
+      "status": "PASS",
+      "checks": {
+        "spec": "PASS",
+        "geometry": "PASS",
+        "fonts": "PASS",
+        "render": "PASS",
+        "visual_review": "PASS"
+      },
+      "visual_record": "reviews/product-launch.json",
+      "evidence_note": "Render/geometry/font statuses from the executed final benchmark QA; visual record separately checked by quality_gate.py against this PPTX hash and page count. No PPTX rebuild between rendering and review."
+    },
+    {
+      "scenario": "project-update",
+      "slides": 5,
+      "profile": "executive-clean",
+      "storyline": "project-update",
+      "compositions": [
+        "cover-hero",
+        "summary-grid",
+        "roadmap-lanes",
+        "risk-register",
+        "message-focus"
+      ],
+      "pptx_sha256": "9711f1b7e579d3758c0e8bec83e2be7c52c9c7af475688c70f255a3979a91bb0",
+      "status": "PASS",
+      "checks": {
+        "spec": "PASS",
+        "geometry": "PASS",
+        "fonts": "PASS",
+        "render": "PASS",
+        "visual_review": "PASS"
+      },
+      "visual_record": "reviews/project-update.json",
+      "evidence_note": "Render/geometry/font statuses from the executed final benchmark QA; visual record separately checked by quality_gate.py against this PPTX hash and page count. No PPTX rebuild between rendering and review."
+    },
+    {
+      "scenario": "research-voc",
+      "slides": 7,
+      "profile": "research",
+      "storyline": "voc-analysis",
+      "compositions": [
+        "cover-hero",
+        "scorecard-table",
+        "chart-full",
+        "compare-multi",
+        "evidence-split",
+        "tree-hierarchy",
+        "message-focus"
+      ],
+      "pptx_sha256": "e0d895adb5be431891c08abc75c097e4b7cf8b12d8888d4d39b81004747f13a8",
+      "status": "PASS",
+      "checks": {
+        "spec": "PASS",
+        "geometry": "PASS",
+        "fonts": "PASS",
+        "render": "PASS",
+        "visual_review": "PASS"
+      },
+      "visual_record": "reviews/research-voc.json",
+      "evidence_note": "Render/geometry/font statuses from the executed final benchmark QA; visual record separately checked by quality_gate.py against this PPTX hash and page count. No PPTX rebuild between rendering and review."
+    },
+    {
+      "scenario": "sales-review",
+      "slides": 5,
+      "profile": "sales",
+      "storyline": "sales-funnel",
+      "compositions": [
+        "cover-hero",
+        "funnel-stages",
+        "compare-multi",
+        "compare-2",
+        "action-register"
+      ],
+      "pptx_sha256": "7eae2fab7e049b3ca070bb3ab15653f20fa3b5ba27d3362b6044a3e2628ebb21",
+      "status": "PASS",
+      "checks": {
+        "spec": "PASS",
+        "geometry": "PASS",
+        "fonts": "PASS",
+        "render": "PASS",
+        "visual_review": "PASS"
+      },
+      "visual_record": "reviews/sales-review.json",
+      "evidence_note": "Render/geometry/font statuses from the executed final benchmark QA; visual record separately checked by quality_gate.py against this PPTX hash and page count. No PPTX rebuild between rendering and review."
+    },
+    {
+      "scenario": "technical-ai-agent",
+      "slides": 6,
+      "profile": "product-tech",
+      "storyline": "ai-agent-proposal",
+      "compositions": [
+        "cover-hero",
+        "message-focus",
+        "architecture-map",
+        "compare-2",
+        "risk-register",
+        "roadmap-lanes"
+      ],
+      "pptx_sha256": "68a6e8f60f7726d75c74cd64c04abc6526e06e36a87d2274bf63a9651e6b931c",
+      "status": "PASS",
+      "checks": {
+        "spec": "PASS",
+        "geometry": "PASS",
+        "fonts": "PASS",
+        "render": "PASS",
+        "visual_review": "PASS"
+      },
+      "visual_record": "reviews/technical-ai-agent.json",
+      "evidence_note": "Render/geometry/font statuses from the executed final benchmark QA; visual record separately checked by quality_gate.py against this PPTX hash and page count. No PPTX rebuild between rendering and review."
+    },
+    {
+      "scenario": "training",
+      "slides": 6,
+      "profile": "training",
+      "storyline": "training",
+      "compositions": [
+        "cover-hero",
+        "message-focus",
+        "flow-horizontal",
+        "evidence-split",
+        "table-detail"
+      ],
+      "pptx_sha256": "fd139db4183c6a0e2fee87f3f9814d5cd6e75aa92a72d6e871324e702031fe69",
+      "status": "PASS_WITH_NOTES",
+      "checks": {
+        "spec": "PASS_WITH_NOTES",
+        "geometry": "PASS",
+        "fonts": "PASS",
+        "render": "PASS",
+        "visual_review": "PASS"
+      },
+      "visual_record": "reviews/training.json",
+      "evidence_note": "Render/geometry/font statuses from the executed final benchmark QA; visual record separately checked by quality_gate.py against this PPTX hash and page count. No PPTX rebuild between rendering and review."
+    }
+  ]
+}

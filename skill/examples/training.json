@@ -1,0 +1,80 @@
+{
+  "title": "销售培训：从“记住产品参数”转向“能把价值讲进客户场景”",
+  "storyline": "training",
+  "profile": "training",
+  "lang": "zh-CN",
+  "footer": "Illustrative synthetic data · 示例数据，不代表真实经营结论",
+  "slides": [
+    {
+      "type": "cover",
+      "title": "产品销售培训"
+    },
+    {
+      "type": "key-message",
+      "title": "培训目标不是让销售讲更多，而是让客户更快理解“为什么与我有关”",
+      "statement": "把产品知识转化为场景问题、价值解释和证据。",
+      "source": "Illustrative synthetic example / 示例数据"
+    },
+    {
+      "type": "process",
+      "title": "一套有效讲解由“问场景—选价值—给证据—确认反馈”四步组成",
+      "source": "Illustrative synthetic example / 示例数据",
+      "items": [
+        {
+          "title": "问场景"
+        },
+        {
+          "title": "选价值"
+        },
+        {
+          "title": "给证据"
+        },
+        {
+          "title": "确认反馈"
+        }
+      ]
+    },
+    {
+      "type": "case-study",
+      "title": "同一个功能，参数讲法与场景讲法带来的理解完全不同",
+      "quote": "“支持 X 功能，参数为 Y。”",
+      "attribution": "参数式表达",
+      "insight": "改成：先确认用户的通勤/家庭场景，再说明这一能力具体减少什么麻烦、带来什么收益。",
+      "source": "Illustrative synthetic example / 示例数据"
+    },
+    {
+      "type": "checklist",
+      "title": "现场是否讲清楚，只需要检查四件事",
+      "headers": [
+        "检查项",
+        "通过标准"
+      ],
+      "rows": [
+        [
+          "场景",
+          "客户明确说出主要使用场景"
+        ],
+        [
+          "价值",
+          "核心卖点不超过3个"
+        ],
+        [
+          "证据",
+          "至少1个可验证证据"
+        ],
+        [
+          "下一步",
+          "明确试驾/跟进动作"
+        ]
+      ],
+      "source": "Illustrative synthetic example / 示例数据"
+    },
+    {
+      "type": "closing",
+      "title": "优秀销售不是信息量最大，而是最会选择对客户有意义的信息",
+      "statement": "少讲一点，讲准一点，验证一点。",
+      "source": "Illustrative synthetic example / 示例数据"
+    }
+  ],
+  "brand": "构见 · GOUJIAN / TRAINING"
+}

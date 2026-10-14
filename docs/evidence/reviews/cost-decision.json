@@ -1,0 +1,14 @@
+{
+  "pptx_sha256": "a5ea7f1d952c7a292b77fafda6cbe456792a5e9567d17998d23605e78ff64e54",
+  "reviewer": "Codex vision-agent review; no independent human approval",
+  "status": "PASS",
+  "slides_reviewed": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6
+  ],
+  "notes": "Reviewed all 6 pages in montage. Cost chart includes zero baseline and units; concentrated cost sources are emphasized and comparison/diagnosis/action pages vary."
+}

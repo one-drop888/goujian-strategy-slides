@@ -1,0 +1,117 @@
+{
+  "title": "新品上市：传播重点应从功能罗列转向五个可感知的用户价值",
+  "storyline": "product-launch",
+  "profile": "launch",
+  "lang": "zh-CN",
+  "footer": "Illustrative synthetic data · 示例数据，不代表真实经营结论",
+  "slides": [
+    {
+      "type": "cover",
+      "title": "新品上市传播方案"
+    },
+    {
+      "type": "product-positioning",
+      "title": "新品的传播位置应占据“高价值感知 + 高差异化”象限",
+      "xLabel": "差异化",
+      "yLabel": "用户价值感知",
+      "items": [
+        {
+          "title": "核心优势 A",
+          "x": 0.82,
+          "y": 0.86
+        },
+        {
+          "title": "优势 B",
+          "x": 0.68,
+          "y": 0.72
+        },
+        {
+          "title": "通用配置",
+          "x": 0.36,
+          "y": 0.45
+        }
+      ],
+      "source": "Illustrative synthetic example / 示例数据"
+    },
+    {
+      "type": "feature-matrix",
+      "title": "每个核心优势都必须对应具体用户场景，而不是只讲参数",
+      "headers": [
+        "优势",
+        "用户场景",
+        "证明素材",
+        "传播钩子"
+      ],
+      "rows": [
+        [
+          "优势1",
+          "城市通勤",
+          "实测/官方素材",
+          "反差"
+        ],
+        [
+          "优势2",
+          "家庭出行",
+          "场景视频",
+          "痛点"
+        ],
+        [
+          "优势3",
+          "长途",
+          "数据对比",
+          "效率"
+        ]
+      ],
+      "source": "Illustrative synthetic example / 示例数据"
+    },
+    {
+      "type": "customer-journey",
+      "title": "内容节奏应从冲突话题获得注意，再用证据完成价值理解",
+      "items": [
+        {
+          "title": "注意",
+          "note": "冲突/问题切入"
+        },
+        {
+          "title": "理解",
+          "note": "核心价值解释"
+        },
+        {
+          "title": "相信",
+          "note": "实测与官方证据"
+        },
+        {
+          "title": "行动",
+          "note": "体验/留资"
+        }
+      ],
+      "source": "Illustrative synthetic example / 示例数据"
+    },
+    {
+      "type": "scorecard",
+      "title": "上市复盘不只看播放量，还要追踪理解、互动与转化",
+      "items": [
+        {
+          "label": "有效播放",
+          "value": "—",
+          "target": "—",
+          "status": "Reach"
+        },
+        {
+          "label": "优势记忆",
+          "value": "—",
+          "target": "—",
+          "status": "Learn"
+        },
+        {
+          "label": "留资率",
+          "value": "—",
+          "target": "—",
+          "status": "Act"
+        }
+      ],
+      "source": "Illustrative synthetic example / 示例数据"
+    }
+  ],
+  "brand": "构见 · GOUJIAN / LAUNCH"
+}

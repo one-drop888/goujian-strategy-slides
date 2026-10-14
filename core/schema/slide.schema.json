@@ -1,0 +1,211 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "slide.schema.json",
+  "title": "Semantic Slide",
+  "type": "object",
+  "required": [
+    "type"
+  ],
+  "properties": {
+    "type": {
+      "enum": [
+        "action",
+        "action-plan",
+        "agenda",
+        "architecture",
+        "area",
+        "audience-strategy",
+        "bar",
+        "baseline",
+        "before-after",
+        "benchmark",
+        "big-number",
+        "bridge",
+        "bubble",
+        "business-case",
+        "capability-model",
+        "case-study",
+        "chart",
+        "checklist",
+        "closing",
+        "cohort",
+        "column",
+        "combo",
+        "comparison",
+        "competitive-landscape",
+        "cost-structure",
+        "cover",
+        "customer-journey",
+        "decision",
+        "decomposition",
+        "distribution",
+        "driver-tree",
+        "evidence-quote",
+        "executive-summary",
+        "feature-matrix",
+        "fishbone",
+        "framework",
+        "funnel",
+        "heatmap",
+        "histogram",
+        "image-insight",
+        "issue",
+        "key-message",
+        "kpi",
+        "kpi-dashboard",
+        "line",
+        "map",
+        "matrix",
+        "milestone",
+        "mitigation-plan",
+        "option-assessment",
+        "organization",
+        "portfolio",
+        "priority",
+        "process",
+        "product-positioning",
+        "pyramid",
+        "quadrant",
+        "recommendation",
+        "regional-performance",
+        "relationship-map",
+        "research-method",
+        "resource-plan",
+        "risk",
+        "roadmap",
+        "roadmap-kpi",
+        "root-cause",
+        "sales-funnel",
+        "sankey-flow",
+        "scatter",
+        "scenario-analysis",
+        "scorecard",
+        "section",
+        "segmentation",
+        "statement",
+        "strategy-map",
+        "table",
+        "target-operating-model",
+        "timeline",
+        "trend",
+        "variance",
+        "waterfall",
+        "win-loss"
+      ]
+    },
+    "title": {
+      "type": "string"
+    },
+    "section": {
+      "type": "string"
+    },
+    "takeaway": {
+      "type": "string"
+    },
+    "composition": {
+      "type": "string"
+    },
+    "source": {
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      ]
+    },
+    "unit": {
+      "type": "string"
+    },
+    "period": {
+      "type": "string"
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "$ref": "evidence.schema.json"
+      }
+    },
+    "items": {
+      "type": "array"
+    },
+    "columns": {
+      "type": "array"
+    },
+    "rows": {
+      "type": "array"
+    },
+    "headers": {
+      "type": "array"
+    },
+    "series": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 4,
+      "items": {
+        "type": "object",
+        "required": [
+          "values"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "labels": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string"
+            }
+          },
+          "values": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 24,
+            "items": {
+              "type": "number"
+            }
+          }
+        }
+      }
+    },
+    "labels": {
+      "type": "array"
+    },
+    "statement": {
+      "type": "string"
+    },
+    "body": {
+      "type": "string"
+    },
+    "insight": {
+      "type": "string"
+    },
+    "note": {
+      "type": "string"
+    },
+    "chartType": {
+      "type": "string",
+      "enum": [
+        "bar",
+        "column",
+        "line",
+        "area",
+        "pie",
+        "doughnut"
+      ]
+    },
+    "highlightIndex": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "axisMin": {
+      "type": "number"
+    }
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,13 @@
+{
+  "pptx_sha256": "2d0b3a60252a8d01640af633ffde2e92c49ba114b46fccbdfcc91eeaff2f3203",
+  "reviewer": "Codex vision-agent review; no independent human approval",
+  "status": "PASS",
+  "slides_reviewed": [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "notes": "Reviewed all 5 pages in montage. Open segment comparison, four-stage flow, proportional funnel and ownership rows are legible."
+}

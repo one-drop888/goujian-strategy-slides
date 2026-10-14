@@ -1,0 +1,222 @@
+{
+  "title": "季度经营复盘：增长恢复，但结构性转化问题仍需优先解决",
+  "storyline": "quarterly-review",
+  "profile": "executive-dense",
+  "lang": "zh-CN",
+  "footer": "Illustrative synthetic data · 示例数据，不代表真实经营结论",
+  "slides": [
+    {
+      "type": "cover",
+      "title": "季度经营复盘",
+      "subtitle": "从结果、结构、原因到下一阶段动作"
+    },
+    {
+      "type": "executive-summary",
+      "title": "总量恢复并未消除结构性问题，下一阶段应优先修复中段转化",
+      "items": [
+        {
+          "title": "结果",
+          "note": "核心指标较上季度改善，但距离目标仍有缺口"
+        },
+        {
+          "title": "结构",
+          "note": "高潜区域贡献增长，低效区域继续拖累"
+        },
+        {
+          "title": "原因",
+          "note": "线索质量改善快于到店与试驾转化"
+        },
+        {
+          "title": "动作",
+          "note": "资源从广覆盖转向高潜线索和关键门店"
+        }
+      ],
+      "source": "Illustrative synthetic example / 示例数据"
+    },
+    {
+      "type": "kpi-dashboard",
+      "title": "成交率为 12.8%，仍低于目标 1.2 个百分点",
+      "items": [
+        {
+          "label": "线索量",
+          "value": "12,480",
+          "delta": "+14%"
+        },
+        {
+          "label": "到店率",
+          "value": "31%",
+          "delta": "+3pp"
+        },
+        {
+          "label": "试驾率",
+          "value": "58%",
+          "delta": "+5pp"
+        },
+        {
+          "label": "成交率",
+          "value": "12.8%",
+          "delta": "目标 14.0% · 差距 1.2pp",
+          "highlight": true
+        }
+      ],
+      "source": "Illustrative synthetic example / 示例数据"
+    },
+    {
+      "type": "trend",
+      "title": "7—9月线索增长36%，成交指数仅提升5%",
+      "labels": [
+        "7月",
+        "8月",
+        "9月"
+      ],
+      "series": [
+        {
+          "name": "线索指数",
+          "labels": [
+            "7月",
+            "8月",
+            "9月"
+          ],
+          "values": [
+            100,
+            117.4,
+            135.7
+          ]
+        },
+        {
+          "name": "成交指数",
+          "labels": [
+            "7月",
+            "8月",
+            "9月"
+          ],
+          "values": [
+            100,
+            103.3,
+            105.5
+          ]
+        }
+      ],
+      "unit": "指数 · 7月=100",
+      "period": "Q3",
+      "source": "Illustrative synthetic example / 示例数据",
+      "insight": "上游供给已经改善，经营重点应转向中后段转化。",
+      "axisMin": 80,
+      "evidence": [
+        {
+          "kind": "assumption",
+          "note": "Synthetic inputs normalized to July=100. Leads: 9200,10800,12480; transaction index:91,94,96. Not real business evidence."
+        }
+      ]
+    },
+    {
+      "type": "segmentation",
+      "title": "区域差异已成为整体缺口的主要来源",
+      "columns": [
+        {
+          "heading": "高表现区域",
+          "points": [
+            "高潜线索占比高",
+            "试驾动作完整",
+            "跟进节奏稳定"
+          ]
+        },
+        {
+          "heading": "低表现区域",
+          "points": [
+            "无效线索占比高",
+            "邀约后缺少二次跟进",
+            "试驾转成交波动大"
+          ]
+        }
+      ],
+      "takeaway": "复制高表现区域的过程动作，比继续增加线索更有杠杆。",
+      "source": "Illustrative synthetic example / 示例数据"
+    },
+    {
+      "type": "root-cause",
+      "title": "成交缺口主要由“到店后试驾”和“试驾后持续跟进”两段驱动",
+      "root": "成交率未达标",
+      "items": [
+        {
+          "title": "到店→试驾",
+          "children": [
+            "产品体验不足",
+            "排队/排期影响",
+            "销售邀约弱"
+          ]
+        },
+        {
+          "title": "试驾→成交",
+          "children": [
+            "异议处理弱",
+            "48h跟进断点",
+            "金融方案触达不足"
+          ]
+        },
+        {
+          "title": "门店差异",
+          "children": [
+            "经理介入时点不同",
+            "过程管理颗粒度不同"
+          ]
+        }
+      ],
+      "source": "Illustrative synthetic example / 示例数据"
+    },
+    {
+      "type": "action-plan",
+      "title": "Q4 只抓三项动作：高潜线索、试驾闭环、48小时二次跟进",
+      "items": [
+        {
+          "title": "高潜线索优先分配",
+          "owner": "销售运营",
+          "time": "10月",
+          "status": "启动"
+        },
+        {
+          "title": "试驾节点强提醒与抽检",
+          "owner": "区域",
+          "time": "10-11月",
+          "status": "进行中"
+        },
+        {
+          "title": "48小时二次跟进看板",
+          "owner": "系统/销售",
+          "time": "11月",
+          "status": "计划"
+        }
+      ],
+      "source": "Illustrative synthetic example / 示例数据"
+    },
+    {
+      "type": "risk",
+      "title": "动作本身不复杂，真正风险在于门店执行一致性",
+      "items": [
+        {
+          "title": "执行标准不一",
+          "likelihood": "高",
+          "impact": "高",
+          "mitigation": "统一SOP+抽检",
+          "owner": "区域"
+        },
+        {
+          "title": "数据回填不完整",
+          "likelihood": "中",
+          "impact": "高",
+          "mitigation": "系统必填+异常提醒",
+          "owner": "运营"
+        },
+        {
+          "title": "动作过多稀释重点",
+          "likelihood": "中",
+          "impact": "中",
+          "mitigation": "只保留三项核心动作",
+          "owner": "项目组"
+        }
+      ],
+      "source": "Illustrative synthetic example / 示例数据"
+    }
+  ],
+  "brand": "构见 · GOUJIAN / EXECUTIVE-DENSE"
+}

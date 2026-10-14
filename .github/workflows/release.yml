@@ -1,0 +1,63 @@
+name: Release v1.0.0
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+concurrency:
+  group: release-v1.0.0
+  cancel-in-progress: false
+jobs:
+  release:
+    if: "github.ref == 'refs/heads/main' && (github.event_name == 'workflow_dispatch' || github.event.head_commit.message == 'feat: release Goujian Strategy Slides v1.0.0')"
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install and test the release source
+        run: |
+          npm ci
+          npm test
+          npm run validate:example
+          npm run build:example
+          npm run benchmark
+          npm run package
+      - name: Create annotated tag and release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          test "$(node -p "require('./package.json').version")" = '1.0.0'
+          if git rev-parse refs/tags/v1.0.0 >/dev/null 2>&1; then
+            test "$(git rev-parse 'v1.0.0^{commit}')" = "$GITHUB_SHA"
+            test "$(git cat-file -t refs/tags/v1.0.0)" = tag
+          else
+            git config user.name 'Goujian release automation'
+            git config user.email 'noreply@github.com'
+            git tag -a v1.0.0 "$GITHUB_SHA" -m 'Goujian Strategy Slides v1.0.0'
+            git push origin refs/tags/v1.0.0
+          fi
+          sha256sum dist/goujian-strategy-slides-v1.0.0.zip > dist/SHA256SUMS.txt
+          if ! gh release view v1.0.0 >/dev/null 2>&1; then
+            gh release create v1.0.0 --verify-tag --title 'Goujian Strategy Slides v1.0.0' --notes-file docs/V1_RELEASE_NOTES.md dist/goujian-strategy-slides-v1.0.0.zip dist/SHA256SUMS.txt
+          fi
+      - name: Verify a fresh clone of the published tag
+        run: |
+          git clone --depth 1 --branch v1.0.0 "https://github.com/$GITHUB_REPOSITORY.git" "$RUNNER_TEMP/goujian-remote-verify"
+          cd "$RUNNER_TEMP/goujian-remote-verify"
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          npm install
+          npm test
+          npm run validate:example
+          npm run build:example
+          npm run qa:example

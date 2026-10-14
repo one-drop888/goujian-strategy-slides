@@ -1,0 +1,33 @@
+{
+  "id": "luxury",
+  "name": "Luxury Restrained",
+  "purpose": "Premium brand and high-end product storytelling",
+  "canvas": "wide",
+  "background": "FCFBF8",
+  "font": {
+    "latin": "Noto Sans",
+    "cjk": "Noto Sans CJK SC",
+    "title_size": 31,
+    "body_size": 20
+  },
+  "colors": {
+    "text": "191816",
+    "muted": "77736C",
+    "accent": "8A6A3F",
+    "accent_soft": "F4EEE5",
+    "panel": "F7F4EF",
+    "line": "DED7CC"
+  },
+  "style": {
+    "density": "medium-low",
+    "margin_x": 0.9,
+    "title_rule": "none",
+    "table_header": "soft",
+    "table_banding": false,
+    "metric_style": "open",
+    "chart_grid": "none",
+    "cover_treatment": "editorial",
+    "table_size": 16,
+    "chart_size": 14
+  }
+}

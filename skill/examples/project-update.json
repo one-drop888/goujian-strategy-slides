@@ -1,0 +1,95 @@
+{
+  "title": "项目进展：核心能力已完成，剩余风险集中在跨团队验收与数据口径",
+  "storyline": "project-update",
+  "profile": "executive-clean",
+  "lang": "zh-CN",
+  "footer": "Illustrative synthetic data · 示例数据，不代表真实经营结论",
+  "slides": [
+    {
+      "type": "cover",
+      "title": "项目进展汇报"
+    },
+    {
+      "type": "executive-summary",
+      "title": "项目按计划进入验收阶段，当前不需要扩范围，只需关闭两项交付风险",
+      "items": [
+        {
+          "title": "范围",
+          "note": "核心需求已完成"
+        },
+        {
+          "title": "进度",
+          "note": "关键里程碑按期"
+        },
+        {
+          "title": "风险",
+          "note": "数据口径、验收责任待关闭"
+        }
+      ],
+      "source": "Illustrative synthetic example / 示例数据"
+    },
+    {
+      "type": "roadmap-kpi",
+      "title": "开发基本完成，未来两周的关键路径全部在验收而非继续建设",
+      "lanes": [
+        {
+          "title": "产品",
+          "phases": [
+            {
+              "title": "需求冻结"
+            },
+            {
+              "title": "UAT"
+            },
+            {
+              "title": "上线"
+            }
+          ]
+        },
+        {
+          "title": "数据",
+          "phases": [
+            {
+              "title": "口径确认"
+            },
+            {
+              "title": "对账"
+            },
+            {
+              "title": "监控"
+            }
+          ]
+        }
+      ],
+      "source": "Illustrative synthetic example / 示例数据"
+    },
+    {
+      "type": "issue",
+      "title": "两个剩余问题都属于治理问题，不应通过继续加功能解决",
+      "items": [
+        {
+          "title": "口径责任人未唯一",
+          "likelihood": "高",
+          "impact": "高",
+          "mitigation": "指定唯一 owner",
+          "owner": "业务"
+        },
+        {
+          "title": "验收标准仍口头化",
+          "likelihood": "中",
+          "impact": "高",
+          "mitigation": "固化验收表",
+          "owner": "项目"
+        }
+      ],
+      "source": "Illustrative synthetic example / 示例数据"
+    },
+    {
+      "type": "decision",
+      "title": "建议冻结新增需求，先完成口径与验收闭环后再进入下一阶段",
+      "statement": "本阶段的成功标准是“可稳定使用”，不是“功能更多”。",
+      "source": "Illustrative synthetic example / 示例数据"
+    }
+  ],
+  "brand": "构见 · GOUJIAN / EXECUTIVE-CLEAN"
+}

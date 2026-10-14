@@ -1,0 +1,10 @@
+node_modules/
+out/
+*.pptx
+*.pdf
+.DS_Store
+__pycache__/
+*.pyc
+dist/
+*.zip
+.venv/

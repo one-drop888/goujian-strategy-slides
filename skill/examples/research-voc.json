@@ -1,0 +1,140 @@
+{
+  "title": "VOC 洞察：抽样必须与全量经营数据结合，才能避免“声音大=问题大”",
+  "storyline": "voc-analysis",
+  "profile": "research",
+  "lang": "zh-CN",
+  "footer": "Illustrative synthetic data · 示例数据，不代表真实经营结论",
+  "slides": [
+    {
+      "type": "cover",
+      "title": "客户声音与经营数据联合洞察",
+      "subtitle": "抽样听录音 + 全量数据验证"
+    },
+    {
+      "type": "research-method",
+      "title": "分层抽样覆盖不同结果、区域与阶段，仍需核对样本偏差",
+      "items": [
+        {
+          "label": "Sample / 样本",
+          "value": "n=240",
+          "note": "按成交/流失、区域、阶段分层"
+        },
+        {
+          "label": "Method / 方法",
+          "value": "录音+数据",
+          "note": "定性编码与全量指标交叉验证"
+        },
+        {
+          "label": "Period / 周期",
+          "value": "4 weeks",
+          "note": "避免单周活动偏差"
+        },
+        {
+          "label": "Limit / 限制",
+          "value": "非因果推断",
+          "note": "定性样本用于发现假设；不能单凭提及频次推断流失原因"
+        }
+      ],
+      "source": "Illustrative synthetic example / 示例数据"
+    },
+    {
+      "type": "distribution",
+      "title": "价格在样本中被提及88次，频次本身不能证明流失原因",
+      "series": [
+        {
+          "name": "提及次数",
+          "labels": [
+            "价格",
+            "产品理解",
+            "等待",
+            "竞品",
+            "服务"
+          ],
+          "values": [
+            88,
+            61,
+            42,
+            36,
+            25
+          ]
+        }
+      ],
+      "unit": "次",
+      "period": "4周",
+      "source": "Illustrative synthetic example / 示例数据",
+      "insight": "高频不等于高影响，需要与转化差异联动。",
+      "chartType": "bar",
+      "highlightIndex": 0
+    },
+    {
+      "type": "segmentation",
+      "title": "高转化与低转化样本的最大差异来自需求澄清和试驾后的二次跟进",
+      "columns": [
+        {
+          "heading": "高转化样本",
+          "points": [
+            "主动澄清使用场景",
+            "针对性产品解释",
+            "试驾后24h内复联"
+          ]
+        },
+        {
+          "heading": "低转化样本",
+          "points": [
+            "快速进入参数讲解",
+            "异议记录粗",
+            "试驾后缺少明确下一步"
+          ]
+        }
+      ],
+      "source": "Illustrative synthetic example / 示例数据"
+    },
+    {
+      "type": "evidence-quote",
+      "title": "用户原话揭示的不是“参数不懂”，而是销售没有把产品价值映射到使用场景",
+      "quote": "“功能很多，但我没听明白跟我每天通勤、带家人有什么关系。”",
+      "attribution": "合成访谈原话，用于演示证据与解释的区分",
+      "insight": "问题不是产品信息不足，而是价值翻译不足。",
+      "source": "Illustrative synthetic example / 示例数据"
+    },
+    {
+      "type": "driver-tree",
+      "title": "把 VOC 与转化数据结合后，三类可行动驱动因素更加清晰",
+      "root": "转化表现",
+      "items": [
+        {
+          "title": "需求识别",
+          "children": [
+            "场景问题",
+            "预算/家庭角色",
+            "关键顾虑"
+          ]
+        },
+        {
+          "title": "体验设计",
+          "children": [
+            "试驾环节",
+            "功能关联",
+            "对比解释"
+          ]
+        },
+        {
+          "title": "后续跟进",
+          "children": [
+            "24/48h节奏",
+            "异议闭环",
+            "下一步承诺"
+          ]
+        }
+      ],
+      "source": "Illustrative synthetic example / 示例数据"
+    },
+    {
+      "type": "recommendation",
+      "title": "下一阶段不应扩大听录音规模，而应固定分层样本并持续追踪“行为差异→经营结果”",
+      "statement": "把抽检做成稳定的经营洞察机制，而不是一次性的 VOC 汇总。",
+      "source": "Illustrative synthetic example / 示例数据"
+    }
+  ],
+  "brand": "构见 · GOUJIAN / RESEARCH"
+}

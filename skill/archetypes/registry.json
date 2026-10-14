@@ -1,0 +1,657 @@
+{
+  "version": "1.0.0",
+  "count": 78,
+  "archetypes": [
+    {
+      "id": "cover",
+      "family": "structure",
+      "composition": "cover-hero",
+      "renderer": "cover",
+      "intent": "Open the deck with topic, thesis and context",
+      "status": "IMPLEMENTED"
+    },
+    {
+      "id": "section",
+      "family": "structure",
+      "composition": "section-divider",
+      "renderer": "section",
+      "intent": "Reset narrative and signal a new chapter",
+      "status": "IMPLEMENTED"
+    },
+    {
+      "id": "agenda",
+      "family": "structure",
+      "composition": "summary-grid",
+      "renderer": "summary",
+      "intent": "Show the discussion structure when it materially helps orientation",
+      "status": "IMPLEMENTED"
+    },
+    {
+      "id": "executive-summary",
+      "family": "message",
+      "composition": "summary-grid",
+      "renderer": "summary",
+      "intent": "Summarize the few findings, implications and actions that matter most",
+      "status": "IMPLEMENTED"
+    },
+    {
+      "id": "key-message",
+      "family": "message",
+      "composition": "message-focus",
+      "renderer": "statement",
+      "intent": "State one decisive conclusion",
+      "status": "IMPLEMENTED"
+    },
+    {
+      "id": "decision",
+      "family": "message",
+      "composition": "message-focus",
+      "renderer": "statement",
+      "intent": "Frame the decision required and recommended choice",
+      "status": "IMPLEMENTED"
+    },
+    {
+      "id": "recommendation",
+      "family": "message",
+      "composition": "message-focus",
+      "renderer": "statement",
+      "intent": "State recommended action and rationale",
+      "status": "IMPLEMENTED"
+    },
+    {
+      "id": "closing",
+      "family": "message",
+      "composition": "message-focus",
+      "renderer": "statement",
+      "intent": "Close with the one message or ask that should remain",
+      "status": "IMPLEMENTED"
+    },
+    {
+      "id": "big-number",
+      "family": "metrics",
+      "composition": "metric-strip",
+      "renderer": "kpi",
+      "intent": "Make one or a few metrics dominate",
+      "status": "IMPLEMENTED"
+    },
+    {
+      "id": "kpi-dashboard",
+      "family": "metrics",
+      "composition": "metric-strip",
+      "renderer": "kpi",
+      "intent": "Summarize business performance",
+      "status": "IMPLEMENTED"
+    },
+    {
+      "id": "scorecard",
+      "family": "metrics",
+      "composition": "scorecard-table",
+      "renderer": "scorecard",
+      "intent": "Compare actual/target/status across metrics",
+      "status": "IMPLEMENTED"
+    },
+    {
+      "id": "baseline",
+      "family": "metrics",
+      "composition": "metric-strip",
+      "renderer": "kpi",
+      "intent": "Establish current baseline before diagnosis",
+      "status": "IMPLEMENTED"
+    },
+    {
+      "id": "comparison",
+      "family": "comparison",
+      "composition": "compare-multi",
+      "renderer": "comparison",
+      "intent": "Compare alternatives or segments",
+      "status": "IMPLEMENTED"
+    },
+    {
+      "id": "before-after",
+      "family": "comparison",
+      "composition": "compare-2",
+      "renderer": "comparison",
+      "intent": "Show the change from current to target state",
+      "status": "IMPLEMENTED"
+    },
+    {
+      "id": "benchmark",
+      "family": "comparison",
+      "composition": "compare-multi",
+      "renderer": "comparison",
+      "intent": "Compare against peers or standards",
+      "status": "IMPLEMENTED"
+    },
+    {
+      "id": "feature-matrix",
+      "family": "comparison",
+      "composition": "table-detail",
+      "renderer": "table",
+      "intent": "Compare features/criteria precisely",
+      "status": "IMPLEMENTED"
+    },
+    {
+      "id": "win-loss",
+      "family": "comparison",
+      "composition": "compare-2",
+      "renderer": "comparison",
+      "intent": "Contrast wins and losses or good and bad cases",
+      "status": "IMPLEMENTED"
+    },
+    {
+      "id": "competitive-landscape",
+      "family": "comparison",
+      "composition": "matrix-2x2",
+      "renderer": "matrix",
+      "intent": "Position competitors across strategic dimensions",
+      "status": "IMPLEMENTED"
+    },
+    {
+      "id": "option-assessment",
+      "family": "comparison",
+      "composition": "scorecard-table",
+      "renderer": "scorecard",
+      "intent": "Evaluate options against criteria",
+      "status": "IMPLEMENTED"
+    },
+    {
+      "id": "process",
+      "family": "flow",
+      "composition": "flow-horizontal",
+      "renderer": "process",
+      "intent": "Explain ordered steps",
+      "status": "IMPLEMENTED"
+    },
+    {
+      "id": "funnel",
+      "family": "flow",
+      "composition": "funnel-stages",
+      "renderer": "funnel",
+      "intent": "Show conversion or stage loss",
+      "status": "IMPLEMENTED"
+    },
+    {
+      "id": "sales-funnel",
+      "family": "flow",
+      "composition": "funnel-stages",
+      "renderer": "funnel",
+      "intent": "Show lead-to-sale conversion",
+      "status": "IMPLEMENTED"
+    },
+    {
+      "id": "customer-journey",
+      "family": "flow",
+      "composition": "flow-horizontal",
+      "renderer": "process",
+      "intent": "Show customer stages, moments and friction",
+      "status": "IMPLEMENTED"
+    },
+    {
+      "id": "relationship-map",
+      "family": "flow",
+      "composition": "architecture-map",
+      "renderer": "architecture",
+      "intent": "Show relationships among actors/entities",
+      "status": "PARTIAL",
+      "limitation": "Component groups only; explicit relationships are not encoded."
+    },
+    {
+      "id": "sankey-flow",
+      "family": "flow",
+      "composition": "architecture-map",
+      "renderer": "architecture",
+      "intent": "Show major flows when exact Sankey is not required",
+      "status": "PARTIAL",
+      "limitation": "Abstract components only; no flow quantities or edges."
+    },
+    {
+      "id": "timeline",
+      "family": "time",
+      "composition": "timeline-horizontal",
+      "renderer": "timeline",
+      "intent": "Show chronology",
+      "status": "IMPLEMENTED"
+    },
+    {
+      "id": "milestone",
+      "family": "time",
+      "composition": "timeline-horizontal",
+      "renderer": "timeline",
+      "intent": "Show milestone completion/status",
+      "status": "IMPLEMENTED"
+    },
+    {
+      "id": "roadmap",
+      "family": "time",
+      "composition": "roadmap-lanes",
+      "renderer": "roadmap",
+      "intent": "Show implementation over time",
+      "status": "IMPLEMENTED"
+    },
+    {
+      "id": "roadmap-kpi",
+      "family": "time",
+      "composition": "roadmap-lanes",
+      "renderer": "roadmap",
+      "intent": "Connect roadmap phases to measurable outcomes",
+      "status": "IMPLEMENTED"
+    },
+    {
+      "id": "matrix",
+      "family": "analysis",
+      "composition": "matrix-2x2",
+      "renderer": "matrix",
+      "intent": "Classify items by two dimensions",
+      "status": "IMPLEMENTED"
+    },
+    {
+      "id": "quadrant",
+      "family": "analysis",
+      "composition": "matrix-2x2",
+      "renderer": "matrix",
+      "intent": "Prioritize or position on two axes",
+      "status": "IMPLEMENTED"
+    },
+    {
+      "id": "driver-tree",
+      "family": "analysis",
+      "composition": "tree-hierarchy",
+      "renderer": "hierarchy",
+      "intent": "Decompose an outcome into drivers",
+      "status": "IMPLEMENTED"
+    },
+    {
+      "id": "root-cause",
+      "family": "analysis",
+      "composition": "tree-hierarchy",
+      "renderer": "hierarchy",
+      "intent": "Explain causal drivers behind an issue",
+      "status": "IMPLEMENTED"
+    },
+    {
+      "id": "fishbone",
+      "family": "analysis",
+      "composition": "tree-hierarchy",
+      "renderer": "hierarchy",
+      "intent": "Group causes by category",
+      "status": "PARTIAL",
+      "limitation": "Categorized cause tree; no fishbone geometry."
+    },
+    {
+      "id": "decomposition",
+      "family": "analysis",
+      "composition": "tree-hierarchy",
+      "renderer": "hierarchy",
+      "intent": "Break an aggregate result into components",
+      "status": "IMPLEMENTED"
+    },
+    {
+      "id": "segmentation",
+      "family": "analysis",
+      "composition": "compare-multi",
+      "renderer": "comparison",
+      "intent": "Compare meaningful segments",
+      "status": "IMPLEMENTED"
+    },
+    {
+      "id": "cohort",
+      "family": "analysis",
+      "composition": "chart-full",
+      "renderer": "chart",
+      "intent": "Compare groups over time or lifecycle",
+      "status": "IMPLEMENTED"
+    },
+    {
+      "id": "distribution",
+      "family": "analysis",
+      "composition": "chart-full",
+      "renderer": "chart",
+      "intent": "Show spread, concentration or polarization",
+      "status": "IMPLEMENTED"
+    },
+    {
+      "id": "heatmap",
+      "family": "analysis",
+      "composition": "risk-register",
+      "renderer": "risk",
+      "intent": "Show intensity across two dimensions",
+      "status": "DESIGNED",
+      "limitation": "No faithful V1 renderer. Choose an implemented archetype explicitly."
+    },
+    {
+      "id": "trend",
+      "family": "data",
+      "composition": "chart-with-insight",
+      "renderer": "chart",
+      "intent": "Show directional change over time",
+      "status": "IMPLEMENTED"
+    },
+    {
+      "id": "bar",
+      "family": "data",
+      "composition": "chart-with-insight",
+      "renderer": "chart",
+      "intent": "Compare categories",
+      "status": "IMPLEMENTED"
+    },
+    {
+      "id": "column",
+      "family": "data",
+      "composition": "chart-with-insight",
+      "renderer": "chart",
+      "intent": "Compare categories or periods",
+      "status": "IMPLEMENTED"
+    },
+    {
+      "id": "line",
+      "family": "data",
+      "composition": "chart-with-insight",
+      "renderer": "chart",
+      "intent": "Show time trend",
+      "status": "IMPLEMENTED"
+    },
+    {
+      "id": "area",
+      "family": "data",
+      "composition": "chart-with-insight",
+      "renderer": "chart",
+      "intent": "Show trend plus volume/composition",
+      "status": "IMPLEMENTED"
+    },
+    {
+      "id": "combo",
+      "family": "data",
+      "composition": "chart-with-insight",
+      "renderer": "chart",
+      "intent": "Show related measures with different units",
+      "status": "DESIGNED",
+      "limitation": "No faithful V1 renderer. Choose an implemented archetype explicitly."
+    },
+    {
+      "id": "scatter",
+      "family": "data",
+      "composition": "chart-full",
+      "renderer": "chart",
+      "intent": "Show relationship/correlation",
+      "status": "DESIGNED",
+      "limitation": "No faithful V1 renderer. Choose an implemented archetype explicitly."
+    },
+    {
+      "id": "bubble",
+      "family": "data",
+      "composition": "chart-full",
+      "renderer": "chart",
+      "intent": "Show two axes plus magnitude",
+      "status": "DESIGNED",
+      "limitation": "No faithful V1 renderer. Choose an implemented archetype explicitly."
+    },
+    {
+      "id": "histogram",
+      "family": "data",
+      "composition": "chart-full",
+      "renderer": "chart",
+      "intent": "Show frequency distribution",
+      "status": "PARTIAL",
+      "limitation": "Requires pre-binned frequency data; no automatic binning."
+    },
+    {
+      "id": "waterfall",
+      "family": "data",
+      "composition": "chart-with-insight",
+      "renderer": "chart",
+      "intent": "Explain bridge from start to end",
+      "status": "DESIGNED",
+      "limitation": "No faithful V1 renderer. Choose an implemented archetype explicitly."
+    },
+    {
+      "id": "bridge",
+      "family": "data",
+      "composition": "chart-with-insight",
+      "renderer": "chart",
+      "intent": "Explain additive/subtractive change",
+      "status": "DESIGNED",
+      "limitation": "No faithful V1 renderer. Choose an implemented archetype explicitly."
+    },
+    {
+      "id": "variance",
+      "family": "data",
+      "composition": "chart-with-insight",
+      "renderer": "chart",
+      "intent": "Explain actual vs plan or prior period",
+      "status": "IMPLEMENTED"
+    },
+    {
+      "id": "cost-structure",
+      "family": "data",
+      "composition": "chart-with-insight",
+      "renderer": "chart",
+      "intent": "Show cost composition and concentration",
+      "status": "IMPLEMENTED"
+    },
+    {
+      "id": "scenario-analysis",
+      "family": "data",
+      "composition": "compare-multi",
+      "renderer": "comparison",
+      "intent": "Compare base/upside/downside or scenarios",
+      "status": "IMPLEMENTED"
+    },
+    {
+      "id": "regional-performance",
+      "family": "data",
+      "composition": "compare-multi",
+      "renderer": "comparison",
+      "intent": "Compare performance across regions",
+      "status": "IMPLEMENTED"
+    },
+    {
+      "id": "table",
+      "family": "detail",
+      "composition": "table-detail",
+      "renderer": "table",
+      "intent": "Show exact values or dense detail",
+      "status": "IMPLEMENTED"
+    },
+    {
+      "id": "action-plan",
+      "family": "execution",
+      "composition": "action-register",
+      "renderer": "action",
+      "intent": "Turn analysis into owned actions",
+      "status": "IMPLEMENTED"
+    },
+    {
+      "id": "mitigation-plan",
+      "family": "execution",
+      "composition": "action-register",
+      "renderer": "action",
+      "intent": "Show risk mitigations, owners and dates",
+      "status": "IMPLEMENTED"
+    },
+    {
+      "id": "risk",
+      "family": "execution",
+      "composition": "risk-register",
+      "renderer": "risk",
+      "intent": "Show risks with severity, likelihood and mitigation",
+      "status": "IMPLEMENTED"
+    },
+    {
+      "id": "issue",
+      "family": "execution",
+      "composition": "risk-register",
+      "renderer": "risk",
+      "intent": "Show blockers/issues and resolution status",
+      "status": "IMPLEMENTED"
+    },
+    {
+      "id": "priority",
+      "family": "execution",
+      "composition": "matrix-2x2",
+      "renderer": "matrix",
+      "intent": "Prioritize work by impact/effort or similar dimensions",
+      "status": "IMPLEMENTED"
+    },
+    {
+      "id": "portfolio",
+      "family": "execution",
+      "composition": "portfolio-board",
+      "renderer": "portfolio",
+      "intent": "Show a set of initiatives/options and allocation",
+      "status": "IMPLEMENTED"
+    },
+    {
+      "id": "resource-plan",
+      "family": "execution",
+      "composition": "scorecard-table",
+      "renderer": "scorecard",
+      "intent": "Show people/budget/capacity allocation",
+      "status": "IMPLEMENTED"
+    },
+    {
+      "id": "evidence-quote",
+      "family": "evidence",
+      "composition": "evidence-split",
+      "renderer": "evidence",
+      "intent": "Pair verbatim evidence with interpretation",
+      "status": "IMPLEMENTED"
+    },
+    {
+      "id": "case-study",
+      "family": "evidence",
+      "composition": "evidence-split",
+      "renderer": "evidence",
+      "intent": "Show context, intervention, result and implication",
+      "status": "PARTIAL",
+      "limitation": "Quote and interpretation only; agent must structure the case."
+    },
+    {
+      "id": "image-insight",
+      "family": "evidence",
+      "composition": "evidence-split",
+      "renderer": "evidence",
+      "intent": "Use an image only when it carries evidence",
+      "status": "DESIGNED",
+      "limitation": "No faithful V1 renderer. Choose an implemented archetype explicitly."
+    },
+    {
+      "id": "research-method",
+      "family": "evidence",
+      "composition": "scorecard-table",
+      "renderer": "scorecard",
+      "intent": "Explain method, sample, period and limitations",
+      "status": "IMPLEMENTED"
+    },
+    {
+      "id": "architecture",
+      "family": "system",
+      "composition": "architecture-map",
+      "renderer": "architecture",
+      "intent": "Explain system components and interfaces",
+      "status": "IMPLEMENTED"
+    },
+    {
+      "id": "organization",
+      "family": "system",
+      "composition": "tree-hierarchy",
+      "renderer": "hierarchy",
+      "intent": "Show organizational structure or accountability",
+      "status": "IMPLEMENTED"
+    },
+    {
+      "id": "target-operating-model",
+      "family": "system",
+      "composition": "architecture-map",
+      "renderer": "architecture",
+      "intent": "Show target process, roles, governance and systems",
+      "status": "IMPLEMENTED"
+    },
+    {
+      "id": "strategy-map",
+      "family": "system",
+      "composition": "architecture-map",
+      "renderer": "architecture",
+      "intent": "Connect strategic choices to capabilities/outcomes",
+      "status": "IMPLEMENTED"
+    },
+    {
+      "id": "pyramid",
+      "family": "system",
+      "composition": "pyramid-stack",
+      "renderer": "pyramid",
+      "intent": "Show hierarchy or layered logic",
+      "status": "IMPLEMENTED"
+    },
+    {
+      "id": "capability-model",
+      "family": "system",
+      "composition": "pyramid-stack",
+      "renderer": "pyramid",
+      "intent": "Show capability layers or maturity",
+      "status": "IMPLEMENTED"
+    },
+    {
+      "id": "framework",
+      "family": "system",
+      "composition": "architecture-map",
+      "renderer": "architecture",
+      "intent": "Explain a reusable conceptual framework",
+      "status": "IMPLEMENTED"
+    },
+    {
+      "id": "product-positioning",
+      "family": "system",
+      "composition": "matrix-2x2",
+      "renderer": "matrix",
+      "intent": "Position a product against user need and alternatives",
+      "status": "IMPLEMENTED"
+    },
+    {
+      "id": "audience-strategy",
+      "family": "system",
+      "composition": "compare-multi",
+      "renderer": "comparison",
+      "intent": "Prioritize audiences and needs",
+      "status": "IMPLEMENTED"
+    },
+    {
+      "id": "business-case",
+      "family": "finance",
+      "composition": "scorecard-table",
+      "renderer": "scorecard",
+      "intent": "Summarize value, cost, ROI and assumptions",
+      "status": "IMPLEMENTED"
+    },
+    {
+      "id": "map",
+      "family": "spatial",
+      "composition": "architecture-map",
+      "renderer": "architecture",
+      "intent": "Show geographic/coverage logic in abstract form",
+      "status": "PARTIAL",
+      "limitation": "Abstract coverage components only; no geographic projection."
+    },
+    {
+      "id": "checklist",
+      "family": "detail",
+      "composition": "table-detail",
+      "renderer": "table",
+      "intent": "Operational checklist with explicit pass criteria",
+      "status": "IMPLEMENTED"
+    }
+  ],
+  "compatibility": {
+    "legacy_types": [
+      "cover",
+      "section",
+      "statement",
+      "kpi",
+      "comparison",
+      "process",
+      "timeline",
+      "chart",
+      "table",
+      "action"
+    ]
+  }
+}

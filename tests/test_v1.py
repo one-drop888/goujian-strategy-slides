@@ -25,8 +25,10 @@ def test_profile_contract():
         d=json.loads(p.read_text(encoding='utf-8')); assert d['id']==p.parent.name; assert d['colors']['accent']; assert d['font']['cjk']
 
 def test_unified_product():
-    r=(ROOT/'README.md').read_text(encoding='utf-8'); a=(ROOT/'docs/architecture/ARCHITECTURE.md').read_text(encoding='utf-8')
+    r=(ROOT/'README.en.md').read_text(encoding='utf-8'); zh=(ROOT/'README.md').read_text(encoding='utf-8'); a=(ROOT/'docs/architecture/ARCHITECTURE.md').read_text(encoding='utf-8')
     assert 'one product' in r.lower(); assert 'one product' in a.lower(); assert not (ROOT/'adapters/company-platform').exists()
+    assert '构见·战略演示' in zh and 'README.en.md' in zh
+    assert (ROOT/'README.zh-CN.md').read_text(encoding='utf-8') == zh
     assert (ROOT/'SKILL.md').exists()
 
 def test_example_build_and_geometry():

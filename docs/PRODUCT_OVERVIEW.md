@@ -35,7 +35,7 @@ The library contains 28 storylines, 78 semantic entries, 23 composition recipes,
 
 V1 focuses on PowerPoint/PPTX. Native text, shapes, tables and supported chart data remain editable. Basic text edits, agent-led reconstruction and style statistics support existing-deck workflows, within explicit limits.
 
-The planner is a small heuristic helper, not an autonomous analyst. Evidence selection, causal judgment, template interpretation and visual repair remain agent/human responsibilities. The full [capability matrix](../README.md#capability-boundaries) and [feasibility review](FEASIBILITY_REVIEW.md) state those limits.
+The planner is a small heuristic helper, not an autonomous analyst. Evidence selection, causal judgment, template interpretation and visual repair remain agent/human responsibilities. The full [capability matrix](../README.en.md#capability-boundaries) and [feasibility review](FEASIBILITY_REVIEW.md) state those limits.
 
 The Presentation Intelligence layer is independent of PptxGenJS. It leaves a path to HTML and web-based renderers, while the reusable cross-renderer geometry engine is future work. V1 does not implement HTML output, animations, arbitrary lossless PPTX editing or deterministic visual repair.
 

@@ -1,6 +1,6 @@
 # Goujian Strategy Slides｜构见·战略演示
 
-[English](README.md) | [简体中文](README.zh-CN.md)
+[English](README.en.md) | [简体中文](README.md)（默认）
 
 **面向 AI Agent 的 Presentation Intelligence**
 

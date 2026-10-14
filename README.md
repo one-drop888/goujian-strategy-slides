@@ -1,40 +1,42 @@
-# Goujian Strategy Slides
+# Goujian Strategy Slides｜构见·战略演示
 
-[English](README.md) | [简体中文](README.zh-CN.md)
+[English](README.en.md) | [简体中文](README.md)（默认）
 
-**构见·战略演示 · Presentation Intelligence for AI Agents**
+**面向 AI Agent 的 Presentation Intelligence**
 
 **Think clearly. Structure strategically. Present decisively.**
 
-Goujian Strategy Slides is an open-source, production-oriented presentation skill designed to help AI agents turn complex information into clear, structured and decision-useful presentations.
+构见·战略演示是一套面向 AI Agent 的开源、生产级演示文稿智能 Skill。这里的“生产级”指可执行、可检查、边界明确的工作流；不代表任何输入都能无人审核交付。
 
-Instead of treating presentation creation as a text-to-slide task, Goujian models the reasoning behind professional presentations:
+它将高质量商业汇报背后的思考过程产品化：
 
-**Think → Structure → Visualize → Build → Validate**
+**思考 → 结构 → 可视化 → 构建 → 验证**
 
-It combines management storytelling, storyline planning, semantic archetypes, reusable compositions, visualization logic, profile-driven design, native editable PPTX generation and quality validation. The AI agent supplies judgment; executable code builds and checks a bounded presentation spec.
+将管理叙事、Storyline、Action Title、Semantic Archetype、Composition Grammar、数据可视化、Profile 驱动设计、原生可编辑 PPTX 与 Quality Gate 整合为统一流程。Agent 负责判断，确定性代码负责构建和检查。
 
-> Great presentations are not collections of beautiful slides. They are structured arguments designed to make complex information understandable and actionable.
+> 好的演示文稿不是漂亮页面的集合，而是一套帮助人理解复杂问题，并形成判断与行动的结构化论证。
 
-**Question → Evidence → Judgment → Action** · **High information density ≠ high text density**
+**Question → Evidence → Judgment → Action**
 
-![Business review: editable metrics, indexed trends, diagnosis and owned actions](docs/visual/executive-review-after.png)
+**问题 → 证据 → 判断 → 行动** · **高信息密度 ≠ 高文字密度**
 
-*Rendered V1 example. All examples use illustrative synthetic content, not real business evidence.*
+![经营复盘：可编辑指标、统一基期趋势、原因与行动](docs/visual/executive-review-after.png)
 
-## What V1 includes
+*V1 实际渲染示例。全部示例均为合成演示内容，不代表真实经营事实。*
 
-- 28 management storylines and 15 template recipes for reviews, strategy, research, sales, projects, launches, marketing, technology, training and cost decisions.
-- 78 semantic catalog entries: **65 implemented, 6 partial, 7 designed only**. Designed entries are rejected by the builder rather than rendered as a misleading approximation.
-- 23 composition recipes routed through 21 reusable rendering functions. Variants share code; these are not 78 independent layouts.
-- 15 profiles controlling typography, spacing, title/cover treatment, table headers/banding, metric treatment, chart grids and colors.
-- 10 runnable benchmark decks, JSON Schema plus payload validation, geometry/font checks, optional rendering and montage generation.
+## V1 提供什么
 
-See the [product overview](docs/PRODUCT_OVERVIEW.md), [feasibility review](docs/FEASIBILITY_REVIEW.md), [library audit](docs/LIBRARY_AUDIT.md) and [visual iterations](docs/VISUAL_REVIEW.md).
+- 28 个管理 Storyline、15 个 Template Recipe，覆盖经营、战略、研究、销售、项目、上市、营销、技术、培训与成本决策。
+- 78 个语义目录条目：**65 个已实现、6 个 Partial、7 个仅设计**。仅设计条目会被构建器明确拒绝。
+- 23 个 Composition Recipe，由 21 个可复用渲染函数实现；不等于 78 套独立版式。
+- 15 个 Profile，实际驱动字体字号、间距、标题/封面、表头/隔行底色、指标样式、图表网格及配色。
+- 10 套可执行 Benchmark、JSON Schema 与负载校验、几何/字体检查、可选渲染与 Montage。
 
-## Installation
+阅读[产品介绍](docs/PRODUCT_OVERVIEW.zh-CN.md)、[可行性报告](docs/FEASIBILITY_REVIEW.zh-CN.md)、[Library 审计](docs/LIBRARY_AUDIT.md)与[视觉迭代记录](docs/VISUAL_REVIEW.md)。
 
-Use **Node.js 18+ and Python 3.9+** with `node`, `npm` and `python3` on PATH. Python core checks use only the standard library. Clone the complete repository; copying `skill/` alone does not install the runtime.
+## 安装
+
+需要 **Node.js 18+、Python 3.9+**，确保 PATH 中有 `node`、`npm`、`python3`。核心 Python 检查仅使用标准库。必须安装完整仓库，不能只复制 `skill/`。
 
 ```bash
 git clone https://github.com/one-drop888/goujian-strategy-slides.git
@@ -46,24 +48,24 @@ npm run build:example
 npm run qa:example
 ```
 
-The PPTX is written to `out/executive-review.pptx`; QA is written to `out/quality-report.json`. `npm ci` reproduces the committed dependency lockfile. No npm registry publication is required.
+输出位于 `out/executive-review.pptx` 和 `out/quality-report.json`。`npm ci` 使用仓库内 lockfile 复现依赖；本项目不依赖 npm 包发布。
 
-Core build/validation works without render tools. `qa:example` attempts rendering and reports `UNAVAILABLE` when dependencies are missing; this is **not** a visual pass. Install render dependencies before inspecting output:
+核心构建和校验不需要渲染工具。`qa:example` 会尝试渲染；缺少依赖时显示 `UNAVAILABLE`，不能当作视觉通过。可选依赖：
 
 ```bash
 python3 -m venv .venv
-# Linux/macOS: activate this environment in your shell
+# Linux/macOS，在当前 shell 激活环境
 . .venv/bin/activate
 python3 -m pip install -r requirements-render.txt
 ```
 
-Also install **LibreOffice**, **Poppler** (`pdftoppm`) and the **Noto Sans / Noto Sans CJK SC** font families. For Debian/Ubuntu, system packages are `libreoffice-impress poppler-utils fontconfig fonts-noto-core fonts-noto-cjk`. Fonts are not bundled or embedded. A custom profile can name other installed fonts.
+另需安装 **LibreOffice、Poppler（pdftoppm）、Noto Sans 与 Noto Sans CJK SC**。Debian/Ubuntu 对应系统包：`libreoffice-impress poppler-utils fontconfig fonts-noto-core fonts-noto-cjk`。字体不随仓库分发，也不会嵌入 PPTX；接收方需要安装字体，或改用已安装字体的自定义 Profile。
 
-Linux was tested locally. macOS needs these executables on PATH. For Windows, use WSL2 for the documented `python3` commands; native Windows and PowerPoint/macOS rendering have not been validated. Font QA uses `fc-list`; without Fontconfig, it reports `UNAVAILABLE`.
+本轮实测平台为 Linux。macOS 需要将上述工具放入 PATH。Windows 建议使用 WSL2 执行文档中的 `python3` 命令；原生 Windows 以及 PowerPoint/macOS 渲染尚未验证。字体检查依赖 `fc-list`，缺少 Fontconfig 时返回 `UNAVAILABLE`。
 
-## Use with an AI agent
+## 与 Agent 配合
 
-Install or expose the **whole repository folder** to your agent's skill discovery mechanism, then load the root [SKILL.md](SKILL.md). Adapters are instructions, not tested platform integrations. Ask the agent to establish the decision, evidence and uncertainty, then author a [semantic spec](docs/SPEC_CONTRACT.md).
+让 Agent 的技能发现机制加载**整个仓库文件夹**及根目录 [SKILL.md](SKILL.md)。Adapters 是接入说明，不代表已完成各平台实测。让 Agent 先确定决策、证据和不确定性，再编写[语义 Spec](docs/SPEC_CONTRACT.md)。
 
 ```bash
 node skill/scripts/build_deck.js skill/examples/executive-review.json out/review.pptx --profile consulting
@@ -72,42 +74,42 @@ npm run benchmark
 npm run benchmark -- --render
 ```
 
-`benchmark` builds and audits all 10 scenarios. Add `--render` for PNG pages and montages. Inspect them before recording visual approval. Each scenario preserves a QA report and PPTX hash under `out/benchmarks/`.
+`benchmark` 构建并检查全部 10 类场景；`--render` 生成 PNG 和 Montage。每套报告及 PPTX 哈希保存在 `out/benchmarks/`。实际检查画面后才能记录视觉通过。
 
-[Custom profiles](docs/CUSTOM_PROFILE_GUIDE.md) inherit from built-ins. [Existing PPTX workflows](docs/EXISTING_PPTX_WORKFLOW.md) cover bounded text editing, inspection and reference-based reconstruction.
+[自定义 Profile](docs/CUSTOM_PROFILE_GUIDE.md)支持继承；[已有 PPTX 工作流](docs/EXISTING_PPTX_WORKFLOW.md)说明文本替换、检查与参考重建。
 
-## Capability boundaries
+## 能力边界
 
-| Capability | V1 status | What actually runs |
+| 能力 | V1 状态 | 实际能力 |
 |---|---|---|
-| Create | Implemented | Validated semantic JSON → native editable PPTX |
-| Edit | Partial | Replace text within individual text nodes; no intelligent reflow |
-| Rebuild | Partial | Agent inspects source and authors a new spec; no lossless converter |
-| Template reuse | Partial | Storyline/profile recipes; no imported master/layout fidelity |
-| Style extraction | Partial | Theme, font and geometry statistics; agent interprets the result |
-| Native editable PPTX | Implemented | Text, shapes, tables and supported native charts |
-| Overflow / overlap | Partial | Bounding boxes and peer-overlap candidates; no exact text-fit proof |
-| Font QA | Partial | Font-family availability on this host; not glyph coverage or embedding |
-| Render / montage | Implemented, optional | LibreOffice → PDF → PNG; Pillow montage |
-| Visual QA | Partial | Human/vision-agent inspection with a hash-bound review record |
-| Repair loop | Partial | Agent changes spec/code and rerenders; no automatic visual repair engine |
-| Planner | Partial | Keyword routing helpers; evidence reasoning remains the agent's work |
-| HTML renderer | Designed | No HTML output in V1 |
+| Create | 已实现 | 合规语义 JSON → 原生可编辑 PPTX |
+| Edit | Partial | 单个文本节点内替换，不自动重排 |
+| Rebuild | Partial | Agent 检查原稿并重写 Spec，不是无损转换 |
+| Template reuse | Partial | Storyline/Profile 配方，不克隆 PPTX 母版 |
+| Style extraction | Partial | 提取主题、字体、几何统计，仍需解释与复核 |
+| Native editable PPTX | 已实现 | 文本、形状、表格、受支持的原生图表 |
+| Overflow / overlap | Partial | 边界框及相交候选，不证明文本完整容纳 |
+| Font QA | Partial | 本机字体族可用性，不证明字形覆盖或字体嵌入 |
+| Render / montage | 已实现，可选 | LibreOffice → PDF → PNG，Pillow 拼图 |
+| Visual QA | Partial | 人或视觉 Agent 检查，记录绑定 PPTX 哈希 |
+| Repair loop | Partial | Agent 修改并重渲染，无自动确定性视觉修复引擎 |
+| Planner | Partial | 关键词路由助手，证据推理仍由 Agent 完成 |
+| HTML Renderer | 仅设计 | V1 不输出 HTML |
 
-Waterfall/bridge, combo, scatter/bubble, heatmap and image-insight have no faithful V1 renderer. Abstract map/relationship/Sankey-like entries are explicitly partial. Canvas support is 16:9 only. Long content must be split or edited; passing a capacity check does not prove readability.
+瀑布/桥接、组合图、散点/气泡、热力图及 image-insight 尚无忠实实现。抽象地图、关系和类 Sankey 条目明确标为 Partial。仅支持 16:9 画布。长内容需要改写或拆页；容量校验通过不等于可读。
 
-## Architecture and contributing
+## 架构与贡献
 
 ```text
-Agent reasoning → Presentation Spec → Storyline / Archetype → Composition + Profile
+Agent 推理 → Presentation Spec → Storyline / Archetype → Composition + Profile
                                                                ↓
-                                                        PPTX Renderer → QA → Review
+                                                     PPTX Renderer → QA → 视觉复核
 ```
 
-The planning and composition layers do not import PptxGenJS. Rendering coordinates remain in the PPTX backend; a shared cross-renderer layout engine is future work. See [architecture](docs/architecture/ARCHITECTURE.md) and [contributing](CONTRIBUTING.md).
+规划和 Composition 层不导入 PptxGenJS；具体几何坐标仍属于 PPTX 后端，跨 Renderer 共享布局引擎属于后续工作。详见[架构](docs/architecture/ARCHITECTURE.md)和[贡献说明](CONTRIBUTING.md)。
 
-There is **one product and one Presentation Library** across agent runtimes. Platform adapters reuse it rather than maintaining separate editions.
+项目只有一个产品和一套 Presentation Library，平台适配器共用它们。
 
-## License
+## 许可证
 
-[Apache-2.0](LICENSE). Runtime dependencies retain their own licenses; see [third-party notices](THIRD_PARTY_NOTICE.md). No commercial templates, copied benchmark code or proprietary visual assets are included. Do not publish private source decks or unlicensed fonts/assets.
+[Apache-2.0](LICENSE)。依赖各自保留许可证，见[第三方声明](THIRD_PARTY_NOTICE.md)。本轮没有复制 Benchmark 源码、商业模板或专有视觉资产。请勿发布私有源文稿或无再分发许可的字体与素材。

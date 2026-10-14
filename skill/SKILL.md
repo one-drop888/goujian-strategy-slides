@@ -17,7 +17,7 @@ High information density ≠ high text density. Preserve the user's decision, ev
 
 ## Runtime and paths
 
-Install the **entire repository**, including `core/`, `skill/`, `package.json` and the lockfile. Run commands from that repository root, even when this entrypoint is opened from `skill/`. Run `npm install` once. Core QA also requires Python 3.9+. Optional rendering needs LibreOffice, Poppler and Pillow; use [installation instructions](README.md#installation).
+Install the **entire repository**, including `core/`, `skill/`, `package.json` and the lockfile. Run commands from that repository root, even when this entrypoint is opened from `skill/`. Run `npm install` once. Core QA also requires Python 3.9+. Optional rendering needs LibreOffice, Poppler and Pillow; use [installation instructions](README.en.md#installation).
 
 `SKILL.md` at the repository root is canonical; `skill/SKILL.md` is a distribution mirror, not a standalone runtime. Resolve relative links against the repository root.
 

@@ -3,7 +3,7 @@
 from pathlib import Path
 import sys, zipfile
 ROOT=Path(__file__).resolve().parents[1]
-INCLUDE=['SKILL.md','core','skill','adapters','docs','tests','scripts','.github','package.json','package-lock.json','requirements-render.txt','README.md','README.zh-CN.md','CONTRIBUTING.md','CHANGELOG.md','LICENSE','THIRD_PARTY_NOTICE.md','.gitignore']
+INCLUDE=['SKILL.md','core','skill','adapters','docs','tests','scripts','.github','package.json','package-lock.json','requirements-render.txt','README.md','README.zh-CN.md','README.en.md','CONTRIBUTING.md','CHANGELOG.md','LICENSE','THIRD_PARTY_NOTICE.md','.gitignore']
 EXCLUDE_DIRS={'node_modules','out','dist','__pycache__','.git','.pytest_cache'}
 def add_tree(z,p,base):
     if p.is_dir():

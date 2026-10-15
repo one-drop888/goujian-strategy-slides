@@ -36,6 +36,8 @@ See the [product overview](docs/PRODUCT_OVERVIEW.md), [feasibility review](docs/
 
 Use **Node.js 18+ and Python 3.9+** with `node`, `npm` and `python3` on PATH. Python core checks use only the standard library. Clone the complete repository; copying `skill/` alone does not install the runtime.
 
+The v1.0.1 installable ZIP extracts to one `goujian-strategy-slides/` folder with a single Skill entry at its root, `SKILL.md`. Upload the complete ZIP to a Skill platform; if it extracts archives itself, use that folder as the Skill root. Platform import and security scanning still require a test on the target platform.
+
 ```bash
 git clone https://github.com/one-drop888/goujian-strategy-slides.git
 cd goujian-strategy-slides

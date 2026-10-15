@@ -28,7 +28,7 @@ def render(pptx,outdir,dpi=140):
             pages=sorted(tmp.glob('slide-*.png'),key=lambda p:int(re.search(r'(\d+)$',p.stem).group(1)))
             if not pages:return {'status':'FAIL','reason':'renderer produced no pages','pages':[]}
             outdir.mkdir(parents=True,exist_ok=True)
-            # Only clean this tool's previous render artifacts after fresh conversion succeeds.
+            # Cleanup is limited to prior slide images from this renderer, after successful conversion.
             for stale in outdir.glob('slide-*.png'):stale.unlink()
             for p in pages:shutil.copy2(p,outdir/p.name)
             shutil.copy2(pdf,outdir/'deck.pdf')

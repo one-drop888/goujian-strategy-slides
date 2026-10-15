@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.0.1 — 2026-10-15
+
+Patch release for Skill installation compatibility; presentation capabilities and the JSON spec contract are unchanged.
+
+- Kept the repository-root `SKILL.md` as the sole Skill entry in source and the installable ZIP. The `skill/` runtime library remains intact.
+- Rewrote the Skill metadata description in clear Chinese, with existing PPTX and visual-review limits preserved in the instructions.
+- Clarified a renderer cleanup comment that could be misread by static prompt-injection scanners; cleanup conditions and scope are unchanged.
+- Made packaging reject duplicate Skill entries and added a distribution regression test.
+- Revalidated source tests, the ten benchmark scenarios, installation from the ZIP, and the release checksum workflow. Company-platform import and scanning require a separate platform-side retest.
+
 ## 1.0.0 — 2026-10-14
 
 First public release of Goujian Strategy Slides / 构见·战略演示.

@@ -1,8 +1,8 @@
 ---
 name: goujian-strategy-slides
 metadata:
-  version: "1.0.0"
-description: Plan, build and review editable PPTX presentations for business reviews, strategy, research and technical decisions. Use for new semantic decks, agent-assisted rebuilding and reference-informed restyling; existing PPTX editing is limited to text within individual runs.
+  version: "1.0.1"
+description: "专业AI PPT制作技能，适用于经营分析、战略规划、销售汇报、市场研究、项目复盘及技术方案等场景。结合结构化思考、证据分析、汇报叙事与可视化设计，辅助生成原生可编辑PPTX，并提供质量检查与视觉复核流程。"
 license: Apache-2.0
 ---
 
@@ -17,9 +17,9 @@ High information density ≠ high text density. Preserve the user's decision, ev
 
 ## Runtime and paths
 
-Install the **entire repository**, including `core/`, `skill/`, `package.json` and the lockfile. Run commands from that repository root, even when this entrypoint is opened from `skill/`. Run `npm install` once. Core QA also requires Python 3.9+. Optional rendering needs LibreOffice, Poppler and Pillow; use [installation instructions](README.en.md#installation).
+Install the **entire repository**, including `core/`, `skill/`, `package.json` and the lockfile. Run commands from the repository root. Run `npm install` once. Core QA also requires Python 3.9+. Optional rendering needs LibreOffice, Poppler and Pillow; use [installation instructions](README.en.md#installation).
 
-`SKILL.md` at the repository root is canonical; `skill/SKILL.md` is a distribution mirror, not a standalone runtime. Resolve relative links against the repository root.
+The repository root contains the only `SKILL.md`. Resolve relative links against that root.
 
 ## Route and plan
 

@@ -38,6 +38,8 @@
 
 需要 **Node.js 18+、Python 3.9+**，确保 PATH 中有 `node`、`npm`、`python3`。核心 Python 检查仅使用标准库。必须安装完整仓库，不能只复制 `skill/`。
 
+v1.0.1 正式 ZIP 解压后是一个 `goujian-strategy-slides/` 文件夹，其中只有文件夹根目录的 `SKILL.md` 一个技能入口。导入 Skill 平台时上传完整 ZIP；若平台自行解包，应以该根目录作为技能目录。平台侧导入与安全扫描仍须在目标平台复测。
+
 ```bash
 git clone https://github.com/one-drop888/goujian-strategy-slides.git
 cd goujian-strategy-slides

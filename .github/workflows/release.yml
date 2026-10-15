@@ -1,4 +1,4 @@
-name: Release v1.0.0
+name: Release v1.0.1
 on:
   workflow_dispatch:
   push:
@@ -6,11 +6,11 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: release-v1.0.0
+  group: release-v1.0.1
   cancel-in-progress: false
 jobs:
   release:
-    if: "github.ref == 'refs/heads/main' && (github.event_name == 'workflow_dispatch' || github.event.head_commit.message == 'feat: release Goujian Strategy Slides v1.0.0')"
+    if: "github.ref == 'refs/heads/main' && (github.event_name == 'workflow_dispatch' || github.event.head_commit.message == 'fix: release Goujian Strategy Slides v1.0.1')"
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -37,23 +37,23 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          test "$(node -p "require('./package.json').version")" = '1.0.0'
-          if git rev-parse refs/tags/v1.0.0 >/dev/null 2>&1; then
-            test "$(git rev-parse 'v1.0.0^{commit}')" = "$GITHUB_SHA"
-            test "$(git cat-file -t refs/tags/v1.0.0)" = tag
+          test "$(node -p "require('./package.json').version")" = '1.0.1'
+          if git rev-parse refs/tags/v1.0.1 >/dev/null 2>&1; then
+            test "$(git rev-parse 'v1.0.1^{commit}')" = "$GITHUB_SHA"
+            test "$(git cat-file -t refs/tags/v1.0.1)" = tag
           else
             git config user.name 'Goujian release automation'
             git config user.email 'noreply@github.com'
-            git tag -a v1.0.0 "$GITHUB_SHA" -m 'Goujian Strategy Slides v1.0.0'
-            git push origin refs/tags/v1.0.0
+            git tag -a v1.0.1 "$GITHUB_SHA" -m 'Goujian Strategy Slides v1.0.1'
+            git push origin refs/tags/v1.0.1
           fi
-          sha256sum dist/goujian-strategy-slides-v1.0.0.zip > dist/SHA256SUMS.txt
-          if ! gh release view v1.0.0 >/dev/null 2>&1; then
-            gh release create v1.0.0 --verify-tag --title 'Goujian Strategy Slides v1.0.0' --notes-file docs/V1_RELEASE_NOTES.md dist/goujian-strategy-slides-v1.0.0.zip dist/SHA256SUMS.txt
+          (cd dist && sha256sum goujian-strategy-slides-v1.0.1.zip > SHA256SUMS.txt)
+          if ! gh release view v1.0.1 >/dev/null 2>&1; then
+            gh release create v1.0.1 --verify-tag --title 'Goujian Strategy Slides v1.0.1' --notes-file docs/V1_0_1_RELEASE_NOTES.md dist/goujian-strategy-slides-v1.0.1.zip dist/SHA256SUMS.txt
           fi
       - name: Verify a fresh clone of the published tag
         run: |
-          git clone --depth 1 --branch v1.0.0 "https://github.com/$GITHUB_REPOSITORY.git" "$RUNNER_TEMP/goujian-remote-verify"
+          git clone --depth 1 --branch v1.0.1 "https://github.com/$GITHUB_REPOSITORY.git" "$RUNNER_TEMP/goujian-remote-verify"
           cd "$RUNNER_TEMP/goujian-remote-verify"
           test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
           npm install

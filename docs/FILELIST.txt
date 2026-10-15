@@ -48,6 +48,7 @@ docs/PRODUCT_OVERVIEW.zh-CN.md
 docs/QUALITY_AND_VALIDATION.md
 docs/SPEC_CONTRACT.md
 docs/STORYLINE_AUTHORING.md
+docs/V1_0_1_RELEASE_NOTES.md
 docs/V1_RELEASE_NOTES.md
 docs/V1_VALIDATION.md
 docs/VISUAL_REVIEW.md
@@ -74,7 +75,6 @@ package.json
 requirements-render.txt
 scripts/benchmark.py
 scripts/package_runtime.py
-skill/SKILL.md
 skill/archetypes/registry.json
 skill/compositions/registry.json
 skill/examples/channel-strategy.json
@@ -121,6 +121,7 @@ skill/storylines/registry.json
 skill/templates/registry.json
 tests/build_gallery.js
 tests/test_contract.js
+tests/test_package.py
 tests/test_qa.py
 tests/test_v1.py
 tests/validate_examples.py

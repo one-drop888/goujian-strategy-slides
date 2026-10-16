@@ -52,7 +52,7 @@ function analyze(input){
   table('趋势保留每个月份及缺失状态',['月份',p.unit],d.trend.map(x=>[x.month,fmt(x.actual)]));
   chart('贡献分析使用同一总量和基期',d.contributions.map(x=>x.label),[{name:'本月',values:d.contributions.map(x=>x.actual)},{name:'上月',values:d.contributions.map(x=>x.previous)}],p.unit,'分项合计与总量校验；贡献与增长贡献分开解释');
   table('贡献份额与增量分开呈现',['分项','本月','上月','份额','增量'],metrics.contributions.map(x=>[x.label,fmt(x.actual),fmt(x.previous),pct(x.share),fmt(x.delta)]));
-  summary('管理摘要只陈述可计算差异',metrics.kpis.map(x=>({title:x.label,note:`实际 ${fmt(x.actual,x.unit)}，差异 ${fmt(x.variance,x.variance_unit)}，同比 ${pct(x.yoy)}；原因与行动由管理者验证。`}))); 
+  summary('管理摘要只陈述可计算差异',metrics.kpis.map(x=>({title:x.label,note:`实际 ${fmt(x.actual,x.unit)}，差异 ${fmt(x.variance,x.variance_unit)}，同比 ${pct(x.yoy)}；原因与行动由管理者验证。`})));
  } else if(d.recipe==='sales-conversion'){
   const asof=date(d.as_of);if(asof<end)throw Error('as_of must cover cohort acquisition period');
   unique(d.stages,x=>x.id);unique(d.edges,x=>x.from+'>'+x.to);

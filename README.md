@@ -97,7 +97,7 @@ npm run benchmark
 npm run benchmark -- --render
 ```
 
-`benchmark` 构建并检查全部 12 类场景；`--render` 生成 PNG 和 Montage。每套报告及 PPTX 哈希保存在 `out/benchmarks/`。实际检查画面后才能记录视觉通过。
+`benchmark` 构建并检查全部 15 类场景；`--render` 生成 PNG 和 Montage。每套报告及 PPTX 哈希保存在 `out/benchmarks/`。实际检查画面后才能记录视觉通过。
 
 [自定义 Profile](docs/CUSTOM_PROFILE_GUIDE.md)支持继承；[已有 PPTX 工作流](docs/EXISTING_PPTX_WORKFLOW.md)说明文本替换、检查与参考重建。
 

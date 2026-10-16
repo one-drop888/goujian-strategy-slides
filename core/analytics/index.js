@@ -38,6 +38,9 @@ function analyze(input){
   if(months.some((m,i)=>i&&m<=months[i-1])||months.at(-1)!==d.period.end.slice(0,7))throw Error('Trend must be ordered and end in the reporting month');
   if(d.period.start!==d.period.end.slice(0,7)+'-01'||date(d.period.end)+DAY!==date(new Date(date(d.period.end)+DAY).toISOString().slice(0,7)+'-01'))throw Error('Business performance requires a full calendar month');
   if(d.trend.at(-1).actual!==p.actual)throw Error('Latest trend observation must equal primary actual');
+  const priorYearMonth=`${Number(d.period.end.slice(0,4))-1}${d.period.end.slice(4,7)}`;
+  const bases=[[d.trend.at(-2),p.previous_month,'previous_month'],[d.trend.find(x=>x.month===priorYearMonth),p.previous_year,'previous_year']];
+  for(const [point,baseline,label] of bases)if(point?.actual!=null&&baseline!=null&&point.actual!==baseline)throw Error('Trend observation conflicts with '+label+' baseline');
   if(months.some((m,i)=>i&&date(m+'-01')!==date(new Date(Date.UTC(Number(months[i-1].slice(0,4)),Number(months[i-1].slice(5)),1)).toISOString().slice(0,10))))throw Error('Trend months must be consecutive; supply explicit null for missing months');
   const total=sum(d.contributions.map(x=>x.actual));if(total!=null&&p.actual!=null&&Math.abs(total-p.actual)>1e-8*Math.max(1,p.actual))throw Error('Contributions must reconcile to primary actual');
   const previous=sum(d.contributions.map(x=>x.previous));if(previous!=null&&p.previous_month!=null&&Math.abs(previous-p.previous_month)>1e-8*Math.max(1,p.previous_month))throw Error('Previous contributions must reconcile to previous_month');

@@ -347,6 +347,66 @@
           }
         }
       }
+    },
+    "dashboard": {
+      "type": "object",
+      "required": [
+        "unit",
+        "labels",
+        "series"
+      ],
+      "properties": {
+        "unit": {
+          "type": "string"
+        },
+        "labels": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "series": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "name",
+              "values"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "values": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "decision_points": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 3,
+      "items": {
+        "type": "object",
+        "required": [
+          "title",
+          "note"
+        ],
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          }
+        }
+      }
     }
   },
   "additionalProperties": true

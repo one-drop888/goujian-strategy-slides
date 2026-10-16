@@ -83,3 +83,9 @@ Deliver the PPTX, spec and QA result. State any `PARTIAL`, `UNAVAILABLE` or `NOT
 ## Source and distribution boundaries
 
 Keep source files intact and derivatives separate. Preserve provenance, evidence limitations, font/asset licenses and user confidentiality. Adapters reuse the same library and do not imply permission to publish user content or contact others.
+
+## Analytical input workflow
+
+For business performance, nonlinear sales conversion or project performance, read [the analytical contract](docs/ANALYTICAL_LIBRARY.md) and [machine definitions](skill/analytics/registry.json). Copy the relevant input example and validate units, calendar/window, identities, observation completeness and denominators before running `node scripts/analyze.js input.json output.pptx`. Use `quality_gate.py --analytics-input input.json --spec output.pptx.spec.json` with the normal output/render options. Do not infer causality from trial or channel correlations. Keep nulls visible and data-owner uncertainty explicit. The first project recipe uses CNY cumulative snapshots; never sum incompatible delivery units.
+
+Use `dashboard` on a KPI slide for comparable native trends and 3–6 complete metrics. Use `decision_points` on a judgment slide to separate the judgment from 1–3 explanations. Hero images use a locally sampled title safety region; protected screenshots cannot enter decorative contrast treatment. These are extensions of existing compositions. Rebuild, render, inspect and repair affected pages before attesting visual PASS.

@@ -14,7 +14,7 @@
     },
     {
       "id": "message-focus",
-      "purpose": "Single conclusion / decision / recommendation",
+      "purpose": "Dominant judgment with optional 1–3 decision explanations",
       "renderer": "statement"
     },
     {
@@ -24,7 +24,7 @@
     },
     {
       "id": "metric-strip",
-      "purpose": "1–6 metrics; six use a 3 × 2 scorecard",
+      "purpose": "1–6 complete KPIs, optionally integrated with a comparable native trend dashboard",
       "renderer": "kpi"
     },
     {
@@ -129,7 +129,7 @@
     },
     {
       "id": "multimodal-hero",
-      "purpose": "Image with locally contrast-resolved native title and subtitle",
+      "purpose": "Editorial image/title integration with a protected title region and local contrast treatment",
       "renderer": "multimodal"
     },
     {

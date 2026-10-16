@@ -17,7 +17,7 @@ function createDataRenderers(pptx, style, spec) {
     slide.addTable(cells, {
       x:left,y:1.85,w:width,colW:widths?.map(v=>v*width),
       rowH, fontFace:F.cjk,fontSize:headers.length>6?Math.max(12,F.tableSize-2):F.tableSize, color:C.text,
-      margin:[.12,.16,.12,.16], valign:'mid', autoPage:false,
+      margin:[5,8,5,8], valign:'mid', autoPage:false,
       border:[{type:'solid',pt:.5,color:C.line},{type:'solid',pt:0,color:style.background},
         {type:'solid',pt:.5,color:C.line},{type:'solid',pt:0,color:style.background}],
     });
@@ -67,7 +67,7 @@ function createDataRenderers(pptx, style, spec) {
       showCatName:false,showShadow:false,showSerName:false,
       chartArea:{fill:{color:style.background},border:{color:style.background,pt:0}},
       plotArea:{fill:{color:style.background},border:{color:style.background,pt:0}},
-      barGapWidthPct:s.semanticType==='histogram'?0:65,barDir:kind==='bar'?'bar':'col',
+      barGapWidthPct:s.semanticType==='histogram'?0:(series[0].labels.length<3?220:65),barDir:kind==='bar'?'bar':'col',
     };
     if (['bar','column','area'].includes(kind)) options.valAxisMinVal=Math.min(0,...series.flatMap(x=>x.values));
     if (s.axisMin != null) options.valAxisMinVal=s.axisMin;

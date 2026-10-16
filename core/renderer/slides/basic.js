@@ -34,7 +34,16 @@ function createSlideRenderers(pptx, style, spec) {
   }
 
   function statement(s) {
-    const slide=pptx.addSlide(); base(slide,s);
+    const slide=pptx.addSlide(); const b=base(slide,s);
+    if(s.decision_points?.length) {
+      text(slide,balancedWrap(s.statement||s.body,F.cjk,F.bodySize+10,b.w*.54).join('\n'),b.x,b.y+.45,b.w*.54,b.h-1,{fontSize:F.bodySize+10,bold:true,valign:'top',scene:{space:'slide'}});
+      const x=b.x+b.w*.62,w=b.w*.38,rh=b.h/s.decision_points.length;
+      s.decision_points.forEach((p,i)=>{
+        const y=b.y+i*rh;
+        text(slide,p.title,x,y,w,.42,{fontSize:16,bold:true,color:C.accent,scene:{space:'slide'}});
+        text(slide,p.note,x,y+.6,w,rh-.8,{fontSize:16,color:C.muted,valign:'top',scene:{space:'slide'}});
+      });finish(slide,s);return;
+    }
     line(slide,left,2.22,.70,C.accent,4);
     text(slide,s.statement||s.body,left,2.72,width*.92,2.5,{fontSize:F.bodySize+10,bold:true,valign:'top'});
     if(s.note) text(slide,s.note,left,5.52,width,.66,{fontSize:15,color:C.muted});
@@ -54,7 +63,24 @@ function createSlideRenderers(pptx, style, spec) {
   }
 
   function kpi(s) {
-    const slide=pptx.addSlide(); base(slide,s);
+    const slide=pptx.addSlide(); const b=base(slide,s);
+    if(s.dashboard) {
+      const dw=b.w*.59,rx=b.x+b.w*.65,rw=b.w*.35,ch=b.h-.7;
+      text(slide,s.dashboard.unit,b.x,b.y,dw,.28,{fontSize:11,color:C.muted,scene:{space:'slide'}});
+      slide.addChart(pptx.ChartType.line,s.dashboard.series.map(x=>({...x,labels:s.dashboard.labels})),{
+        x:b.x,y:b.y+.5,w:dw,h:ch,fontFace:F.cjk,showLegend:true,legendPos:'b',legendFontFace:F.cjk,legendFontSize:11,
+        dataLabelFontFace:F.latin,chartColors:[C.accent,'99A7B2'],showTitle:false,showBorder:false,showValue:false,
+        catAxisLabelFontFace:F.cjk,catAxisLabelFontSize:12,valAxisLabelFontFace:F.latin,valAxisLabelFontSize:11,
+        catAxisLineShow:false,valAxisLineShow:false,catGridLine:{style:'none'},valGridLine:{color:C.line,size:.5},
+        showMarker:true,lineDataSymbol:'circle',lineDataSymbolSize:5,lineSize:2.5,scene:{space:'slide',role:'evidence'}});
+      const rh=b.h/Math.ceil(s.items.length/2);
+      s.items.forEach((it,i)=>{
+        const x=rx+(i%2)*(rw/2+.08),y=b.y+Math.floor(i/2)*rh,w=rw/2-.18;
+        text(slide,it.label||it.title,x,y,w,.4,{fontSize:12,color:C.muted,scene:{space:'slide'}});
+        text(slide,it.value,x,y+(s.items.length>4?.4:.55),w,.62,{fontSize:s.items.length>4?24:27,bold:true,color:it.highlight?C.accent:C.text,scene:{space:'slide'}});
+        text(slide,String(it.delta||it.note||'').replace(/ · /g,'\n'),x,y+(s.items.length>4?1.14:1.45),w,s.items.length>4?.4:.62,{fontSize:s.items.length>4?10:11,color:C.muted,valign:'top',scene:{space:'slide'}});
+      });finish(slide,s);return;
+    }
     const six=s.items.length===6,cols=columns(six?3:s.items.length,.32,left,width);
     s.items.forEach((it,i)=>{
       const {x,w}=cols[six?i%3:i]; const emphasis=it.highlight===true;

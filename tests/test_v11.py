@@ -25,6 +25,8 @@ class Regression(unittest.TestCase):
             data={'asset':{'type':'background'},'path':str(source),'output':str(Path(tmp)/'prepared.png'),'ratio':1,'overlay':{'x':0,'y':0,'w':1,'h':1}}
             r=prepare.prepare(data);self.assertEqual(r['contrast']['scrim'],'000000');self.assertGreaterEqual(r['contrast']['ratio'],4.5)
             data['asset']={'type':'document_screenshot','fit':'cover'};data['ratio']=2
+            with self.assertRaisesRegex(ValueError,'contrast-treated'):prepare.prepare(data)
+            data.pop('overlay')
             with self.assertRaisesRegex(ValueError,'Evidence assets require contain'):prepare.prepare(data)
             data['asset'].update(allow_crop=True,safe_area={'x':0,'y':0,'w':1,'h':1})
             with self.assertRaisesRegex(ValueError,'protected evidence'):prepare.prepare(data)
@@ -48,6 +50,9 @@ class Regression(unittest.TestCase):
             self.assertTrue(any(s['relationships'] for s in report['slides']))
             self.assertTrue(any(o['kind']=='table' and len(o['rows'][0])==9 for o in objects))
             self.assertTrue(any(o['text']=='12.8%' for o in report['slides'][1]['shapes']))
+    def test_overlapping_native_value_note_is_blocking(self):
+        nodes=[{'id':str(i),'kind':'text','role':'evidence','text':t,'bbox':{'x':1,'y':y,'w':2,'h':.62},'z':i} for i,(t,y) in enumerate([('22%',2.55),('Target 24%',3.13)])]
+        result=spatial.audit({'slides':[{'slide':1,'nodes':nodes}]});self.assertEqual(result['status'],'FAIL');self.assertIn('TEXT_TEXT_COLLISION',[i['code'] for i in result['issues']])
     def test_scene_hash_mismatch_never_passes(self):
         p=ROOT/'out/regression/multimodal.pptx'
         with tempfile.TemporaryDirectory() as tmp:

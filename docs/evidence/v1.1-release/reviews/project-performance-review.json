@@ -1,0 +1,26 @@
+{
+  "pptx_sha256": "ba494c929bcb21ec0359ca997887c3756297e1d98e87589417021184c7d7669c",
+  "reviewer": "Codex visual inspection / 2026-10-16",
+  "status": "PASS",
+  "slides_reviewed": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+  ],
+  "notes": "Inspected all 8 slides in final montage and full-size cost table. Corrected point padding separates money columns. Unknown realized value and value/cost stay N/A; overdue and late milestone statuses readable.",
+  "rendered_page_sha256": {
+    "slide-1.png": "3950d6244c14b92e6a563c6df8764c8d7135f6d90baa68c1e88bcf112e7ef303",
+    "slide-2.png": "018b8b1b87f85159194840c5a3335ecb2ea7372bc42b0e158d3dfd9f3d085426",
+    "slide-3.png": "23b8effdc52785a3b59797a5151eb460a9bfb6bd99c23421f490cdf5a42bdfa9",
+    "slide-4.png": "9bf28061fd8dbbedaaedb4c3d4847c6ad2ee4cd87677069634377b352d323f0d",
+    "slide-5.png": "751fe276d7e3cf6eb72353f4347e202560025dd0e71c04654bcbaa9393cd544e",
+    "slide-6.png": "c5a7d287ca0b72f6c009f9d52967810a3f7bc0c185c33dcc9cb82f282795f9bb",
+    "slide-7.png": "d326edd8bc22fce0e7ff8a9eb2b83951d4e8fdf643f8bbcedc1dc9b0af67adba",
+    "slide-8.png": "aebbe108c10e5ab94a3f230f290cde8e99b158e7b519ed9717d90420eeac23cc"
+  }
+}

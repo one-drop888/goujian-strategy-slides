@@ -23,6 +23,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
+      - name: Install declared Linux font prerequisites
+        run: sudo apt-get update -qq && sudo apt-get install -y fontconfig fonts-noto-core fonts-noto-cjk
       - run: npm ci
       - run: python3 -m pip install -r requirements-render.txt
       - run: npm test

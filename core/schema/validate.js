@@ -32,6 +32,8 @@ function validateDeck(spec) {
         if(items?.some(x=>x==null || !['object','string'].includes(typeof x))) fail('items must be strings or objects');
       }
       if(renderer==='statement' && !(s.statement||s.body)?.trim()) fail('statement/body is required');
+      if(s.decision_points && (!Array.isArray(s.decision_points)||s.decision_points.length<1||s.decision_points.length>3||s.decision_points.some(p=>!p.title?.trim()||!p.note?.trim())))fail('decision_points requires 1–3 titled explanations');
+      if(s.dashboard && (renderer!=='kpi'||s.items?.length<3||s.items?.length>6||!s.dashboard.unit?.trim()||!s.dashboard.labels?.length||s.dashboard.labels.length>12||!s.dashboard.series?.length||s.dashboard.series.some(x=>x.values?.length!==s.dashboard.labels.length||x.values.some(v=>typeof v!=='number'||!Number.isFinite(v)))))fail('dashboard requires 3–6 KPIs, unit, at most 12 labels and matching finite series');
       if(renderer==='evidence' && !(s.quote||s.evidenceText||s.body)) fail('quote/evidenceText/body is required');
       if(renderer==='comparison') {
         if(!s.columns?.length || s.columns.length>4) fail('comparison requires 1–4 columns');

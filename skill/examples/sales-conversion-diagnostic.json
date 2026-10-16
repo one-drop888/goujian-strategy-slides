@@ -1,0 +1,267 @@
+{
+  "title": "销售转化诊断：队列与可选行为",
+  "profile": "executive-dense",
+  "lang": "zh-CN",
+  "storyline": "sales-funnel",
+  "footer": "合成数据 · Project-authored synthetic dataset / Apache-2.0",
+  "slides": [
+    {
+      "type": "cover",
+      "title": "销售转化诊断：队列与可选行为",
+      "source": "合成数据 · Project-authored synthetic dataset / Apache-2.0",
+      "subtitle": "2026-08-01 至 2026-09-30 · 合成数据示例"
+    },
+    {
+      "type": "kpi-dashboard",
+      "title": "获客与成交按成熟客户队列计算",
+      "source": "合成数据 · Project-authored synthetic dataset / Apache-2.0",
+      "items": [
+        {
+          "label": "获客客户",
+          "value": "40"
+        },
+        {
+          "label": "成熟分母",
+          "value": "30"
+        },
+        {
+          "label": "未成熟排除",
+          "value": "10"
+        },
+        {
+          "label": "成交客户",
+          "value": "10"
+        },
+        {
+          "label": "成交率",
+          "value": "33.33%",
+          "highlight": true
+        },
+        {
+          "label": "观察窗",
+          "value": "30 天"
+        }
+      ]
+    },
+    {
+      "type": "sales-funnel",
+      "title": "获客到成交仅使用必然嵌套的客户集合",
+      "source": "合成数据 · Project-authored synthetic dataset / Apache-2.0",
+      "items": [
+        {
+          "title": "成熟获客客户",
+          "value": 30
+        },
+        {
+          "title": "窗口内成交客户",
+          "value": 10
+        }
+      ]
+    },
+    {
+      "type": "chart",
+      "title": "到店、试驾与成交分别统计，分支不是必经阶段",
+      "source": "合成数据 · Project-authored synthetic dataset / Apache-2.0",
+      "labels": [
+        "获客",
+        "到店",
+        "试驾（可选）",
+        "成交"
+      ],
+      "series": [
+        {
+          "name": "成熟客户数",
+          "values": [
+            30,
+            20,
+            7,
+            10
+          ]
+        }
+      ],
+      "unit": "客户",
+      "period": "2026-08-01 至 2026-09-30",
+      "insight": "阶段覆盖允许分支；不强制画成逐级收窄漏斗",
+      "chartType": "bar"
+    },
+    {
+      "type": "table",
+      "title": "阶段流失指观察窗内未见后续事件",
+      "source": "合成数据 · Project-authored synthetic dataset / Apache-2.0",
+      "headers": [
+        "观察路径",
+        "分母",
+        "后续客户",
+        "未见后续",
+        "转化率"
+      ],
+      "rows": [
+        [
+          "获客 → 到店",
+          30,
+          20,
+          10,
+          "66.67%"
+        ],
+        [
+          "到店 → 成交",
+          20,
+          7,
+          13,
+          "35%"
+        ],
+        [
+          "试驾（可选） → 成交",
+          7,
+          2,
+          5,
+          "28.57%"
+        ]
+      ]
+    },
+    {
+      "type": "table",
+      "title": "队列转化保持相同观察窗",
+      "source": "合成数据 · Project-authored synthetic dataset / Apache-2.0",
+      "headers": [
+        "获客月份",
+        "成熟客户",
+        "成交",
+        "转化率"
+      ],
+      "rows": [
+        [
+          "2026-08",
+          20,
+          6,
+          "30%"
+        ],
+        [
+          "2026-09",
+          10,
+          4,
+          "40%"
+        ]
+      ]
+    },
+    {
+      "type": "chart",
+      "title": "区域对比展示客户量与成交量",
+      "source": "合成数据 · Project-authored synthetic dataset / Apache-2.0",
+      "labels": [
+        "华东",
+        "华北",
+        "华南",
+        "西南"
+      ],
+      "series": [
+        {
+          "name": "成熟客户",
+          "values": [
+            7,
+            8,
+            8,
+            7
+          ]
+        },
+        {
+          "name": "成交",
+          "values": [
+            2,
+            3,
+            3,
+            2
+          ]
+        }
+      ],
+      "unit": "客户",
+      "period": "2026-08-01 至 2026-09-30",
+      "insight": "区域属于首次获客归属；不按最新门店重新分配",
+      "chartType": "bar"
+    },
+    {
+      "type": "table",
+      "title": "渠道归因固定首次获客口径",
+      "source": "合成数据 · Project-authored synthetic dataset / Apache-2.0",
+      "headers": [
+        "渠道",
+        "成熟客户",
+        "成交",
+        "转化率"
+      ],
+      "rows": [
+        [
+          "广告",
+          10,
+          4,
+          "40%"
+        ],
+        [
+          "自然",
+          10,
+          3,
+          "30%"
+        ],
+        [
+          "转介",
+          10,
+          3,
+          "30%"
+        ]
+      ]
+    },
+    {
+      "type": "table",
+      "title": "行为分组只提示关联，不能证明增量因果",
+      "source": "合成数据 · Project-authored synthetic dataset / Apache-2.0",
+      "headers": [
+        "行为",
+        "参与客户",
+        "成交",
+        "成交率",
+        "未参与",
+        "成交",
+        "成交率"
+      ],
+      "rows": [
+        [
+          "到店",
+          20,
+          7,
+          "35%",
+          10,
+          3,
+          "30%"
+        ],
+        [
+          "试驾（可选）",
+          7,
+          2,
+          "28.57%",
+          23,
+          8,
+          "34.78%"
+        ]
+      ]
+    },
+    {
+      "type": "executive-summary",
+      "title": "诊断需先核对口径，再设计验证",
+      "source": "合成数据 · Project-authored synthetic dataset / Apache-2.0",
+      "items": [
+        {
+          "title": "客户去重",
+          "note": "额外线索 1 条；重复阶段事件 1 条，均不重复计客户。"
+        },
+        {
+          "title": "跨期与成熟度",
+          "note": "截至 2026-10-10，固定 30 天观察窗；未成熟 10 人排除。"
+        },
+        {
+          "title": "结论边界",
+          "note": "行为选择、客群与渠道差异均可能影响转化；试驾相关性不能自动解释为因果。"
+        }
+      ]
+    }
+  ]
+}

@@ -21,6 +21,7 @@ def prepare(data):
     if iw*ih>32_000_000:raise ValueError('Asset exceeds 32 megapixels; resize a derivative explicitly')
     protected=asset.get('type') in {'document_screenshot','ui_screenshot','chart_screenshot','table_screenshot','diagram'}
     if protected and (asset.get('mask','rect')!='rect' or asset.get('opacity',1)!=1):raise ValueError('Protected evidence must retain a rectangular mask and full opacity')
+    if protected and data.get('overlay'):raise ValueError('Evidence screenshots cannot be used as contrast-treated backgrounds')
     fit=data.get('fit') or asset.get('fit') or ('contain' if protected else 'cover')
     region=asset.get('crop')
     crop=[0,0,1,1]
@@ -44,7 +45,6 @@ def prepare(data):
         im.putalpha(ImageChops.multiply(im.getchannel('A'),mask))
     opacity=asset.get('opacity',1)
     if opacity<1:im.putalpha(im.getchannel('A').point(lambda v:round(v*opacity)))
-    im.save(out)
     if region:fit='contain'
     result={'path':str(out),'width':iw,'height':ih,'aspect_ratio':iw/ih,'mime':mime,'fit':fit,'crop':dict(zip(('x','y','w','h'),crop)),'render_ratio':im.width/im.height,'sha256':hashlib.sha256(source.read_bytes()).hexdigest()}
     if data.get('overlay'):
@@ -56,7 +56,22 @@ def prepare(data):
         white=sorted(1.05/(v+.05) for v in ls);black=sorted((v+.05)/.05 for v in ls)
         low=max(0,math.floor(len(ls)*.01)-1);wc,bc=white[low],black[low]
         if max(wc,bc)>=4.5:result['contrast']={'color':'FFFFFF' if wc>=bc else '000000','ratio':max(wc,bc),'scrim':None,'sample':'local 1st percentile'}
-        else:result['contrast']={'color':'FFFFFF','ratio':21,'scrim':'000000','sample':'local opaque scrim required; source contrast insufficient'}
+        else:
+            # Composite only the title safety region; preserve the rest of the source image.
+            alpha=1.0;contrast=21
+            for step in range(5,101,5):
+                a=step/100
+                values=sorted(1.05/(luminance(tuple(round(c*(1-a)) for c in px))+.05) for px in sample.getdata())
+                if values[low]>=4.5:alpha=a;contrast=values[low];break
+            from PIL import ImageFilter
+            x0,y0,x1,y1=(round(r['x']*im.width),round(r['y']*im.height),round((r['x']+r['w'])*im.width),round((r['y']+r['h'])*im.height))
+            pad=max(8,round(im.width*.025));mask=Image.new('L',im.size,0)
+            ImageDraw.Draw(mask).rectangle((x0-pad,y0-pad,x1+pad,y1+pad),fill=round(alpha*255))
+            mask=mask.filter(ImageFilter.GaussianBlur(pad*.45))
+            ImageDraw.Draw(mask).rectangle((x0,y0,x1,y1),fill=round(alpha*255))
+            layer=Image.new('RGBA',im.size,(0,0,0,0));layer.putalpha(mask);im=Image.alpha_composite(im,layer)
+            result['contrast']={'color':'FFFFFF','ratio':contrast,'scrim':'000000','opacity':alpha,'embedded_scrim':True,'sample':'local percentile after alpha composition; soft edges outside title safety area'}
+    im.save(out)
     return result
 
 if __name__=='__main__':

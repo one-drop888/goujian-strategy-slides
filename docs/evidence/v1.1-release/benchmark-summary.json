@@ -1,0 +1,359 @@
+[
+  {
+    "scenario": "channel-strategy",
+    "slides": 7,
+    "profile": "strategy",
+    "storyline": "channel-strategy",
+    "compositions": [
+      "cover-hero",
+      "message-focus",
+      "compare-multi",
+      "matrix-2x2",
+      "portfolio-board",
+      "roadmap-lanes"
+    ],
+    "pptx_sha256": "dddc8747ccabbd51c9e8b86668b742b9f4874f57d98853f4d2ddbb9779263e46",
+    "status": "PASS_WITH_NOTES",
+    "checks": {
+      "spec": "PASS",
+      "geometry": "PASS",
+      "fonts": "PASS",
+      "spatial": "PASS",
+      "render": "PASS",
+      "visual_review": "NOT_RUN"
+    }
+  },
+  {
+    "scenario": "cost-decision",
+    "slides": 6,
+    "profile": "finance",
+    "storyline": "cost-reduction",
+    "compositions": [
+      "cover-hero",
+      "chart-with-insight",
+      "compare-multi",
+      "tree-hierarchy",
+      "portfolio-board",
+      "message-focus"
+    ],
+    "pptx_sha256": "79dac09713de88b2b08db560d22aa70459b4d69578166b3a96dc088fa53eb9f8",
+    "status": "PASS_WITH_NOTES",
+    "checks": {
+      "spec": "PASS",
+      "geometry": "PASS",
+      "fonts": "PASS",
+      "spatial": "PASS_WITH_NOTES",
+      "render": "PASS",
+      "visual_review": "NOT_RUN"
+    }
+  },
+  {
+    "scenario": "executive-business-review",
+    "slides": 9,
+    "profile": "executive-dense",
+    "storyline": "quarterly-review",
+    "compositions": [
+      "cover-hero",
+      "metric-strip",
+      "chart-with-insight",
+      "table-detail",
+      "summary-grid"
+    ],
+    "pptx_sha256": "4181a1df4b2d4645eb6b965532e8f70997aac272a4eb4cbaa3a7bffb7efc7be9",
+    "status": "PASS",
+    "checks": {
+      "spec": "PASS",
+      "data_fidelity": "PASS",
+      "geometry": "PASS",
+      "fonts": "PASS",
+      "spatial": "PASS",
+      "render": "PASS",
+      "visual_review": "PASS"
+    }
+  },
+  {
+    "scenario": "executive-review",
+    "slides": 8,
+    "profile": "executive-dense",
+    "storyline": "quarterly-review",
+    "compositions": [
+      "cover-hero",
+      "summary-grid",
+      "metric-strip",
+      "chart-with-insight",
+      "compare-multi",
+      "tree-hierarchy",
+      "action-register",
+      "risk-register"
+    ],
+    "pptx_sha256": "f67200d0789526a2eaa4811cf5b196fb9602755c2437af71640a10c42cbcbd8a",
+    "status": "PASS",
+    "checks": {
+      "spec": "PASS",
+      "geometry": "PASS",
+      "fonts": "PASS",
+      "spatial": "PASS",
+      "render": "PASS",
+      "visual_review": "PASS"
+    }
+  },
+  {
+    "scenario": "marketing-campaign",
+    "slides": 5,
+    "profile": "marketing",
+    "storyline": "marketing-campaign",
+    "compositions": [
+      "cover-hero",
+      "compare-multi",
+      "flow-horizontal",
+      "funnel-stages",
+      "action-register"
+    ],
+    "pptx_sha256": "70549218aee12f01a2f2dc3aef0641a8f5b478506a4e6a2c693b9ebcc181903e",
+    "status": "PASS_WITH_NOTES",
+    "checks": {
+      "spec": "PASS",
+      "geometry": "PASS",
+      "fonts": "PASS",
+      "spatial": "PASS",
+      "render": "PASS",
+      "visual_review": "NOT_RUN"
+    }
+  },
+  {
+    "scenario": "multimodal-integration",
+    "slides": 9,
+    "profile": "executive-clean",
+    "storyline": "executive-business-review",
+    "compositions": [
+      "multimodal-hero",
+      "metric-strip",
+      "table-detail",
+      "multimodal-split",
+      "multimodal-annotated",
+      "multimodal-gallery"
+    ],
+    "pptx_sha256": "e6b327484312ee2820a1b5465710d136a0477c38fd69d72867f3b382a06124b8",
+    "status": "PASS",
+    "checks": {
+      "spec": "PASS",
+      "geometry": "PASS",
+      "fonts": "PASS",
+      "spatial": "PASS",
+      "render": "PASS",
+      "visual_review": "PASS"
+    }
+  },
+  {
+    "scenario": "product-launch",
+    "slides": 5,
+    "profile": "launch",
+    "storyline": "product-launch",
+    "compositions": [
+      "cover-hero",
+      "matrix-2x2",
+      "table-detail",
+      "flow-horizontal",
+      "scorecard-table"
+    ],
+    "pptx_sha256": "e0527122d4b580b5b702c4b4f0690c7237634f34c8217e7b0b5394ea461d084d",
+    "status": "PASS_WITH_NOTES",
+    "checks": {
+      "spec": "PASS",
+      "geometry": "PASS",
+      "fonts": "PASS",
+      "spatial": "PASS",
+      "render": "PASS",
+      "visual_review": "NOT_RUN"
+    }
+  },
+  {
+    "scenario": "project-performance-review",
+    "slides": 8,
+    "profile": "executive-dense",
+    "storyline": "project-update",
+    "compositions": [
+      "cover-hero",
+      "metric-strip",
+      "chart-with-insight",
+      "table-detail",
+      "summary-grid"
+    ],
+    "pptx_sha256": "ba494c929bcb21ec0359ca997887c3756297e1d98e87589417021184c7d7669c",
+    "status": "PASS",
+    "checks": {
+      "spec": "PASS",
+      "data_fidelity": "PASS",
+      "geometry": "PASS",
+      "fonts": "PASS",
+      "spatial": "PASS",
+      "render": "PASS",
+      "visual_review": "PASS"
+    }
+  },
+  {
+    "scenario": "project-update",
+    "slides": 5,
+    "profile": "executive-clean",
+    "storyline": "project-update",
+    "compositions": [
+      "cover-hero",
+      "summary-grid",
+      "roadmap-lanes",
+      "risk-register",
+      "message-focus"
+    ],
+    "pptx_sha256": "701bedee7ebe6bd99cd273801e89d3d80e7a434ea4c895be3df4bb717960ff89",
+    "status": "PASS_WITH_NOTES",
+    "checks": {
+      "spec": "PASS",
+      "geometry": "PASS",
+      "fonts": "PASS",
+      "spatial": "PASS",
+      "render": "PASS",
+      "visual_review": "NOT_RUN"
+    }
+  },
+  {
+    "scenario": "research-voc",
+    "slides": 7,
+    "profile": "research",
+    "storyline": "voc-analysis",
+    "compositions": [
+      "cover-hero",
+      "scorecard-table",
+      "chart-full",
+      "compare-multi",
+      "evidence-split",
+      "tree-hierarchy",
+      "message-focus"
+    ],
+    "pptx_sha256": "f9947b2fc811f52555755f0be5469d2ebf6a8926d873cd7029f271be3e0976f7",
+    "status": "PASS",
+    "checks": {
+      "spec": "PASS",
+      "geometry": "PASS",
+      "fonts": "PASS",
+      "spatial": "PASS",
+      "render": "PASS",
+      "visual_review": "PASS"
+    }
+  },
+  {
+    "scenario": "sales-conversion-diagnostic",
+    "slides": 10,
+    "profile": "executive-dense",
+    "storyline": "sales-funnel",
+    "compositions": [
+      "cover-hero",
+      "metric-strip",
+      "funnel-stages",
+      "chart-with-insight",
+      "table-detail",
+      "summary-grid"
+    ],
+    "pptx_sha256": "38b6e410acbbcbb63414c4b00845297d78c566deaab9fe3cdf7d4bbb5d93150e",
+    "status": "PASS",
+    "checks": {
+      "spec": "PASS",
+      "data_fidelity": "PASS",
+      "geometry": "PASS",
+      "fonts": "PASS",
+      "spatial": "PASS",
+      "render": "PASS",
+      "visual_review": "PASS"
+    }
+  },
+  {
+    "scenario": "sales-review",
+    "slides": 5,
+    "profile": "sales",
+    "storyline": "sales-funnel",
+    "compositions": [
+      "cover-hero",
+      "funnel-stages",
+      "compare-multi",
+      "compare-2",
+      "action-register"
+    ],
+    "pptx_sha256": "3f913089a029b31b92adb312eee6cacb1f96554a687f7d2bd90c1bf6c2f03d25",
+    "status": "PASS_WITH_NOTES",
+    "checks": {
+      "spec": "PASS",
+      "geometry": "PASS",
+      "fonts": "PASS",
+      "spatial": "PASS",
+      "render": "PASS",
+      "visual_review": "NOT_RUN"
+    }
+  },
+  {
+    "scenario": "technical-ai-agent",
+    "slides": 6,
+    "profile": "product-tech",
+    "storyline": "ai-agent-proposal",
+    "compositions": [
+      "cover-hero",
+      "message-focus",
+      "architecture-map",
+      "compare-2",
+      "risk-register",
+      "roadmap-lanes"
+    ],
+    "pptx_sha256": "a0bd28a07d73b243e3edc3a8b337256d6c61f4748b01ac314ff3f31d10d7f4d5",
+    "status": "PASS_WITH_NOTES",
+    "checks": {
+      "spec": "PASS",
+      "geometry": "PASS",
+      "fonts": "PASS",
+      "spatial": "PASS_WITH_NOTES",
+      "render": "PASS",
+      "visual_review": "NOT_RUN"
+    }
+  },
+  {
+    "scenario": "title-subtitle-layout",
+    "slides": 8,
+    "profile": "consulting",
+    "storyline": "executive-business-review",
+    "compositions": [
+      "section-divider",
+      "action-register",
+      "message-focus",
+      "compare-multi"
+    ],
+    "pptx_sha256": "7d047c76b27d695fd0a351ccde1c923040b7e333f3cf2aeb6ca145ac621eafc6",
+    "status": "PASS_WITH_NOTES",
+    "checks": {
+      "spec": "PASS",
+      "geometry": "PASS",
+      "fonts": "PASS",
+      "spatial": "PASS_WITH_NOTES",
+      "render": "PASS",
+      "visual_review": "NOT_RUN"
+    }
+  },
+  {
+    "scenario": "training",
+    "slides": 6,
+    "profile": "training",
+    "storyline": "training",
+    "compositions": [
+      "cover-hero",
+      "message-focus",
+      "flow-horizontal",
+      "evidence-split",
+      "table-detail"
+    ],
+    "pptx_sha256": "c1dca1278192e07e5bea1a4f9042e14ff994e1269448ba6170e159a8383457ef",
+    "status": "PASS_WITH_NOTES",
+    "checks": {
+      "spec": "PASS_WITH_NOTES",
+      "geometry": "PASS",
+      "fonts": "PASS",
+      "spatial": "PASS_WITH_NOTES",
+      "render": "PASS",
+      "visual_review": "NOT_RUN"
+    }
+  }
+]

@@ -63,6 +63,8 @@ def audit(graph):
                 if 'background' in {ra,rb} or 'decoration' in {ra,rb}:continue
                 pair={a['kind'],b['kind']}
                 area=intersection(ba,bb);small=min(ba['w']*ba['h'],bb['w']*bb['h'])
+                if a['kind']==b['kind']=='text' and a.get('text') and b.get('text') and area>.015 and min(ba['y']+ba['h'],bb['y']+bb['h'])-max(ba['y'],bb['y'])>.015:
+                    issue(si,'TEXT_TEXT_COLLISION',[a['id'],b['id']],'Native informative text boxes overlap; separate value, explanation and label regions')
                 annotation=((a['id'],b['id'],'annotates') in linked or (b['id'],a['id'],'annotates') in linked)
                 if area>.02 and small and area/small>.04 and not annotation and ('image' in pair or ra==rb=='evidence' and pair&{'chart','table'}):
                     metrics['semantic_occlusion']+=1;issue(si,'SEMANTIC_OCCLUSION',[a['id'],b['id']],'Evidence/image/text regions intersect without an intentional relationship')

@@ -28,7 +28,7 @@ It combines management storytelling, storyline planning, semantic archetypes, re
 - 86 semantic catalog entries: **74 implemented, 6 partial, 6 designed only**. Designed entries are rejected by the builder rather than rendered as a misleading approximation.
 - 27 composition recipes routed through 22 reusable rendering functions. Variants share code; these are not 86 independent layouts.
 - 15 profiles controlling typography, spacing, title/cover treatment, table headers/banding, metric treatment, chart grids and colors.
-- 12 runnable benchmark decks, JSON Schema plus payload validation, geometry/font checks, optional rendering and montage generation.
+- 15 runnable benchmark decks, JSON Schema plus payload validation, geometry/font checks, optional rendering and montage generation.
 
 See the [product overview](docs/PRODUCT_OVERVIEW.md), [feasibility review](docs/FEASIBILITY_REVIEW.md), [library audit](docs/LIBRARY_AUDIT.md) and [visual iterations](docs/VISUAL_REVIEW.md).
 
@@ -37,6 +37,18 @@ See the [product overview](docs/PRODUCT_OVERVIEW.md), [feasibility review](docs/
 Four shared compositions connect native images, charts, tables and interpretation. PNG/JPEG/WEBP assets enter PPTX directly; screenshots default to contain, with embedded pixel text distinguished from editable text. Measured titles support `title_short` / `subtitle` and dynamic divider/body flow. A PPTX-hash-bound scene record enables spatial checks for evidence occlusion, text/rule collisions and source relationships.
 
 Asset classification, conclusion rewriting and visual repair remain agent-assisted. There is no automatic OCR, arbitrary lossless PPTX editor or autonomous vision engine. Read the [multimodal contract](docs/MULTIMODAL_CONTRACT.md), [ground truth audit](docs/V1_1_GROUND_TRUTH.md) and [current validation](docs/V1_1_VALIDATION.md).
+
+## Runnable analytics
+
+Replace JSON inputs for Business Performance, nonlinear Sales Conversion and Project Analytics. Three executable families cover 18 tasks, with strict schemas, unit/window/denominator rules, null handling, reconciliation, explicit splitting and native data-fidelity checks. Trial is optional; association never implies causal lift. The first project contract uses CNY cumulative snapshots. See [inputs, formulas and commands](docs/ANALYTICAL_LIBRARY.md).
+
+```bash
+npm run analyze:business
+npm run analyze:sales
+npm run analyze:project
+```
+
+Integrated native dashboards, decision explanations and local soft image scrims strengthen existing compositions without expanding template/profile counts. See [final validation and before/after](docs/V1_1_RELEASE_VALIDATION.md).
 
 ## Installation
 
@@ -83,7 +95,7 @@ npm run benchmark
 npm run benchmark -- --render
 ```
 
-`benchmark` builds and audits all 12 scenarios. Add `--render` for PNG pages and montages. Inspect them before recording visual approval. Each scenario preserves a QA report and PPTX hash under `out/benchmarks/`.
+`benchmark` builds and audits all 15 scenarios. Add `--render` for PNG pages and montages. Inspect them before recording visual approval. Each scenario preserves a QA report and PPTX hash under `out/benchmarks/`.
 
 [Custom profiles](docs/CUSTOM_PROFILE_GUIDE.md) inherit from built-ins. [Existing PPTX workflows](docs/EXISTING_PPTX_WORKFLOW.md) cover bounded text editing, inspection and reference-based reconstruction.
 

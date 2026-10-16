@@ -9,6 +9,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 PREFIX = 'goujian-strategy-slides/'
 REQUIRED = {
+    'core/analytics/index.js', 'core/schema/analytics.schema.json', 'scripts/analyze.js',
+    'skill/analytics/business-performance.json', 'skill/analytics/sales-conversion.json', 'skill/analytics/project-analytics.json',
     'SKILL.md', 'package.json', 'package-lock.json',
     'core/renderer/index.js', 'core/schema/deck.schema.json',
     'skill/storylines/registry.json', 'skill/archetypes/registry.json',

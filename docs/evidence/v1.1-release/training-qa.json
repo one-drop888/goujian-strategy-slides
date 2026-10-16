@@ -1,0 +1,166 @@
+{
+  "status": "PASS_WITH_NOTES",
+  "VISUAL_QA": "NOT_RUN",
+  "capabilities": {
+    "tools": {
+      "libreoffice": "/usr/bin/libreoffice",
+      "soffice": "/home/zheyou/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/override/soffice",
+      "pdftoppm": "/home/zheyou/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/override/pdftoppm",
+      "fc-list": "/usr/bin/fc-list",
+      "pillow": true
+    },
+    "levels": {
+      "0_spec": "AVAILABLE",
+      "1_geometry_spatial": "AVAILABLE",
+      "2_pptx_inspection": "AVAILABLE",
+      "3_native_render": "AVAILABLE",
+      "4_vision_review": "REQUIRES_REVIEWER",
+      "5_repair_rerender": "REQUIRES_AGENT"
+    },
+    "VISUAL_QA": "NOT_RUN"
+  },
+  "pptx": "out/release-final/training.pptx",
+  "checks": {
+    "spec": {
+      "status": "PASS_WITH_NOTES",
+      "slides": 6,
+      "issues": [
+        {
+          "severity": "WARN",
+          "path": "slides[3]",
+          "message": "Quote and interpretation only; agent must structure the case."
+        }
+      ]
+    },
+    "geometry": {
+      "status": "PASS",
+      "limitations": [
+        "Bounding-box checks do not prove text fit, glyph coverage, or chart-label readability. Grouped/rotated shapes require visual review."
+      ],
+      "slide_size_inches": [
+        13.333333333333334,
+        7.5
+      ],
+      "slides": [
+        {
+          "slide": 1,
+          "objects": 5,
+          "peer_overlap_candidates": 0
+        },
+        {
+          "slide": 2,
+          "objects": 6,
+          "peer_overlap_candidates": 0
+        },
+        {
+          "slide": 3,
+          "objects": 13,
+          "peer_overlap_candidates": 0
+        },
+        {
+          "slide": 4,
+          "objects": 9,
+          "peer_overlap_candidates": 0
+        },
+        {
+          "slide": 5,
+          "objects": 5,
+          "peer_overlap_candidates": 0
+        },
+        {
+          "slide": 6,
+          "objects": 6,
+          "peer_overlap_candidates": 0
+        }
+      ],
+      "issues": []
+    },
+    "fonts": {
+      "status": "PASS",
+      "used": [
+        {
+          "font": "Noto Sans CJK SC",
+          "occurrences": 147
+        },
+        {
+          "font": "Noto Sans",
+          "occurrences": 17
+        }
+      ],
+      "missing_on_this_machine": [],
+      "note": "Missing fonts indicate possible substitution on this machine; they do not prove the recipient environment lacks the fonts.",
+      "resolution": [
+        {
+          "script": "latin",
+          "requested": "Noto Sans",
+          "resolved": "Noto Sans",
+          "substituted": false,
+          "status": "PROVEN"
+        },
+        {
+          "script": "cjk",
+          "requested": "Noto Sans CJK SC",
+          "resolved": "Noto Sans CJK SC",
+          "substituted": false,
+          "status": "PROVEN"
+        }
+      ]
+    },
+    "spatial": {
+      "status": "PASS_WITH_NOTES",
+      "metrics": {
+        "source_coverage": null,
+        "duplicate_content": 0,
+        "unresolved_assets": 0,
+        "detached_annotation": 0,
+        "semantic_occlusion": 0
+      },
+      "issues": [
+        {
+          "slide": 2,
+          "code": "TITLE_WRAP",
+          "objects": [
+            "claim"
+          ],
+          "severity": "NOTE",
+          "message": "Two-line title allowed after measured alternatives"
+        }
+      ],
+      "limitations": [
+        "Spatial relationships are explicit, not inferred human intent. Contrast uses local raster samples; visual review remains required."
+      ],
+      "fonts": [
+        {
+          "script": "latin",
+          "requested": "Noto Sans",
+          "resolved": "Noto Sans",
+          "substituted": false,
+          "status": "PROVEN"
+        },
+        {
+          "script": "cjk",
+          "requested": "Noto Sans CJK SC",
+          "resolved": "Noto Sans CJK SC",
+          "substituted": false,
+          "status": "PROVEN"
+        }
+      ]
+    },
+    "render": {
+      "status": "PASS",
+      "pages": [
+        "out/release-final/training/slide-1.png",
+        "out/release-final/training/slide-2.png",
+        "out/release-final/training/slide-3.png",
+        "out/release-final/training/slide-4.png",
+        "out/release-final/training/slide-5.png",
+        "out/release-final/training/slide-6.png"
+      ],
+      "note": "Executed final native render retained; PPTX and page hashes in acceptance record where reviewed."
+    },
+    "visual_review": {
+      "status": "NOT_RUN",
+      "note": "Requires an explicit review record bound to this PPTX hash."
+    }
+  }
+}

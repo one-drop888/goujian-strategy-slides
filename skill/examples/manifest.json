@@ -12,7 +12,10 @@
     "sales-review",
     "technical-ai-agent",
     "title-subtitle-layout",
-    "training"
+    "training",
+    "executive-business-review",
+    "sales-conversion-diagnostic",
+    "project-performance-review"
   ],
   "note": "All benchmark examples are synthetic/sanitized and contain no confidential company data."
 }

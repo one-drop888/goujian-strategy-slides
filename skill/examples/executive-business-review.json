@@ -1,0 +1,289 @@
+{
+  "title": "经营总览：目标、增长与贡献",
+  "profile": "executive-dense",
+  "lang": "zh-CN",
+  "storyline": "quarterly-review",
+  "footer": "合成数据 · Project-authored synthetic dataset / Apache-2.0",
+  "slides": [
+    {
+      "type": "cover",
+      "title": "经营总览：目标、增长与贡献",
+      "source": "合成数据 · Project-authored synthetic dataset / Apache-2.0",
+      "subtitle": "2026-09-01 至 2026-09-30 · 合成数据示例"
+    },
+    {
+      "type": "kpi-dashboard",
+      "title": "收入达成 96%，目标差异 -40万元",
+      "source": "合成数据 · Project-authored synthetic dataset / Apache-2.0",
+      "items": [
+        {
+          "label": "收入",
+          "value": "960万元",
+          "delta": "目标 1,000万元 · 同比 20%",
+          "highlight": true
+        },
+        {
+          "label": "订单",
+          "value": "240单",
+          "delta": "目标 250单 · 同比 20%",
+          "highlight": false
+        },
+        {
+          "label": "毛利率",
+          "value": "22%",
+          "delta": "目标 24% · 同比 10%",
+          "highlight": false
+        }
+      ],
+      "dashboard": {
+        "unit": "万元 · 月度实际",
+        "labels": [
+          "2026-04",
+          "2026-05",
+          "2026-06",
+          "2026-07",
+          "2026-08",
+          "2026-09"
+        ],
+        "series": [
+          {
+            "name": "收入",
+            "values": [
+              780,
+              820,
+              850,
+              870,
+              900,
+              960
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "type": "chart",
+      "title": "收入实际 960万元，目标 1,000万元",
+      "source": "合成数据 · Project-authored synthetic dataset / Apache-2.0",
+      "labels": [
+        "收入"
+      ],
+      "series": [
+        {
+          "name": "实际",
+          "values": [
+            960
+          ]
+        },
+        {
+          "name": "目标",
+          "values": [
+            1000
+          ]
+        }
+      ],
+      "unit": "万元",
+      "period": "2026-09-01 至 2026-09-30",
+      "insight": "同一指标、同一月份，避免混合单位比较",
+      "chartType": "bar"
+    },
+    {
+      "type": "chart",
+      "title": "收入环比 6.67%",
+      "source": "合成数据 · Project-authored synthetic dataset / Apache-2.0",
+      "labels": [
+        "2026-04",
+        "2026-05",
+        "2026-06",
+        "2026-07",
+        "2026-08",
+        "2026-09"
+      ],
+      "series": [
+        {
+          "name": "收入",
+          "values": [
+            780,
+            820,
+            850,
+            870,
+            900,
+            960
+          ]
+        }
+      ],
+      "unit": "万元",
+      "period": "2026-09-01 至 2026-09-30",
+      "insight": "月度实际值；同比与环比均使用显式提供的基期",
+      "chartType": "line"
+    },
+    {
+      "type": "table",
+      "title": "目标差异按指标逐项核对",
+      "source": "合成数据 · Project-authored synthetic dataset / Apache-2.0",
+      "headers": [
+        "指标",
+        "单位",
+        "实际",
+        "目标",
+        "差异",
+        "达成",
+        "环比",
+        "同比"
+      ],
+      "rows": [
+        [
+          "收入",
+          "万元",
+          "960",
+          "1,000",
+          "-40万元",
+          "96%",
+          "6.67%",
+          "20%"
+        ],
+        [
+          "订单",
+          "单",
+          "240",
+          "250",
+          "-10单",
+          "96%",
+          "6.67%",
+          "20%"
+        ],
+        [
+          "毛利率",
+          "%",
+          "22",
+          "24",
+          "-2pp",
+          "91.67%",
+          "4.76%",
+          "10%"
+        ]
+      ],
+      "subtitle": "百分比指标差异用百分点（pp）；同比、环比均为相对变化"
+    },
+    {
+      "type": "table",
+      "title": "趋势保留每个月份及缺失状态",
+      "source": "合成数据 · Project-authored synthetic dataset / Apache-2.0",
+      "headers": [
+        "月份",
+        "万元"
+      ],
+      "rows": [
+        [
+          "2026-04",
+          "780"
+        ],
+        [
+          "2026-05",
+          "820"
+        ],
+        [
+          "2026-06",
+          "850"
+        ],
+        [
+          "2026-07",
+          "870"
+        ],
+        [
+          "2026-08",
+          "900"
+        ],
+        [
+          "2026-09",
+          "960"
+        ]
+      ]
+    },
+    {
+      "type": "chart",
+      "title": "贡献分析使用同一总量和基期",
+      "source": "合成数据 · Project-authored synthetic dataset / Apache-2.0",
+      "labels": [
+        "直营",
+        "渠道",
+        "线上"
+      ],
+      "series": [
+        {
+          "name": "本月",
+          "values": [
+            480,
+            320,
+            160
+          ]
+        },
+        {
+          "name": "上月",
+          "values": [
+            450,
+            300,
+            150
+          ]
+        }
+      ],
+      "unit": "万元",
+      "period": "2026-09-01 至 2026-09-30",
+      "insight": "分项合计与总量校验；贡献与增长贡献分开解释",
+      "chartType": "bar"
+    },
+    {
+      "type": "table",
+      "title": "贡献份额与增量分开呈现",
+      "source": "合成数据 · Project-authored synthetic dataset / Apache-2.0",
+      "headers": [
+        "分项",
+        "本月",
+        "上月",
+        "份额",
+        "增量"
+      ],
+      "rows": [
+        [
+          "直营",
+          "480",
+          "450",
+          "50%",
+          "30"
+        ],
+        [
+          "渠道",
+          "320",
+          "300",
+          "33.33%",
+          "20"
+        ],
+        [
+          "线上",
+          "160",
+          "150",
+          "16.67%",
+          "10"
+        ]
+      ]
+    },
+    {
+      "type": "executive-summary",
+      "title": "管理摘要只陈述可计算差异",
+      "source": "合成数据 · Project-authored synthetic dataset / Apache-2.0",
+      "items": [
+        {
+          "title": "收入",
+          "note": "实际 960万元，差异 -40万元，同比 20%；原因与行动由管理者验证。"
+        },
+        {
+          "title": "订单",
+          "note": "实际 240单，差异 -10单，同比 20%；原因与行动由管理者验证。"
+        },
+        {
+          "title": "毛利率",
+          "note": "实际 22%，差异 -2pp，同比 10%；原因与行动由管理者验证。"
+        }
+      ]
+    }
+  ]
+}

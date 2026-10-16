@@ -1,13 +1,15 @@
 # Changelog
 
-## 1.1.0 — 2026-10-16 (engineering candidate, not published)
+## 1.1.0 — 2026-10-16
 
 - Native raster asset schema/pipeline, protected evidence cropping, focal point/opacity/masks, provenance and four reusable multimodal compositions. No python-pptx image postprocessing.
 - Measured title/subtitle flow, bounded title rewriting, balanced wrapping, typography-scaled divider gaps and explicit header-capacity rejection.
 - Hash-bound native scene records, semantic/spatial QA, local contrast resolution, font substitution reporting and spec-local profile resolution.
 - Existing PPTX inspection now maps native text, pictures, tables, charts, groups and master/layout candidates with source identities; complex reconstruction remains partial.
 - Six-KPI scorecard and nine-column native tables preserve all data; redundant renderer slices removed. Context-aware analytical-series repetition.
-- Permanent A–H/Unicode/native ingestion regressions, twelve rendered scenarios, three-deck visual repair/attestation evidence and fifteen-profile visual comparison.
+- Permanent A–H/Unicode/native ingestion regressions, fifteen rendered scenarios, six-deck visual repair/attestation evidence and fifteen-profile visual comparison.
+- Three runnable analytical families cover 18 business/sales/project tasks with explicit units/windows, mature cohort denominators, optional trial behavior, missing data, reconciliation, native numeric fidelity checks and explicit pagination.
+- Integrated dashboard and decision variants, local alpha-composited soft hero scrims and corrected native table padding; no profile/template count expansion.
 - Retained product identity, one root Skill entry, JSON compatibility for legacy accepted specs and Apache-2.0 notices.
 
 

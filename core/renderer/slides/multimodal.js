@@ -20,19 +20,19 @@ function createMultimodalRenderers(pptx,style,spec,assets) {
     }
     if(p.kind==='table') {
       const header={fill:C.accentSoft,bold:true};
-      slide.addTable([p.headers.map(t=>({text:String(t),options:header})),...p.rows],{x:b.x,y:b.y,w:b.w,rowH:Math.min(.65,b.h/(p.rows.length+1)),fontFace:F.cjk,fontSize:Math.max(12,F.tableSize-1),margin:.1,border:{pt:.5,color:C.line},autoPage:false,scene});return;
+      slide.addTable([p.headers.map(t=>({text:String(t),options:header})),...p.rows],{x:b.x,y:b.y,w:b.w,rowH:Math.min(.65,b.h/(p.rows.length+1)),fontFace:F.cjk,fontSize:Math.max(12,F.tableSize-1),margin:[4,4,4,4],border:{pt:.5,color:C.line},autoPage:false,scene});return;
     }
     const colors=[C.accent,'A9B6BF','526373'];
     slide.addChart(p.chartType==='line'?pptx.ChartType.line:pptx.ChartType.bar,p.series.map(s=>({name:s.name||'',labels:s.labels||p.labels,values:s.values})),{...b,barDir:p.chartType==='column'?'col':'bar',showLegend:p.series.length>1,showValue:true,showTitle:false,showCatName:false,showBorder:false,fontFace:F.cjk,catAxisLabelFontFace:F.cjk,valAxisLabelFontFace:F.latin,dataLabelFontFace:F.latin,legendFontFace:F.cjk,catAxisLabelFontSize:12,valAxisLabelFontSize:11,dataLabelFontSize:12,dataLabelFormatCode:p.numberFormat||'0.0',chartColors:colors,valAxisMinVal:0,catAxisLineShow:false,valAxisLineShow:false,catGridLine:{style:'none'},valGridLine:{color:C.line,size:.5},showShadow:false,scene});
   }
   function hero(slide,s) {
     const box={x:0,y:0,w:W,h:H};
-    const titleFont={...F,titleSize:Math.min(40,F.titleSize+8)},tw=width*.8;
-    const flow=resolveTitle(s,titleFont,tw),ty=2.15,sh=flow.h+(flow.subtitleH?flow.subtitleH+.2:0);
+    const titleFont={...F,titleSize:Math.min(40,F.titleSize+8)},tw=width*.68;
+    const flow=resolveTitle(s,titleFont,tw),ty=4.45,sh=flow.h+(flow.subtitleH?flow.subtitleH+.2:0);
     const overlay={x:(left-.2)/W,y:(ty-.2)/H,w:(tw+.4)/W,h:(sh+.4)/H};
     const r=assets.draw(slide,s.asset_ids[0],box,{id:'hero-image',role:'background',overlay,fit:'cover'});
     const c=r.contrast;slide._scene.title={...flow,titleY:ty};
-    if(c.scrim)slide.addShape(pptx.ShapeType.rect,{x:left-.2,y:ty-.2,w:tw+.4,h:sh+.4,line:{color:c.scrim,transparency:100},fill:{color:c.scrim},scene:native({role:'background',id:'local-scrim'})});
+    if(c.scrim&&!c.embedded_scrim)slide.addShape(pptx.ShapeType.rect,{x:left-.2,y:ty-.2,w:tw+.4,h:sh+.4,line:{color:c.scrim,transparency:100},fill:{color:c.scrim},scene:native({role:'background',id:'local-scrim'})});
     text(slide,flow.lines.join('\n'),left,ty,tw,flow.h,{fontSize:flow.size,bold:true,color:c.color,valign:'top',scene:native({id:'claim',role:'claim',contrast:c})});
     if(flow.subtitleH)text(slide,flow.subtitleLines.join('\n'),left,ty+flow.h+.2,tw,flow.subtitleH,{fontSize:Math.min(F.bodySize,17),color:c.color,valign:'top',scene:native({id:'subtitle',role:'subtitle',contrast:c})});
     slide._scene.relationships.push({from:'hero-image',to:'claim',type:'background_of'});

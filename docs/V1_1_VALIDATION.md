@@ -1,5 +1,7 @@
 # GOUJIAN STRATEGY SLIDES V1.1
 
+Historical engineering acceptance at `ddac321`; superseded for public release by [final release validation](V1_1_RELEASE_VALIDATION.md).
+
 Theme: **Multimodal Composition & Visual Intelligence**. Engineering audit date: **2026-10-16**. Baseline: `8416d958` (v1.0.1; same V1.0 presentation engine, preserving the packaging patch).
 
 **STATUS: V1.1 READY — documented, agent-assisted contract passed local acceptance**. This is a local engineering delivery, not a published GitHub Release. Source and all historical v1.0 tags remain distinct.

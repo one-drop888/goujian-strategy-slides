@@ -47,3 +47,5 @@ Presentation Intelligence 层独立于 PptxGenJS，为 HTML Slides、Web Present
 ## V1.1 多模态边界
 
 图片、图表、表格和解释以原生对象进入同一构建流程，并保存来源、像素文字属性、裁剪区域和场景关系。标题/副标题/分割线按测量结果排列；空间 QA 读回实际 PPTX 坐标。图片分类、语义改写和视觉修复仍需 Agent；OCR、SmartArt/母版完整恢复和自主视觉修复未实现。详见[多模态契约](MULTIMODAL_CONTRACT.md)与[验证记录](V1_1_VALIDATION.md)。
+
+三类可运行分析库支持替换 JSON 数据并重新生成原生可编辑演示：经营总览、非线性销售转化及项目绩效。18 项分析任务明确字段、计算、单位、时间窗口、分母、缺失值和数据保真门禁。详见[分析库](ANALYTICAL_LIBRARY.md)与[最终验收](V1_1_RELEASE_VALIDATION.md)。

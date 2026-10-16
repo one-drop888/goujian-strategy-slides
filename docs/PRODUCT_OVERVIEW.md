@@ -45,3 +45,5 @@ There is one product and one Presentation Library. Platform adapters provide thi
 ## V1.1 multimodal boundary
 
 Images, native charts/tables and interpretation share one build pipeline with source, pixel-text, crop and scene relationships. Measured title/subtitle/divider flow and spatial QA use actual native PPTX geometry. Asset classification, semantic rewriting and visual repair remain agent-assisted; OCR, complete SmartArt/master recovery and autonomous visual repair are not implemented. See the [contract](MULTIMODAL_CONTRACT.md) and [validation](V1_1_VALIDATION.md).
+
+Three runnable analytical families turn replaceable JSON data into native editable presentations: business performance, nonlinear sales conversion and project analytics. Their 18 tasks define fields, formulas, units, windows, denominators, missing-data rules and fidelity gates. See [analytical library](ANALYTICAL_LIBRARY.md) and [final release validation](V1_1_RELEASE_VALIDATION.md).

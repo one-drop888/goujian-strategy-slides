@@ -1,0 +1,19 @@
+{
+  "status": "PASS",
+  "date": "2026-10-16",
+  "platform": "Linux",
+  "environment": "New Python venv with Pillow 12.3.0; npm install in independently extracted ZIP",
+  "runtime_files_match_source": 108,
+  "commands": {
+    "npm_install": "PASS",
+    "npm_test": "PASS",
+    "validate_example": "PASS",
+    "build_example": "PASS",
+    "qa_example_render": "PASS",
+    "unicode_sales_analysis": "PASS",
+    "sales_input_spec_native_fidelity": "PASS",
+    "sales_render": "PASS"
+  },
+  "qa_boundary": "Rebuilt copy visual_review NOT_RUN; original six acceptance hashes are separate",
+  "packaging": "One root SKILL.md; no duplicate/corrupt ZIP entries; final docs-only repack must retain identical runtime bytes"
+}

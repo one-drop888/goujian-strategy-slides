@@ -54,7 +54,7 @@ Integrated native dashboards, decision explanations and local soft image scrims 
 
 Use **Node.js 18+ and Python 3.9+** with `node`, `npm` and `python3` on PATH. Images and the complete tests require Pillow; local glyph measurement uses Fontconfig. Basic geometry checks use the standard library. Clone the complete repository; copying `skill/` alone does not install the runtime.
 
-The V1.1 engineering ZIP (not yet a GitHub Release) extracts to one `goujian-strategy-slides/` folder with a single Skill entry at its root, `SKILL.md`. Upload the complete ZIP to a Skill platform; if it extracts archives itself, use that folder as the Skill root. Platform import and security scanning still require a test on the target platform.
+The [v1.1.0 release ZIP](https://github.com/one-drop888/goujian-strategy-slides/releases/tag/v1.1.0) extracts to one `goujian-strategy-slides/` folder with a single Skill entry at its root, `SKILL.md`. Upload the complete ZIP to a Skill platform; if it extracts archives itself, use that folder as the Skill root. Platform import and security scanning still require a test on the target platform.
 
 ```bash
 git clone https://github.com/one-drop888/goujian-strategy-slides.git

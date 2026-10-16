@@ -18,7 +18,7 @@ Output: editable `.pptx`, generated `.spec.json`, recomputable `.data.json` and 
 
 ## Business Performance
 
-Input: full calendar reporting month, explicitly named primary metric, metrics with their own units, ordered consecutive monthly trend, and primary-metric contributions. The last trend point must equal primary actual. Both current and previous contributions reconcile to their totals. Metrics with different units never share an axis.
+Input: full calendar reporting month, explicitly named primary metric, metrics with their own units, ordered consecutive monthly trend, and primary-metric contributions. The last trend point must equal primary actual. Both current and previous contributions reconcile to their totals. An available trend observation for the previous month or same month last year must agree with the supplied comparison baseline. Metrics with different units never share an axis.
 
 - KPI Scorecard: actual, target and attainment = actual / target.
 - Target vs Actual: grouped native bars for the same primary metric and unit, baseline zero.

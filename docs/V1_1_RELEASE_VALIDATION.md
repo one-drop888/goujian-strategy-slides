@@ -40,7 +40,7 @@ No obvious accidental occlusion, unexplained duplicate marker, title/subtitle/di
 
 | Gate | Executed result / denominator |
 |---|---|
-| Analytical Node tests | 23 / 23 PASS, including native serialization and input overwrite protection |
+| Analytical Node tests | 24 / 24 PASS, including native serialization and input overwrite protection |
 | Python unittest QA | 17 / 17 PASS (6 existing + 8 V1.1 + 3 analytical fidelity) |
 | V1 script smoke functions | 5 / 5 PASS |
 | Other existing contract/routing/package/native regression scripts | PASS; individual assertions are not presented as independent test counts |
@@ -58,6 +58,8 @@ No obvious accidental occlusion, unexplained duplicate marker, title/subtitle/di
 [Benchmark statuses](evidence/v1.1-release/benchmark-summary.json), [hash-bound review records](evidence/v1.1-release/reviews/), and per-deck QA JSON record scope. Automated notes include acceptable title wrapping; render success alone never becomes vision PASS. Data fidelity verifies declared inputs, not their real-world truth.
 
 ## Release boundary / 发布边界
+
+A pre-publication adversarial input check exposed contradictory trend/comparison baselines; the first release run was cancelled before tag creation. Cross-checks and a permanent previous-month/year regression were added without changing the accepted sample outputs.
 
 The existing GitHub release workflow is updated for v1.1.0. It tests the actual main commit, packages it, creates an annotated tag without overwriting existing history, publishes bilingual notes/ZIP/checksum and verifies a fresh tagged clone. Public release is a separate external result from these local gates; consult the actual [v1.1.0 Release](https://github.com/one-drop888/goujian-strategy-slides/releases/tag/v1.1.0), workflow result and final delivery report for commit, asset SHA256 and remote verification. This document does not turn an unexecuted remote step into PASS.
 

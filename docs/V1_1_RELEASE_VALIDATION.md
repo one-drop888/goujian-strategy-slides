@@ -59,7 +59,7 @@ No obvious accidental occlusion, unexplained duplicate marker, title/subtitle/di
 
 ## Release boundary / 发布边界
 
-A pre-publication adversarial input check exposed contradictory trend/comparison baselines; the first release run was cancelled before tag creation. Cross-checks and a permanent previous-month/year regression were added without changing the accepted sample outputs.
+A pre-publication adversarial input check exposed contradictory trend/comparison baselines; a cancellation request was submitted during the first release run, but took effect after tag/Release creation and interrupted remote-clone verification. The immutable v1.1.0 release is retained. Cross-checks and a permanent previous-month/year regression are ready on the development branch, without changing accepted sample outputs; publication of this correction requires a new patch version.
 
 The existing GitHub release workflow is updated for v1.1.0. It tests the actual main commit, packages it, creates an annotated tag without overwriting existing history, publishes bilingual notes/ZIP/checksum and verifies a fresh tagged clone. Public release is a separate external result from these local gates; consult the actual [v1.1.0 Release](https://github.com/one-drop888/goujian-strategy-slides/releases/tag/v1.1.0), workflow result and final delivery report for commit, asset SHA256 and remote verification. This document does not turn an unexecuted remote step into PASS.
 

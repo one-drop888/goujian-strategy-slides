@@ -15,5 +15,13 @@
     "sales_render": "PASS"
   },
   "qa_boundary": "Rebuilt copy visual_review NOT_RUN; original six acceptance hashes are separate",
-  "packaging": "One root SKILL.md; no duplicate/corrupt ZIP entries; final docs-only repack must retain identical runtime bytes"
+  "packaging": "One root SKILL.md; no duplicate/corrupt ZIP entries; final docs-only repack must retain identical runtime bytes",
+  "post_publication_fix_recheck": {
+    "npm_install": "PASS",
+    "npm_test": "PASS",
+    "analytical_node_tests": "24/24 PASS",
+    "python_unittest": "17/17 PASS",
+    "business_sales_project_cli": "PASS",
+    "scope": "Independent ZIP extraction includes baseline cross-check fix; original Pillow venv reused. Publication version pending."
+  }
 }

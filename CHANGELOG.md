@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.1 — 2026-10-16
+
+- Reject contradictory primary-metric trend observations and separately supplied previous-month/year baselines before calculating or building.
+- Add permanent cross-period baseline regression; retain all V1.1 native/editable, multimodal, analytical and visual capabilities.
+- Preserve published v1.1.0 tag/assets; no dependency upgrades. See the v1.1.0 Release Notes for the disclosed input-validation limitation.
+
 ## 1.1.0 — 2026-10-16
 
 - Native raster asset schema/pipeline, protected evidence cropping, focal point/opacity/masks, provenance and four reusable multimodal compositions. No python-pptx image postprocessing.

@@ -22,6 +22,6 @@
     "analytical_node_tests": "24/24 PASS",
     "python_unittest": "17/17 PASS",
     "business_sales_project_cli": "PASS",
-    "scope": "Independent ZIP extraction includes baseline cross-check fix; original Pillow venv reused. Publication version pending."
+    "scope": "Independent ZIP extraction includes baseline cross-check fix; original isolated Pillow venv reused. User authorized corrective version v1.1.1; external publication is recorded separately."
   }
 }

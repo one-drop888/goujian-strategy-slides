@@ -1,0 +1,26 @@
+{
+  "pptx_sha256": "d822148139454f5c17cd4726ada51dfe2c396a27778ce4219835614246cd6586",
+  "reviewer": "Codex visual inspection / 2026-10-16",
+  "status": "PASS",
+  "slides_reviewed": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+  ],
+  "notes": "Reviewed all 8 slides in final montage and full-size pages. One-line action title + subtitle has clear divider gaps. Chart units/labels and risk table are readable; comparison/framework/action rhythm varies. No occlusion, glyph boxes or repeated section markers observed.",
+  "rendered_page_sha256": {
+    "slide-1.png": "96529bddebe06e305400158c5c54d52601fd3a4e849e46b599f390a10e9f957c",
+    "slide-2.png": "8941c4eb23990eb5995ec6ef64326f1104c12a79b72f7d91a6b1ba8401c139dd",
+    "slide-3.png": "b7a759d905e267811bc524256a5f95023e2a633b31ca1816931b6446b6226588",
+    "slide-4.png": "c636fc0a95fcf0d29ec9c9a7128063b6f3e7ab750b0d2e3d3e9e984211363e1a",
+    "slide-5.png": "f69bcc39e672bcd1a355d33d832f2c200e1da1f6df7f8758cef1dd0fe5bf445e",
+    "slide-6.png": "6717612be63c294108aa975c9cf42d4357830c9e37b144c675524c4785b71896",
+    "slide-7.png": "f84f9ffb5219f97b6ba11d3f34c6d1a97173423b3a3bc64d6f4f066d597fbc4d",
+    "slide-8.png": "bdc7a88abe4ddb1c5b091129d0d8eda015fd920c4e4344f4fd0ed86f9ea4f9b9"
+  }
+}

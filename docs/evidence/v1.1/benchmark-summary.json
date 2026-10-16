@@ -1,0 +1,286 @@
+[
+  {
+    "scenario": "channel-strategy",
+    "slides": 7,
+    "profile": "strategy",
+    "storyline": "channel-strategy",
+    "compositions": [
+      "cover-hero",
+      "message-focus",
+      "compare-multi",
+      "matrix-2x2",
+      "portfolio-board",
+      "roadmap-lanes"
+    ],
+    "pptx_sha256": "ca1131b61b18995389922e90a73c698fb1ea6ae613716d305a1d35f3e7b8b7b1",
+    "status": "PASS_WITH_NOTES",
+    "checks": {
+      "spec": "PASS",
+      "geometry": "PASS",
+      "fonts": "PASS",
+      "spatial": "PASS",
+      "render": "PASS",
+      "visual_review": "NOT_RUN"
+    }
+  },
+  {
+    "scenario": "cost-decision",
+    "slides": 6,
+    "profile": "finance",
+    "storyline": "cost-reduction",
+    "compositions": [
+      "cover-hero",
+      "chart-with-insight",
+      "compare-multi",
+      "tree-hierarchy",
+      "portfolio-board",
+      "message-focus"
+    ],
+    "pptx_sha256": "74b9c2afcb06c01560d6111fcd3d3c821ffd499fc9c356590338b1488d94551b",
+    "status": "PASS_WITH_NOTES",
+    "checks": {
+      "spec": "PASS",
+      "geometry": "PASS",
+      "fonts": "PASS",
+      "spatial": "PASS_WITH_NOTES",
+      "render": "PASS",
+      "visual_review": "NOT_RUN"
+    }
+  },
+  {
+    "scenario": "executive-review",
+    "slides": 8,
+    "profile": "executive-dense",
+    "storyline": "quarterly-review",
+    "compositions": [
+      "cover-hero",
+      "summary-grid",
+      "metric-strip",
+      "chart-with-insight",
+      "compare-multi",
+      "tree-hierarchy",
+      "action-register",
+      "risk-register"
+    ],
+    "pptx_sha256": "d822148139454f5c17cd4726ada51dfe2c396a27778ce4219835614246cd6586",
+    "status": "PASS",
+    "checks": {
+      "spec": "PASS",
+      "geometry": "PASS",
+      "fonts": "PASS",
+      "spatial": "PASS",
+      "render": "PASS",
+      "visual_review": "PASS"
+    }
+  },
+  {
+    "scenario": "marketing-campaign",
+    "slides": 5,
+    "profile": "marketing",
+    "storyline": "marketing-campaign",
+    "compositions": [
+      "cover-hero",
+      "compare-multi",
+      "flow-horizontal",
+      "funnel-stages",
+      "action-register"
+    ],
+    "pptx_sha256": "c4ea892dcfc40c6658c78d4f38ba97937857ba41599e6b91ff4079e348fb0c80",
+    "status": "PASS_WITH_NOTES",
+    "checks": {
+      "spec": "PASS",
+      "geometry": "PASS",
+      "fonts": "PASS",
+      "spatial": "PASS",
+      "render": "PASS",
+      "visual_review": "NOT_RUN"
+    }
+  },
+  {
+    "scenario": "multimodal-integration",
+    "slides": 9,
+    "profile": "executive-clean",
+    "storyline": "executive-business-review",
+    "compositions": [
+      "multimodal-hero",
+      "metric-strip",
+      "table-detail",
+      "multimodal-split",
+      "multimodal-annotated",
+      "multimodal-gallery"
+    ],
+    "pptx_sha256": "4fd3119644aeec64c781e9095724483b130565bd23b0188155e7b3932d654e55",
+    "status": "PASS",
+    "checks": {
+      "spec": "PASS",
+      "geometry": "PASS",
+      "fonts": "PASS",
+      "spatial": "PASS",
+      "render": "PASS",
+      "visual_review": "PASS"
+    }
+  },
+  {
+    "scenario": "product-launch",
+    "slides": 5,
+    "profile": "launch",
+    "storyline": "product-launch",
+    "compositions": [
+      "cover-hero",
+      "matrix-2x2",
+      "table-detail",
+      "flow-horizontal",
+      "scorecard-table"
+    ],
+    "pptx_sha256": "c6f85897cffd275a4cfe4c7e666bca1ae4e1276aa49b64b2c1a732a39ba5f562",
+    "status": "PASS_WITH_NOTES",
+    "checks": {
+      "spec": "PASS",
+      "geometry": "PASS",
+      "fonts": "PASS",
+      "spatial": "PASS",
+      "render": "PASS",
+      "visual_review": "NOT_RUN"
+    }
+  },
+  {
+    "scenario": "project-update",
+    "slides": 5,
+    "profile": "executive-clean",
+    "storyline": "project-update",
+    "compositions": [
+      "cover-hero",
+      "summary-grid",
+      "roadmap-lanes",
+      "risk-register",
+      "message-focus"
+    ],
+    "pptx_sha256": "150e15ab427f1032fe2228df772067dbc0ab2fd1f791482ce9cad9424abb90da",
+    "status": "PASS_WITH_NOTES",
+    "checks": {
+      "spec": "PASS",
+      "geometry": "PASS",
+      "fonts": "PASS",
+      "spatial": "PASS",
+      "render": "PASS",
+      "visual_review": "NOT_RUN"
+    }
+  },
+  {
+    "scenario": "research-voc",
+    "slides": 7,
+    "profile": "research",
+    "storyline": "voc-analysis",
+    "compositions": [
+      "cover-hero",
+      "scorecard-table",
+      "chart-full",
+      "compare-multi",
+      "evidence-split",
+      "tree-hierarchy",
+      "message-focus"
+    ],
+    "pptx_sha256": "0876a43ad35a460ed294c32c03751a6634a4d030744b97772648d53efdb7bb73",
+    "status": "PASS",
+    "checks": {
+      "spec": "PASS",
+      "geometry": "PASS",
+      "fonts": "PASS",
+      "spatial": "PASS",
+      "render": "PASS",
+      "visual_review": "PASS"
+    }
+  },
+  {
+    "scenario": "sales-review",
+    "slides": 5,
+    "profile": "sales",
+    "storyline": "sales-funnel",
+    "compositions": [
+      "cover-hero",
+      "funnel-stages",
+      "compare-multi",
+      "compare-2",
+      "action-register"
+    ],
+    "pptx_sha256": "a546c7129d3ce2cd78ee13a1dba63168cfdd47e3e87e9cfe7923772e2daa5adc",
+    "status": "PASS_WITH_NOTES",
+    "checks": {
+      "spec": "PASS",
+      "geometry": "PASS",
+      "fonts": "PASS",
+      "spatial": "PASS",
+      "render": "PASS",
+      "visual_review": "NOT_RUN"
+    }
+  },
+  {
+    "scenario": "technical-ai-agent",
+    "slides": 6,
+    "profile": "product-tech",
+    "storyline": "ai-agent-proposal",
+    "compositions": [
+      "cover-hero",
+      "message-focus",
+      "architecture-map",
+      "compare-2",
+      "risk-register",
+      "roadmap-lanes"
+    ],
+    "pptx_sha256": "337254e18bb9a0b7651e67326040f93865367de24f6db5c874df1808eb821ab4",
+    "status": "PASS_WITH_NOTES",
+    "checks": {
+      "spec": "PASS",
+      "geometry": "PASS",
+      "fonts": "PASS",
+      "spatial": "PASS_WITH_NOTES",
+      "render": "PASS",
+      "visual_review": "NOT_RUN"
+    }
+  },
+  {
+    "scenario": "title-subtitle-layout",
+    "slides": 8,
+    "profile": "consulting",
+    "storyline": "executive-business-review",
+    "compositions": [
+      "section-divider",
+      "action-register",
+      "message-focus",
+      "compare-multi"
+    ],
+    "pptx_sha256": "d4681487ffc5c92a905d5b77c3308231f23b2a005e16e7918b0b15bb1ae73c57",
+    "status": "PASS_WITH_NOTES",
+    "checks": {
+      "spec": "PASS",
+      "geometry": "PASS",
+      "fonts": "PASS",
+      "spatial": "PASS_WITH_NOTES",
+      "render": "PASS",
+      "visual_review": "NOT_RUN"
+    }
+  },
+  {
+    "scenario": "training",
+    "slides": 6,
+    "profile": "training",
+    "storyline": "training",
+    "compositions": [
+      "cover-hero",
+      "message-focus",
+      "flow-horizontal",
+      "evidence-split",
+      "table-detail"
+    ],
+    "pptx_sha256": "90e8b7fcb083ea43a682cac716322b872fb51b09738a01d158b051ab244b7b21",
+    "status": "PASS_WITH_NOTES",
+    "checks": {
+      "spec": "PASS_WITH_NOTES",
+      "geometry": "PASS",
+      "fonts": "PASS",
+      "spatial": "PASS_WITH_NOTES",
+      "render": "PASS",
+      "visual_review": "NOT_RUN"
+    }
+  }
+]

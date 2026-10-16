@@ -1,0 +1,180 @@
+{
+  "status": "PASS",
+  "VISUAL_QA": "PASS",
+  "capabilities": {
+    "tools": {
+      "libreoffice": "/usr/bin/libreoffice",
+      "soffice": "/home/zheyou/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/override/soffice",
+      "pdftoppm": "/home/zheyou/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/override/pdftoppm",
+      "fc-list": "/usr/bin/fc-list",
+      "pillow": true
+    },
+    "levels": {
+      "0_spec": "AVAILABLE",
+      "1_geometry_spatial": "AVAILABLE",
+      "2_pptx_inspection": "AVAILABLE",
+      "3_native_render": "AVAILABLE",
+      "4_vision_review": "REQUIRES_REVIEWER",
+      "5_repair_rerender": "REQUIRES_AGENT"
+    },
+    "VISUAL_QA": "NOT_RUN"
+  },
+  "pptx": "out/release-final/research-voc.pptx",
+  "checks": {
+    "spec": {
+      "status": "PASS",
+      "slides": 7,
+      "issues": []
+    },
+    "geometry": {
+      "status": "PASS",
+      "limitations": [
+        "Bounding-box checks do not prove text fit, glyph coverage, or chart-label readability. Grouped/rotated shapes require visual review."
+      ],
+      "slide_size_inches": [
+        13.333333333333334,
+        7.5
+      ],
+      "slides": [
+        {
+          "slide": 1,
+          "objects": 5,
+          "peer_overlap_candidates": 0
+        },
+        {
+          "slide": 2,
+          "objects": 5,
+          "peer_overlap_candidates": 0
+        },
+        {
+          "slide": 3,
+          "objects": 8,
+          "peer_overlap_candidates": 0
+        },
+        {
+          "slide": 4,
+          "objects": 20,
+          "peer_overlap_candidates": 0
+        },
+        {
+          "slide": 5,
+          "objects": 9,
+          "peer_overlap_candidates": 0
+        },
+        {
+          "slide": 6,
+          "objects": 22,
+          "peer_overlap_candidates": 0
+        },
+        {
+          "slide": 7,
+          "objects": 10,
+          "peer_overlap_candidates": 0
+        }
+      ],
+      "issues": []
+    },
+    "fonts": {
+      "status": "PASS",
+      "used": [
+        {
+          "font": "Noto Sans CJK SC",
+          "occurrences": 268
+        },
+        {
+          "font": "Noto Sans",
+          "occurrences": 23
+        }
+      ],
+      "missing_on_this_machine": [],
+      "note": "Missing fonts indicate possible substitution on this machine; they do not prove the recipient environment lacks the fonts.",
+      "resolution": [
+        {
+          "script": "latin",
+          "requested": "Noto Sans",
+          "resolved": "Noto Sans",
+          "substituted": false,
+          "status": "PROVEN"
+        },
+        {
+          "script": "cjk",
+          "requested": "Noto Sans CJK SC",
+          "resolved": "Noto Sans CJK SC",
+          "substituted": false,
+          "status": "PROVEN"
+        }
+      ]
+    },
+    "spatial": {
+      "status": "PASS",
+      "metrics": {
+        "source_coverage": null,
+        "duplicate_content": 0,
+        "unresolved_assets": 0,
+        "detached_annotation": 0,
+        "semantic_occlusion": 0
+      },
+      "issues": [],
+      "limitations": [
+        "Spatial relationships are explicit, not inferred human intent. Contrast uses local raster samples; visual review remains required."
+      ],
+      "fonts": [
+        {
+          "script": "latin",
+          "requested": "Noto Sans",
+          "resolved": "Noto Sans",
+          "substituted": false,
+          "status": "PROVEN"
+        },
+        {
+          "script": "cjk",
+          "requested": "Noto Sans CJK SC",
+          "resolved": "Noto Sans CJK SC",
+          "substituted": false,
+          "status": "PROVEN"
+        }
+      ]
+    },
+    "render": {
+      "status": "PASS",
+      "pages": [
+        "out/release-final/research-voc/slide-1.png",
+        "out/release-final/research-voc/slide-2.png",
+        "out/release-final/research-voc/slide-3.png",
+        "out/release-final/research-voc/slide-4.png",
+        "out/release-final/research-voc/slide-5.png",
+        "out/release-final/research-voc/slide-6.png",
+        "out/release-final/research-voc/slide-7.png"
+      ],
+      "note": "Executed final native render retained; PPTX and page hashes in acceptance record where reviewed."
+    },
+    "visual_review": {
+      "status": "PASS",
+      "record": {
+        "pptx_sha256": "f9947b2fc811f52555755f0be5469d2ebf6a8926d873cd7029f271be3e0976f7",
+        "reviewer": "Codex visual inspection / 2026-10-16",
+        "status": "PASS",
+        "slides_reviewed": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "notes": "Inspected all 7 slides in final montage and full-size decision page. Decision has a clear judgment and separate limitations/actions, natural clause breaks. Research method and noncausal limitation remain visible. No observed collision.",
+        "rendered_page_sha256": {
+          "slide-1.png": "2a64b94dc4664b278ab3ef8aaa8f72539e1ce7deb0aa2a4c3892ea7a8f2f5085",
+          "slide-2.png": "18f86d09ab3b24f6281a2b185eb47793ad5fa809d850f41a98ad86217aed8d7f",
+          "slide-3.png": "f595f07d9e489f0eea8247b076a72056cd1a0568cbefb1943772f6daa73b28f4",
+          "slide-4.png": "0b8ac146da19f05016360cdd191904a817a312d42a23baf46f5deb4da092e86a",
+          "slide-5.png": "12956c760a59898f03967f620ba9e285a5247583f97326b1c8a1b97c6ddda65c",
+          "slide-6.png": "b6a451b63d2326961f209327f401323b3196570d05a192f68e99f2e7249ffa8f",
+          "slide-7.png": "8ff56ec8f236e1dc068d05679ee97dded3765dfcde712d3b08935c4029323d51"
+        }
+      },
+      "note": "Reviewer attestation; not automated visual judgment."
+    }
+  }
+}

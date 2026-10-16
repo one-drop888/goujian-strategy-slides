@@ -1,0 +1,30 @@
+{
+  "pptx_sha256": "38b6e410acbbcbb63414c4b00845297d78c566deaab9fe3cdf7d4bbb5d93150e",
+  "reviewer": "Codex visual inspection / 2026-10-16",
+  "status": "PASS",
+  "slides_reviewed": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+  ],
+  "notes": "Inspected all 10 slides in final montage and full-size behavior table. Optional trial shown separately from nested acquisition/outcome funnel; mature/immature denominators and observational boundary visible. No inferred causal lift.",
+  "rendered_page_sha256": {
+    "slide-01.png": "321cd52023e0ef0eb87f05b56a4a897695bf985fb09885d2875876b7756617ab",
+    "slide-02.png": "7fb1e2611177f1060ad23ed204c094eb31f88a7b0b68277cbcf91d9ef5e11a5c",
+    "slide-03.png": "7d1d5a77b9948a9ab127ede70b5befbafe2f02f2064837287d05b02faae1753d",
+    "slide-04.png": "823b4cc590c57aec71ec2f4b3a586e34460e82440a41ed858970bcf49f822e25",
+    "slide-05.png": "85cb949831bee08c5f2ee72417b371733feef769a3bbd0b7f1c28121bad747f5",
+    "slide-06.png": "088f38c8472a8bba60af038c0e3de3b59990c8235bed1b998e362c83d35c7651",
+    "slide-07.png": "9d2b4c80fd020993a4248d202771e2ca45abf06ce8451353ef6911349322c655",
+    "slide-08.png": "c88b41cffa32417e9d5e6ee67971095b33532980e716583f265da27515457506",
+    "slide-09.png": "30177e4a6566699627800e0a900fd0e81188093e8001fe1ae8b3c5f0c3ef65a4",
+    "slide-10.png": "ae6e56637336d31db3265903e2a1a9dccdc2583f7340221f8b84821e3a1e9e26"
+  }
+}

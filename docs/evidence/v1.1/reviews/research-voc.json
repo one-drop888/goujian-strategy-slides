@@ -1,0 +1,24 @@
+{
+  "pptx_sha256": "0876a43ad35a460ed294c32c03751a6634a4d030744b97772648d53efdb7bb73",
+  "reviewer": "Codex visual inspection / 2026-10-16",
+  "status": "PASS",
+  "slides_reviewed": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+  ],
+  "notes": "Reviewed all 7 slides in the final montage and full-size pages, including repaired quote slide. Long conclusion is now title + subtitle; quote and interpretation use explicit clause breaks. Method/sample limitations remain visible. No collision, clipping, unexplained symbol or orphan title observed.",
+  "rendered_page_sha256": {
+    "slide-1.png": "2a64b94dc4664b278ab3ef8aaa8f72539e1ce7deb0aa2a4c3892ea7a8f2f5085",
+    "slide-2.png": "6c23a132bc2ce70dd74177eeab0a9736aec2936b7b6ff92de2e4315c13ab8a49",
+    "slide-3.png": "f595f07d9e489f0eea8247b076a72056cd1a0568cbefb1943772f6daa73b28f4",
+    "slide-4.png": "0b8ac146da19f05016360cdd191904a817a312d42a23baf46f5deb4da092e86a",
+    "slide-5.png": "12956c760a59898f03967f620ba9e285a5247583f97326b1c8a1b97c6ddda65c",
+    "slide-6.png": "b6a451b63d2326961f209327f401323b3196570d05a192f68e99f2e7249ffa8f",
+    "slide-7.png": "e7877458906f9fb8ae063a9a74ae4a81ab0ff7ec4a8dcc8977e28681b36c047a"
+  }
+}

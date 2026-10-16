@@ -1,0 +1,28 @@
+{
+  "pptx_sha256": "4181a1df4b2d4645eb6b965532e8f70997aac272a4eb4cbaa3a7bffb7efc7be9",
+  "reviewer": "Codex visual inspection / 2026-10-16",
+  "status": "PASS",
+  "slides_reviewed": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+  ],
+  "notes": "Inspected all 9 slides in final montage and full-size dashboard/variance table. Fixed value/note overlap; percent-level difference is pp, relative growth distinguished. Tables retain current and prior totals; negative variance visible.",
+  "rendered_page_sha256": {
+    "slide-1.png": "b47f2dffa05173e226ff9a80e59c0e88ba0c9fd9837462405148437ac72010fe",
+    "slide-2.png": "f9026ab8156501fdca20c37d954b7b03fea3dc41d89e79370bbdcd47cd31c1f4",
+    "slide-3.png": "211ec1d3a98b9067bc99fe69af323e366365caf476c3160591339f5daf2ed394",
+    "slide-4.png": "1a30003a2b59f2b8764aa2ef0c406423bea36b1079b2b3cefcbd9df9c533dda8",
+    "slide-5.png": "dcf19f0632ef9f2610edd46e1b40bf2496e8069a8fe913539265b4039a8edb7b",
+    "slide-6.png": "58582e653cb93f7171fc942a47ec965d532e387967ad96ca8fe20d5d0eea04f1",
+    "slide-7.png": "c1bc7ce9c0455f698746bee2bf6beed5be614e7b661dd92ee2b3f5eb3609e6aa",
+    "slide-8.png": "312033f6a8f87ee1ef2d14a994178869161232fb2d475d7d86b845a7a836d5b5",
+    "slide-9.png": "770b964cd79c2912aa4dad33a9452425b3a841b1f8803cea2951b770c92492fb"
+  }
+}

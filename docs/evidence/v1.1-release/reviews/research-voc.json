@@ -1,0 +1,24 @@
+{
+  "pptx_sha256": "f9947b2fc811f52555755f0be5469d2ebf6a8926d873cd7029f271be3e0976f7",
+  "reviewer": "Codex visual inspection / 2026-10-16",
+  "status": "PASS",
+  "slides_reviewed": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+  ],
+  "notes": "Inspected all 7 slides in final montage and full-size decision page. Decision has a clear judgment and separate limitations/actions, natural clause breaks. Research method and noncausal limitation remain visible. No observed collision.",
+  "rendered_page_sha256": {
+    "slide-1.png": "2a64b94dc4664b278ab3ef8aaa8f72539e1ce7deb0aa2a4c3892ea7a8f2f5085",
+    "slide-2.png": "18f86d09ab3b24f6281a2b185eb47793ad5fa809d850f41a98ad86217aed8d7f",
+    "slide-3.png": "f595f07d9e489f0eea8247b076a72056cd1a0568cbefb1943772f6daa73b28f4",
+    "slide-4.png": "0b8ac146da19f05016360cdd191904a817a312d42a23baf46f5deb4da092e86a",
+    "slide-5.png": "12956c760a59898f03967f620ba9e285a5247583f97326b1c8a1b97c6ddda65c",
+    "slide-6.png": "b6a451b63d2326961f209327f401323b3196570d05a192f68e99f2e7249ffa8f",
+    "slide-7.png": "8ff56ec8f236e1dc068d05679ee97dded3765dfcde712d3b08935c4029323d51"
+  }
+}

@@ -9,6 +9,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 PREFIX = 'goujian-strategy-slides/'
 REQUIRED = {
+    'core/analytics/index.js', 'core/schema/analytics.schema.json', 'scripts/analyze.js',
+    'skill/analytics/business-performance.json', 'skill/analytics/sales-conversion.json', 'skill/analytics/project-analytics.json',
     'SKILL.md', 'package.json', 'package-lock.json',
     'core/renderer/index.js', 'core/schema/deck.schema.json',
     'skill/storylines/registry.json', 'skill/archetypes/registry.json',
@@ -32,7 +34,8 @@ def main():
             assert {PREFIX + name for name in REQUIRED} <= set(names)
             frontmatter = package.read(PREFIX + 'SKILL.md').decode('utf-8').split('---', 2)[1]
             assert 'name: goujian-strategy-slides' in frontmatter
-            assert 'version: "1.0.1"' in frontmatter
+            version=json.loads(package.read(PREFIX+'package.json'))['version']
+            assert f'version: "{version}"' in frontmatter
             line = next(line for line in frontmatter.splitlines() if line.startswith('description: '))
             description = json.loads(line.removeprefix('description: '))
             assert '专业AI PPT制作技能' in description and '原生可编辑PPTX' in description

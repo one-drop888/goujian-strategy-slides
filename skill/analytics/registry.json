@@ -1,0 +1,228 @@
+{
+  "version": "1.1.0",
+  "input_schema": "core/schema/analytics.schema.json",
+  "engine": "core/analytics/index.js",
+  "commands": {
+    "business-performance": "node scripts/analyze.js skill/analytics/business-performance.json out/business-performance.pptx",
+    "sales-conversion": "node scripts/analyze.js skill/analytics/sales-conversion.json out/sales-conversion.pptx",
+    "project-analytics": "node scripts/analyze.js skill/analytics/project-analytics.json out/project-analytics.pptx"
+  },
+  "families": [
+    {
+      "id": "business-performance",
+      "input_example": "skill/analytics/business-performance.json",
+      "recipes": [
+        {
+          "name": "KPI Scorecard",
+          "input_fields": "metrics[].actual,target,unit",
+          "calculation": "actual / target; null or zero target = N/A",
+          "visualization": {
+            "archetype": "kpi-dashboard",
+            "composition": "metric-strip"
+          },
+          "conclusion_boundary": "Computed descriptive findings only; user or agent verifies source quality, causal explanation and action",
+          "output": "Native editable PPTX + .spec.json + .data.json + .scene.json"
+        },
+        {
+          "name": "Target vs Actual",
+          "input_fields": "primary_metric,metrics",
+          "calculation": "one metric and unit on one zero-based axis",
+          "visualization": {
+            "archetype": "chart",
+            "composition": "chart-with-insight"
+          },
+          "conclusion_boundary": "Computed descriptive findings only; user or agent verifies source quality, causal explanation and action",
+          "output": "Native editable PPTX + .spec.json + .data.json + .scene.json"
+        },
+        {
+          "name": "YoY / MoM Trend",
+          "input_fields": "trend[].month,actual; previous_month,previous_year",
+          "calculation": "(actual - baseline) / baseline; monthly consecutive observations",
+          "visualization": {
+            "archetype": "trend",
+            "composition": "chart-with-insight"
+          },
+          "conclusion_boundary": "Computed descriptive findings only; user or agent verifies source quality, causal explanation and action",
+          "output": "Native editable PPTX + .spec.json + .data.json + .scene.json"
+        },
+        {
+          "name": "Variance Analysis",
+          "input_fields": "metrics[].actual,target",
+          "calculation": "actual - target; percentage metric difference in pp",
+          "visualization": {
+            "archetype": "table",
+            "composition": "table-detail"
+          },
+          "conclusion_boundary": "Computed descriptive findings only; user or agent verifies source quality, causal explanation and action",
+          "output": "Native editable PPTX + .spec.json + .data.json + .scene.json"
+        },
+        {
+          "name": "Contribution Analysis",
+          "input_fields": "contributions[].actual,previous",
+          "calculation": "share = part / total; growth contribution = part - previous; reconcile both totals",
+          "visualization": {
+            "archetype": "chart",
+            "composition": "chart-with-insight"
+          },
+          "conclusion_boundary": "Computed descriptive findings only; user or agent verifies source quality, causal explanation and action",
+          "output": "Native editable PPTX + .spec.json + .data.json + .scene.json"
+        },
+        {
+          "name": "Management Summary",
+          "input_fields": "computed metrics",
+          "calculation": "observed differences only; no inferred cause/action",
+          "visualization": {
+            "archetype": "executive-summary",
+            "composition": "summary-grid"
+          },
+          "conclusion_boundary": "Computed descriptive findings only; user or agent verifies source quality, causal explanation and action",
+          "output": "Native editable PPTX + .spec.json + .data.json + .scene.json"
+        }
+      ]
+    },
+    {
+      "id": "sales-conversion",
+      "input_example": "skill/analytics/sales-conversion.json",
+      "recipes": [
+        {
+          "name": "Lead Funnel",
+          "input_fields": "leads,events,outcome_stage",
+          "calculation": "unique mature acquisition cohort -> observed outcome; optional behaviors separate",
+          "visualization": {
+            "archetype": "sales-funnel",
+            "composition": "funnel-stages"
+          },
+          "conclusion_boundary": "Computed descriptive findings only; user or agent verifies source quality, causal explanation and action",
+          "output": "Native editable PPTX + .spec.json + .data.json + .scene.json"
+        },
+        {
+          "name": "Conversion Rate",
+          "input_fields": "period,as_of,horizon_days",
+          "calculation": "unique outcome customers within fixed horizon / mature unique acquired customers",
+          "visualization": {
+            "archetype": "kpi-dashboard",
+            "composition": "metric-strip"
+          },
+          "conclusion_boundary": "Computed descriptive findings only; user or agent verifies source quality, causal explanation and action",
+          "output": "Native editable PPTX + .spec.json + .data.json + .scene.json"
+        },
+        {
+          "name": "Stage Drop-off",
+          "input_fields": "edges,events",
+          "calculation": "ordered first-observed target among customers reaching source; not observed is not proven lost",
+          "visualization": {
+            "archetype": "table",
+            "composition": "table-detail"
+          },
+          "conclusion_boundary": "Computed descriptive findings only; user or agent verifies source quality, causal explanation and action",
+          "output": "Native editable PPTX + .spec.json + .data.json + .scene.json"
+        },
+        {
+          "name": "Cohort Conversion",
+          "input_fields": "leads[].acquired",
+          "calculation": "group mature customers by acquisition month, same observation horizon",
+          "visualization": {
+            "archetype": "table",
+            "composition": "table-detail"
+          },
+          "conclusion_boundary": "Computed descriptive findings only; user or agent verifies source quality, causal explanation and action",
+          "output": "Native editable PPTX + .spec.json + .data.json + .scene.json"
+        },
+        {
+          "name": "Regional / Store Comparison",
+          "input_fields": "leads[].region",
+          "calculation": "first-touch region attribution, customer counts and outcome counts",
+          "visualization": {
+            "archetype": "chart",
+            "composition": "chart-with-insight"
+          },
+          "conclusion_boundary": "Computed descriptive findings only; user or agent verifies source quality, causal explanation and action",
+          "output": "Native editable PPTX + .spec.json + .data.json + .scene.json"
+        },
+        {
+          "name": "Sales Driver Analysis",
+          "input_fields": "stages,events,leads[].channel",
+          "calculation": "optional-behavior strata and first-touch channels; descriptive association, never causal effect",
+          "visualization": {
+            "archetype": "table",
+            "composition": "table-detail"
+          },
+          "conclusion_boundary": "Computed descriptive findings only; user or agent verifies source quality, causal explanation and action",
+          "output": "Native editable PPTX + .spec.json + .data.json + .scene.json"
+        }
+      ]
+    },
+    {
+      "id": "project-analytics",
+      "input_example": "skill/analytics/project-analytics.json",
+      "recipes": [
+        {
+          "name": "Project KPI",
+          "input_fields": "projects[].planned_units,actual_units; unit",
+          "calculation": "common delivery unit, cumulative as_of; no mixed units",
+          "visualization": {
+            "archetype": "kpi-dashboard",
+            "composition": "metric-strip"
+          },
+          "conclusion_boundary": "Computed descriptive findings only; user or agent verifies source quality, causal explanation and action",
+          "output": "Native editable PPTX + .spec.json + .data.json + .scene.json"
+        },
+        {
+          "name": "Planned vs Actual",
+          "input_fields": "projects[].planned_units,actual_units",
+          "calculation": "actual - planned units, no quality or acceptance inference",
+          "visualization": {
+            "archetype": "chart",
+            "composition": "chart-with-insight"
+          },
+          "conclusion_boundary": "Computed descriptive findings only; user or agent verifies source quality, causal explanation and action",
+          "output": "Native editable PPTX + .spec.json + .data.json + .scene.json"
+        },
+        {
+          "name": "Milestone Performance",
+          "input_fields": "milestones[].planned,actual; as_of",
+          "calculation": "actual - planned days; null actual stays open, not zero-delay",
+          "visualization": {
+            "archetype": "table",
+            "composition": "table-detail"
+          },
+          "conclusion_boundary": "Computed descriptive findings only; user or agent verifies source quality, causal explanation and action",
+          "output": "Native editable PPTX + .spec.json + .data.json + .scene.json"
+        },
+        {
+          "name": "Resource Allocation",
+          "input_fields": "projects[].planned_days,actual_days",
+          "calculation": "same human-day unit; sum only complete data",
+          "visualization": {
+            "archetype": "chart",
+            "composition": "chart-with-insight"
+          },
+          "conclusion_boundary": "Computed descriptive findings only; user or agent verifies source quality, causal explanation and action",
+          "output": "Native editable PPTX + .spec.json + .data.json + .scene.json"
+        },
+        {
+          "name": "Budget / Cost Variance",
+          "input_fields": "budget,actual_days,day_rate,external_cost,currency",
+          "calculation": "cost = days * rate + external; variance = cost - full budget, not earned value",
+          "visualization": {
+            "archetype": "table",
+            "composition": "table-detail"
+          },
+          "conclusion_boundary": "Computed descriptive findings only; user or agent verifies source quality, causal explanation and action",
+          "output": "Native editable PPTX + .spec.json + .data.json + .scene.json"
+        },
+        {
+          "name": "Risk and Delivery Overview",
+          "input_fields": "risk,realized_value,cost",
+          "calculation": "declared risk; realized value / cost, not projected ROI; missing value remains unknown",
+          "visualization": {
+            "archetype": "table",
+            "composition": "table-detail"
+          },
+          "conclusion_boundary": "Computed descriptive findings only; user or agent verifies source quality, causal explanation and action",
+          "output": "Native editable PPTX + .spec.json + .data.json + .scene.json"
+        }
+      ]
+    }
+  ]
+}

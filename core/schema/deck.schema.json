@@ -61,6 +61,29 @@
           "type": "number",
           "minimum": 12,
           "maximum": 28
+        },
+        "preferred": {
+          "type": "object",
+          "properties": {
+            "latin": {
+              "type": "string"
+            },
+            "cjk": {
+              "type": "string"
+            }
+          }
+        },
+        "fallback_latin": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "fallback_cjk": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },
@@ -145,12 +168,34 @@
           "type": "number",
           "minimum": 10,
           "maximum": 18
+        },
+        "image_gap": {
+          "type": "number",
+          "minimum": 0.2,
+          "maximum": 0.7
+        },
+        "image_caption_size": {
+          "type": "number",
+          "minimum": 10,
+          "maximum": 14
+        },
+        "image_border": {
+          "enum": [
+            "line",
+            "none"
+          ]
         }
       }
     },
     "background": {
       "type": "string",
       "pattern": "^[0-9A-Fa-f]{6}$"
+    },
+    "assets": {
+      "type": "array",
+      "items": {
+        "$ref": "asset.schema.json"
+      }
     }
   },
   "additionalProperties": true

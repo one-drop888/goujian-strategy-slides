@@ -15,12 +15,15 @@ def main():
     a=ap.parse_args();out=Path(a.out).resolve();out.mkdir(parents=True,exist_ok=True);results=[]
     archetypes=json.loads((ROOT/'skill/archetypes/registry.json').read_text())['archetypes']
     mapping={x['id']:x['composition'] for x in archetypes}
+    mapping.update({'chart':'chart-with-insight','statement':'message-focus','kpi':'metric-strip','action':'action-register'})
     for p in sorted((ROOT/'skill/examples').glob('*.json')):
         if p.name=='manifest.json':continue
         d=json.loads(p.read_text(encoding='utf-8'));pptx=out/(p.stem+'.pptx');report=out/(p.stem+'-qa.json')
         try:
             run(['node','skill/scripts/build_deck.js',str(p),str(pptx)])
             cmd=[sys.executable,'skill/scripts/quality_gate.py',str(pptx),'--spec',str(p),'--out',str(report)]
+            inputs={'executive-business-review':'business-performance','sales-conversion-diagnostic':'sales-conversion','project-performance-review':'project-analytics'}
+            if p.stem in inputs:cmd+=['--analytics-input',str(ROOT/'skill/analytics'/(inputs[p.stem]+'.json'))]
             if a.render:cmd+=['--render-dir',str(out/p.stem)]
             run(cmd);qa=json.loads(report.read_text())
             result={'scenario':p.stem,'slides':len(d['slides']),'profile':d['profile'],'storyline':d['storyline'],

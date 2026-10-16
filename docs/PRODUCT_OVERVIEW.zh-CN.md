@@ -31,7 +31,7 @@
 
 Agent 先明确决策、证据和约束，选择 Storyline 与每页语义目的，再形成 JSON Presentation Spec。可复用 Composition 与明确的 Profile 驱动 PPTX 后端。可执行校验拒绝错误及超出容量的输入，渲染与实际视觉审查形成闭环。
 
-Library 包含 28 个 Storyline、78 个语义条目、23 个 Composition Recipe、15 个 Profile、15 个模板配方。**其中 65 个语义条目已实现、6 个 Partial、7 个仅设计**；仅设计条目不能构建。数量表示表达词汇的范围，不代表 78 套独立设计或同等完整的专用版式。
+Library 包含 28 个 Storyline、86 个语义条目、27 个 Composition Recipe、15 个 Profile、15 个模板配方。**其中 74 个语义条目已实现、6 个 Partial、6 个仅设计**；仅设计条目不能构建。数量表示表达词汇的范围，不代表 86 套独立设计或同等完整的专用版式。
 
 ## V1 边界
 
@@ -42,3 +42,10 @@ Planner 是小型启发式助手；证据选择、因果判断、模板解释和
 Presentation Intelligence 层独立于 PptxGenJS，为 HTML Slides、Web Presentation 等输出保留空间；跨 Renderer 的共享几何布局引擎属于未来工作。V1 不实现 HTML、动画、任意 PPTX 完全无损编辑或自动确定性视觉修复。
 
 只有一个产品和一套 Presentation Library。平台适配器只提供薄层执行指引，不拆分公共版、公司版或个人版。
+
+
+## V1.1 多模态边界
+
+图片、图表、表格和解释以原生对象进入同一构建流程，并保存来源、像素文字属性、裁剪区域和场景关系。标题/副标题/分割线按测量结果排列；空间 QA 读回实际 PPTX 坐标。图片分类、语义改写和视觉修复仍需 Agent；OCR、SmartArt/母版完整恢复和自主视觉修复未实现。详见[多模态契约](MULTIMODAL_CONTRACT.md)与[验证记录](V1_1_VALIDATION.md)。
+
+三类可运行分析库支持替换 JSON 数据并重新生成原生可编辑演示：经营总览、非线性销售转化及项目绩效。18 项分析任务明确字段、计算、单位、时间窗口、分母、缺失值和数据保真门禁。详见[分析库](ANALYTICAL_LIBRARY.md)与[最终验收](V1_1_RELEASE_VALIDATION.md)。

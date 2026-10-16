@@ -1,0 +1,181 @@
+{
+  "status": "PASS",
+  "VISUAL_QA": "PASS",
+  "capabilities": {
+    "tools": {
+      "libreoffice": "/usr/bin/libreoffice",
+      "soffice": "soffice",
+      "pdftoppm": "pdftoppm",
+      "fc-list": "/usr/bin/fc-list",
+      "pillow": true
+    },
+    "levels": {
+      "0_spec": "AVAILABLE",
+      "1_geometry_spatial": "AVAILABLE",
+      "2_pptx_inspection": "AVAILABLE",
+      "3_native_render": "AVAILABLE",
+      "4_vision_review": "REQUIRES_REVIEWER",
+      "5_repair_rerender": "REQUIRES_AGENT"
+    },
+    "VISUAL_QA": "NOT_RUN"
+  },
+  "pptx": "out/v11-final/research-voc.pptx",
+  "checks": {
+    "spec": {
+      "status": "PASS",
+      "slides": 7,
+      "issues": []
+    },
+    "geometry": {
+      "status": "PASS",
+      "limitations": [
+        "Bounding-box checks do not prove text fit, glyph coverage, or chart-label readability. Grouped/rotated shapes require visual review."
+      ],
+      "slide_size_inches": [
+        13.333333333333334,
+        7.5
+      ],
+      "slides": [
+        {
+          "slide": 1,
+          "objects": 5,
+          "peer_overlap_candidates": 0
+        },
+        {
+          "slide": 2,
+          "objects": 5,
+          "peer_overlap_candidates": 0
+        },
+        {
+          "slide": 3,
+          "objects": 8,
+          "peer_overlap_candidates": 0
+        },
+        {
+          "slide": 4,
+          "objects": 20,
+          "peer_overlap_candidates": 0
+        },
+        {
+          "slide": 5,
+          "objects": 9,
+          "peer_overlap_candidates": 0
+        },
+        {
+          "slide": 6,
+          "objects": 22,
+          "peer_overlap_candidates": 0
+        },
+        {
+          "slide": 7,
+          "objects": 7,
+          "peer_overlap_candidates": 0
+        }
+      ],
+      "issues": []
+    },
+    "fonts": {
+      "status": "PASS",
+      "used": [
+        {
+          "font": "Noto Sans CJK SC",
+          "occurrences": 250
+        },
+        {
+          "font": "Noto Sans",
+          "occurrences": 23
+        }
+      ],
+      "missing_on_this_machine": [],
+      "note": "Missing fonts indicate possible substitution on this machine; they do not prove the recipient environment lacks the fonts.",
+      "resolution": [
+        {
+          "script": "latin",
+          "requested": "Noto Sans",
+          "resolved": "Noto Sans",
+          "substituted": false,
+          "status": "PROVEN"
+        },
+        {
+          "script": "cjk",
+          "requested": "Noto Sans CJK SC",
+          "resolved": "Noto Sans CJK SC",
+          "substituted": false,
+          "status": "PROVEN"
+        }
+      ]
+    },
+    "spatial": {
+      "status": "PASS",
+      "metrics": {
+        "source_coverage": null,
+        "duplicate_content": 0,
+        "unresolved_assets": 0,
+        "detached_annotation": 0,
+        "semantic_occlusion": 0
+      },
+      "issues": [],
+      "limitations": [
+        "Spatial relationships are explicit, not inferred human intent. Contrast uses local raster samples; visual review remains required."
+      ],
+      "fonts": [
+        {
+          "script": "latin",
+          "requested": "Noto Sans",
+          "resolved": "Noto Sans",
+          "substituted": false,
+          "status": "PROVEN"
+        },
+        {
+          "script": "cjk",
+          "requested": "Noto Sans CJK SC",
+          "resolved": "Noto Sans CJK SC",
+          "substituted": false,
+          "status": "PROVEN"
+        }
+      ]
+    },
+    "render": {
+      "status": "PASS",
+      "pages": [
+        "out/v11-final/research-voc/slide-1.png",
+        "out/v11-final/research-voc/slide-2.png",
+        "out/v11-final/research-voc/slide-3.png",
+        "out/v11-final/research-voc/slide-4.png",
+        "out/v11-final/research-voc/slide-5.png",
+        "out/v11-final/research-voc/slide-6.png",
+        "out/v11-final/research-voc/slide-7.png"
+      ],
+      "montage": "out/v11-final/research-voc/montage.png",
+      "pdf": "out/v11-final/research-voc/deck.pdf"
+    },
+    "visual_review": {
+      "status": "PASS",
+      "record": {
+        "pptx_sha256": "0876a43ad35a460ed294c32c03751a6634a4d030744b97772648d53efdb7bb73",
+        "reviewer": "Codex visual inspection / 2026-10-16",
+        "status": "PASS",
+        "slides_reviewed": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "notes": "Reviewed all 7 slides in the final montage and full-size pages, including repaired quote slide. Long conclusion is now title + subtitle; quote and interpretation use explicit clause breaks. Method/sample limitations remain visible. No collision, clipping, unexplained symbol or orphan title observed.",
+        "rendered_page_sha256": {
+          "slide-1.png": "2a64b94dc4664b278ab3ef8aaa8f72539e1ce7deb0aa2a4c3892ea7a8f2f5085",
+          "slide-2.png": "6c23a132bc2ce70dd74177eeab0a9736aec2936b7b6ff92de2e4315c13ab8a49",
+          "slide-3.png": "f595f07d9e489f0eea8247b076a72056cd1a0568cbefb1943772f6daa73b28f4",
+          "slide-4.png": "0b8ac146da19f05016360cdd191904a817a312d42a23baf46f5deb4da092e86a",
+          "slide-5.png": "12956c760a59898f03967f620ba9e285a5247583f97326b1c8a1b97c6ddda65c",
+          "slide-6.png": "b6a451b63d2326961f209327f401323b3196570d05a192f68e99f2e7249ffa8f",
+          "slide-7.png": "e7877458906f9fb8ae063a9a74ae4a81ab0ff7ec4a8dcc8977e28681b36c047a"
+        }
+      },
+      "note": "Reviewer attestation; not automated visual judgment."
+    }
+  }
+}

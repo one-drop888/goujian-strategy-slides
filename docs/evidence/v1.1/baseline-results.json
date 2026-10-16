@@ -1,0 +1,43 @@
+[
+  {
+    "case": "multimodal",
+    "baseline_commit": "8416d958",
+    "status": "FAIL",
+    "expected": "FAIL",
+    "errors": [
+      "/slides/0/type must be equal to one of the allowed values",
+      "/slides/3/type must be equal to one of the allowed values",
+      "/slides/4/type must be equal to one of the allowed values",
+      "/slides/6/type must be equal to one of the allowed values",
+      "/slides/7/type must be equal to one of the allowed values",
+      "/slides/8/type must be equal to one of the allowed values"
+    ]
+  },
+  {
+    "case": "six-kpi",
+    "baseline_commit": "8416d958",
+    "status": "FAIL",
+    "expected": "FAIL",
+    "errors": [
+      "slides[0]: items exceed layout capacity 5; split the slide"
+    ]
+  },
+  {
+    "case": "nine-column-table",
+    "baseline_commit": "8416d958",
+    "status": "FAIL",
+    "expected": "FAIL",
+    "errors": [
+      "slides[0]: table requires rectangular rows; capacity is 6 columns × 8 rows"
+    ]
+  },
+  {
+    "case": "image-insight",
+    "baseline_commit": "8416d958",
+    "status": "FAIL",
+    "expected": "FAIL",
+    "errors": [
+      "slides[0]: image-insight: No faithful V1 renderer. Choose an implemented archetype explicitly."
+    ]
+  }
+]

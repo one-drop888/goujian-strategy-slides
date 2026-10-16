@@ -16,18 +16,18 @@ function createDataRenderers(pptx, style, spec) {
     const rowH = Math.min(.87, 4.5/(rows.length+1));
     slide.addTable(cells, {
       x:left,y:1.85,w:width,colW:widths?.map(v=>v*width),
-      rowH, fontFace:F.cjk,fontSize:F.tableSize, color:C.text,
-      margin:[.12,.16,.12,.16], valign:'mid', autoPage:false,
+      rowH, fontFace:F.cjk,fontSize:headers.length>6?Math.max(12,F.tableSize-2):F.tableSize, color:C.text,
+      margin:[5,8,5,8], valign:'mid', autoPage:false,
       border:[{type:'solid',pt:.5,color:C.line},{type:'solid',pt:0,color:style.background},
         {type:'solid',pt:.5,color:C.line},{type:'solid',pt:0,color:style.background}],
     });
   }
   function table(s) {
-    const slide=pptx.addSlide(); base(slide,s.title,s.section);
+    const slide=pptx.addSlide(); base(slide,s);
     drawTable(slide,s.headers,s.rows,s,s.columnWidths); finish(slide,s);
   }
   function scorecard(s) {
-    const slide=pptx.addSlide(); base(slide,s.title,s.section);
+    const slide=pptx.addSlide(); base(slide,s);
     if(s.semanticType==='research-method') {
       drawTable(slide, zh?['设计维度','范围 / 方法','依据与限制']:['Design','Scope / method','Basis and limitations'],
         s.items.map(it=>[it.label||it.title,it.value,it.note||'']),s,[.23,.24,.53]);
@@ -39,14 +39,14 @@ function createDataRenderers(pptx, style, spec) {
     finish(slide,s);
   }
   function risk(s) {
-    const slide=pptx.addSlide(); base(slide,s.title,s.section);
+    const slide=pptx.addSlide(); base(slide,s);
     drawTable(slide,zh?['风险 / 问题','可能性','影响','应对措施','负责人']:['Risk / issue','Likelihood','Impact','Mitigation','Owner'],
       s.items.map(it=>[it.title||it.label,it.likelihood||'',it.impact||it.severity||'',it.mitigation||it.action||'',it.owner||'']),
       s,[.24,.12,.11,.38,.15]);
     finish(slide,s);
   }
   function chart(s) {
-    const slide=pptx.addSlide(); base(slide,s.title,s.section);
+    const slide=pptx.addSlide(); base(slide,s);
     const kind=s.chartType || 'bar';
     const map={bar:pptx.ChartType.bar,column:pptx.ChartType.bar,line:pptx.ChartType.line,area:pptx.ChartType.area,
       pie:pptx.ChartType.pie,doughnut:pptx.ChartType.doughnut};
@@ -67,7 +67,7 @@ function createDataRenderers(pptx, style, spec) {
       showCatName:false,showShadow:false,showSerName:false,
       chartArea:{fill:{color:style.background},border:{color:style.background,pt:0}},
       plotArea:{fill:{color:style.background},border:{color:style.background,pt:0}},
-      barGapWidthPct:s.semanticType==='histogram'?0:65,barDir:kind==='bar'?'bar':'col',
+      barGapWidthPct:s.semanticType==='histogram'?0:(series[0].labels.length<3?220:65),barDir:kind==='bar'?'bar':'col',
     };
     if (['bar','column','area'].includes(kind)) options.valAxisMinVal=Math.min(0,...series.flatMap(x=>x.values));
     if (s.axisMin != null) options.valAxisMinVal=s.axisMin;

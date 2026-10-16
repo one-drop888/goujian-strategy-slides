@@ -1,0 +1,152 @@
+[
+  {
+    "profile": "consulting",
+    "checks": {
+      "geometry": "PASS",
+      "fonts": "PASS",
+      "spatial": "PASS",
+      "render": "PASS",
+      "visual_review": "NOT_RUN"
+    }
+  },
+  {
+    "profile": "corporate",
+    "checks": {
+      "geometry": "PASS",
+      "fonts": "PASS",
+      "spatial": "PASS",
+      "render": "PASS",
+      "visual_review": "NOT_RUN"
+    }
+  },
+  {
+    "profile": "dark-executive",
+    "checks": {
+      "geometry": "PASS",
+      "fonts": "PASS",
+      "spatial": "PASS",
+      "render": "PASS",
+      "visual_review": "NOT_RUN"
+    }
+  },
+  {
+    "profile": "executive-clean",
+    "checks": {
+      "geometry": "PASS",
+      "fonts": "PASS",
+      "spatial": "PASS",
+      "render": "PASS",
+      "visual_review": "NOT_RUN"
+    }
+  },
+  {
+    "profile": "executive-dense",
+    "checks": {
+      "geometry": "PASS",
+      "fonts": "PASS",
+      "spatial": "PASS",
+      "render": "PASS",
+      "visual_review": "NOT_RUN"
+    }
+  },
+  {
+    "profile": "finance",
+    "checks": {
+      "geometry": "PASS",
+      "fonts": "PASS",
+      "spatial": "PASS",
+      "render": "PASS",
+      "visual_review": "NOT_RUN"
+    }
+  },
+  {
+    "profile": "launch",
+    "checks": {
+      "geometry": "PASS",
+      "fonts": "PASS",
+      "spatial": "PASS",
+      "render": "PASS",
+      "visual_review": "NOT_RUN"
+    }
+  },
+  {
+    "profile": "luxury",
+    "checks": {
+      "geometry": "PASS",
+      "fonts": "PASS",
+      "spatial": "PASS",
+      "render": "PASS",
+      "visual_review": "NOT_RUN"
+    }
+  },
+  {
+    "profile": "marketing",
+    "checks": {
+      "geometry": "PASS",
+      "fonts": "PASS",
+      "spatial": "PASS",
+      "render": "PASS",
+      "visual_review": "NOT_RUN"
+    }
+  },
+  {
+    "profile": "minimal",
+    "checks": {
+      "geometry": "PASS",
+      "fonts": "PASS",
+      "spatial": "PASS",
+      "render": "PASS",
+      "visual_review": "NOT_RUN"
+    }
+  },
+  {
+    "profile": "product-tech",
+    "checks": {
+      "geometry": "PASS",
+      "fonts": "PASS",
+      "spatial": "PASS",
+      "render": "PASS",
+      "visual_review": "NOT_RUN"
+    }
+  },
+  {
+    "profile": "research",
+    "checks": {
+      "geometry": "PASS",
+      "fonts": "PASS",
+      "spatial": "PASS",
+      "render": "PASS",
+      "visual_review": "NOT_RUN"
+    }
+  },
+  {
+    "profile": "sales",
+    "checks": {
+      "geometry": "PASS",
+      "fonts": "PASS",
+      "spatial": "PASS",
+      "render": "PASS",
+      "visual_review": "NOT_RUN"
+    }
+  },
+  {
+    "profile": "strategy",
+    "checks": {
+      "geometry": "PASS",
+      "fonts": "PASS",
+      "spatial": "PASS",
+      "render": "PASS",
+      "visual_review": "NOT_RUN"
+    }
+  },
+  {
+    "profile": "training",
+    "checks": {
+      "geometry": "PASS",
+      "fonts": "PASS",
+      "spatial": "PASS",
+      "render": "PASS",
+      "visual_review": "NOT_RUN"
+    }
+  }
+]

@@ -6,26 +6,50 @@ const {resolveStyle}=require('../style/resolve-style');
 const {createSlideRenderers}=require('./slides/basic');
 const {assertDeck,schemaErrors}=require('../schema/validate');
 const {resolveSlide}=require('../composition/resolver');
+const {resolveFonts}=require('../style/font-resolver');
+const {attachScene}=require('./scene-adapter');
+const {createAssetPipeline}=require('./assets');
+const {deduplicateSection}=require('../composition/scene');
+const os=require('os'),crypto=require('crypto');
 
 async function buildDeck(spec,outPath,options={}){
   assertDeck(spec);
   const repoRoot=options.repoRoot||path.resolve(__dirname,'../..');
-  const profile=loadProfile(options.profile||spec.profile||'executive-clean',repoRoot);
+  if((spec.assets||[]).some(a=>path.resolve(options.specDir||repoRoot,a.path)===path.resolve(outPath)))throw Error('PPTX output must differ from every source asset');
+  const profile=loadProfile(options.profile||spec.profile||'executive-clean',repoRoot,new Set(),options.specDir);
   const errors=schemaErrors('profile',profile);
   if(errors.length) throw new Error('Invalid profile: '+errors.join('; '));
   const style=resolveStyle(profile,spec);
+  const fontResolution=resolveFonts({...style.font,preferred:spec.font?.preferred||profile.font.preferred,fallback_latin:spec.font?.fallback_latin||profile.font.fallback_latin,fallback_cjk:spec.font?.fallback_cjk||profile.font.fallback_cjk});
+  style.font=fontResolution.font;
+  const tempDir=fs.mkdtempSync(path.join(os.tmpdir(),'goujian-assets-'));
+  const assets=createAssetPipeline(spec.assets,options.specDir||repoRoot,tempDir,style.background);
   const pptx=new pptxgen();
   pptx.layout=style.canvas==='wide'?'LAYOUT_WIDE':'LAYOUT_4X3';
   pptx.author=spec.author||'Goujian Strategy Slides'; pptx.subject=spec.title||''; pptx.title=spec.title||''; pptx.company=spec.company||''; pptx.lang=spec.lang||'zh-CN';
   pptx.theme={headFontFace:style.font.latin,bodyFontFace:style.font.latin,lang:spec.lang||'zh-CN'};
-  const renderers=createSlideRenderers(pptx,style,spec);
+  const scenes=[];let current;
+  const nativeAddSlide=pptx.addSlide.bind(pptx);
+  pptx.addSlide=(...args)=>{const slide=nativeAddSlide(...args);scenes.push(attachScene(slide,current,scenes.length+1,style));return slide;};
+  const renderers={...createSlideRenderers(pptx,style,spec),...require('./slides/multimodal').createMultimodalRenderers(pptx,style,spec,assets)};
   const resolved=[];
+  try {
   for(const raw of spec.slides||[]){
-    const {renderer,slide}=resolveSlide(raw,repoRoot);
+    const {renderer,slide}=resolveSlide(deduplicateSection(raw,spec.assets),repoRoot);current=slide;
     const fn=renderers[renderer]; if(!fn) throw new Error(`renderer not implemented: ${renderer} (semantic type ${raw.type})`);
-    fn(slide); resolved.push({semantic:raw.type,composition:slide.composition,renderer});
+    fn(slide);
+    const scene=scenes.at(-1),ids=new Set(scene.nodes.map(n=>n.id));
+    for(const n of scene.nodes) {
+      if(n.role==='evidence'&&ids.has('claim'))scene.relationships.push({from:n.id,to:'claim',type:'supports'});
+      if(n.role==='evidence'&&ids.has('source'))scene.relationships.push({from:'source',to:n.id,type:'source_of'});
+    }
+    scene.relationships.push(...(slide.relationships||[]));
+    resolved.push({semantic:raw.type,composition:slide.composition,renderer});
   }
   fs.mkdirSync(path.dirname(outPath),{recursive:true}); await pptx.writeFile({fileName:outPath});
-  return {outPath,profile:profile.id,slides:(spec.slides||[]).length,resolved};
+  const graph={version:'1.1',pptx_sha256:crypto.createHash('sha256').update(fs.readFileSync(outPath)).digest('hex'),fonts:fontResolution.report,declared_assets:(spec.assets||[]).map(a=>a.id),assets:assets.used,slides:scenes};
+  fs.writeFileSync(outPath+'.scene.json',JSON.stringify(graph,null,2)+'\n');
+  return {outPath,profile:profile.id,slides:(spec.slides||[]).length,resolved,scene:outPath+'.scene.json'};
+  } finally {fs.rmSync(tempDir,{recursive:true,force:true});}
 }
 module.exports={buildDeck};

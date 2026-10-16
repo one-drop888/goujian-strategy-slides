@@ -9,7 +9,7 @@ def run(*args):return subprocess.run(args,cwd=ROOT,text=True,capture_output=True
 def test_library_scale():
     assert load('skill/storylines/registry.json')['count'] >= 20
     assert load('skill/archetypes/registry.json')['count'] >= 60
-    assert 15 <= load('skill/compositions/registry.json')['count'] <= 25
+    assert load('skill/compositions/registry.json')['count'] >= 23
     assert len(list((ROOT/'skill/profiles').glob('*/profile.json'))) >= 10
     assert load('skill/templates/registry.json')['count'] >= 10
 

@@ -16,28 +16,30 @@ function profileSearchDirs(repoRoot) {
   return [path.join(repoRoot, 'skill', 'profiles'), ...envDirs];
 }
 
-function resolveProfileFile(ref, repoRoot) {
+function resolveProfileFile(ref, repoRoot, projectDir) {
   const id = ref || 'executive-clean';
-  const direct = path.resolve(id);
-  if (fs.existsSync(direct) && fs.statSync(direct).isFile()) return direct;
-  for (const dir of profileSearchDirs(repoRoot)) {
+  const configured=profileSearchDirs(repoRoot);
+  const dirs=[configured[0],...(projectDir?[path.join(projectDir,'profiles'),projectDir]:[]),...configured.slice(1)];
+  for (const dir of dirs) {
     for (const p of [path.join(dir, id, 'profile.json'), path.join(dir, `${id}.json`)]) {
       if (fs.existsSync(p) && fs.statSync(p).isFile()) return p;
     }
   }
+  const direct = path.resolve(projectDir||process.cwd(),id);
+  if (fs.existsSync(direct) && fs.statSync(direct).isFile()) return direct;
   throw new Error(`profile not found: ${id}`);
 }
 
-function loadProfile(profileRef, repoRoot, seen = new Set()) {
+function loadProfile(profileRef, repoRoot, seen = new Set(), projectDir) {
   const base = repoRoot || path.resolve(__dirname, '../..');
-  const file = resolveProfileFile(profileRef || 'executive-clean', base);
+  const file = resolveProfileFile(profileRef || 'executive-clean', base,projectDir);
   const key = path.resolve(file);
   if (seen.has(key)) throw new Error(`profile inheritance cycle: ${key}`);
   seen.add(key);
   const data = JSON.parse(fs.readFileSync(file, 'utf8'));
   if (!data.extends) return data;
   const relativeParent = path.resolve(path.dirname(file), data.extends);
-  const parent = loadProfile(fs.existsSync(relativeParent) ? relativeParent : data.extends, base, seen);
+  const parent = loadProfile(fs.existsSync(relativeParent) ? relativeParent : data.extends, base, seen,projectDir);
   const child = Object.assign({}, data); delete child.extends;
   return deepMerge(parent, child);
 }

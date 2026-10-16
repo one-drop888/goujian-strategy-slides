@@ -92,9 +92,9 @@
     {
       "type": "evidence-quote",
       "title": "用户原话揭示的不是“参数不懂”，而是销售没有把产品价值映射到使用场景",
-      "quote": "“功能很多，但我没听明白跟我每天通勤、带家人有什么关系。”",
+      "quote": "“功能很多，但我没听明白\n跟我每天通勤、带家人\n有什么关系。”",
       "attribution": "合成访谈原话，用于演示证据与解释的区分",
-      "insight": "问题不是产品信息不足，而是价值翻译不足。",
+      "insight": "问题不是产品信息不足，\n而是价值翻译不足。",
       "source": "Illustrative synthetic example / 示例数据"
     },
     {
@@ -133,7 +133,9 @@
       "type": "recommendation",
       "title": "下一阶段不应扩大听录音规模，而应固定分层样本并持续追踪“行为差异→经营结果”",
       "statement": "把抽检做成稳定的经营洞察机制，而不是一次性的 VOC 汇总。",
-      "source": "Illustrative synthetic example / 示例数据"
+      "source": "Illustrative synthetic example / 示例数据",
+      "title_short": "下一阶段应固定分层样本，追踪行为与经营结果",
+      "subtitle": "不扩大听录音规模；持续核查行为差异与经营结果的关系"
     }
   ],
   "brand": "构见 · GOUJIAN / RESEARCH"

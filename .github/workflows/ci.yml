@@ -24,6 +24,7 @@ jobs:
         with:
           python-version: ${{ matrix.python }}
       - run: npm ci
+      - run: python3 -m pip install -r requirements-render.txt
       - run: npm test
       - run: npm run benchmark
       - run: npm run package

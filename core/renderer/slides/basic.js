@@ -1,4 +1,5 @@
 const { columns } = require('../compositions/layout');
+const {resolveTitle,balancedWrap}=require('../../planner/title');
 
 function createSlideRenderers(pptx, style, spec) {
   const { createPrimitives } = require('../primitives/base');
@@ -11,24 +12,29 @@ function createSlideRenderers(pptx, style, spec) {
 
   function cover(s) {
     const slide=pptx.addSlide(); slide.background={color:style.background};
+    const flow=resolveTitle({...s,title:s.title||spec.title},{...F,titleSize:Math.max(36,F.titleSize+10)},width);
+    const ty=2.03,sy=ty+flow.h+.35,ruleY=Math.max(5.73,(flow.subtitleH?sy+flow.subtitleH:ty+flow.h)+.4);
+    if(ruleY>6.25)throw Error('Cover heading needs a shorter title/subtitle');
+    slide._scene.title={...flow,titleY:ty};
     const dark=style.style.cover_treatment==='band';
     if(dark) slide.addShape(pptx.ShapeType.rect,{x:0,y:0,w:W,h:.20,line:{color:C.accent},fill:{color:C.accent}});
-    text(slide,s.kicker||spec.brand||'构见 · GOUJIAN',left,1.0,width,.32,{fontSize:12,bold:true,color:C.accent});
-    text(slide,s.title||spec.title,left,2.03,width,1.7,{fontSize:Math.max(36,F.titleSize+10),bold:true,valign:'top'});
-    if(s.subtitle) text(slide,s.subtitle,left,4.03,width*.85,.9,{fontSize:F.bodySize+1,color:C.muted,valign:'top'});
-    line(slide,left,5.73,style.style.cover_treatment==='editorial'?width:2.1,C.accent,1.5);
-    text(slide,s.footer||spec.footer||'',left,6.66,width,.25,{fontSize:10,color:C.muted});
+    text(slide,s.kicker||spec.brand||'构见 · GOUJIAN',left,1.0,width,.32,{fontSize:12,bold:true,color:C.accent,scene:{role:'decoration',space:'slide'}});
+    text(slide,flow.lines.join('\n'),left,ty,width,flow.h,{fontSize:flow.size,bold:true,valign:'top',scene:{id:'claim',role:'claim',space:'slide'}});
+    if(flow.subtitleH)text(slide,flow.subtitleLines.join('\n'),left,sy,width,flow.subtitleH,{fontSize:Math.min(F.bodySize,17),color:C.muted,valign:'top',scene:{id:'subtitle',role:'subtitle',space:'slide'}});
+    line(slide,left,ruleY,style.style.cover_treatment==='editorial'?width:2.1,C.accent,1.5);
+    text(slide,s.footer||spec.footer||'',left,6.66,width,.25,{fontSize:10,color:C.muted,scene:{role:'source',space:'slide'}});
   }
 
   function section(s) {
     const slide=pptx.addSlide(); slide.background={color:C.accentSoft};
-    text(slide,s.number==null?'':String(s.number).padStart(2,'0'),left,1.2,2,.7,{fontSize:30,bold:true,color:C.accent});
-    text(slide,s.title,left,2.5,width,1.25,{fontSize:36,bold:true});
-    if(s.subtitle) text(slide,s.subtitle,left,4.0,width*.85,.9,{color:C.muted});
+    const flow=resolveTitle(s,{...F,titleSize:36},width);slide._scene.title={...flow,titleY:2.5};
+    text(slide,s.number==null?'':String(s.number).padStart(2,'0'),left,1.2,2,.7,{fontSize:30,bold:true,color:C.accent,scene:{role:'decoration',semantic_role:'section_number',space:'slide'}});
+    text(slide,flow.lines.join('\n'),left,2.5,width,flow.h,{fontSize:flow.size,bold:true,valign:'top',scene:{id:'claim',role:'claim',space:'slide'}});
+    if(flow.subtitleH)text(slide,flow.subtitleLines.join('\n'),left,2.5+flow.h+.35,width,flow.subtitleH,{fontSize:Math.min(F.bodySize,17),color:C.muted,scene:{role:'subtitle',space:'slide'}});
   }
 
   function statement(s) {
-    const slide=pptx.addSlide(); base(slide,s.title,s.section);
+    const slide=pptx.addSlide(); base(slide,s);
     line(slide,left,2.22,.70,C.accent,4);
     text(slide,s.statement||s.body,left,2.72,width*.92,2.5,{fontSize:F.bodySize+10,bold:true,valign:'top'});
     if(s.note) text(slide,s.note,left,5.52,width,.66,{fontSize:15,color:C.muted});
@@ -36,7 +42,7 @@ function createSlideRenderers(pptx, style, spec) {
   }
 
   function summary(s) {
-    const slide=pptx.addSlide(); base(slide,s.title,s.section);
+    const slide=pptx.addSlide(); base(slide,s);
     const rowH=Math.min(1.14,4.65/s.items.length);
     s.items.forEach((it,i)=>{
       const y=1.94+i*rowH;
@@ -48,10 +54,17 @@ function createSlideRenderers(pptx, style, spec) {
   }
 
   function kpi(s) {
-    const slide=pptx.addSlide(); base(slide,s.title,s.section);
-    const cols=columns(s.items.length,.32,left,width);
+    const slide=pptx.addSlide(); base(slide,s);
+    const six=s.items.length===6,cols=columns(six?3:s.items.length,.32,left,width);
     s.items.forEach((it,i)=>{
-      const {x,w}=cols[i]; const emphasis=it.highlight===true;
+      const {x,w}=cols[six?i%3:i]; const emphasis=it.highlight===true;
+      if(six) {
+        const y=1.95+Math.floor(i/3)*2.22;
+        text(slide,it.label||it.title,x+.08,y,w-.16,.38,{fontSize:15,color:C.muted});
+        text(slide,it.value,x+.08,y+.53,w-.16,.72,{fontFace:F.latin,fontSize:32,bold:true,color:emphasis?C.accent:C.text});
+        line(slide,x+.08,y+1.4,w-.16,emphasis?C.accent:C.line,emphasis?2:1);
+        text(slide,it.note||it.delta||'',x+.08,y+1.57,w-.16,.43,{fontSize:13,color:C.muted});return;
+      }
       if(style.style.metric_style==='panel') slide.addShape(pptx.ShapeType.rect,{x,y:2.12,w,h:3.0,line:{color:C.panel},fill:{color:C.panel}});
       text(slide,it.label||it.title,x+.08,2.24,w-.16,.5,{fontSize:16,color:C.muted});
       text(slide,it.value,x+.08,3.06,w-.16,.88,{fontFace:F.latin,fontSize:s.items.length>4?30:38,bold:true,color:emphasis?C.accent:C.text});
@@ -61,7 +74,7 @@ function createSlideRenderers(pptx, style, spec) {
   }
 
   function comparison(s) {
-    const slide=pptx.addSlide(); base(slide,s.title,s.section);
+    const slide=pptx.addSlide(); base(slide,s);
     const cols=columns(s.columns.length,.55,left,width);
     s.columns.forEach((c,i)=>{
       const {x,w}=cols[i]; const highlight=c.highlight===true;
@@ -77,7 +90,7 @@ function createSlideRenderers(pptx, style, spec) {
   }
 
   function process(s) {
-    const slide=pptx.addSlide(); base(slide,s.title,s.section);
+    const slide=pptx.addSlide(); base(slide,s);
     const cols=columns(s.items.length,.32,left,width);
     line(slide,left,2.56,width,C.line,1.5);
     s.items.forEach((it,i)=>{
@@ -89,7 +102,7 @@ function createSlideRenderers(pptx, style, spec) {
   }
 
   function funnel(s) {
-    const slide=pptx.addSlide(); base(slide,s.title,s.section);
+    const slide=pptx.addSlide(); base(slide,s);
     const values=s.items.map(it=>Number(String(it.value).replaceAll(',','').replace(/%$/, '')));
     const max=Math.max(...values); const rh=Math.min(.86,4.55/s.items.length);
     s.items.forEach((it,i)=>{
@@ -102,7 +115,7 @@ function createSlideRenderers(pptx, style, spec) {
   }
 
   function timeline(s) {
-    const slide=pptx.addSlide(); base(slide,s.title,s.section); const items=(s.items||[]).slice(0,7);
+    const slide=pptx.addSlide(); base(slide,s); const items=(s.items||[]);
     slide.addShape(pptx.ShapeType.line,{x:1.15,y:3.62,w:10.9,h:0,line:{color:C.line,width:2}}); const n=Math.max(1,items.length);
     items.forEach((it,i)=>{ const x=1.15+(n===1?5.45:i*(10.9/(n-1)));
       slide.addShape(pptx.ShapeType.ellipse,{x:x-.11,y:3.51,w:.22,h:.22,line:{color:C.accent,width:1},fill:{color:C.accent}});
@@ -113,7 +126,7 @@ function createSlideRenderers(pptx, style, spec) {
   }
 
   function roadmap(s) {
-    const slide=pptx.addSlide(); base(slide,s.title,s.section);
+    const slide=pptx.addSlide(); base(slide,s);
     const lanes=s.lanes||s.items, h=Math.min(1.13,4.6/lanes.length-.1);
     lanes.forEach((lane,i)=>{
       const y=1.98+i*(h+.10);
@@ -128,7 +141,7 @@ function createSlideRenderers(pptx, style, spec) {
   }
 
   function matrix(s) {
-    const slide=pptx.addSlide(); base(slide,s.title,s.section);
+    const slide=pptx.addSlide(); base(slide,s);
     const x=left+.55,y=2.02,w=s.insight?8.7:width-.8,h=4.12;
     slide.addShape(pptx.ShapeType.rect,{x,y,w,h,line:{color:C.line,width:.6},fill:{color:style.background}});
     slide.addShape(pptx.ShapeType.line,{x:x+w/2,y,w:0,h,line:{color:C.line,width:.7,dash:'dash'}});
@@ -147,7 +160,7 @@ function createSlideRenderers(pptx, style, spec) {
   }
 
   function hierarchy(s) {
-    const slide=pptx.addSlide(); base(slide,s.title,s.section);
+    const slide=pptx.addSlide(); base(slide,s);
     const items=s.items||s.branches, cols=columns(items.length,.42,left,width);
     text(slide,s.root||s.center||s.statement,left,1.93,width,.70,{fontSize:F.bodySize+5,bold:true,align:'center'});
     const centers=cols.map(c=>c.x+c.w/2);
@@ -162,7 +175,7 @@ function createSlideRenderers(pptx, style, spec) {
   }
 
   function action(s) {
-    const slide=pptx.addSlide(); base(slide,s.title,s.section);
+    const slide=pptx.addSlide(); base(slide,s);
     const rh=Math.min(1.2,4.55/s.items.length);
     s.items.forEach((it,i)=>{
       const y=1.99+i*rh;
@@ -176,19 +189,21 @@ function createSlideRenderers(pptx, style, spec) {
   }
 
   function evidence(s) {
-    const slide=pptx.addSlide(); base(slide,s.title,s.section);
+    const slide=pptx.addSlide(); base(slide,s);
     slide.addShape(pptx.ShapeType.rect,{x:left,y:1.94,w:width*.47,h:4.35,line:{color:C.panel},fill:{color:C.panel}});
-    text(slide,s.quote||s.evidenceText||s.body,left+.32,2.33,width*.47-.64,2.65,{fontSize:F.bodySize+6,bold:true,valign:'top'});
+    const quote=balancedWrap(s.quote||s.evidenceText||s.body,F.cjk,F.bodySize+6,width*.47-.64).join('\n');
+    text(slide,quote,left+.32,2.33,width*.47-.64,2.65,{fontSize:F.bodySize+6,bold:true,valign:'top'});
     if(s.attribution) text(slide,s.attribution,left+.32,5.4,width*.47-.64,.57,{fontSize:12,color:C.muted});
     const x=left+width*.53;
     line(slide,x,2.30,.55,C.accent,3);
-    text(slide,s.insight||s.interpretation||s.takeaway,x,2.72,width*.47,2.2,{fontSize:F.bodySize+4,bold:true,valign:'top'});
+    const insight=balancedWrap(s.insight||s.interpretation||s.takeaway,F.cjk,F.bodySize+4,width*.47).join('\n');
+    text(slide,insight,x,2.72,width*.47,2.2,{fontSize:F.bodySize+4,bold:true,valign:'top'});
     if(s.note) text(slide,s.note,x,5.3,width*.47,.8,{fontSize:14,color:C.muted});
     finish(slide,{...s,takeaway:null});
   }
 
   function architecture(s) {
-    const slide=pptx.addSlide(); base(slide,s.title,s.section);
+    const slide=pptx.addSlide(); base(slide,s);
     const layers=s.layers||[{title:'',items:s.items||s.nodes}];
     const h=Math.min(1.2,(4.55-.12*(layers.length-1))/layers.length);
     layers.forEach((layer,i)=>{
@@ -203,7 +218,7 @@ function createSlideRenderers(pptx, style, spec) {
   }
 
   function portfolio(s) {
-    const slide=pptx.addSlide(); base(slide,s.title,s.section);
+    const slide=pptx.addSlide(); base(slide,s);
     const cols=columns(2,.65,left,width), rows=Math.ceil(s.items.length/2),rh=Math.min(2.0,4.6/rows);
     s.items.forEach((it,i)=>{
       const {x,w}=cols[i%2],y=1.98+Math.floor(i/2)*rh;
@@ -215,7 +230,7 @@ function createSlideRenderers(pptx, style, spec) {
   }
 
   function pyramid(s) {
-    const slide=pptx.addSlide(); base(slide,s.title,s.section); const levels=(s.levels||s.items||[]).slice(0,5); const n=Math.max(levels.length,1);
+    const slide=pptx.addSlide(); base(slide,s); const levels=(s.levels||s.items||[]); const n=Math.max(levels.length,1);
     levels.forEach((it,i)=>{const width=4.2+i*1.35, x=(W-width)/2, y=1.80+i*.88; slide.addShape(pptx.ShapeType.trapezoid,{x,y,w:width,h:.68,line:{color:i===0?C.accent:C.line},fill:{color:i===0?C.accentSoft:C.panel}}); slide.addText(itemTitle(it),{x:x+.25,y:y+.19,w:width-.5,h:.28,fontFace:F.cjk,fontSize:14,bold:true,color:C.text,align:'center',margin:0,fit:'shrink'});}); finish(slide,s);
   }
 

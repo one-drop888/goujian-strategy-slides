@@ -20,7 +20,7 @@ Real renderer tokens:
 
 | Token | Values / effect |
 |---|---|
-| `font.latin`, `font.cjk` | Installed font families; no font embedding or automatic fallback |
+| `font.latin`, `font.cjk`, `font.preferred`, `fallback_latin`, `fallback_cjk` | Requested/preferred script families and fallback arrays; installed candidates resolve when Fontconfig is available; no embedding |
 | `font.title_size`, `font.body_size` | Presentation title/body size; some diagram labels use bounded explicit sizes |
 | `style.density` | Default spacing category; explicit `margin_x` takes precedence |
 | `style.margin_x` | Horizontal margin in inches |
@@ -31,6 +31,7 @@ Real renderer tokens:
 | `style.metric_style` | `open`, `panel` |
 | `style.chart_grid` | `light`, `none` |
 | `style.cover_treatment` | `editorial`, `band` |
+| `style.image_gap`, `image_caption_size`, `image_border` | Image gutter (inches), caption size (pt), `line`/`none` border |
 | `colors` | `text`, `muted`, `accent`, `accent_soft`, `panel`, `line`; six-digit hex |
 
-Only `canvas: "wide"` is supported. Profile claims about image treatment or gradients were removed because V1 has no image primitive or gradient engine. The 15 built-ins form related design families, not 15 entirely unrelated art directions. Test a custom profile with a title, table, chart and representative Chinese/English text before adopting it.
+Only `canvas: "wide"` is supported. V1.1 images use real gutter/caption/border tokens. There is no gradient engine. Built-in ids resolve first, followed by the spec directory's `profiles/` and root, configured search directories, then explicit paths. Omitted ids use the default; unknown explicit ids fail. The 15 built-ins form related design families, not 15 unrelated art directions. Test a custom profile with titles, images, tables, charts and mixed Chinese/English text before adopting it.

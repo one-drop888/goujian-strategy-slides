@@ -28,6 +28,9 @@
     "chart_grid": "light",
     "cover_treatment": "editorial",
     "table_size": 14,
-    "chart_size": 12
+    "chart_size": 12,
+    "image_gap": 0.5,
+    "image_caption_size": 11,
+    "image_border": "none"
   }
 }

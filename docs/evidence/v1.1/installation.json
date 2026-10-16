@@ -1,0 +1,33 @@
+{
+  "status": "PASS",
+  "runtime_files_identical_to_source": 95,
+  "environment": "Fresh Python venv with Pillow 12.3.0; fresh npm install (23 packages)",
+  "commands": {
+    "pip_install": "PASS",
+    "npm_install": "PASS",
+    "npm_test": "PASS",
+    "validate_example": "PASS",
+    "build_example": "PASS",
+    "example_geometry_fonts_spatial_render": "PASS",
+    "multimodal_unicode_build": "PASS",
+    "multimodal_geometry_fonts_spatial_render": "PASS"
+  },
+  "visual_review_of_clean_rebuild": "NOT_RUN (new PPTX hashes); acceptance reviews bind separate final artifacts",
+  "platform": "Linux",
+  "date": "2026-10-16",
+  "final_archive": {
+    "entries": 175,
+    "skill_entries": 1,
+    "corruption": "NONE",
+    "duplicate_members": 0,
+    "all_member_bytes_match_source": true,
+    "runtime_files_match_full_tested_clean_install": 95,
+    "final_fresh_extraction": {
+      "npm_install": "PASS",
+      "validate_example": "PASS",
+      "build_example": "PASS",
+      "unicode_multimodal_build": "PASS"
+    },
+    "visual_review_of_new_rebuild": "NOT_RUN"
+  }
+}

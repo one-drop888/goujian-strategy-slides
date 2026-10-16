@@ -1,0 +1,372 @@
+{
+  "title": "多源经营复盘",
+  "profile": "executive-clean",
+  "storyline": "executive-business-review",
+  "lang": "zh-CN",
+  "assets": [
+    {
+      "id": "channel",
+      "path": "assets/channel-evidence.png",
+      "type": "table_screenshot",
+      "role": "evidence",
+      "source": "Project-authored synthetic source PPTX; Apache-2.0",
+      "fit": "contain",
+      "caption": "渠道复盘原始表格 · 合成数据",
+      "attribution": "Synthetic fixture / 非真实业务证据",
+      "provenance": [
+        {
+          "kind": "image_text",
+          "text": "渠道复盘原始表格 · 合成数据",
+          "source_asset": "channel",
+          "source_region": {
+            "x": 0,
+            "y": 0,
+            "w": 1,
+            "h": 1
+          },
+          "confidence": 1,
+          "render_mode": "embedded",
+          "source_mapping": {
+            "source_file": "经营 分析（Q4）&★.pptx",
+            "source_pptx_sha256": "05647dfb024c417cbbe26a3be4b7a022b039bab66d9ce887f6befcc8175be372",
+            "slide_part": "ppt/slides/slide1.xml"
+          }
+        }
+      ]
+    },
+    {
+      "id": "interview",
+      "path": "assets/interview-evidence.png",
+      "type": "document_screenshot",
+      "role": "evidence",
+      "source": "Project-authored synthetic source PPTX; Apache-2.0",
+      "fit": "contain",
+      "caption": "客户访谈摘录 · 合成样本",
+      "attribution": "Synthetic fixture / 非真实业务证据",
+      "provenance": [
+        {
+          "kind": "image_text",
+          "text": "试驾后没人说明下一步，我就先比较了别的品牌。样本：24 位近期试驾客户；方法：半结构化访谈；限制：定性频次不能证明因果。",
+          "source_asset": "interview",
+          "source_region": {
+            "x": 0,
+            "y": 0,
+            "w": 1,
+            "h": 1
+          },
+          "confidence": 1,
+          "render_mode": "embedded",
+          "source_mapping": {
+            "source_file": "调研 证据（访谈）&★.pptx",
+            "source_pptx_sha256": "35102ef889edbe1f0ef262fa5abf685575726fb87ade47fe3bba8ef74c6f7922",
+            "slide_part": "ppt/slides/slide1.xml"
+          }
+        }
+      ]
+    },
+    {
+      "id": "chart-source",
+      "path": "assets/chart-evidence.png",
+      "type": "chart_screenshot",
+      "role": "evidence",
+      "source": "Project-authored synthetic source PPTX; Apache-2.0",
+      "fit": "contain",
+      "caption": "源图表 · 成交率，%",
+      "attribution": "Synthetic fixture / 非真实业务证据",
+      "provenance": [
+        {
+          "kind": "image_text",
+          "text": "源图表 · 成交率，%",
+          "source_asset": "chart-source",
+          "source_region": {
+            "x": 0,
+            "y": 0,
+            "w": 1,
+            "h": 1
+          },
+          "confidence": 1,
+          "render_mode": "embedded",
+          "source_mapping": {
+            "source_file": "调研 证据（访谈）&★.pptx",
+            "source_pptx_sha256": "35102ef889edbe1f0ef262fa5abf685575726fb87ade47fe3bba8ef74c6f7922",
+            "slide_part": "ppt/slides/slide2.xml"
+          }
+        }
+      ]
+    },
+    {
+      "id": "source-background",
+      "path": "assets/showroom-illustration.png",
+      "type": "background",
+      "role": "background",
+      "source": "AI-generated fictional automotive showroom, 2026-10-16; not documentary evidence",
+      "fit": "cover",
+      "caption": "AI-generated fictional showroom; illustration, not evidence",
+      "attribution": "AI 合成展厅示意 · 非真实业务照片",
+      "provenance": [
+        {
+          "kind": "generated_annotation",
+          "text": "AI-generated scene, not business evidence",
+          "render_mode": "embedded"
+        }
+      ]
+    }
+  ],
+  "slides": [
+    {
+      "type": "image-hero",
+      "title": "区域差异需要结合访谈证据解释",
+      "subtitle": "多 PPT 整合复盘 · 合成数据与访谈材料",
+      "asset_ids": [
+        "source-background"
+      ],
+      "source": "AI 合成展厅示意 · 非真实业务照片"
+    },
+    {
+      "type": "kpi-dashboard",
+      "title": "六项指标同时保留，成交转化仍是关注重点",
+      "items": [
+        {
+          "label": "有效线索",
+          "value": "4,280",
+          "note": "季度合成样本",
+          "highlight": false
+        },
+        {
+          "label": "到店率",
+          "value": "31%",
+          "note": "同一口径",
+          "highlight": false
+        },
+        {
+          "label": "试驾率",
+          "value": "58%",
+          "note": "到店客户",
+          "highlight": false
+        },
+        {
+          "label": "跟进完成率",
+          "value": "86%",
+          "note": "24h 内",
+          "highlight": false
+        },
+        {
+          "label": "库存周转",
+          "value": "41 天",
+          "note": "季末",
+          "highlight": false
+        },
+        {
+          "label": "成交率",
+          "value": "12.8%",
+          "note": "目标 14.0%",
+          "highlight": true
+        }
+      ],
+      "source": "Synthetic multi-PPT dogfood · Apache-2.0"
+    },
+    {
+      "type": "table",
+      "title": "九列表格完整保留，区域和责任分工可一并核对",
+      "headers": [
+        "战区",
+        "线索",
+        "到店",
+        "试驾",
+        "成交率",
+        "库存",
+        "跟进",
+        "负责人",
+        "复核日"
+      ],
+      "rows": [
+        [
+          "华南",
+          "1,280",
+          "34%",
+          "61%",
+          "14.2%",
+          "38天",
+          "90%",
+          "A",
+          "10/20"
+        ],
+        [
+          "华东",
+          "1,160",
+          "32%",
+          "59%",
+          "13.8%",
+          "39天",
+          "88%",
+          "B",
+          "10/20"
+        ],
+        [
+          "华北",
+          "980",
+          "29%",
+          "55%",
+          "11.6%",
+          "43天",
+          "83%",
+          "C",
+          "10/21"
+        ],
+        [
+          "西南",
+          "860",
+          "28%",
+          "54%",
+          "10.9%",
+          "46天",
+          "81%",
+          "D",
+          "10/21"
+        ]
+      ],
+      "source": "Synthetic multi-PPT dogfood · Apache-2.0"
+    },
+    {
+      "type": "image-evidence",
+      "title": "汇总指标与访谈原文并排，保留两类证据的边界",
+      "panels": [
+        {
+          "id": "channel-table",
+          "kind": "table",
+          "headers": [
+            "战区",
+            "成交率"
+          ],
+          "rows": [
+            [
+              "华南",
+              "14.2%"
+            ],
+            [
+              "华东",
+              "13.8%"
+            ],
+            [
+              "华北",
+              "11.6%"
+            ],
+            [
+              "西南",
+              "10.9%"
+            ]
+          ],
+          "provenance": {
+            "kind": "source_data",
+            "render_mode": "editable",
+            "source_mapping": {
+              "pptx_sha256": "05647dfb024c417cbbe26a3be4b7a022b039bab66d9ce887f6befcc8175be372",
+              "slide_part": "ppt/slides/slide1.xml",
+              "shape_id": "2"
+            }
+          }
+        },
+        {
+          "id": "interview-shot",
+          "kind": "image",
+          "asset_id": "interview"
+        }
+      ],
+      "takeaway": "访谈提示跟进断点；是否解释区域差异仍需验证。",
+      "source": "Synthetic multi-PPT dogfood · Apache-2.0"
+    },
+    {
+      "type": "image-evidence",
+      "title": "可恢复的数值重建为原生图表，源图保留供核对",
+      "panels": [
+        {
+          "id": "native-rate",
+          "kind": "chart",
+          "chartType": "bar",
+          "series": [
+            {
+              "name": "成交率",
+              "labels": [
+                "华南",
+                "华东",
+                "华北",
+                "西南"
+              ],
+              "values": [
+                14.2,
+                13.8,
+                11.6,
+                10.9
+              ]
+            }
+          ],
+          "numberFormat": "0.0\"%\""
+        },
+        {
+          "id": "source-rate",
+          "kind": "image",
+          "asset_id": "chart-source"
+        }
+      ],
+      "takeaway": "本页数值来自同一组合成数据；原生图可继续编辑。",
+      "source": "Synthetic multi-PPT dogfood · Apache-2.0"
+    },
+    {
+      "type": "image-insight",
+      "title": "客户原话提示下一步说明不足，尚不能证明因果",
+      "asset_ids": [
+        "interview"
+      ],
+      "insight": "把试驾后的下一步说明纳入跟进核查。\n\n24 位访谈样本用于提出假设，\n不能代表总体比例。",
+      "source": "Synthetic multi-PPT dogfood · Apache-2.0"
+    },
+    {
+      "type": "document-evidence",
+      "title": "标注绑定原文区域，证据截图保持完整",
+      "asset_ids": [
+        "interview"
+      ],
+      "annotations": [
+        {
+          "text": "试驾后的下一步说明出现断点",
+          "source_region": {
+            "x": 0.045,
+            "y": 0.28,
+            "w": 0.91,
+            "h": 0.26
+          }
+        },
+        {
+          "text": "样本和方法限制随证据保留",
+          "source_region": {
+            "x": 0.045,
+            "y": 0.64,
+            "w": 0.91,
+            "h": 0.27
+          }
+        }
+      ],
+      "source": "Synthetic multi-PPT dogfood · Apache-2.0"
+    },
+    {
+      "type": "image-comparison",
+      "title": "表格说明差异，访谈补充可能机制",
+      "asset_ids": [
+        "channel",
+        "interview"
+      ],
+      "takeaway": "两种材料关联到同一问题；频次和转化率不能直接等同。",
+      "source": "Synthetic multi-PPT dogfood · Apache-2.0"
+    },
+    {
+      "type": "image-gallery",
+      "title": "源表与源图可追溯，下一步核查区域口径",
+      "asset_ids": [
+        "channel",
+        "chart-source"
+      ],
+      "takeaway": "统一指标定义后，再验证跟进质量与转化结果的关系。",
+      "source": "Synthetic multi-PPT dogfood · Apache-2.0"
+    }
+  ]
+}

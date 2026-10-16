@@ -24,25 +24,34 @@
 
 *V1 实际渲染示例。全部示例均为合成演示内容，不代表真实经营事实。*
 
-## V1 提供什么
+## V1.1 提供什么
 
 - 28 个管理 Storyline、15 个 Template Recipe，覆盖经营、战略、研究、销售、项目、上市、营销、技术、培训与成本决策。
-- 78 个语义目录条目：**65 个已实现、6 个 Partial、7 个仅设计**。仅设计条目会被构建器明确拒绝。
-- 23 个 Composition Recipe，由 21 个可复用渲染函数实现；不等于 78 套独立版式。
+- 86 个语义目录条目：**74 个已实现、6 个 Partial、6 个仅设计**。仅设计条目会被构建器明确拒绝。
+- 27 个 Composition Recipe，由 22 个可复用渲染函数实现；不等于 86 套独立版式。
 - 15 个 Profile，实际驱动字体字号、间距、标题/封面、表头/隔行底色、指标样式、图表网格及配色。
-- 10 套可执行 Benchmark、JSON Schema 与负载校验、几何/字体检查、可选渲染与 Montage。
+- 12 套可执行 Benchmark、JSON Schema 与负载校验、几何/字体检查、可选渲染与 Montage。
 
 阅读[产品介绍](docs/PRODUCT_OVERVIEW.zh-CN.md)、[可行性报告](docs/FEASIBILITY_REVIEW.zh-CN.md)、[Library 审计](docs/LIBRARY_AUDIT.md)与[视觉迭代记录](docs/VISUAL_REVIEW.md)。
 
+## V1.1 多模态与视觉智能
+
+图片、原生图表、表格与解释通过四种可复用组合连接。PNG/JPEG/WEBP 原生进入 PPTX；截图默认完整保留，像素文字与可编辑文字明确区分。标题按字形宽度测量，支持 `title_short` / `subtitle`、动态分割线和正文流。构建同时输出绑定 PPTX 哈希的场景记录，空间 QA 可检查证据遮挡、文字/横线冲突和来源关系。
+
+资产分类、结论改写和视觉修复仍由 Agent 负责；没有自动 OCR、任意 PPTX 无损编辑或自主视觉推理引擎。参阅[多模态契约](docs/MULTIMODAL_CONTRACT.md)、[代码基线审计](docs/V1_1_GROUND_TRUTH.md)与[本轮验证](docs/V1_1_VALIDATION.md)。
+
 ## 安装
 
-需要 **Node.js 18+、Python 3.9+**，确保 PATH 中有 `node`、`npm`、`python3`。核心 Python 检查仅使用标准库。必须安装完整仓库，不能只复制 `skill/`。
+需要 **Node.js 18+、Python 3.9+**，确保 PATH 中有 `node`、`npm`、`python3`。图片与完整测试需要 Pillow；本机字体测量使用 Fontconfig。基础几何检查使用标准库。必须安装完整仓库，不能只复制 `skill/`。
 
-v1.0.1 正式 ZIP 解压后是一个 `goujian-strategy-slides/` 文件夹，其中只有文件夹根目录的 `SKILL.md` 一个技能入口。导入 Skill 平台时上传完整 ZIP；若平台自行解包，应以该根目录作为技能目录。平台侧导入与安全扫描仍须在目标平台复测。
+V1.1 工程包（尚未创建 GitHub Release） 解压后是一个 `goujian-strategy-slides/` 文件夹，其中只有文件夹根目录的 `SKILL.md` 一个技能入口。导入 Skill 平台时上传完整 ZIP；若平台自行解包，应以该根目录作为技能目录。平台侧导入与安全扫描仍须在目标平台复测。
 
 ```bash
 git clone https://github.com/one-drop888/goujian-strategy-slides.git
 cd goujian-strategy-slides
+python3 -m venv .venv
+. .venv/bin/activate
+python3 -m pip install -r requirements-render.txt
 npm install
 npm test
 npm run validate:example
@@ -76,7 +85,7 @@ npm run benchmark
 npm run benchmark -- --render
 ```
 
-`benchmark` 构建并检查全部 10 类场景；`--render` 生成 PNG 和 Montage。每套报告及 PPTX 哈希保存在 `out/benchmarks/`。实际检查画面后才能记录视觉通过。
+`benchmark` 构建并检查全部 12 类场景；`--render` 生成 PNG 和 Montage。每套报告及 PPTX 哈希保存在 `out/benchmarks/`。实际检查画面后才能记录视觉通过。
 
 [自定义 Profile](docs/CUSTOM_PROFILE_GUIDE.md)支持继承；[已有 PPTX 工作流](docs/EXISTING_PPTX_WORKFLOW.md)说明文本替换、检查与参考重建。
 
@@ -98,7 +107,7 @@ npm run benchmark -- --render
 | Planner | Partial | 关键词路由助手，证据推理仍由 Agent 完成 |
 | HTML Renderer | 仅设计 | V1 不输出 HTML |
 
-瀑布/桥接、组合图、散点/气泡、热力图及 image-insight 尚无忠实实现。抽象地图、关系和类 Sankey 条目明确标为 Partial。仅支持 16:9 画布。长内容需要改写或拆页；容量校验通过不等于可读。
+瀑布/桥接、组合图、散点/气泡、热力图 尚无忠实实现。抽象地图、关系和类 Sankey 条目明确标为 Partial。仅支持 16:9 画布。长内容需要改写或拆页；容量校验通过不等于可读。
 
 ## 架构与贡献
 

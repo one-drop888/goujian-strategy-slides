@@ -1,6 +1,6 @@
 {
-  "version": "1.0.1",
-  "count": 78,
+  "version": "1.1.0",
+  "count": 86,
   "archetypes": [
     {
       "id": "cover",
@@ -528,11 +528,10 @@
     {
       "id": "image-insight",
       "family": "evidence",
-      "composition": "evidence-split",
-      "renderer": "evidence",
+      "composition": "multimodal-split",
+      "renderer": "multimodal",
       "intent": "Use an image only when it carries evidence",
-      "status": "DESIGNED",
-      "limitation": "No faithful V1 renderer. Choose an implemented archetype explicitly."
+      "status": "IMPLEMENTED"
     },
     {
       "id": "research-method",
@@ -637,6 +636,70 @@
       "composition": "table-detail",
       "renderer": "table",
       "intent": "Operational checklist with explicit pass criteria",
+      "status": "IMPLEMENTED"
+    },
+    {
+      "id": "image-hero",
+      "family": "multimodal",
+      "composition": "multimodal-hero",
+      "renderer": "multimodal",
+      "intent": "Introduce a subject with a meaningful visual",
+      "status": "IMPLEMENTED"
+    },
+    {
+      "id": "image-evidence",
+      "family": "multimodal",
+      "composition": "multimodal-split",
+      "renderer": "multimodal",
+      "intent": "Connect visual evidence to a claim",
+      "status": "IMPLEMENTED"
+    },
+    {
+      "id": "image-grid",
+      "family": "multimodal",
+      "composition": "multimodal-gallery",
+      "renderer": "multimodal",
+      "intent": "Compare related visual evidence on a consistent grid",
+      "status": "IMPLEMENTED"
+    },
+    {
+      "id": "image-gallery",
+      "family": "multimodal",
+      "composition": "multimodal-gallery",
+      "renderer": "multimodal",
+      "intent": "Present a coherent evidence set with a conclusion",
+      "status": "IMPLEMENTED"
+    },
+    {
+      "id": "image-comparison",
+      "family": "multimodal",
+      "composition": "multimodal-gallery",
+      "renderer": "multimodal",
+      "intent": "Compare two source images with interpretation",
+      "status": "IMPLEMENTED"
+    },
+    {
+      "id": "image-background",
+      "family": "multimodal",
+      "composition": "multimodal-hero",
+      "renderer": "multimodal",
+      "intent": "Place readable native text over a contextual background",
+      "status": "IMPLEMENTED"
+    },
+    {
+      "id": "image-text-split",
+      "family": "multimodal",
+      "composition": "multimodal-split",
+      "renderer": "multimodal",
+      "intent": "Bind native explanation to an image",
+      "status": "IMPLEMENTED"
+    },
+    {
+      "id": "document-evidence",
+      "family": "multimodal",
+      "composition": "multimodal-annotated",
+      "renderer": "multimodal",
+      "intent": "Preserve documentary evidence and linked annotations",
       "status": "IMPLEMENTED"
     }
   ],

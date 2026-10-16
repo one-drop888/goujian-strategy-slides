@@ -13,7 +13,7 @@ assert.deepEqual(validateDeck(deck({type:'key-message',title:'Decision',statemen
 invalid({type:'chart',title:'Trend',series:[{labels:['A'],values:[1,2]}]},/matching lengths/);
 invalid({type:'chart',title:'Trend',series:[{labels:['A'],values:['2']}]},/must be number/);
 invalid({type:'chart',title:'Trend',series:[{labels:['A'],values:[1]}],axisMin:2},/zero|hide/);
-invalid({type:'kpi',title:'Metrics',items:Array(6).fill({label:'A',value:1})},/capacity/);
+invalid({type:'kpi',title:'Metrics',items:Array(7).fill({label:'A',value:1})},/capacity/);
 invalid({type:'table',title:'Detail',headers:['A','B'],rows:[[1]]},/rectangular/);
 invalid({type:'matrix',title:'Position',items:[{title:'Unknown'}]},/explicit x and y/);
 invalid({type:'comparison',title:'Compare',columns:[{heading:'A',points:Array(7).fill('x')}]},/at most 6/);

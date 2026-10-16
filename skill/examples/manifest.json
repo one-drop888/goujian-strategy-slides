@@ -1,15 +1,17 @@
 {
-  "version": "1.0.1",
+  "version": "1.1.0",
   "benchmarks": [
     "channel-strategy",
     "cost-decision",
     "executive-review",
     "marketing-campaign",
+    "multimodal-integration",
     "product-launch",
     "project-update",
     "research-voc",
     "sales-review",
     "technical-ai-agent",
+    "title-subtitle-layout",
     "training"
   ],
   "note": "All benchmark examples are synthetic/sanitized and contain no confidential company data."

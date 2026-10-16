@@ -29,7 +29,7 @@ Its management reasoning model is **Question → Evidence → Judgment → Actio
 
 The agent first establishes the decision, evidence and constraints. It chooses a storyline and semantic slide purpose, then creates a JSON presentation spec. Reusable compositions and an explicit visual profile drive the PPTX backend. Executable validation rejects malformed or over-capacity payloads. Rendering and visual inspection close the loop.
 
-The library contains 28 storylines, 78 semantic entries, 23 composition recipes, 15 profiles and 15 starting recipes. **65 semantic entries are implemented, 6 are partial, and 7 are designed only.** The last group cannot be built. Counts describe a vocabulary, not a promise of 78 independently designed or equally expressive layouts.
+The library contains 28 storylines, 86 semantic entries, 27 composition recipes, 15 profiles and 15 starting recipes. **74 semantic entries are implemented, 6 are partial, and 6 are designed only.** The last group cannot be built. Counts describe a vocabulary, not a promise of 86 independently designed or equally expressive layouts.
 
 ## V1 scope
 
@@ -40,3 +40,8 @@ The planner is a small heuristic helper, not an autonomous analyst. Evidence sel
 The Presentation Intelligence layer is independent of PptxGenJS. It leaves a path to HTML and web-based renderers, while the reusable cross-renderer geometry engine is future work. V1 does not implement HTML output, animations, arbitrary lossless PPTX editing or deterministic visual repair.
 
 There is one product and one Presentation Library. Platform adapters provide thin execution guidance, not different public/company/personal editions.
+
+
+## V1.1 multimodal boundary
+
+Images, native charts/tables and interpretation share one build pipeline with source, pixel-text, crop and scene relationships. Measured title/subtitle/divider flow and spatial QA use actual native PPTX geometry. Asset classification, semantic rewriting and visual repair remain agent-assisted; OCR, complete SmartArt/master recovery and autonomous visual repair are not implemented. See the [contract](MULTIMODAL_CONTRACT.md) and [validation](V1_1_VALIDATION.md).

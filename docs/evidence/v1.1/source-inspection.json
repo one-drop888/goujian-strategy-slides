@@ -1,0 +1,103 @@
+[
+  {
+    "file": "经营 分析（Q4）&★.pptx",
+    "source_sha256": "05647dfb024c417cbbe26a3be4b7a022b039bab66d9ce887f6befcc8175be372",
+    "slides": [
+      {
+        "slide": 1,
+        "kinds": [
+          "native_text",
+          "table",
+          "native_text"
+        ],
+        "source_mapping": [
+          {
+            "pptx_sha256": "05647dfb024c417cbbe26a3be4b7a022b039bab66d9ce887f6befcc8175be372",
+            "slide_part": "ppt/slides/slide1.xml",
+            "shape_id": "2"
+          },
+          {
+            "pptx_sha256": "05647dfb024c417cbbe26a3be4b7a022b039bab66d9ce887f6befcc8175be372",
+            "slide_part": "ppt/slides/slide1.xml",
+            "shape_id": "2"
+          },
+          {
+            "pptx_sha256": "05647dfb024c417cbbe26a3be4b7a022b039bab66d9ce887f6befcc8175be372",
+            "slide_part": "ppt/slides/slide1.xml",
+            "shape_id": "4"
+          }
+        ]
+      }
+    ],
+    "fidelity": {
+      "source_coverage": {
+        "identified_objects": 3,
+        "mapped_objects": 3
+      },
+      "duplicate_assets": 0,
+      "unresolved_assets": [],
+      "detached_annotation": "UNKNOWN_REQUIRES_SEMANTIC_REVIEW",
+      "semantic_occlusion": "REQUIRES_SCENE_OR_VISUAL_REVIEW"
+    }
+  },
+  {
+    "file": "调研 证据（访谈）&★.pptx",
+    "source_sha256": "35102ef889edbe1f0ef262fa5abf685575726fb87ade47fe3bba8ef74c6f7922",
+    "slides": [
+      {
+        "slide": 1,
+        "kinds": [
+          "native_text",
+          "native_text",
+          "native_text"
+        ],
+        "source_mapping": [
+          {
+            "pptx_sha256": "35102ef889edbe1f0ef262fa5abf685575726fb87ade47fe3bba8ef74c6f7922",
+            "slide_part": "ppt/slides/slide1.xml",
+            "shape_id": "2"
+          },
+          {
+            "pptx_sha256": "35102ef889edbe1f0ef262fa5abf685575726fb87ade47fe3bba8ef74c6f7922",
+            "slide_part": "ppt/slides/slide1.xml",
+            "shape_id": "3"
+          },
+          {
+            "pptx_sha256": "35102ef889edbe1f0ef262fa5abf685575726fb87ade47fe3bba8ef74c6f7922",
+            "slide_part": "ppt/slides/slide1.xml",
+            "shape_id": "4"
+          }
+        ]
+      },
+      {
+        "slide": 2,
+        "kinds": [
+          "native_text",
+          "chart"
+        ],
+        "source_mapping": [
+          {
+            "pptx_sha256": "35102ef889edbe1f0ef262fa5abf685575726fb87ade47fe3bba8ef74c6f7922",
+            "slide_part": "ppt/slides/slide2.xml",
+            "shape_id": "2"
+          },
+          {
+            "pptx_sha256": "35102ef889edbe1f0ef262fa5abf685575726fb87ade47fe3bba8ef74c6f7922",
+            "slide_part": "ppt/slides/slide2.xml",
+            "shape_id": "3"
+          }
+        ]
+      }
+    ],
+    "fidelity": {
+      "source_coverage": {
+        "identified_objects": 5,
+        "mapped_objects": 5
+      },
+      "duplicate_assets": 0,
+      "unresolved_assets": [],
+      "detached_annotation": "UNKNOWN_REQUIRES_SEMANTIC_REVIEW",
+      "semantic_occlusion": "REQUIRES_SCENE_OR_VISUAL_REVIEW"
+    }
+  }
+]

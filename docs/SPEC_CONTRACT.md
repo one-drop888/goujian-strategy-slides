@@ -21,7 +21,7 @@ The JSON Schema is executed by Ajv 2020 in both build and spec QA. Composition p
 | Cover / section | `title`, optional `subtitle`, `kicker`, `footer`, `number` |
 | Message | `statement` or `body`; optional `note` |
 | Summary | 1–5 `items`: `title`, `note` or `implication` |
-| KPI | 1–5 `items`: `label`, `value`, `delta`/`note`, optional `highlight` |
+| KPI | 1–6 `items`: `label`, `value`, `delta`/`note`, optional `highlight` |
 | Scorecard | 1–7 `items`: `label`, `value`/`actual`, `target`, `variance`/`delta`, `status`; research-method uses `label`, `value`, `note` |
 | Comparison | 1–4 `columns`: `heading`, `points` (max 6), optional `value`, `highlight`; `compare-2` requires exactly two |
 | Process / timeline | 1–6 process or 1–7 timeline `items`: `title`, `note`, `time`/`period` |
@@ -30,7 +30,7 @@ The JSON Schema is executed by Ajv 2020 in both build and spec QA. Composition p
 | Matrix | Up to 14 `items`: `title`, author-supplied `x`,`y` in [0,1]; `xLabel`, `yLabel`, optional `quadrants`, `insight`; close labels may collide |
 | Hierarchy | `root`, 1–5 `items`: `title`, up to 3 `children`; two levels only |
 | Chart | 1–4 `series`: `name`, `labels`, numeric `values`; at most 24 categories with identical labels across series. `chartType`: bar, column, line, area, pie, doughnut. Optional `highlightIndex`, `numberFormat`, `axisMin`, `unit`, `period`, `insight`. Bar/area baselines include zero; line baselines may differ if explicit. |
-| Table | `headers`, rectangular `rows`, max 6 columns × 8 rows; optional `columnWidths` fractions summing to 1, zero-based `highlightRows` |
+| Table | `headers`, rectangular `rows`, max 9 columns × 8 rows; optional `columnWidths` fractions summing to 1, zero-based `highlightRows` |
 | Action / risk | Up to 6 `items`; action: `title`, `note`, `owner`, `time`, `status`; risk: `title`, `likelihood`, `impact`, `mitigation`, `owner` |
 | Evidence | `quote`/`evidenceText`/`body`, `attribution`, `insight`, optional `note` |
 | Architecture | 1–5 `layers`: `title`, 1–5 `items` with `title`, optional `highlight`; component groups, not executable graph edges |
@@ -42,3 +42,7 @@ Capacity is an upper bound, not a fit guarantee. Long text needs editing, a larg
 Native chart data includes editable workbook values. Colors emphasize the selected first category by default; use `highlightIndex` deliberately. Synthetic examples illustrate structure and must not be presented as real research.
 
 The `renderer` override is not public. Unknown compositions, malformed series, unsupported advanced chart archetypes, missing coordinates and excess item counts fail before output is written. Custom profile paths and inheritance are supported. V1 accepts only `canvas: "wide"`; standard/4:3 is not implemented.
+
+## V1.1 assets and measured headers
+
+See [Multimodal Contract](MULTIMODAL_CONTRACT.md) for deck assets, panels, provenance, relationships, title_short/subtitle, analytical_series, local profile search and spatial QA. Six KPIs use 3 × 2. Tables over six columns use compact type (minimum 12pt); split content when it is too dense. No renderer silently drops items or columns.

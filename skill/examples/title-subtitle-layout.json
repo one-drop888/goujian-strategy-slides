@@ -1,0 +1,170 @@
+{
+  "title": "标题层级与区域分析",
+  "profile": "consulting",
+  "storyline": "executive-business-review",
+  "lang": "zh-CN",
+  "slides": [
+    {
+      "type": "section",
+      "number": 1,
+      "section": "01",
+      "title": "01 总体经营达成",
+      "subtitle": "经营复盘 · 季度口径统一",
+      "source": "Synthetic title / analytical-series regression"
+    },
+    {
+      "type": "action-plan",
+      "title": "Q4重点攻坚行动：九城收单、保客增换、库存去化、新车蓄势全面推进",
+      "subtitle": "六项重点行动分战区推进，覆盖收单窗口、专人专岗、库存清理与新品战役",
+      "items": [
+        {
+          "title": "九城收单窗口复核",
+          "owner": "区域",
+          "time": "10月"
+        },
+        {
+          "title": "保客专岗跟进",
+          "owner": "客户运营",
+          "time": "每周"
+        },
+        {
+          "title": "库存清理计划",
+          "owner": "销售",
+          "time": "11月"
+        }
+      ],
+      "source": "Synthetic title / analytical-series regression",
+      "title_short": "Q4聚焦九城收单、保客增换、库存去化与新车蓄势"
+    },
+    {
+      "type": "key-message",
+      "title": "在扩大投入前验证跟进改善能否提高成交率",
+      "subtitle": "以同一季度为基线；区域差异不能直接证明因果",
+      "statement": "先复核指标口径，再进行对照试点。",
+      "source": "Synthetic title / analytical-series regression"
+    },
+    {
+      "type": "key-message",
+      "title": "Measured regional differences require source verification before investment decisions",
+      "subtitle": "The same quarter and metric definitions apply across all regions; causality still needs validation.",
+      "statement": "Follow-up quality needs a controlled regional pilot.",
+      "source": "Synthetic title / analytical-series regression"
+    },
+    {
+      "type": "regional-performance",
+      "title": "华南：按统一口径核查转化差异",
+      "analytical_series": {
+        "id": "regional-conversion",
+        "metrics": [
+          "lead",
+          "conversion"
+        ],
+        "task": "regional comparison"
+      },
+      "columns": [
+        {
+          "heading": "结果",
+          "points": [
+            "统一季度口径",
+            "比较成交率"
+          ]
+        },
+        {
+          "heading": "待验证机制",
+          "points": [
+            "核查跟进断点",
+            "保留证据来源"
+          ]
+        }
+      ],
+      "source": "Synthetic title / analytical-series regression"
+    },
+    {
+      "type": "regional-performance",
+      "title": "华东：按统一口径核查转化差异",
+      "analytical_series": {
+        "id": "regional-conversion",
+        "metrics": [
+          "lead",
+          "conversion"
+        ],
+        "task": "regional comparison"
+      },
+      "columns": [
+        {
+          "heading": "结果",
+          "points": [
+            "统一季度口径",
+            "比较成交率"
+          ]
+        },
+        {
+          "heading": "待验证机制",
+          "points": [
+            "核查跟进断点",
+            "保留证据来源"
+          ]
+        }
+      ],
+      "source": "Synthetic title / analytical-series regression"
+    },
+    {
+      "type": "regional-performance",
+      "title": "华北：按统一口径核查转化差异",
+      "analytical_series": {
+        "id": "regional-conversion",
+        "metrics": [
+          "lead",
+          "conversion"
+        ],
+        "task": "regional comparison"
+      },
+      "columns": [
+        {
+          "heading": "结果",
+          "points": [
+            "统一季度口径",
+            "比较成交率"
+          ]
+        },
+        {
+          "heading": "待验证机制",
+          "points": [
+            "核查跟进断点",
+            "保留证据来源"
+          ]
+        }
+      ],
+      "source": "Synthetic title / analytical-series regression"
+    },
+    {
+      "type": "regional-performance",
+      "title": "西南：按统一口径核查转化差异",
+      "analytical_series": {
+        "id": "regional-conversion",
+        "metrics": [
+          "lead",
+          "conversion"
+        ],
+        "task": "regional comparison"
+      },
+      "columns": [
+        {
+          "heading": "结果",
+          "points": [
+            "统一季度口径",
+            "比较成交率"
+          ]
+        },
+        {
+          "heading": "待验证机制",
+          "points": [
+            "核查跟进断点",
+            "保留证据来源"
+          ]
+        }
+      ],
+      "source": "Synthetic title / analytical-series regression"
+    }
+  ]
+}

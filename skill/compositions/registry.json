@@ -1,6 +1,6 @@
 {
-  "version": "1.0.1",
-  "count": 23,
+  "version": "1.1.0",
+  "count": 27,
   "compositions": [
     {
       "id": "cover-hero",
@@ -24,7 +24,7 @@
     },
     {
       "id": "metric-strip",
-      "purpose": "1-5 headline metrics",
+      "purpose": "1–6 metrics; six use a 3 × 2 scorecard",
       "renderer": "kpi"
     },
     {
@@ -116,6 +116,26 @@
       "id": "pyramid-stack",
       "purpose": "Hierarchy / strategy / capability stack",
       "renderer": "pyramid"
+    },
+    {
+      "id": "multimodal-split",
+      "purpose": "Claim with adjacent image, native chart/table or text evidence",
+      "renderer": "multimodal"
+    },
+    {
+      "id": "multimodal-gallery",
+      "purpose": "Two to four uncropped related images with captions and conclusion",
+      "renderer": "multimodal"
+    },
+    {
+      "id": "multimodal-hero",
+      "purpose": "Image with locally contrast-resolved native title and subtitle",
+      "renderer": "multimodal"
+    },
+    {
+      "id": "multimodal-annotated",
+      "purpose": "Document evidence with protected region and linked native annotations",
+      "renderer": "multimodal"
     }
   ]
 }

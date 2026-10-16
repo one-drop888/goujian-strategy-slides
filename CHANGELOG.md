@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.1.0 — 2026-10-16 (engineering candidate, not published)
+
+- Native raster asset schema/pipeline, protected evidence cropping, focal point/opacity/masks, provenance and four reusable multimodal compositions. No python-pptx image postprocessing.
+- Measured title/subtitle flow, bounded title rewriting, balanced wrapping, typography-scaled divider gaps and explicit header-capacity rejection.
+- Hash-bound native scene records, semantic/spatial QA, local contrast resolution, font substitution reporting and spec-local profile resolution.
+- Existing PPTX inspection now maps native text, pictures, tables, charts, groups and master/layout candidates with source identities; complex reconstruction remains partial.
+- Six-KPI scorecard and nine-column native tables preserve all data; redundant renderer slices removed. Context-aware analytical-series repetition.
+- Permanent A–H/Unicode/native ingestion regressions, twelve rendered scenarios, three-deck visual repair/attestation evidence and fifteen-profile visual comparison.
+- Retained product identity, one root Skill entry, JSON compatibility for legacy accepted specs and Apache-2.0 notices.
+
+
 ## 1.0.1 — 2026-10-15
 
 Patch release for Skill installation compatibility; presentation capabilities and the JSON spec contract are unchanged.

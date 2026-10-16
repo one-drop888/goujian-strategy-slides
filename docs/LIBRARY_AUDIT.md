@@ -1,5 +1,7 @@
 # Presentation Library quality audit
 
+**Historical V1.0 audit below.** V1.1 adds 8 semantic routes and implements image-insight through 4 reusable multimodal compositions: 86 entries (74 implemented / 6 partial / 6 designed), 27 compositions, 15 profiles and 12 scenarios. All 15 profiles were rendered with a common image/text payload; they remain related variants, not independent design systems. Current evidence: [V1.1 validation](V1_1_VALIDATION.md).
+
 Review date: 2026-10-14. Counts were read from the registries and checked against the actual entries.
 
 ## Storylines: 28 distinct sequences, related management families

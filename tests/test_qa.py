@@ -27,11 +27,11 @@ class QualityTests(unittest.TestCase):
     def test_native_composition_gallery(self):
         subprocess.run(['node',str(ROOT/'tests/build_gallery.js')],cwd=ROOT,check=True,capture_output=True)
         p=ROOT/'out/composition-gallery.pptx';r=geom.inspect(p)
-        self.assertEqual(r['status'],'PASS');self.assertEqual(len(r['slides']),23)
+        self.assertEqual(r['status'],'PASS');self.assertEqual(len(r['slides']),27)
         with zipfile.ZipFile(p) as z:
             names=z.namelist();self.assertTrue(any(n.startswith('ppt/charts/chart') and n.endswith('.xml') for n in names))
             self.assertTrue(any(n.endswith('.xlsx') for n in names))
-            self.assertFalse(any(n.startswith('ppt/media/') and not n.endswith('/') for n in names))
+            self.assertTrue(any(n.startswith('ppt/media/') and not n.endswith('/') for n in names))
     def test_visual_attestation_is_hash_bound(self):
         with tempfile.TemporaryDirectory() as td:
             p=ROOT/'out/test-v1.pptx';r=Path(td)/'review.json';r.write_text(json.dumps({'status':'PASS','pptx_sha256':'wrong','reviewer':'test','notes':'test','slides_reviewed':list(range(1,9))}))

@@ -4,7 +4,7 @@ const Ajv = require('ajv/dist/2020');
 const {resolveSlide} = require('../composition/resolver');
 const ROOT = path.resolve(__dirname,'../..');
 const ajv = new Ajv({allErrors:true,strict:false});
-for(const name of ['evidence','slide','deck','profile','composition']) ajv.addSchema(JSON.parse(fs.readFileSync(path.join(__dirname,`${name}.schema.json`),'utf8')));
+for(const name of ['asset','evidence','slide','deck','profile','composition']) ajv.addSchema(JSON.parse(fs.readFileSync(path.join(__dirname,`${name}.schema.json`),'utf8')));
 function schemaErrors(name,data) {
   const valid=ajv.getSchema(`${name}.schema.json`);
   return valid(data)?[]:valid.errors.map(e=>`${e.instancePath || '/'} ${e.message}`);
@@ -12,13 +12,19 @@ function schemaErrors(name,data) {
 function validateDeck(spec) {
   const errors=schemaErrors('deck',spec);
   if(errors.length) return errors;
+  const assets=new Map((spec.assets||[]).map(a=>[a.id,a]));
+  if(assets.size!==(spec.assets||[]).length)errors.push('Asset IDs must be unique');
+  function checkRegion(r,label) {if(r&&(r.x+r.w>1.00001||r.y+r.h>1.00001))errors.push(label+': region exceeds source bounds');}
+  for(const a of spec.assets||[]) {
+    checkRegion(a.crop,a.id+'.crop');checkRegion(a.safe_area,a.id+'.safe_area');
+    for(const p of a.provenance||[]){if(p.source_asset&&!assets.has(p.source_asset))errors.push('Unknown provenance source_asset '+p.source_asset);checkRegion(p.source_region,a.id+'.provenance');}
+  }
   spec.slides.forEach((raw,i)=>{
     const fail=m=>errors.push(`slides[${i}]: ${m}`);
     try {
       const {renderer,slide:s}=resolveSlide(raw,ROOT);
       if(!['cover','section'].includes(renderer)&&!s.title?.trim()) fail('title is required');
-      if((s.title||'').length>100) fail('title exceeds 100 characters; shorten or split the argument');
-      const limits={summary:5,kpi:5,scorecard:7,process:6,funnel:6,timeline:7,matrix:14,hierarchy:5,action:6,risk:6,portfolio:4,pyramid:5};
+      const limits={summary:5,kpi:6,scorecard:7,process:6,funnel:6,timeline:7,matrix:14,hierarchy:5,action:6,risk:6,portfolio:4,pyramid:5};
       const items=s.items||s.branches||s.levels;
       if(limits[renderer]) {
         if(!Array.isArray(items)||!items.length) fail('nonempty items are required');
@@ -51,7 +57,7 @@ function validateDeck(spec) {
       }
       if(renderer==='table') {
         if(!s.headers?.length||!s.rows?.length) fail('headers and rows are required');
-        else if(s.headers.length>6||s.rows.length>8||s.rows.some(r=>!Array.isArray(r)||r.length!==s.headers.length)) fail('table requires rectangular rows; capacity is 6 columns × 8 rows');
+        else if(s.headers.length>9||s.rows.length>8||s.rows.some(r=>!Array.isArray(r)||r.length!==s.headers.length)) fail('table requires rectangular rows; capacity is 9 columns × 8 rows (split larger tables explicitly)');
         if(s.columnWidths && (s.columnWidths.length!==s.headers.length || s.columnWidths.some(v=>!Number.isFinite(v)||v<=0) || Math.abs(s.columnWidths.reduce((a,b)=>a+b,0)-1)>.001)) fail('columnWidths must be positive fractions summing to 1');
       }
       if(renderer==='matrix' && items?.some(it=>![it.x,it.y].every(v=>typeof v==='number'&&v>=0&&v<=1))) fail('matrix items require explicit x and y values between 0 and 1');
@@ -67,6 +73,26 @@ function validateDeck(spec) {
       if(renderer==='architecture') {
         const layers=s.layers||[{items:s.items||s.nodes}];
         if(!layers.length||layers.length>5||layers.some(l=>!l.items?.length||l.items.length>5)) fail('architecture requires 1–5 layers with 1–5 items each');
+      }
+      if(renderer==='multimodal') {
+        const ids=s.asset_ids||[];
+        for(const id of [...ids,...(s.panels||[]).filter(p=>p.kind==='image').map(p=>p.asset_id)])if(!assets.has(id))fail('Unknown asset '+id);
+        if(!ids.length&&!s.panels?.length)fail('Multimodal slide requires asset_ids or panels');
+        if(s.composition==='multimodal-hero'&&ids.length!==1)fail('Hero requires exactly one asset');
+        if(s.composition==='multimodal-annotated'&&(ids.length!==1||!s.annotations?.length))fail('Document evidence requires one asset and annotations');
+        if(s.composition==='multimodal-split'&&!s.panels&&(!s.insight&&!s.body||ids.length>3))fail('Split requires insight/body and at most three assets');
+        if(s.type==='image-comparison'&&ids.length!==2)fail('Image comparison requires two assets');
+        if(s.panels&&new Set(s.panels.map(p=>p.id)).size!==s.panels.length)fail('Panel IDs must be unique');
+        for(const a of s.annotations||[])checkRegion(a.source_region,`slides[${i}].annotation`);
+        for(const p of s.panels||[]) {
+          if(p.kind==='text'&&!p.text?.trim())fail('Text panel requires text');
+          if(p.kind==='text'&&p.provenance&&p.provenance.render_mode!=='editable')fail('Noneditable image/OCR text belongs in asset provenance, not a native text panel');
+          if(p.provenance?.source_asset&&!assets.has(p.provenance.source_asset))fail('Unknown source_asset');
+          checkRegion(p.provenance?.source_region,`slides[${i}].panel`);
+          if(p.kind==='table'&&(!p.headers?.length||p.headers.length>6||!p.rows?.length||p.rows.length>6||p.rows.some(r=>!Array.isArray(r)||r.length!==p.headers.length)))fail('Half-page table requires rectangular data within 6 × 6; split larger evidence');
+          if(p.kind==='chart'&&(!p.series?.length||p.series.some(x=>!(x.labels||p.labels)?.length||x.values?.length!==(x.labels||p.labels).length||x.values.some(v=>typeof v!=='number'||!Number.isFinite(v)||v<0))))fail('Panel chart requires matching labels and nonnegative finite values');
+          if(p.kind==='chart'&&p.chartType&&!['bar','column','line'].includes(p.chartType))fail('Panel chart supports bar, column and line only');
+        }
       }
     } catch(e) {fail(e.message);}
   });

@@ -53,7 +53,7 @@ def check(data):
         comp=s.get('composition') or meta.get('composition') or t; comps.append(comp)
 
         items=s.get('items') or []
-        if t in {'kpi','kpi-dashboard','big-number','baseline'} and len(items)>5: issues.append(('WARN',path+'.items','More than 5 KPI items may reduce readability'))
+        if t in {'kpi','kpi-dashboard','big-number','baseline'} and len(items)>6: issues.append(('WARN',path+'.items','More than 6 KPI items require explicit slide splitting'))
         if t in {'comparison','benchmark','segmentation','regional-performance','scenario-analysis'} and len(s.get('columns') or [])>4: issues.append(('WARN',path+'.columns','Comparison has more than 4 columns'))
         if t in {'chart','trend','line','bar','column','area','combo','scatter','bubble','histogram','waterfall','bridge','variance','cost-structure','cohort','distribution'}:
             if not (s.get('series') or []): issues.append(('ERROR',path+'.series','Data/chart archetype requires series'))
@@ -74,7 +74,9 @@ def check(data):
         if comps[i]==comps[i-1]: run+=1
         else: run=1
         if run==4 and slides[i].get('type') not in {'table','scorecard'}:
-            issues.append(('WARN',f'slides[{i-3}:{i+1}]','4 consecutive slides use the same resolved composition; verify repetition is intentional'))
+            series=[s.get('analytical_series') for s in slides[i-3:i+1]]
+            intentional=all(series) and all(s==series[0] for s in series[1:])
+            if not intentional:issues.append(('WARN',f'slides[{i-3}:{i+1}]','4 consecutive slides use the same composition without shared analytical_series id/metrics/task'))
     content_scores=[x for x in action_scores if x is not None]
     if len(content_scores)>=5 and sum(1 for x in content_scores if x<0)/len(content_scores)>.45:
         issues.append(('WARN','slides','Many titles are topic labels; deck may read like a document outline rather than a management argument'))

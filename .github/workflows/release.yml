@@ -28,6 +28,7 @@ jobs:
       - name: Install and test the release source
         run: |
           npm ci
+          python3 -m pip install -r requirements-render.txt
           npm test
           npm run validate:example
           npm run build:example

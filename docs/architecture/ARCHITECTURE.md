@@ -1,17 +1,19 @@
-# V1 architecture
+# V1.1 architecture
 
 Goujian is one product and one distributable Presentation Library.
 
 | Layer | Implementation | Boundary |
 |---|---|---|
 | Schema | `core/schema/validate.js`: Ajv Draft 2020-12 + composition payload guards | Shape/capacity validation, not factual correctness or exact text fitting |
-| Planner | `core/planner/`: keyword storyline/archetype recommendation and title scoring | Partial helper; no end-to-end source-to-spec planner |
+| Planner | Keyword storyline/archetype routing and measured title resolution | Partial semantic reasoning; rewriting remains agent/author-assisted |
 | Storyline | 28 registry entries with questions, triggers and sequences | Agent chooses/adapts; sequence is guidance, not enforced page order |
-| Archetype | 78 semantic entries with explicit status and limitations | 65 implemented, 6 partial, 7 rejected as designed-only |
-| Composition | `core/composition/resolver.js`: portable JSON normalization and registry mapping | 23 recipes → 21 rendering functions; two are variants, not separate engines |
-| Profile | Inheritance + schema validation + style resolution | Typography, spacing, palette, table/metric/chart/title/cover tokens |
+| Archetype | 86 semantic entries with explicit status and limitations | 74 implemented, 6 partial, 6 rejected as designed-only |
+| Composition | Portable JSON normalization, role-aware deduplication and registry mapping | 27 recipes → 22 rendering functions; four reusable multimodal grammars |
+| Asset / provenance | Local raster contract, source region/confidence/render mode and protected evidence | Agent supplies classification; no OCR or universal visual understanding |
+| Profile | Inheritance, spec-local lookup, schema/style/font resolution | Typography, spacing, table/chart/title/image tokens; no font embedding |
 | Renderer | `core/renderer/`: PPTX orchestration, primitives, structural slides, data slides | Native PPTX objects; wide canvas; backend-specific geometry |
 | QA | `core/qa/`, `quality_gate.py`, `render_deck.py` | Executable bounded checks plus explicit reviewer attestation |
+| Scene | Hash-bound native object record with semantic relationships | Spatial QA reads actual serialized native geometry and order; no arbitrary imported intent inference |
 
 ```text
 Agent reasoning / source interpretation
@@ -41,3 +43,5 @@ The original builder's chart/table code was separated into `slides/data.js`, and
 Unknown compositions, unsupported special charts, missing matrix coordinates, nonfinite/mismatched chart values and over-capacity content fail before writing. `renderer` is not an accepted override. Profile inheritance detects cycles and resolves relative parent files from the child file's directory.
 
 Evidence metadata is preserved in speaker notes. It is an author-provided record, not verified source truth. Visual records bind to the exact PPTX SHA256 and reviewed slide numbers; they attest that inspection happened, not that a machine proved visual quality.
+
+V1.1 records actual native draw calls at `scene-adapter.js`; the existing body coordinate frame adapts to measured header height. Raster preparation occurs before native serialization in an isolated temporary directory; source files are never overwritten. Asset schema, provenance and relationship JSON do not import PptxGenJS. See [multimodal contract](../MULTIMODAL_CONTRACT.md) for exact supported semantics and limits.

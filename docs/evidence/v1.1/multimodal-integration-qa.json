@@ -1,0 +1,197 @@
+{
+  "status": "PASS",
+  "VISUAL_QA": "PASS",
+  "capabilities": {
+    "tools": {
+      "libreoffice": "/usr/bin/libreoffice",
+      "soffice": "soffice",
+      "pdftoppm": "pdftoppm",
+      "fc-list": "/usr/bin/fc-list",
+      "pillow": true
+    },
+    "levels": {
+      "0_spec": "AVAILABLE",
+      "1_geometry_spatial": "AVAILABLE",
+      "2_pptx_inspection": "AVAILABLE",
+      "3_native_render": "AVAILABLE",
+      "4_vision_review": "REQUIRES_REVIEWER",
+      "5_repair_rerender": "REQUIRES_AGENT"
+    },
+    "VISUAL_QA": "NOT_RUN"
+  },
+  "pptx": "out/v11-final/multimodal-integration.pptx",
+  "checks": {
+    "spec": {
+      "status": "PASS",
+      "slides": 9,
+      "issues": []
+    },
+    "geometry": {
+      "status": "PASS",
+      "limitations": [
+        "Bounding-box checks do not prove text fit, glyph coverage, or chart-label readability. Grouped/rotated shapes require visual review."
+      ],
+      "slide_size_inches": [
+        13.333333333333334,
+        7.5
+      ],
+      "slides": [
+        {
+          "slide": 1,
+          "objects": 7,
+          "peer_overlap_candidates": 0
+        },
+        {
+          "slide": 2,
+          "objects": 29,
+          "peer_overlap_candidates": 0
+        },
+        {
+          "slide": 3,
+          "objects": 6,
+          "peer_overlap_candidates": 0
+        },
+        {
+          "slide": 4,
+          "objects": 10,
+          "peer_overlap_candidates": 0
+        },
+        {
+          "slide": 5,
+          "objects": 10,
+          "peer_overlap_candidates": 0
+        },
+        {
+          "slide": 6,
+          "objects": 8,
+          "peer_overlap_candidates": 0
+        },
+        {
+          "slide": 7,
+          "objects": 11,
+          "peer_overlap_candidates": 0
+        },
+        {
+          "slide": 8,
+          "objects": 11,
+          "peer_overlap_candidates": 0
+        },
+        {
+          "slide": 9,
+          "objects": 11,
+          "peer_overlap_candidates": 0
+        }
+      ],
+      "issues": []
+    },
+    "fonts": {
+      "status": "PASS",
+      "used": [
+        {
+          "font": "Noto Sans CJK SC",
+          "occurrences": 475
+        },
+        {
+          "font": "Noto Sans",
+          "occurrences": 50
+        }
+      ],
+      "missing_on_this_machine": [],
+      "note": "Missing fonts indicate possible substitution on this machine; they do not prove the recipient environment lacks the fonts.",
+      "resolution": [
+        {
+          "script": "latin",
+          "requested": "Noto Sans",
+          "resolved": "Noto Sans",
+          "substituted": false,
+          "status": "PROVEN"
+        },
+        {
+          "script": "cjk",
+          "requested": "Noto Sans CJK SC",
+          "resolved": "Noto Sans CJK SC",
+          "substituted": false,
+          "status": "PROVEN"
+        }
+      ]
+    },
+    "spatial": {
+      "status": "PASS",
+      "metrics": {
+        "source_coverage": 1.0,
+        "duplicate_content": 0,
+        "unresolved_assets": 0,
+        "detached_annotation": 0,
+        "semantic_occlusion": 0
+      },
+      "issues": [],
+      "limitations": [
+        "Spatial relationships are explicit, not inferred human intent. Contrast uses local raster samples; visual review remains required."
+      ],
+      "fonts": [
+        {
+          "script": "latin",
+          "requested": "Noto Sans",
+          "resolved": "Noto Sans",
+          "substituted": false,
+          "status": "PROVEN"
+        },
+        {
+          "script": "cjk",
+          "requested": "Noto Sans CJK SC",
+          "resolved": "Noto Sans CJK SC",
+          "substituted": false,
+          "status": "PROVEN"
+        }
+      ]
+    },
+    "render": {
+      "status": "PASS",
+      "pages": [
+        "out/v11-final/multimodal-integration/slide-1.png",
+        "out/v11-final/multimodal-integration/slide-2.png",
+        "out/v11-final/multimodal-integration/slide-3.png",
+        "out/v11-final/multimodal-integration/slide-4.png",
+        "out/v11-final/multimodal-integration/slide-5.png",
+        "out/v11-final/multimodal-integration/slide-6.png",
+        "out/v11-final/multimodal-integration/slide-7.png",
+        "out/v11-final/multimodal-integration/slide-8.png",
+        "out/v11-final/multimodal-integration/slide-9.png"
+      ],
+      "montage": "out/v11-final/multimodal-integration/montage.png",
+      "pdf": "out/v11-final/multimodal-integration/deck.pdf"
+    },
+    "visual_review": {
+      "status": "PASS",
+      "record": {
+        "pptx_sha256": "4fd3119644aeec64c781e9095724483b130565bd23b0188155e7b3932d654e55",
+        "reviewer": "Codex visual inspection / 2026-10-16",
+        "status": "PASS",
+        "slides_reviewed": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "notes": "Reviewed all 9 slides in final montage and full-size pages, including final repaired explanation. Six KPI values and nine table columns remain present. Screenshots are complete and readable; image text is embedded and explanation is native. Table/document and chart/source-image regions stay separate; annotation highlights preserve full evidence. Native hero text uses a local black scrim and visible generated-image disclosure. No accidental evidence occlusion, title collision or duplicate marker observed.",
+        "rendered_page_sha256": {
+          "slide-1.png": "807c5443771abac004cd2938088721784b99fc2b354689896a935aaa486a5596",
+          "slide-2.png": "22c685cfa0dc64d6288eb472ee34fcd958a6712393a139480ee1a30045ea97d6",
+          "slide-3.png": "588fe4bd614f8347ce4bc506f7de0df1495cb8b42a068fff4a0f8b940c72d431",
+          "slide-4.png": "12993c68c0ed4bd4d1ed30f8855227f75b4539b6505b59c81c721f0a7c79b572",
+          "slide-5.png": "b51abbd34d2ac72bd20151522d11666690b606d2e16664d478c0146b561bb1fd",
+          "slide-6.png": "9dc2dd91a5611fccbdd655aef4da7e09404033b599b0fd5a6a2ed04d731c2f4b",
+          "slide-7.png": "ee8a1ed8383159ee8ccaad9093826d51d861fe739c399ba2e7ef5f61fdd350de",
+          "slide-8.png": "f9399169401ed4fa5a583cb8d503753f371c909a9d2b2102036ec5ba85da63d5",
+          "slide-9.png": "94885637b96d61688a67d9a0f486cb43947f272bfed09503347ce2ba1dc12f4d"
+        }
+      },
+      "note": "Reviewer attestation; not automated visual judgment."
+    }
+  }
+}

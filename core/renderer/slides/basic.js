@@ -1,9 +1,11 @@
 const { columns } = require('../compositions/layout');
 const {resolveTitle,balancedWrap}=require('../../planner/title');
+const {createChartHelper}=require('../charts');
 
 function createSlideRenderers(pptx, style, spec) {
   const { createPrimitives } = require('../primitives/base');
   const { base, finish, text, line, C, F, W, H, left, right, width } = createPrimitives(pptx, style);
+  const charts = createChartHelper(style);
   const body = style.layout?.bodySize || F.bodySize || 15;
 
   const txt=(v)=>v==null?'':String(v);
@@ -67,12 +69,12 @@ function createSlideRenderers(pptx, style, spec) {
     if(s.dashboard) {
       const dw=b.w*.59,rx=b.x+b.w*.65,rw=b.w*.35,ch=b.h-.7;
       text(slide,s.dashboard.unit,b.x,b.y,dw,.28,{fontSize:11,color:C.muted,scene:{space:'slide'}});
-      slide.addChart(pptx.ChartType.line,s.dashboard.series.map(x=>({...x,labels:s.dashboard.labels})),{
-        x:b.x,y:b.y+.5,w:dw,h:ch,fontFace:F.cjk,showLegend:true,legendPos:'b',legendFontFace:F.cjk,legendFontSize:11,
-        dataLabelFontFace:F.latin,chartColors:[C.accent,'99A7B2'],showTitle:false,showBorder:false,showValue:false,
-        catAxisLabelFontFace:F.cjk,catAxisLabelFontSize:12,valAxisLabelFontFace:F.latin,valAxisLabelFontSize:11,
-        catAxisLineShow:false,valAxisLineShow:false,catGridLine:{style:'none'},valGridLine:{color:C.line,size:.5},
-        showMarker:true,lineDataSymbol:'circle',lineDataSymbolSize:5,lineSize:2.5,scene:{space:'slide',role:'evidence'}});
+      slide.addChart(pptx.ChartType.line,s.dashboard.series.map(x=>({...x,labels:s.dashboard.labels})),charts.options({
+        x:b.x,y:b.y+.5,w:dw,h:ch,showLegend:true,legendFontSize:11,
+        chartColors:charts.tokens.chart.palette.slice(0,2),showValue:false,
+        catAxisLabelFontSize:12,valAxisLabelFontSize:11,
+        valGridLine:{color:charts.tokens.chart.grid,size:.5,style:style.style.chart_grid==='none'?'none':'solid'},
+        showMarker:true,lineDataSymbol:'circle',lineDataSymbolSize:5,lineSize:2.5,scene:{space:'slide',role:'evidence'}}));
       const rh=b.h/Math.ceil(s.items.length/2);
       s.items.forEach((it,i)=>{
         const x=rx+(i%2)*(rw/2+.08),y=b.y+Math.floor(i/2)*rh,w=rw/2-.18;

@@ -4,6 +4,7 @@ const pptxgen=require('pptxgenjs');
 const {loadProfile}=require('../style/profile-loader');
 const {resolveStyle}=require('../style/resolve-style');
 const {createSlideRenderers}=require('./slides/basic');
+const {normalizeChartXml}=require('./charts');
 const {assertDeck,schemaErrors}=require('../schema/validate');
 const {resolveSlide}=require('../composition/resolver');
 const {resolveFonts}=require('../style/font-resolver');
@@ -46,7 +47,9 @@ async function buildDeck(spec,outPath,options={}){
     scene.relationships.push(...(slide.relationships||[]));
     resolved.push({semantic:raw.type,composition:slide.composition,renderer});
   }
-  fs.mkdirSync(path.dirname(outPath),{recursive:true}); await pptx.writeFile({fileName:outPath});
+  fs.mkdirSync(path.dirname(outPath),{recursive:true});
+  const buffer=await pptx.write({outputType:'nodebuffer'});
+  fs.writeFileSync(outPath,await normalizeChartXml(buffer,style));
   const graph={version:'1.1',pptx_sha256:crypto.createHash('sha256').update(fs.readFileSync(outPath)).digest('hex'),fonts:fontResolution.report,declared_assets:(spec.assets||[]).map(a=>a.id),assets:assets.used,slides:scenes};
   fs.writeFileSync(outPath+'.scene.json',JSON.stringify(graph,null,2)+'\n');
   return {outPath,profile:profile.id,slides:(spec.slides||[]).length,resolved,scene:outPath+'.scene.json'};

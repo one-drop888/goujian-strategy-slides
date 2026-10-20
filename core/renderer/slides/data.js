@@ -1,25 +1,26 @@
 const { createPrimitives } = require('../primitives/base');
+const { createChartHelper } = require('../charts');
 function createDataRenderers(pptx, style, spec) {
   const {base, finish, text, line, C, F, left, width} = createPrimitives(pptx, style);
+  const charts = createChartHelper(style), tableTokens = style.tokens.table;
   const zh = (spec.lang || 'zh-CN').startsWith('zh');
   function drawTable(slide, headers, rows, s, widths) {
-    const headerFill = style.style.table_header === 'solid' ? C.text : C.accentSoft;
-    const headerColor = style.style.table_header === 'solid' ? style.background : C.text;
     const numeric = (v) => typeof v === 'number' || /^[+−-]?[\d,.]+\s*(%|pp|万元|万)?$/.test(String(v));
-    const cells = [headers.map(t => ({text:String(t),options:{bold:true,fill:headerFill,color:headerColor}})),
+    const cells = [headers.map(t => ({text:String(t),options:{bold:true,fill:tableTokens.headerFill,color:tableTokens.headerText}})),
       ...rows.map((row,i) => row.map((v,j) => ({text:String(v ?? ''),options:{
         align: numeric(v) && j>0 ? 'right' : 'left',
         bold: s.highlightRows?.includes(i) || false,
-        fill: s.highlightRows?.includes(i) ? C.accentSoft :
-          style.style.table_banding && i%2===1 ? C.panel : style.background,
+        color: tableTokens.bodyText,
+        fill: s.highlightRows?.includes(i) ? style.tokens.accentSoft :
+          style.style.table_banding && i%2===1 ? tableTokens.bandFill : tableTokens.bodyFill,
       }})))];
     const rowH = Math.min(.87, 4.5/(rows.length+1));
     slide.addTable(cells, {
       x:left,y:1.85,w:width,colW:widths?.map(v=>v*width),
-      rowH, fontFace:F.cjk,fontSize:headers.length>6?Math.max(12,F.tableSize-2):F.tableSize, color:C.text,
+      rowH, fontFace:F.cjk,fontSize:headers.length>6?Math.max(12,F.tableSize-2):F.tableSize, color:tableTokens.bodyText,
       margin:[5,8,5,8], valign:'mid', autoPage:false,
-      border:[{type:'solid',pt:.5,color:C.line},{type:'solid',pt:0,color:style.background},
-        {type:'solid',pt:.5,color:C.line},{type:'solid',pt:0,color:style.background}],
+      border:[{type:'solid',pt:.5,color:tableTokens.border},{type:'solid',pt:0,color:style.background},
+        {type:'solid',pt:.5,color:tableTokens.border},{type:'solid',pt:0,color:style.background}],
     });
   }
   function table(s) {
@@ -52,23 +53,18 @@ function createDataRenderers(pptx, style, spec) {
       pie:pptx.ChartType.pie,doughnut:pptx.ChartType.doughnut};
     const series=s.series.map(x=>({name:x.name||'',labels:x.labels||s.labels,values:x.values}));
     const colors=series.length===1 && ['bar','column'].includes(kind)
-      ? series[0].values.map((_,i)=>i===(s.highlightIndex??0)?C.accent:'A9B6BF')
-      : [C.accent,'899AA8','B3BDC6','526373'];
-    const options={fontFace:F.cjk,dataLabelFontFace:F.latin,x:left,y:2.12,w:s.insight?8.25:width,h:4.32,
-      showLegend:series.length>1,legendPos:'b',legendColor:C.muted,legendFontFace:F.cjk,legendFontSize:F.chartSize,
-      showTitle:false,showBorder:false,showValue:['bar','column'].includes(kind),
-      dataLabelPosition:'outEnd',dataLabelColor:C.text,dataLabelFormatCode:s.numberFormat||'0.##',
-      dataLabelFontSize:F.chartSize,
-      chartColors:colors,catAxisLabelFontFace:F.cjk,catAxisLabelFontSize:F.chartSize,catAxisLabelColor:C.muted,
-      valAxisLabelFontFace:F.latin,valAxisLabelFontSize:F.chartSize,valAxisLabelColor:C.muted,
-      catAxisLineShow:false,valAxisLineShow:false,catAxisLabelRotate:0,
-      catGridLine:{style:'none'},valGridLine:{color:C.line,size:.5,style:style.style.chart_grid==='none'?'none':'solid'},
+      ? charts.categoryColors(series[0].values,s.highlightIndex)
+      : charts.tokens.chart.palette;
+    const options=charts.options({
+      x:left,y:2.12,w:s.insight?8.25:width,h:4.32,
+      showLegend:series.length>1,showValue:['bar','column'].includes(kind),
+      dataLabelPosition:'outEnd',dataLabelFormatCode:s.numberFormat||'0.##',
+      chartColors:colors,
+      valGridLine:{color:charts.tokens.chart.grid,size:.5,style:style.style.chart_grid==='none'?'none':'solid'},
       showMarker:true,lineSize:2.5,lineDataSymbol:'circle',lineDataSymbolSize:5,
       showCatName:false,showShadow:false,showSerName:false,
-      chartArea:{fill:{color:style.background},border:{color:style.background,pt:0}},
-      plotArea:{fill:{color:style.background},border:{color:style.background,pt:0}},
       barGapWidthPct:s.semanticType==='histogram'?0:(series[0].labels.length<3?220:65),barDir:kind==='bar'?'bar':'col',
-    };
+    });
     if (['bar','column','area'].includes(kind)) options.valAxisMinVal=Math.min(0,...series.flatMap(x=>x.values));
     if (s.axisMin != null) options.valAxisMinVal=s.axisMin;
     slide.addChart(map[kind],series,options);

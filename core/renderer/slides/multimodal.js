@@ -1,7 +1,9 @@
 const {createPrimitives}=require('../primitives/base');
+const {createChartHelper}=require('../charts');
 const {resolveTitle,balancedWrap}=require('../../planner/title');
 function createMultimodalRenderers(pptx,style,spec,assets) {
   const {base,finish,text,C,F,left,width,W,H}=createPrimitives(pptx,style);
+  const charts=createChartHelper(style),table=style.tokens.table;
   const native=(extra)=>({space:'slide',...extra});
   function imagePanel(slide,id,box,nodeId) {
     const asset=assets.map.get(id),caption=asset.caption||asset.attribution||asset.source;
@@ -19,11 +21,12 @@ function createMultimodalRenderers(pptx,style,spec,assets) {
       text(slide,balancedWrap(p.text,F.cjk,F.bodySize+2,b.w).join('\n'),b.x,b.y+.1,b.w,b.h-.2,{fontSize:F.bodySize+2,bold:true,valign:'top',scene});return;
     }
     if(p.kind==='table') {
-      const header={fill:C.accentSoft,bold:true};
-      slide.addTable([p.headers.map(t=>({text:String(t),options:header})),...p.rows],{x:b.x,y:b.y,w:b.w,rowH:Math.min(.65,b.h/(p.rows.length+1)),fontFace:F.cjk,fontSize:Math.max(12,F.tableSize-1),margin:[4,4,4,4],border:{pt:.5,color:C.line},autoPage:false,scene});return;
+      const header={fill:table.headerFill,bold:true,color:table.headerText};
+      const rows=p.rows.map((row,i)=>row.map(value=>({text:String(value),options:{color:table.bodyText,fill:i%2===1?table.bandFill:table.bodyFill}})));
+      slide.addTable([p.headers.map(t=>({text:String(t),options:header})),...rows],{x:b.x,y:b.y,w:b.w,rowH:Math.min(.65,b.h/(p.rows.length+1)),fontFace:F.cjk,fontSize:Math.max(12,F.tableSize-1),color:table.bodyText,margin:[4,4,4,4],border:{pt:.5,color:table.border},autoPage:false,scene});return;
     }
-    const colors=[C.accent,'A9B6BF','526373'];
-    slide.addChart(p.chartType==='line'?pptx.ChartType.line:pptx.ChartType.bar,p.series.map(s=>({name:s.name||'',labels:s.labels||p.labels,values:s.values})),{...b,barDir:p.chartType==='column'?'col':'bar',showLegend:p.series.length>1,showValue:true,showTitle:false,showCatName:false,showBorder:false,fontFace:F.cjk,catAxisLabelFontFace:F.cjk,valAxisLabelFontFace:F.latin,dataLabelFontFace:F.latin,legendFontFace:F.cjk,catAxisLabelFontSize:12,valAxisLabelFontSize:11,dataLabelFontSize:12,dataLabelFormatCode:p.numberFormat||'0.0',chartColors:colors,valAxisMinVal:0,catAxisLineShow:false,valAxisLineShow:false,catGridLine:{style:'none'},valGridLine:{color:C.line,size:.5},showShadow:false,scene});
+    const colors=charts.tokens.chart.palette;
+    slide.addChart(p.chartType==='line'?pptx.ChartType.line:pptx.ChartType.bar,p.series.map(s=>({name:s.name||'',labels:s.labels||p.labels,values:s.values})),charts.options({...b,barDir:p.chartType==='column'?'col':'bar',showLegend:p.series.length>1,showValue:true,showCatName:false,catAxisLabelFontSize:12,valAxisLabelFontSize:11,dataLabelFontSize:12,dataLabelFormatCode:p.numberFormat||'0.0',chartColors:colors,valAxisMinVal:0,valGridLine:{color:charts.tokens.chart.grid,size:.5,style:style.style.chart_grid==='none'?'none':'solid'},showShadow:false,scene}));
   }
   function hero(slide,s) {
     const box={x:0,y:0,w:W,h:H};

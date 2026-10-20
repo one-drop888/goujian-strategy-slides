@@ -1,0 +1,178 @@
+#!/usr/bin/env python3
+"""Idempotent local bootstrap: npm ci from the lockfile plus an isolated .venv."""
+import argparse, hashlib, json, os, platform, re, shutil, subprocess, sys, datetime
+from pathlib import Path
+
+ROOT=Path(__file__).resolve().parents[1]
+
+class BootstrapError(RuntimeError):pass
+
+def read_json(path,default=None):
+    try:return json.loads(Path(path).read_text(encoding='utf-8'))
+    except (OSError,ValueError):return default
+
+def run_command(args,cwd,env=None,runner=None):
+    runner=runner or subprocess.run
+    return runner(args,cwd=str(cwd),env=env,capture_output=True,text=True)
+
+def version_tuple(text):
+    match=re.search(r'(\d+)\.(\d+)\.(\d+)',str(text or ''))
+    return tuple(int(x) for x in match.groups()) if match else None
+
+def choose_python(explicit=None):
+    if explicit:return explicit,'--python'
+    if os.environ.get('GOUJIAN_PYTHON'):return os.environ['GOUJIAN_PYTHON'],'GOUJIAN_PYTHON'
+    if sys.version_info>=(3,9):return sys.executable,'current interpreter (Python >= 3.9)'
+    for name in ('python3','python'):
+        path=shutil.which(name)
+        if path:return path,'PATH fallback (current interpreter is older than 3.9)'
+    raise BootstrapError('Python >= 3.9 not found; install it or pass --python')
+
+def verify_python(path,runner=None):
+    result=run_command([path,'-c','import sys; print(".".join(map(str,sys.version_info[:3])))'],Path.cwd(),runner=runner)
+    version=version_tuple(result.stdout if result.returncode==0 else '')
+    if result.returncode!=0 or not version:raise BootstrapError(f'Cannot execute Python at {path}: {(result.stderr or result.stdout).strip()}')
+    if version<(3,9):raise BootstrapError(f'Python >= 3.9 required; {path} is {version[0]}.{version[1]}.{version[2]}')
+    return '.'.join(map(str,version))
+
+def expected_js(root):
+    package=read_json(Path(root)/'package.json')
+    if not package:raise BootstrapError('package.json not found or invalid')
+    return {**package.get('dependencies',{}),**package.get('overrides',{})}
+
+def js_status(root):
+    installed,missing,mismatched={},[],[]
+    for name,wanted in sorted(expected_js(root).items()):
+        package=read_json(Path(root)/'node_modules'/name/'package.json')
+        actual=package.get('version') if package else None
+        installed[name]=actual
+        if not actual:missing.append(name)
+        elif re.fullmatch(r'\d+\.\d+\.\d+',str(wanted)) and actual!=wanted:mismatched.append(f'{name} {actual}!={wanted}')
+    return {'ready':not missing and not mismatched,'installed':installed,'missing':missing,'mismatched':mismatched}
+
+def npm_command():
+    return shutil.which('npm') or shutil.which('npm.cmd')
+
+def venv_python(venv):
+    candidate=Path(venv)/('Scripts/python.exe' if platform.system()=='Windows' else 'bin/python')
+    return candidate if candidate.is_file() else None
+
+def venv_pillow(python,runner=None):
+    result=run_command([str(python),'-c','import importlib.metadata as m; print(m.version("Pillow"))'],Path.cwd(),runner=runner)
+    return result.stdout.strip() if result.returncode==0 else None
+
+def file_hash(path):
+    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+
+def state_path(venv):return Path(venv)/'.goujian-bootstrap.json'
+
+def read_state(venv):return read_json(state_path(venv),{})
+
+def write_state(venv,state):
+    target=state_path(venv);temporary=target.with_suffix('.tmp')
+    temporary.write_text(json.dumps(state,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+    os.replace(temporary,target)
+
+def bootstrap(root=ROOT,python=None,dry_run=False,force=False,runner=None,emit=print):
+    root=Path(root).resolve();runner=runner or subprocess.run
+    selected,reason=choose_python(python)
+    python_version=verify_python(selected,runner)
+    actions=[]
+    # 1. JavaScript dependencies from the lockfile.
+    status=js_status(root)
+    if status['ready'] and not force:
+        actions.append({'step':'npm-ci','status':'SKIPPED','reason':'exact dependency versions already installed'})
+    else:
+        npm=npm_command()
+        if not npm:raise BootstrapError('npm not found; install Node.js 18+ or restore node_modules manually')
+        lockfile=root/'package-lock.json'
+        if not lockfile.is_file():raise BootstrapError('package-lock.json is required for npm ci')
+        command=[npm,'ci','--no-audit','--no-fund']
+        if dry_run:actions.append({'step':'npm-ci','status':'PLANNED','command':command})
+        else:
+            result=run_command(command,root,runner=runner)
+            if result.returncode!=0:raise BootstrapError(f'npm ci failed: {(result.stderr or result.stdout).strip()}')
+            actions.append({'step':'npm-ci','status':'OK','command':command})
+    # 2. Isolated virtual environment (repairing an interrupted partial venv is safe).
+    venv=root/'.venv';python_path=venv_python(venv)
+    if python_path:
+        actions.append({'step':'venv','status':'SKIPPED','path':str(venv),'reason':'virtual environment already present'})
+    else:
+        command=[selected,'-m','venv',str(venv)]
+        if dry_run:actions.append({'step':'venv','status':'PLANNED','command':command})
+        else:
+            result=run_command(command,root,runner=runner)
+            if result.returncode!=0:raise BootstrapError(f'venv creation failed: {(result.stderr or result.stdout).strip()}')
+            python_path=venv_python(venv)
+            if not python_path:raise BootstrapError('venv created without a Python interpreter; rerun bootstrap')
+            actions.append({'step':'venv','status':'OK','path':str(python_path)})
+    requirements=root/'requirements-render.txt'
+    if not requirements.is_file():raise BootstrapError('requirements-render.txt is required for the isolated environment')
+    requirement_hash=file_hash(requirements);lock_hash=file_hash(root/'package-lock.json') if (root/'package-lock.json').is_file() else None
+    state=read_state(venv) if venv.is_dir() else {}
+    state_matches=(state.get('requirements_sha256')==requirement_hash and state.get('lock_sha256')==lock_hash
+                   and state.get('python_version')==python_version and state.get('npm_ready'))
+    pillow=venv_pillow(python_path,runner) if python_path else None
+    # 3. Isolated Python dependencies, never global pip.
+    if state_matches and pillow and not force:
+        actions.append({'step':'pip-install','status':'SKIPPED','reason':'bootstrap state is complete and requirements are unchanged','pillow':pillow})
+    else:
+        planned_python=python_path or venv_python(venv)
+        if planned_python is None and dry_run:
+            suffix='Scripts/python.exe' if platform.system()=='Windows' else 'bin/python'
+            planned_python=venv/suffix
+        if planned_python is None:raise BootstrapError('virtual environment Python is unavailable')
+        if venv.resolve() not in Path(planned_python).resolve().parents:
+            raise BootstrapError('Refusing pip outside the isolated .venv')
+        command=[str(planned_python),'-m','pip','install','--disable-pip-version-check','--no-input','-r',str(requirements)]
+        env={**os.environ,'PYTHONNOUSERSITE':'1','PIP_NO_INPUT':'1','PIP_DISABLE_PIP_VERSION_CHECK':'1','PIP_USER':'0'}
+        if dry_run:actions.append({'step':'pip-install','status':'PLANNED','command':command,'env':{'PYTHONNOUSERSITE':'1'}})
+        else:
+            result=run_command(command,root,env=env,runner=runner)
+            if result.returncode!=0:raise BootstrapError(f'pip install failed: {(result.stderr or result.stdout).strip()}')
+            pillow=venv_pillow(planned_python,runner)
+            actions.append({'step':'pip-install','status':'OK','command':command,'pillow':pillow})
+    if not dry_run:
+        state={'schema_version':1,'completed_at':datetime.datetime.now().astimezone().isoformat(timespec='seconds'),
+               'python':str(selected),'python_version':python_version,'venv_python':str(python_path or venv_python(venv)),
+               'requirements_sha256':requirement_hash,'lock_sha256':lock_hash,'npm_ready':js_status(root)['ready'],'pillow':pillow}
+        write_state(venv,state)
+        actions.append({'step':'state','status':'OK','path':str(state_path(venv))})
+    result={'status':'DRY_RUN' if dry_run else 'READY','root':str(root),'python':str(selected),
+            'python_choice':reason,'python_version':python_version,'venv':str(venv),'pillow':pillow,'actions':actions}
+    emit_human(result,emit)
+    return result
+
+def emit_human(result,emit):
+    emit(f"Bootstrap: {result['status']}")
+    emit(f"Root: {result['root']}")
+    emit(f"Python: {result['python']} ({result['python_choice']}, {result['python_version']})")
+    for action in result['actions']:
+        detail=action.get('reason') or action.get('path') or ' '.join(action.get('command',[]))
+        emit(f"- {action['step']}: {action['status']} {detail}")
+    if result['status']!='DRY_RUN':
+        activate=Path(result['venv'])/('Scripts/activate' if platform.system()=='Windows' else 'bin/activate')
+        emit(f"Activate isolated dependencies: source {activate}" if platform.system()!='Windows' else f"Activate isolated dependencies: {activate}")
+
+def main():
+    parser=argparse.ArgumentParser(description='Install npm and Python dependencies locally without sudo.')
+    parser.add_argument('--root',default=str(ROOT),help='Project root (defaults to repository root)')
+    parser.add_argument('--python',help='Python interpreter to create .venv (defaults to GOUJIAN_PYTHON or the current >=3.9 interpreter)')
+    parser.add_argument('--dry-run',action='store_true',help='Show actions without creating files or downloading')
+    parser.add_argument('--force',action='store_true',help='Reinstall even when dependency state matches')
+    parser.add_argument('--json',action='store_true',help='Print machine-readable JSON')
+    args=parser.parse_args()
+    try:
+        if args.json:
+            result=None
+            def capture(line):pass
+            result=bootstrap(Path(args.root),args.python,args.dry_run,args.force,emit=capture)
+            print(json.dumps(result,ensure_ascii=False,indent=2))
+        else:
+            bootstrap(Path(args.root),args.python,args.dry_run,args.force)
+    except BootstrapError as error:
+        if args.json:print(json.dumps({'status':'FAILED','error':str(error)},ensure_ascii=False,indent=2))
+        else:print(f'Bootstrap failed: {error}',file=sys.stderr)
+        raise SystemExit(1)
+
+if __name__=='__main__':main()

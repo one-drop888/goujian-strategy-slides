@@ -44,4 +44,4 @@ function loadProfile(profileRef, repoRoot, seen = new Set(), projectDir) {
   return deepMerge(parent, child);
 }
 
-module.exports = { loadProfile, deepMerge, profileSearchDirs };
+module.exports = { loadProfile, deepMerge, profileSearchDirs, resolveProfileFile };

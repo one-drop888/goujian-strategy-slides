@@ -4,7 +4,7 @@ const Ajv = require('ajv/dist/2020');
 const {resolveSlide} = require('../composition/resolver');
 const ROOT = path.resolve(__dirname,'../..');
 const ajv = new Ajv({allErrors:true,strict:false});
-for(const name of ['asset','evidence','slide','deck','profile','composition']) ajv.addSchema(JSON.parse(fs.readFileSync(path.join(__dirname,`${name}.schema.json`),'utf8')));
+for(const name of ['asset','evidence','slide','deck','profile','composition','reasoning-plan']) ajv.addSchema(JSON.parse(fs.readFileSync(path.join(__dirname,`${name}.schema.json`),'utf8')));
 function schemaErrors(name,data) {
   const valid=ajv.getSchema(`${name}.schema.json`);
   return valid(data)?[]:valid.errors.map(e=>`${e.instancePath || '/'} ${e.message}`);

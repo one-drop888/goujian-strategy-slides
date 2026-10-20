@@ -1,0 +1,29 @@
+{
+  "id": "brand-blue",
+  "name": "Synthetic Brand Blue",
+  "purpose": "Synthetic brand profile for theme-variant regression; not a real brand",
+  "canvas": "wide",
+  "background": "FFFFFF",
+  "font": {
+    "latin": "Noto Sans",
+    "cjk": "Noto Sans CJK SC",
+    "title_size": 27,
+    "body_size": 18
+  },
+  "colors": {
+    "text": "172B4D",
+    "muted": "5E6C84",
+    "accent": "1F5EFF",
+    "accent_soft": "E9F0FF",
+    "panel": "F4F7FF",
+    "line": "D7E0F5"
+  },
+  "style": {
+    "title_rule": "accent",
+    "table_header": "soft",
+    "table_banding": true,
+    "metric_style": "panel",
+    "chart_grid": "light",
+    "cover_treatment": "editorial"
+  }
+}

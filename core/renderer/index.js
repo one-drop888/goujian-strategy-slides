@@ -11,16 +11,30 @@ const {resolveFonts}=require('../style/font-resolver');
 const {attachScene}=require('./scene-adapter');
 const {createAssetPipeline}=require('./assets');
 const {deduplicateSection}=require('../composition/scene');
+const {publicThemeDecision}=require('../reasoning/theme-decision');
+const {embedReasoningReport,serializeReasoningReport}=require('../reasoning/embed');
 const os=require('os'),crypto=require('crypto');
+function sha256(buffer){return crypto.createHash('sha256').update(buffer).digest('hex');}
 
 async function buildDeck(spec,outPath,options={}){
   assertDeck(spec);
+  if(options.reasoning&&(options.reasoning.validated!==true||!options.reasoning.plan_sha256)) {
+    throw new Error('Reasoning metadata must come from a validated reasoning-plan compile');
+  }
   const repoRoot=options.repoRoot||path.resolve(__dirname,'../..');
   if((spec.assets||[]).some(a=>path.resolve(options.specDir||repoRoot,a.path)===path.resolve(outPath)))throw Error('PPTX output must differ from every source asset');
-  const profile=loadProfile(options.profile||spec.profile||'executive-clean',repoRoot,new Set(),options.specDir);
+  const profileRef=options.themeDecision?.profile_path||options.profile||spec.profile||'executive-clean';
+  const profile=loadProfile(profileRef,repoRoot,new Set(),options.specDir);
   const errors=schemaErrors('profile',profile);
   if(errors.length) throw new Error('Invalid profile: '+errors.join('; '));
   const style=resolveStyle(profile,spec);
+  const themeDecision=options.themeDecision?publicThemeDecision(options.themeDecision):{
+    selected_profile:profile.id,
+    source:options.profile?'explicit-user':(spec.profile?'spec-profile':'default'),
+    mode:style.tokens.mode,requested_mode:'auto',
+    rationale:'Legacy spec build without an Agent reasoning plan; theme selection is not plan-validated.',
+    conflicts:[],
+  };
   const fontResolution=resolveFonts({...style.font,preferred:spec.font?.preferred||profile.font.preferred,fallback_latin:spec.font?.fallback_latin||profile.font.fallback_latin,fallback_cjk:spec.font?.fallback_cjk||profile.font.fallback_cjk});
   style.font=fontResolution.font;
   const tempDir=fs.mkdtempSync(path.join(os.tmpdir(),'goujian-assets-'));
@@ -37,6 +51,7 @@ async function buildDeck(spec,outPath,options={}){
   try {
   for(const raw of spec.slides||[]){
     const {renderer,slide}=resolveSlide(deduplicateSection(raw,spec.assets),repoRoot);current=slide;
+    if(options.reasoning?.notes?.[resolved.length]) slide.__reasoning_notes=options.reasoning.notes[resolved.length];
     const fn=renderers[renderer]; if(!fn) throw new Error(`renderer not implemented: ${renderer} (semantic type ${raw.type})`);
     fn(slide);
     const scene=scenes.at(-1),ids=new Set(scene.nodes.map(n=>n.id));
@@ -48,11 +63,25 @@ async function buildDeck(spec,outPath,options={}){
     resolved.push({semantic:raw.type,composition:slide.composition,renderer});
   }
   fs.mkdirSync(path.dirname(outPath),{recursive:true});
-  const buffer=await pptx.write({outputType:'nodebuffer'});
-  fs.writeFileSync(outPath,await normalizeChartXml(buffer,style));
-  const graph={version:'1.1',pptx_sha256:crypto.createHash('sha256').update(fs.readFileSync(outPath)).digest('hex'),fonts:fontResolution.report,declared_assets:(spec.assets||[]).map(a=>a.id),assets:assets.used,slides:scenes};
+  let buffer=await normalizeChartXml(await pptx.write({outputType:'nodebuffer'}),style);
+  const content_sha256=sha256(buffer);
+  let reasoningReport=null,report_sha256=null;
+  if(options.reasoning?.reportFactory){
+    reasoningReport=options.reasoning.reportFactory({content_sha256,scene:{slides:scenes},theme_decision:themeDecision});
+    buffer=await embedReasoningReport(buffer,reasoningReport);
+    report_sha256=sha256(Buffer.from(serializeReasoningReport(reasoningReport)));
+  }
+  fs.writeFileSync(outPath,buffer);
+  const pptx_sha256=sha256(fs.readFileSync(outPath));
+  const reasoning=options.reasoning?{
+    status:'VALIDATED',plan_sha256:options.reasoning.plan_sha256,
+    report_sha256,embedded_part:reasoningReport?'docProps/goujian-reasoning.json':null,
+  }:{status:'NOT_RUN',reason:'legacy spec build without an Agent-authored reasoning plan'};
+  const graph={version:'1.2',pptx_sha256,content_sha256,theme_decision:themeDecision,reasoning,
+    fonts:fontResolution.report,declared_assets:(spec.assets||[]).map(a=>a.id),assets:assets.used,slides:scenes};
   fs.writeFileSync(outPath+'.scene.json',JSON.stringify(graph,null,2)+'\n');
-  return {outPath,profile:profile.id,slides:(spec.slides||[]).length,resolved,scene:outPath+'.scene.json'};
+  return {outPath,profile:profile.id,slides:(spec.slides||[]).length,resolved,scene:outPath+'.scene.json',
+    theme_decision:themeDecision,reasoning,reasoning_report:reasoningReport,pptx_sha256,content_sha256};
   } finally {fs.rmSync(tempDir,{recursive:true,force:true});}
 }
 module.exports={buildDeck};

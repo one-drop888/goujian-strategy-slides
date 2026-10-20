@@ -88,6 +88,20 @@ async function main(){
   assert(normalizedXml.includes('typeface="A&amp;B Serif"'),'global label font is XML-escaped');
   assert(normalizedXml.includes('<c:v>40</c:v>'),'chart data cache is unchanged');
 
+  // Shared tokens also drive text primitives, not only charts.
+  const midProfile={id:'midgray',canvas:'wide',background:'808080',font:{latin:'Noto Sans',cjk:'Noto Sans CJK SC',title_size:27,body_size:18},
+    colors:{text:'888888',muted:'888888',accent:'888888',accent_soft:'909090',panel:'808080',line:'808080'}};
+  const midStyle=resolveStyle(midProfile);
+  assert(contrastRatio(midStyle.tokens.text,'808080')>=4.5);
+  const midProfilePath=path.join(root,'out/regression/midgray-profile.json');
+  fs.mkdirSync(path.dirname(midProfilePath),{recursive:true});fs.writeFileSync(midProfilePath,JSON.stringify(midProfile));
+  const midFile=path.join(root,'out/regression/midgray.pptx');
+  await buildDeck({title:'Midgray',slides:[{type:'key-message',title:'正文与图表共享令牌',statement:'低对比度输入被纠正。'}]},midFile,{profile:midProfilePath});
+  const midScene=JSON.parse(fs.readFileSync(midFile+'.scene.json'));
+  const claim=midScene.slides[0].nodes.find(node=>node.role==='claim');
+  assert.equal(claim.color,midStyle.tokens.text);
+  assert(contrastRatio(claim.color,'808080')>=4.5);
+
   const profiles=['executive-clean','dark-executive'];
   const expectedCharts=[
     {cats:['7月','8月','9月'],nums:[100,117.4,135.7,100,103.3,105.5]},

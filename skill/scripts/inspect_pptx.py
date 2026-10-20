@@ -30,7 +30,9 @@ def inspect(path,asset_dir=None):
             if relpart in names:
                 for r in ET.fromstring(z.read(relpart)):
                     if r.attrib.get('TargetMode')=='External':continue
-                    rels[r.attrib['Id']]=posixpath.normpath(posixpath.join(posixpath.dirname(n),r.attrib['Target']))
+                    target=r.attrib.get('Target','')
+                    resolved=target.lstrip('/') if target.startswith('/') else posixpath.normpath(posixpath.join(posixpath.dirname(n),target))
+                    rels[r.attrib['Id']]=resolved
             def visit(parent,in_group=False):
                 nonlocal total
                 for el in parent:

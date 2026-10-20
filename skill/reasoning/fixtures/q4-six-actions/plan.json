@@ -1,0 +1,258 @@
+{
+  "schema_version": "1.0",
+  "plan_id": "q4-six-actions",
+  "synthetic": true,
+  "intent": {
+    "audience": "区域运营、CRM、门店、财务、供应链与产品负责人",
+    "goal": "在追加预算前确认六项Q4行动的顺序、责任人与依赖关系",
+    "decision_question": "是否批准六项行动的顺序与责任人，并把预算另行审议？",
+    "audience_needs": ["六项行动全部保留", "四条依赖边清晰可见", "不编造业绩、原因或ROI"],
+    "context": { "scenario": "Q4 management decision", "medium": "projection", "printable": true }
+  },
+  "sources": [
+    {
+      "id": "q4-source",
+      "locator": "sources/q4-actions.md",
+      "summary": "合成材料列出六项Q4行动、三组分类、负责人、截止日期与四条依赖边；明确不提供历史业绩、因果结论或ROI，预算另行审议。",
+      "importance": "critical",
+      "synthetic": true,
+      "path": "sources/q4-actions.md",
+      "sha256": "4e008f30fa4f18e4d822933e601b6e658adce63382b37073ce52df1c553b2a4e"
+    }
+  ],
+  "claims": [
+    { "id": "c-a1", "type": "FACT", "text": "A1 九城收单窗口审计，负责人区域运营，截止10月10日。", "source_ids": ["q4-source"] },
+    { "id": "c-a2", "type": "FACT", "text": "A2 客户保留设置专职角色，负责人CRM，截止10月15日，依赖A1。", "source_ids": ["q4-source"] },
+    { "id": "c-a3", "type": "FACT", "text": "A3 分群保客外呼，负责人门店，截止10月22日，依赖A2。", "source_ids": ["q4-source"] },
+    { "id": "c-a4", "type": "FACT", "text": "A4 库存账龄与价格复核，负责人财务，截止10月12日。", "source_ids": ["q4-source"] },
+    { "id": "c-a5", "type": "FACT", "text": "A5 库存分配试点，负责人供应链，截止11月01日，依赖A4。", "source_ids": ["q4-source"] },
+    { "id": "c-a6", "type": "FACT", "text": "A6 新车上市准备度评审，负责人产品，截止11月15日，依赖A1。", "source_ids": ["q4-source"] },
+    { "id": "c-groups", "type": "FACT", "text": "经营基础组为A1、A2、A4；转化测试组为A3、A5；上市闸门为A6。", "source_ids": ["q4-source"] },
+    { "id": "c-deps", "type": "FACT", "text": "依赖边为A2→A1、A3→A2、A5→A4、A6→A1。", "source_ids": ["q4-source"] },
+    {
+      "id": "c-risk",
+      "type": "INTERPRETATION",
+      "text": "若A1或A4延期，依赖它们的后续行动窗口会被压缩；材料未提供延误概率或损失金额。",
+      "source_ids": ["q4-source"],
+      "depends_on": ["c-deps", "c-a1", "c-a4"],
+      "limits": "仅说明依赖关系，不推断延误概率、因果或财务影响。"
+    },
+    {
+      "id": "c-sequence",
+      "type": "RECOMMENDATION",
+      "text": "先批准六项行动的顺序与责任人，再另行审议预算；不预设ROI或绩效结果。",
+      "source_ids": ["q4-source"],
+      "depends_on": ["c-deps", "c-groups"]
+    }
+  ],
+  "content_decisions": [
+    { "source_id": "q4-source", "disposition": "retain", "rationale": "六项行动、四条依赖边与责任信息全部保留在正文和附录。" }
+  ],
+  "findings": [
+    { "text": "六项行动分三组，四条依赖边集中在A1、A2与A4。", "claim_ids": ["c-groups", "c-deps"] }
+  ],
+  "evidence_gaps": [
+    { "text": "源材料不提供历史业绩、原因结论、延误概率或ROI。", "source_ids": ["q4-source"] }
+  ],
+  "candidate_conclusions": [],
+  "uncertainties": [
+    { "text": "依赖关系明确，但延误概率与财务影响未知。", "claim_ids": ["c-risk"] }
+  ],
+  "storyline_strategy": {
+    "approach": "用依赖分组替代六张并列卡片，先锁定顺序与责任人",
+    "rationale": "决策问题是顺序与责任，不是预算或收益承诺"
+  },
+  "deck": {
+    "title": "Q4六项行动：先定顺序与责任人",
+    "lang": "zh-CN",
+    "footer": "合成材料 · 非真实业务材料 · Apache-2.0"
+  },
+  "slides": [
+    {
+      "id": "q4-cover",
+      "order": 1,
+      "question": "Q4决策要先解决什么？",
+      "title_mode": "descriptive",
+      "claim_ids": ["c-sequence"],
+      "source_ids": ["q4-source"],
+      "transition": "进入决策摘要",
+      "communication_intent": "把问题限定在顺序、责任人与预算边界",
+      "visual_intent": "narrative",
+      "appendix": false,
+      "spec": {
+        "type": "cover",
+        "title": "Q4六项行动：先定顺序与责任人，再谈预算",
+        "subtitle": "六项行动 · 四条依赖边 · 合成管理材料",
+        "source": "合成材料 · Project-authored synthetic fixture / Apache-2.0"
+      },
+      "bindings": []
+    },
+    {
+      "id": "q4-summary",
+      "order": 2,
+      "question": "本次需要批准什么？",
+      "title_mode": "conclusion",
+      "claim_ids": ["c-a1", "c-a4", "c-deps", "c-sequence"],
+      "source_ids": ["q4-source"],
+      "transition": "从批准事项进入依赖分组",
+      "communication_intent": "先给决策，再解释分组与依赖",
+      "visual_intent": "decision",
+      "appendix": false,
+      "spec": {
+        "type": "key-message",
+        "title": "先批准顺序与责任人，预算另行审议",
+        "statement": "六项行动全部保留；以A1、A2、A4为经营基础，A3、A5做转化测试，A6作为上市闸门。",
+        "decision_points": [
+          { "title": "批准顺序", "note": "按A1→A2→A3与A1→A6、A4→A5的依赖推进。" },
+          { "title": "批准责任人", "note": "区域运营、CRM、门店、财务、供应链与产品各自负责。" },
+          { "title": "预算边界", "note": "本次不追加预算，不预设ROI或业绩结果。" }
+        ],
+        "source": "合成材料 · Project-authored synthetic fixture / Apache-2.0"
+      },
+      "bindings": []
+    },
+    {
+      "id": "q4-roadmap",
+      "order": 3,
+      "question": "六项行动如何按依赖分组？",
+      "title_mode": "descriptive",
+      "claim_ids": ["c-groups", "c-a1", "c-a2", "c-a3", "c-a4", "c-a5", "c-a6"],
+      "source_ids": ["q4-source"],
+      "transition": "分组之后核对责任人与日期",
+      "communication_intent": "用三条推进线展示分组，而不是六张并列卡片",
+      "visual_intent": "process",
+      "appendix": false,
+      "spec": {
+        "type": "roadmap",
+        "title": "按依赖关系分三条推进线，六项行动全部保留",
+        "lanes": [
+          {
+            "title": "经营基础",
+            "phases": [
+              { "title": "A1 九城收单窗口审计" },
+              { "title": "A2 客户保留专职角色" },
+              { "title": "A4 库存账龄与价格复核" }
+            ]
+          },
+          {
+            "title": "转化测试",
+            "phases": [
+              { "title": "A3 分群保客外呼" },
+              { "title": "A5 库存分配试点" }
+            ]
+          },
+          {
+            "title": "上市闸门",
+            "phases": [
+              { "title": "A6 新车上市准备度评审" }
+            ]
+          }
+        ],
+        "source": "合成材料 · Project-authored synthetic fixture / Apache-2.0"
+      },
+      "bindings": []
+    },
+    {
+      "id": "q4-table",
+      "order": 4,
+      "question": "每项行动的负责人、截止与依赖是什么？",
+      "title_mode": "conclusion",
+      "claim_ids": ["c-a1", "c-a2", "c-a3", "c-a4", "c-a5", "c-a6", "c-deps"],
+      "source_ids": ["q4-source"],
+      "transition": "责任锁定后看关键路径风险",
+      "communication_intent": "用一张表锁定六项行动与四条依赖边",
+      "visual_intent": "evidence_table",
+      "appendix": false,
+      "spec": {
+        "type": "table",
+        "title": "六项行动、责任人与四条依赖边一次锁定",
+        "headers": ["ID", "行动", "分组", "负责人", "截止", "依赖"],
+        "rows": [
+          ["A1", "九城收单窗口审计", "经营基础", "区域运营", "10月10日", "无"],
+          ["A2", "客户保留设置专职角色", "经营基础", "CRM", "10月15日", "A1"],
+          ["A3", "分群保客外呼", "转化测试", "门店", "10月22日", "A2"],
+          ["A4", "库存账龄与价格复核", "经营基础", "财务", "10月12日", "无"],
+          ["A5", "库存分配试点", "转化测试", "供应链", "11月01日", "A4"],
+          ["A6", "新车上市准备度评审", "上市闸门", "产品", "11月15日", "A1"]
+        ],
+        "columnWidths": [0.08, 0.29, 0.14, 0.15, 0.16, 0.18],
+        "source": "合成材料 · Project-authored synthetic fixture / Apache-2.0"
+      },
+      "bindings": []
+    },
+    {
+      "id": "q4-risk",
+      "order": 5,
+      "question": "哪些依赖会压缩后续窗口？",
+      "title_mode": "descriptive",
+      "claim_ids": ["c-risk", "c-deps", "c-a1", "c-a4"],
+      "source_ids": ["q4-source"],
+      "transition": "确认风险边界后结束决策",
+      "communication_intent": "只陈述依赖影响，不编造概率或损失",
+      "visual_intent": "evidence_table",
+      "appendix": false,
+      "spec": {
+        "type": "risk",
+        "title": "关键路径风险：A1或A4延期将压缩后续窗口",
+        "items": [
+          { "title": "A2与A6依赖A1", "likelihood": "待评估", "impact": "窗口缩短", "mitigation": "先锁定A1审计范围与完成标准", "owner": "区域运营" },
+          { "title": "A3依赖A2", "likelihood": "待评估", "impact": "外呼推迟", "mitigation": "A2责任人按周复核专职角色到位", "owner": "CRM" },
+          { "title": "A5依赖A4", "likelihood": "待评估", "impact": "试点推迟", "mitigation": "A4先完成账龄与价格口径", "owner": "财务" },
+          { "title": "预算与ROI未提供", "likelihood": "已知", "impact": "收益未知", "mitigation": "预算另行审议，本次不做ROI判断", "owner": "经营班子" }
+        ],
+        "source": "合成材料 · Project-authored synthetic fixture / Apache-2.0"
+      },
+      "bindings": []
+    },
+    {
+      "id": "q4-decision",
+      "order": 6,
+      "question": "结束前需要形成什么决定？",
+      "title_mode": "conclusion",
+      "claim_ids": ["c-sequence", "c-groups", "c-a1", "c-a4"],
+      "source_ids": ["q4-source"],
+      "transition": "附录保留来源与边界",
+      "communication_intent": "用明确决定结束，不扩展到预算或收益承诺",
+      "visual_intent": "decision",
+      "appendix": false,
+      "spec": {
+        "type": "key-message",
+        "title": "批准顺序与责任人，预算另行审议",
+        "statement": "本次决定只覆盖六项行动的顺序、责任人与依赖；预算和ROI不在批准范围内。",
+        "decision_points": [
+          { "title": "批准", "note": "三条推进线、六位责任人与四个复核节点。" },
+          { "title": "不批准", "note": "不追加预算，不承诺业绩、原因或ROI。" },
+          { "title": "下一步", "note": "A1与A4先完成，再按依赖推进后续行动。" }
+        ],
+        "source": "合成材料 · Project-authored synthetic fixture / Apache-2.0"
+      },
+      "bindings": []
+    },
+    {
+      "id": "q4-appendix",
+      "order": 7,
+      "question": "来源与边界是否可追溯？",
+      "title_mode": "descriptive",
+      "claim_ids": ["c-a1", "c-a4", "c-a6"],
+      "source_ids": ["q4-source"],
+      "transition": "结束",
+      "communication_intent": "保留完整来源与明确不包含项",
+      "visual_intent": "evidence_table",
+      "appendix": true,
+      "spec": {
+        "type": "table",
+        "title": "附录：六项行动来源与边界",
+        "headers": ["来源/主题", "内容与限制"],
+        "rows": [
+          ["行动清单", "A1至A6、三组分类、负责人与截止日期"],
+          ["依赖关系", "A2→A1；A3→A2；A5→A4；A6→A1"],
+          ["明确不包含", "历史业绩、因果结论、延误概率与ROI"],
+          ["使用边界", "合成材料，不代表任何真实公司或团队"]
+        ],
+        "columnWidths": [0.24, 0.76],
+        "source": "合成材料 · Project-authored synthetic fixture / Apache-2.0"
+      },
+      "bindings": []
+    }
+  ]
+}

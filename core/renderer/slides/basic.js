@@ -4,7 +4,7 @@ const {createChartHelper}=require('../charts');
 
 function createSlideRenderers(pptx, style, spec) {
   const { createPrimitives } = require('../primitives/base');
-  const { base, finish, text, line, C, F, W, H, left, right, width } = createPrimitives(pptx, style);
+  const { base, finish, notes, text, line, C, F, W, H, left, right, width } = createPrimitives(pptx, style);
   const charts = createChartHelper(style);
   const body = style.layout?.bodySize || F.bodySize || 15;
 
@@ -25,6 +25,7 @@ function createSlideRenderers(pptx, style, spec) {
     if(flow.subtitleH)text(slide,flow.subtitleLines.join('\n'),left,sy,width,flow.subtitleH,{fontSize:Math.min(F.bodySize,17),color:C.muted,valign:'top',scene:{id:'subtitle',role:'subtitle',space:'slide'}});
     line(slide,left,ruleY,style.style.cover_treatment==='editorial'?width:2.1,C.accent,1.5);
     text(slide,s.footer||spec.footer||'',left,6.66,width,.25,{fontSize:10,color:C.muted,scene:{role:'source',space:'slide'}});
+    notes(slide,s);
   }
 
   function section(s) {
@@ -33,6 +34,7 @@ function createSlideRenderers(pptx, style, spec) {
     text(slide,s.number==null?'':String(s.number).padStart(2,'0'),left,1.2,2,.7,{fontSize:30,bold:true,color:C.accent,scene:{role:'decoration',semantic_role:'section_number',space:'slide'}});
     text(slide,flow.lines.join('\n'),left,2.5,width,flow.h,{fontSize:flow.size,bold:true,valign:'top',scene:{id:'claim',role:'claim',space:'slide'}});
     if(flow.subtitleH)text(slide,flow.subtitleLines.join('\n'),left,2.5+flow.h+.35,width,flow.subtitleH,{fontSize:Math.min(F.bodySize,17),color:C.muted,scene:{role:'subtitle',space:'slide'}});
+    notes(slide,s);
   }
 
   function statement(s) {

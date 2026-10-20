@@ -29,6 +29,12 @@ function createPrimitives(pptx, style) {
     slide._bodyTop=flow.bodyTop;
     return {x:left,y:flow.bodyTop,w:width,h:6.45-flow.bodyTop};
   }
+  function notes(slide,s) {
+    const lines=[];
+    if (s.evidence?.length) lines.push(...s.evidence.map(e => JSON.stringify(e)));
+    if (s.__reasoning_notes) lines.push(s.__reasoning_notes);
+    if (lines.length) slide.addNotes(lines.join('\n'));
+  }
   function finish(slide, s) {
     if (s.takeaway) {
       line(slide, left, 6.77, .42, C.accent, 3);
@@ -38,8 +44,8 @@ function createPrimitives(pptx, style) {
     if (src) text(slide, src, left, 7.18, width-.4, .18, { fontSize: 8, color: C.muted,scene:{id:"source",role:"source",space:"slide"} });
     text(slide, String(pptx._slides.length).padStart(2,'0'), W-right-.3, 7.18, .3, .18,
       { fontSize: 8, color: C.muted, align: 'right', fontFace: F.latin,scene:{role:'decoration',semantic_role:'page_number',space:'slide'} });
-    if (s.evidence?.length) slide.addNotes(s.evidence.map(e => JSON.stringify(e)).join('\n'));
+    notes(slide,s);
   }
-  return { base, finish, text, line, C, F, W, H, M, left, right, width };
+  return { base, finish, notes, text, line, C, F, W, H, M, left, right, width };
 }
 module.exports = { createPrimitives };

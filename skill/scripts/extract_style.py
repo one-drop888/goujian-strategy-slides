@@ -1,15 +1,18 @@
 #!/usr/bin/env python3
 """Extract reusable design evidence from a reference PPTX.
 This is a best-effort structural/style extractor, not pixel-perfect cloning.
+Images, master/layout inheritance, SmartArt and semantic style remain PARTIAL.
 """
-import json, sys, zipfile, re, statistics
+import json, sys, zipfile, re, statistics, posixpath
 import xml.etree.ElementTree as ET
 from collections import Counter
 from pathlib import Path
-A='http://schemas.openxmlformats.org/drawingml/2006/main'; P='http://schemas.openxmlformats.org/presentationml/2006/main'; EMU=914400
+A='http://schemas.openxmlformats.org/drawingml/2006/main'; P='http://schemas.openxmlformats.org/presentationml/2006/main'
+C='http://schemas.openxmlformats.org/drawingml/2006/chart'; R='http://schemas.openxmlformats.org/officeDocument/2006/relationships'
+EMU=914400
 
 def rect(el):
-    x=el.find(f'.//{{{A}}}xfrm');
+    x=el.find(f'.//{{{A}}}xfrm')
     if x is None:return None
     off=x.find(f'{{{A}}}off'); ext=x.find(f'{{{A}}}ext')
     if off is None or ext is None:return None
@@ -25,10 +28,83 @@ def font_sizes(el):
             except:pass
     return vals
 
+def scheme_hex(key,theme):
+    aliases={'tx1':'dk1','tx2':'dk2','bg1':'lt1','bg2':'lt2'}
+    value=theme.get(aliases.get(key,key))
+    return value if isinstance(value,str) and re.fullmatch(r'[0-9A-Fa-f]{6}',value) else None
+
+def solid_color(el,theme):
+    fill=el.find(f'.//{{{A}}}solidFill')
+    if fill is None:return None,None
+    for child in list(fill):
+        tag=child.tag.split('}')[-1]
+        if tag=='srgbClr':return child.attrib.get('val'),None
+        if tag=='schemeClr':
+            key=child.attrib.get('val');return scheme_hex(key,theme),key
+    return None,None
+
+def rels(z,names,part):
+    relpart=posixpath.join(posixpath.dirname(part),'_rels',posixpath.basename(part)+'.rels')
+    result={}
+    if relpart not in names:return result
+    try:root=ET.fromstring(z.read(relpart))
+    except ET.ParseError:return result
+    for item in root:
+        if item.attrib.get('TargetMode')=='External':continue
+        target=item.attrib.get('Target','')
+        resolved=target.lstrip('/') if target.startswith('/') else posixpath.normpath(posixpath.join(posixpath.dirname(part),target))
+        result[item.attrib.get('Id')]=resolved
+    return result
+
+def background(z,names,part,theme):
+    chain=[]
+    rel=rels(z,names,part)
+    chain.append(('slide',part))
+    layout=next((target for target in rel.values() if '/slideLayouts/' in target),None)
+    if layout:chain.append(('layout',layout))
+    if layout:
+        layout_rels=rels(z,names,layout)
+        master=next((target for target in layout_rels.values() if '/slideMasters/' in target),None)
+        if master:chain.append(('master',master))
+    for kind,target in chain:
+        if target not in names:continue
+        try:root=ET.fromstring(z.read(target))
+        except ET.ParseError:continue
+        bg=root.find(f'.//{{{P}}}bg')
+        if bg is None:continue
+        color,scheme=solid_color(bg,theme)
+        if color or scheme:return color,scheme,kind
+    return None,None,None
+
+def chart_paints(z,names,part,theme):
+    rel=rels(z,names,part)
+    series,labels,texts=Counter(),Counter(),Counter()
+    for target in rel.values():
+        if '/charts/' not in target or target not in names:continue
+        try:root=ET.fromstring(z.read(target))
+        except ET.ParseError:continue
+        for color in (node.attrib.get('val') for node in root.findall(f'.//{{{C}}}ser/{{{C}}}spPr//{{{A}}}srgbClr')):series[color]+=1
+        for color in (node.attrib.get('val') for node in root.findall(f'.//{{{C}}}dPt//{{{A}}}srgbClr')):series[color]+=1
+        for color in (node.attrib.get('val') for node in root.findall(f'.//{{{C}}}dLbls//{{{A}}}srgbClr')):labels[color]+=1
+        for color in (node.attrib.get('val') for node in root.findall(f'.//{{{C}}}txPr//{{{A}}}srgbClr')):texts[color]+=1
+        for node in root.findall(f'.//{{{C}}}chartSpace/{{{C}}}spPr//{{{A}}}srgbClr'):
+            if node.attrib.get('val'):texts[node.attrib['val']]+=1
+    return series,labels,texts
+
 def main(src,out):
     src=Path(src); out=Path(out)
     if not src.exists():raise SystemExit(f'Missing: {src}')
-    result={'source':str(src),'canvas':{},'fonts':{},'theme_colors':{},'typography':{},'layout':{},'slides':[],'notes':['Auto-extracted evidence; visually verify before production use.']}
+    result={'source':str(src),'canvas':{},'fonts':{},'theme_colors':{},'typography':{},'layout':{},'slides':[],
+            'native_evidence':{'background_candidates':[],'text_colors':[],'title_colors':[],'chart_series_colors':[],
+                               'chart_label_colors':[],'chart_text_colors':[],'images':[],'density':{},
+                               'limitations':[
+                                   'Slide backgrounds read from slide/layout/master solid fills; gradients, picture fills and theme color transforms remain PARTIAL.',
+                                   'Images are reported by bounds and crop; no OCR or semantic classification is performed.',
+                                   'SmartArt, grouped transforms and master/layout shape reconstruction remain PARTIAL.',
+                                   'Native chart paint statistics cover cached series/label/text colors; theme-linked paint may resolve differently at render time.'
+                               ]},
+            'notes':['Auto-extracted evidence; visually verify before production use.']}
+    backgrounds=Counter();text_colors=Counter();title_colors=Counter();chart_series=Counter();chart_labels=Counter();chart_texts=Counter()
     with zipfile.ZipFile(src) as z:
         names=set(z.namelist())
         if 'ppt/presentation.xml' in names:
@@ -46,31 +122,50 @@ def main(src,out):
                     key=child.tag.split('}')[-1]; val=None
                     for c in list(child): val=c.attrib.get('val') or c.attrib.get('lastClr');
                     if val:result['theme_colors'][key]=val
-        fonts=[];sizes=[];title_positions=[];shape_counts=[];signatures=[]
+        theme=result['theme_colors']
+        fonts=[];sizes=[];title_positions=[];shape_counts=[];signatures=[];text_area_ratios=[]
+        W=result['canvas'].get('width_in') or 13.333;H=result['canvas'].get('height_in') or 7.5
         slide_names=sorted([n for n in names if re.match(r'ppt/slides/slide\d+\.xml$',n)],key=lambda x:int(re.search(r'(\d+)',Path(x).stem).group(1)))
         for idx,n in enumerate(slide_names,1):
             try:r=ET.fromstring(z.read(n))
             except:continue
-            shapes=[]; text_boxes=[]
+            shapes=[]; text_boxes=[]; text_area=0.0
             for el in r.findall(f'.//{{{P}}}sp'):
                 rr=rect(el);tt=text(el);fs=font_sizes(el);sizes.extend(fs)
                 for tag in ['latin','ea']:
                     for fe in el.findall(f'.//{{{A}}}{tag}'):
                         if fe.attrib.get('typeface'):fonts.append(fe.attrib['typeface'])
+                shape_color=None
+                for run in el.findall(f'.//{{{A}}}rPr')+el.findall(f'.//{{{A}}}defRPr'):
+                    color,scheme=solid_color(run,theme)
+                    if color:text_colors[color]+=1;shape_color=shape_color or color
                 if rr:
                     shapes.append(rr)
-                    if tt:text_boxes.append((rr,tt,max(fs) if fs else 0))
-            # title candidate = highest font size, tie by top position
+                    if tt:
+                        text_boxes.append((rr,tt,max(fs) if fs else 0,shape_color))
+                        text_area+=min(max(rr[2],0),W)*min(max(rr[3],0),H)
             title=None
             if text_boxes:
                 title=sorted(text_boxes,key=lambda x:(-x[2],x[0][1]))[0]
                 title_positions.append(title[0])
-            shape_counts.append(len(shapes))
+                if title[3]:title_colors[title[3]]+=1
+            shape_counts.append(len(shapes));text_area_ratios.append(text_area/(W*H))
             norm=[]
-            W=result['canvas'].get('width_in') or 13.333;H=result['canvas'].get('height_in') or 7.5
             for x,y,w,h in sorted(shapes,key=lambda q:(q[1],q[0]))[:20]:norm.append([round(x/W,1),round(y/H,1),round(w/W,1),round(h/H,1)])
             sig=json.dumps(norm,separators=(',',':'));signatures.append(sig)
-            result['slides'].append({'slide':idx,'shape_count':len(shapes),'text_box_count':len(text_boxes),'title_candidate':title[1][:120] if title else None,'title_rect':[round(v,3) for v in title[0]] if title else None,'title_font_size':title[2] if title else None})
+            bg_color,bg_scheme,bg_source=background(z,names,n,theme)
+            if bg_color:backgrounds[bg_color]+=1
+            series,labels,texts=chart_paints(z,names,n,theme)
+            chart_series.update(series);chart_labels.update(labels);chart_texts.update(texts)
+            images=[]
+            for pic in r.findall(f'.//{{{P}}}pic'):
+                box=rect(pic);crop=pic.find(f'.//{{{A}}}srcRect')
+                images.append({'rect':[round(v,3) for v in box] if box else None,'crop':dict(crop.attrib) if crop is not None else None})
+                result['native_evidence']['images'].append({'slide':idx,'rect':[round(v,3) for v in box] if box else None,'crop':dict(crop.attrib) if crop is not None else None})
+            result['slides'].append({'slide':idx,'shape_count':len(shapes),'text_box_count':len(text_boxes),'title_candidate':title[1][:120] if title else None,
+                                     'title_rect':[round(v,3) for v in title[0]] if title else None,'title_font_size':title[2] if title else None,
+                                     'title_color':title[3] if title else None,'background':{'color':bg_color,'scheme':bg_scheme,'source':bg_source},
+                                     'chart_paint':{'series':dict(series),'labels':dict(labels),'text':dict(texts)},'images':images})
         if fonts:result['fonts']['explicit_top']=[{'font':x,'count':n} for x,n in Counter(fonts).most_common(10)]
         if sizes:
             result['typography']={'font_size_median':round(statistics.median(sizes),1),'font_size_p90':round(sorted(sizes)[int(.9*(len(sizes)-1))],1),'top_sizes':[{'size':x,'count':n} for x,n in Counter(round(v,1) for v in sizes).most_common(10)]}
@@ -79,6 +174,13 @@ def main(src,out):
         if shape_counts:result['layout']['shape_count_median']=round(statistics.median(shape_counts),1)
         common=Counter(signatures).most_common(8);result['layout']['repeated_layout_signatures']=[{'count':n,'signature':json.loads(sig)} for sig,n in common if n>1]
         result['layout']['slide_count']=len(slide_names)
+        result['native_evidence']['background_candidates']=[{'color':c,'count':n} for c,n in backgrounds.most_common(5)]
+        result['native_evidence']['text_colors']=[{'color':c,'count':n} for c,n in text_colors.most_common(8)]
+        result['native_evidence']['title_colors']=[{'color':c,'count':n} for c,n in title_colors.most_common(5)]
+        result['native_evidence']['chart_series_colors']=[{'color':c,'count':n} for c,n in chart_series.most_common(8)]
+        result['native_evidence']['chart_label_colors']=[{'color':c,'count':n} for c,n in chart_labels.most_common(5)]
+        result['native_evidence']['chart_text_colors']=[{'color':c,'count':n} for c,n in chart_texts.most_common(5)]
+        if text_area_ratios:result['native_evidence']['density']={'text_area_ratio_median':round(statistics.median(text_area_ratios),3)}
     out.parent.mkdir(parents=True,exist_ok=True);out.write_text(json.dumps(result,ensure_ascii=False,indent=2),encoding='utf-8');print(out)
 if __name__=='__main__':
     if len(sys.argv)!=3:raise SystemExit('usage: extract_style.py input.pptx output.json')

@@ -1,0 +1,51 @@
+{
+  "source": "Project-authored synthetic dataset / Apache-2.0",
+  "synthetic": true,
+  "title": "九月经营实际与目标（合成）",
+  "period": {
+    "start": "2026-09-01",
+    "end": "2026-09-30"
+  },
+  "metrics": [
+    {
+      "id": "revenue",
+      "label": "收入",
+      "unit": "万元",
+      "actual": 960,
+      "target": 1000,
+      "previous_month": 900,
+      "previous_year": 800
+    },
+    {
+      "id": "orders",
+      "label": "订单",
+      "unit": "单",
+      "actual": 240,
+      "target": 250,
+      "previous_month": 225,
+      "previous_year": 200
+    },
+    {
+      "id": "margin",
+      "label": "毛利率",
+      "unit": "%",
+      "actual": 22,
+      "target": 24,
+      "previous_month": 21,
+      "previous_year": 20
+    }
+  ],
+  "trend": [
+    { "month": "2026-04", "actual": 780 },
+    { "month": "2026-05", "actual": 820 },
+    { "month": "2026-06", "actual": 850 },
+    { "month": "2026-07", "actual": 870 },
+    { "month": "2026-08", "actual": 900 },
+    { "month": "2026-09", "actual": 960 }
+  ],
+  "missing": [
+    "产品结构明细",
+    "折扣执行明细"
+  ],
+  "notes": "Synthetic fixture. The cause of the margin gap and revenue shortfall is intentionally unknown; no ROI or impact amount is supplied."
+}

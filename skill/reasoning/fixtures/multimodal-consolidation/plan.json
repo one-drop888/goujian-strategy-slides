@@ -1,0 +1,429 @@
+{
+  "schema_version": "1.0",
+  "plan_id": "multimodal-consolidation",
+  "synthetic": true,
+  "intent": {
+    "audience": "经营分析与区域运营团队",
+    "goal": "整合渠道表格、图表截图、访谈截图与视觉素材，区分规范数据、派生视图与定性假设",
+    "decision_question": "哪些原始数值应作为规范来源，哪些材料只能作为解释或附录？",
+    "audience_needs": ["九列表格完整可读", "截图与解释分开", "重复数值有明确规范来源"],
+    "context": { "scenario": "multimodal consolidation review", "medium": "projection", "printable": false }
+  },
+  "sources": [
+    {
+      "id": "s-channel",
+      "locator": "技能示例截图 channel-evidence.png；对应合成源表",
+      "summary": "合成渠道表：四个战区的线索、到店、试驾、成交率、库存、跟进、负责人与复核日；九列全部保留。",
+      "importance": "critical",
+      "synthetic": true,
+      "path": "../../../examples/assets/channel-evidence.png",
+      "sha256": "0f8cf0ed2062e449ecceb7b4db850b7833966b531a0ce80e1f6e7589ba30c204",
+      "values": [
+        { "id": "sc-hn-leads", "label": "华南线索", "metric": "线索", "value": 1280, "unit": "线索", "time_window": "2026-Q3" },
+        { "id": "sc-hn-reach", "label": "华南到店率", "metric": "到店率", "value": 34, "unit": "%", "time_window": "2026-Q3" },
+        { "id": "sc-hn-test", "label": "华南试驾率", "metric": "试驾率", "value": 61, "unit": "%", "time_window": "2026-Q3" },
+        { "id": "sc-hn-conv", "label": "华南成交率", "metric": "成交率", "value": 14.2, "unit": "%", "time_window": "2026-Q3" },
+        { "id": "sc-hn-inv", "label": "华南库存", "metric": "库存天数", "value": 38, "unit": "天", "time_window": "2026-Q3" },
+        { "id": "sc-hn-follow", "label": "华南跟进", "metric": "跟进率", "value": 90, "unit": "%", "time_window": "2026-Q3" },
+        { "id": "sc-hd-leads", "label": "华东线索", "metric": "线索", "value": 1160, "unit": "线索", "time_window": "2026-Q3" },
+        { "id": "sc-hd-reach", "label": "华东到店率", "metric": "到店率", "value": 32, "unit": "%", "time_window": "2026-Q3" },
+        { "id": "sc-hd-test", "label": "华东试驾率", "metric": "试驾率", "value": 59, "unit": "%", "time_window": "2026-Q3" },
+        { "id": "sc-hd-conv", "label": "华东成交率", "metric": "成交率", "value": 13.8, "unit": "%", "time_window": "2026-Q3" },
+        { "id": "sc-hd-inv", "label": "华东库存", "metric": "库存天数", "value": 39, "unit": "天", "time_window": "2026-Q3" },
+        { "id": "sc-hd-follow", "label": "华东跟进", "metric": "跟进率", "value": 88, "unit": "%", "time_window": "2026-Q3" },
+        { "id": "sc-hb-leads", "label": "华北线索", "metric": "线索", "value": 980, "unit": "线索", "time_window": "2026-Q3" },
+        { "id": "sc-hb-reach", "label": "华北到店率", "metric": "到店率", "value": 29, "unit": "%", "time_window": "2026-Q3" },
+        { "id": "sc-hb-test", "label": "华北试驾率", "metric": "试驾率", "value": 55, "unit": "%", "time_window": "2026-Q3" },
+        { "id": "sc-hb-conv", "label": "华北成交率", "metric": "成交率", "value": 11.6, "unit": "%", "time_window": "2026-Q3" },
+        { "id": "sc-hb-inv", "label": "华北库存", "metric": "库存天数", "value": 43, "unit": "天", "time_window": "2026-Q3" },
+        { "id": "sc-hb-follow", "label": "华北跟进", "metric": "跟进率", "value": 83, "unit": "%", "time_window": "2026-Q3" },
+        { "id": "sc-xn-leads", "label": "西南线索", "metric": "线索", "value": 860, "unit": "线索", "time_window": "2026-Q3" },
+        { "id": "sc-xn-reach", "label": "西南到店率", "metric": "到店率", "value": 28, "unit": "%", "time_window": "2026-Q3" },
+        { "id": "sc-xn-test", "label": "西南试驾率", "metric": "试驾率", "value": 54, "unit": "%", "time_window": "2026-Q3" },
+        { "id": "sc-xn-conv", "label": "西南成交率", "metric": "成交率", "value": 10.9, "unit": "%", "time_window": "2026-Q3" },
+        { "id": "sc-xn-inv", "label": "西南库存", "metric": "库存天数", "value": 46, "unit": "天", "time_window": "2026-Q3" },
+        { "id": "sc-xn-follow", "label": "西南跟进", "metric": "跟进率", "value": 81, "unit": "%", "time_window": "2026-Q3" }
+      ]
+    },
+    {
+      "id": "s-chart",
+      "locator": "技能示例截图 chart-evidence.png；对应合成源图",
+      "summary": "合成源图表截图，展示四个战区的成交率14.2%、13.8%、11.6%、10.9%，与渠道表数值重复。",
+      "importance": "supporting",
+      "synthetic": true,
+      "path": "../../../examples/assets/chart-evidence.png",
+      "sha256": "3f0c862f36bd790dabae05f58eb0a8bbc12d95842ac401a4d8f45e37916642ef"
+    },
+    {
+      "id": "s-interview",
+      "locator": "技能示例截图 interview-evidence.png；对应合成访谈摘录",
+      "summary": "合成访谈摘录：24位近期试驾客户，半结构化访谈；客户提到试驾后缺少下一步说明。定性频次不能证明因果。",
+      "importance": "critical",
+      "synthetic": true,
+      "path": "../../../examples/assets/interview-evidence.png",
+      "sha256": "225067e67304cead2c462f379d07224eba837ba37dce94e4ba3bf3dcb377c8d2"
+    },
+    {
+      "id": "s-visual",
+      "locator": "技能示例素材 showroom-illustration.png",
+      "summary": "项目自有的AI合成展厅示意图，仅用于封面氛围，不是业务证据。",
+      "importance": "supporting",
+      "synthetic": true,
+      "path": "../../../examples/assets/showroom-illustration.png",
+      "sha256": "b248e523060e8a0cb10d8407c6bc59a087ae3297eb3855004d4fed740297080f"
+    }
+  ],
+  "claims": [
+    {
+      "id": "c-table-fact",
+      "type": "FACT",
+      "text": "九列渠道表覆盖四个战区：线索1,280/1,160/980/860，成交率14.2%/13.8%/11.6%/10.9%。",
+      "source_ids": ["s-channel"]
+    },
+    {
+      "id": "c-chart-recon",
+      "type": "FACT",
+      "text": "源图表截图的成交率与渠道表一致；原生图表按规范值重建且可编辑。",
+      "source_ids": ["s-channel", "s-chart"]
+    },
+    {
+      "id": "c-interview-hypothesis",
+      "type": "HYPOTHESIS",
+      "text": "访谈提示试驾后的下一步说明不足，可能影响客户比较；24位样本尚不能证明因果。",
+      "source_ids": ["s-interview"],
+      "depends_on": ["c-table-fact"],
+      "uncertainty": "定性样本，不能代表总体比例或证明转化率差异。"
+    },
+    {
+      "id": "c-limits",
+      "type": "INTERPRETATION",
+      "text": "截图文字保持嵌入不可编辑；数值通过原生表/图重建，并保留源截图供核对。",
+      "source_ids": ["s-channel", "s-chart"],
+      "limits": "截图与原生对象是两种证据形态，不能视为同一可编辑对象。"
+    },
+    {
+      "id": "c-dedup",
+      "type": "INTERPRETATION",
+      "text": "图表截图中的成交率与渠道表重复，以渠道表为规范来源；图表仅作为派生视图。",
+      "source_ids": ["s-channel", "s-chart"]
+    },
+    {
+      "id": "c-recommendation",
+      "type": "RECOMMENDATION",
+      "text": "先统一指标口径，再验证跟进质量与转化结果的关系；不把访谈频次当作因果证据。",
+      "source_ids": ["s-interview", "s-channel"],
+      "depends_on": ["c-interview-hypothesis", "c-dedup"]
+    },
+    {
+      "id": "c-visual-fact",
+      "type": "FACT",
+      "text": "封面使用项目自有的AI合成展厅示意，不是业务证据。",
+      "source_ids": ["s-visual"]
+    }
+  ],
+  "content_decisions": [
+    { "source_id": "s-channel", "disposition": "retain", "rationale": "九列表格是数值的规范来源，正文与附录均保留。" },
+    { "source_id": "s-chart", "disposition": "deduplicate", "dedup_target": "s-channel", "rationale": "图表截图的成交率与渠道表重复；保留截图核对，但规范数值指向渠道表。" },
+    { "source_id": "s-interview", "disposition": "retain", "rationale": "访谈用于提出跟进假设，并保留样本与方法限制。" },
+    { "source_id": "s-visual", "disposition": "retain", "rationale": "合成视觉仅用于封面氛围，并在来源中声明不是业务证据。" }
+  ],
+  "findings": [
+    { "text": "同一组成交率同时出现在表格与图表截图中，表格被声明为规范来源。", "claim_ids": ["c-table-fact", "c-dedup"] }
+  ],
+  "evidence_gaps": [
+    { "text": "访谈为24位定性样本，不能提供总体比例或因果证据。", "source_ids": ["s-interview"] }
+  ],
+  "candidate_conclusions": [],
+  "uncertainties": [
+    { "text": "跟进说明不足是否解释区域转化差异，尚不能验证。", "claim_ids": ["c-interview-hypothesis"] }
+  ],
+  "storyline_strategy": {
+    "approach": "先覆盖九列规范表，再展示原生派生视图与访谈边界，最后给出规范来源表",
+    "rationale": "把数值、派生视图和定性解释分开，避免把截图文字当成可编辑数据"
+  },
+  "deck": {
+    "title": "多源材料整合：先统一口径，再解释差异",
+    "lang": "zh-CN",
+    "footer": "合成材料 · Project-authored synthetic fixture / Apache-2.0",
+    "assets": [
+      {
+        "id": "channel",
+        "path": "../../../examples/assets/channel-evidence.png",
+        "type": "table_screenshot",
+        "role": "evidence",
+        "source": "Project-authored synthetic source table; Apache-2.0",
+        "fit": "contain",
+        "caption": "渠道复盘原始表格 · 合成数据",
+        "attribution": "Synthetic fixture / 非真实业务证据",
+        "provenance": [
+          { "kind": "image_text", "text": "渠道复盘原始表格 · 合成数据", "source_asset": "channel", "source_region": { "x": 0, "y": 0, "w": 1, "h": 1 }, "confidence": 1, "render_mode": "embedded" }
+        ]
+      },
+      {
+        "id": "chart",
+        "path": "../../../examples/assets/chart-evidence.png",
+        "type": "chart_screenshot",
+        "role": "evidence",
+        "source": "Project-authored synthetic source chart; Apache-2.0",
+        "fit": "contain",
+        "caption": "源图表 · 成交率，%",
+        "attribution": "Synthetic fixture / 非真实业务证据",
+        "provenance": [
+          { "kind": "image_text", "text": "源图表 · 成交率，%", "source_asset": "chart", "source_region": { "x": 0, "y": 0, "w": 1, "h": 1 }, "confidence": 1, "render_mode": "embedded" }
+        ]
+      },
+      {
+        "id": "interview",
+        "path": "../../../examples/assets/interview-evidence.png",
+        "type": "document_screenshot",
+        "role": "evidence",
+        "source": "Project-authored synthetic interview excerpt; Apache-2.0",
+        "fit": "contain",
+        "caption": "客户访谈摘录 · 合成样本",
+        "attribution": "Synthetic fixture / 非真实业务证据",
+        "provenance": [
+          { "kind": "image_text", "text": "试驾后没人说明下一步，我就先比较了别的品牌。样本：24 位近期试驾客户；方法：半结构化访谈；限制：定性频次不能证明因果。", "source_asset": "interview", "source_region": { "x": 0, "y": 0, "w": 1, "h": 1 }, "confidence": 1, "render_mode": "embedded" }
+        ]
+      },
+      {
+        "id": "showroom",
+        "path": "../../../examples/assets/showroom-illustration.png",
+        "type": "background",
+        "role": "background",
+        "source": "AI-generated fictional showroom, 2026-10-16; not documentary evidence",
+        "fit": "cover",
+        "caption": "AI 合成展厅示意 · 非真实业务照片",
+        "attribution": "AI 合成展厅示意 · 非真实业务照片",
+        "provenance": [
+          { "kind": "generated_annotation", "text": "AI-generated scene, not business evidence", "render_mode": "embedded" }
+        ]
+      }
+    ]
+  },
+  "slides": [
+    {
+      "id": "mm-hero",
+      "order": 1,
+      "question": "为什么需要先统一口径？",
+      "title_mode": "descriptive",
+      "claim_ids": ["c-visual-fact", "c-recommendation"],
+      "source_ids": ["s-visual", "s-channel", "s-interview"],
+      "transition": "进入九列规范表",
+      "communication_intent": "用一张合成视觉建立主题，同时声明不是业务证据",
+      "visual_intent": "image_evidence",
+      "appendix": false,
+      "spec": {
+        "type": "image-hero",
+        "title": "多源材料整合：先统一口径，再解释差异",
+        "subtitle": "表格、图表、访谈与视觉素材的边界 · 合成数据",
+        "asset_ids": ["showroom"],
+        "source": "AI 合成展厅示意 · 非真实业务照片"
+      },
+      "bindings": []
+    },
+    {
+      "id": "mm-table",
+      "order": 2,
+      "question": "九列渠道表是否完整保留？",
+      "title_mode": "conclusion",
+      "claim_ids": ["c-table-fact"],
+      "source_ids": ["s-channel"],
+      "transition": "完整表之后展示可读性拆分与访谈证据",
+      "communication_intent": "用一张九列表锁定全部原始字段",
+      "visual_intent": "evidence_table",
+      "appendix": false,
+      "spec": {
+        "type": "table",
+        "title": "九列渠道表完整保留，数值可由规范来源复核",
+        "headers": ["战区", "线索", "到店", "试驾", "成交率", "库存", "跟进", "负责人", "复核日"],
+        "rows": [
+          ["华南", "1,280", "34%", "61%", "14.2%", "38天", "90%", "A", "10/20"],
+          ["华东", "1,160", "32%", "59%", "13.8%", "39天", "88%", "B", "10/20"],
+          ["华北", "980", "29%", "55%", "11.6%", "43天", "83%", "C", "10/21"],
+          ["西南", "860", "28%", "54%", "10.9%", "46天", "81%", "D", "10/21"]
+        ],
+        "columnWidths": [0.08, 0.12, 0.10, 0.10, 0.14, 0.12, 0.10, 0.10, 0.14],
+        "source": "Synthetic multi-source fixture · Apache-2.0"
+      },
+      "bindings": [
+        { "pointer": "/rows/0/1", "target": { "kind": "source", "source_id": "s-channel", "value_id": "sc-hn-leads" }, "format": { "kind": "thousands" } },
+        { "pointer": "/rows/0/2", "target": { "kind": "source", "source_id": "s-channel", "value_id": "sc-hn-reach" }, "format": { "kind": "percent", "precision": 0 } },
+        { "pointer": "/rows/0/3", "target": { "kind": "source", "source_id": "s-channel", "value_id": "sc-hn-test" }, "format": { "kind": "percent", "precision": 0 } },
+        { "pointer": "/rows/0/4", "target": { "kind": "source", "source_id": "s-channel", "value_id": "sc-hn-conv" }, "format": { "kind": "percent", "precision": 1 } },
+        { "pointer": "/rows/0/5", "target": { "kind": "source", "source_id": "s-channel", "value_id": "sc-hn-inv" }, "format": { "kind": "integer", "suffix": "天" } },
+        { "pointer": "/rows/0/6", "target": { "kind": "source", "source_id": "s-channel", "value_id": "sc-hn-follow" }, "format": { "kind": "percent", "precision": 0 } },
+        { "pointer": "/rows/1/1", "target": { "kind": "source", "source_id": "s-channel", "value_id": "sc-hd-leads" }, "format": { "kind": "thousands" } },
+        { "pointer": "/rows/1/2", "target": { "kind": "source", "source_id": "s-channel", "value_id": "sc-hd-reach" }, "format": { "kind": "percent", "precision": 0 } },
+        { "pointer": "/rows/1/3", "target": { "kind": "source", "source_id": "s-channel", "value_id": "sc-hd-test" }, "format": { "kind": "percent", "precision": 0 } },
+        { "pointer": "/rows/1/4", "target": { "kind": "source", "source_id": "s-channel", "value_id": "sc-hd-conv" }, "format": { "kind": "percent", "precision": 1 } },
+        { "pointer": "/rows/1/5", "target": { "kind": "source", "source_id": "s-channel", "value_id": "sc-hd-inv" }, "format": { "kind": "integer", "suffix": "天" } },
+        { "pointer": "/rows/1/6", "target": { "kind": "source", "source_id": "s-channel", "value_id": "sc-hd-follow" }, "format": { "kind": "percent", "precision": 0 } },
+        { "pointer": "/rows/2/1", "target": { "kind": "source", "source_id": "s-channel", "value_id": "sc-hb-leads" }, "format": { "kind": "thousands" } },
+        { "pointer": "/rows/2/2", "target": { "kind": "source", "source_id": "s-channel", "value_id": "sc-hb-reach" }, "format": { "kind": "percent", "precision": 0 } },
+        { "pointer": "/rows/2/3", "target": { "kind": "source", "source_id": "s-channel", "value_id": "sc-hb-test" }, "format": { "kind": "percent", "precision": 0 } },
+        { "pointer": "/rows/2/4", "target": { "kind": "source", "source_id": "s-channel", "value_id": "sc-hb-conv" }, "format": { "kind": "percent", "precision": 1 } },
+        { "pointer": "/rows/2/5", "target": { "kind": "source", "source_id": "s-channel", "value_id": "sc-hb-inv" }, "format": { "kind": "integer", "suffix": "天" } },
+        { "pointer": "/rows/2/6", "target": { "kind": "source", "source_id": "s-channel", "value_id": "sc-hb-follow" }, "format": { "kind": "percent", "precision": 0 } },
+        { "pointer": "/rows/3/1", "target": { "kind": "source", "source_id": "s-channel", "value_id": "sc-xn-leads" }, "format": { "kind": "thousands" } },
+        { "pointer": "/rows/3/2", "target": { "kind": "source", "source_id": "s-channel", "value_id": "sc-xn-reach" }, "format": { "kind": "percent", "precision": 0 } },
+        { "pointer": "/rows/3/3", "target": { "kind": "source", "source_id": "s-channel", "value_id": "sc-xn-test" }, "format": { "kind": "percent", "precision": 0 } },
+        { "pointer": "/rows/3/4", "target": { "kind": "source", "source_id": "s-channel", "value_id": "sc-xn-conv" }, "format": { "kind": "percent", "precision": 1 } },
+        { "pointer": "/rows/3/5", "target": { "kind": "source", "source_id": "s-channel", "value_id": "sc-xn-inv" }, "format": { "kind": "integer", "suffix": "天" } },
+        { "pointer": "/rows/3/6", "target": { "kind": "source", "source_id": "s-channel", "value_id": "sc-xn-follow" }, "format": { "kind": "percent", "precision": 0 } }
+      ]
+    },
+    {
+      "id": "mm-split",
+      "order": 3,
+      "question": "表格与访谈如何并排而不混淆？",
+      "title_mode": "qualified_hypothesis",
+      "claim_ids": ["c-table-fact", "c-interview-hypothesis", "c-limits"],
+      "source_ids": ["s-channel", "s-interview"],
+      "transition": "从定性提示进入原生图表复现",
+      "communication_intent": "把规范数值与定性提示分栏，保留因果边界",
+      "visual_intent": "image_evidence",
+      "appendix": false,
+      "spec": {
+        "type": "image-evidence",
+        "title": "访谈提示跟进断点，尚不能证明因果",
+        "panels": [
+          {
+            "id": "panel-table",
+            "kind": "table",
+            "headers": ["战区", "线索", "成交率"],
+            "rows": [
+              ["华南", "1,280", "14.2%"],
+              ["华东", "1,160", "13.8%"],
+              ["华北", "980", "11.6%"],
+              ["西南", "860", "10.9%"]
+            ]
+          },
+          { "id": "interview-shot", "kind": "image", "asset_id": "interview" }
+        ],
+        "takeaway": "访谈提示跟进断点；是否解释区域差异仍需验证。",
+        "source": "Synthetic multi-source fixture · Apache-2.0"
+      },
+      "bindings": [
+        { "pointer": "/panels/0/rows/0/1", "target": { "kind": "source", "source_id": "s-channel", "value_id": "sc-hn-leads" }, "format": { "kind": "thousands" } },
+        { "pointer": "/panels/0/rows/0/2", "target": { "kind": "source", "source_id": "s-channel", "value_id": "sc-hn-conv" }, "format": { "kind": "percent", "precision": 1 } },
+        { "pointer": "/panels/0/rows/1/1", "target": { "kind": "source", "source_id": "s-channel", "value_id": "sc-hd-leads" }, "format": { "kind": "thousands" } },
+        { "pointer": "/panels/0/rows/1/2", "target": { "kind": "source", "source_id": "s-channel", "value_id": "sc-hd-conv" }, "format": { "kind": "percent", "precision": 1 } },
+        { "pointer": "/panels/0/rows/2/1", "target": { "kind": "source", "source_id": "s-channel", "value_id": "sc-hb-leads" }, "format": { "kind": "thousands" } },
+        { "pointer": "/panels/0/rows/2/2", "target": { "kind": "source", "source_id": "s-channel", "value_id": "sc-hb-conv" }, "format": { "kind": "percent", "precision": 1 } },
+        { "pointer": "/panels/0/rows/3/1", "target": { "kind": "source", "source_id": "s-channel", "value_id": "sc-xn-leads" }, "format": { "kind": "thousands" } },
+        { "pointer": "/panels/0/rows/3/2", "target": { "kind": "source", "source_id": "s-channel", "value_id": "sc-xn-conv" }, "format": { "kind": "percent", "precision": 1 } }
+      ]
+    },
+    {
+      "id": "mm-native-chart",
+      "order": 4,
+      "question": "源图表数值如何重建为可编辑对象？",
+      "title_mode": "conclusion",
+      "claim_ids": ["c-chart-recon", "c-dedup"],
+      "source_ids": ["s-channel", "s-chart"],
+      "transition": "从派生图表进入原文标注",
+      "communication_intent": "原生图与源图并排，数值指向规范来源",
+      "visual_intent": "comparison",
+      "appendix": false,
+      "spec": {
+        "type": "image-evidence",
+        "title": "复现同一组成交率：原生图可编辑，源图保留核对",
+        "panels": [
+          {
+            "id": "native-rate",
+            "kind": "chart",
+            "chartType": "bar",
+            "series": [
+              { "name": "成交率", "labels": ["华南", "华东", "华北", "西南"], "values": [14.2, 13.8, 11.6, 10.9] }
+            ],
+            "numberFormat": "0.0\"%\""
+          },
+          { "id": "source-rate", "kind": "image", "asset_id": "chart" }
+        ],
+        "takeaway": "图表截图与渠道表重复；规范数值以渠道表为准。",
+        "source": "Synthetic multi-source fixture · Apache-2.0"
+      },
+      "bindings": [
+        { "pointer": "/panels/0/series/0/values/0", "target": { "kind": "source", "source_id": "s-channel", "value_id": "sc-hn-conv" }, "format": { "kind": "number" } },
+        { "pointer": "/panels/0/series/0/values/1", "target": { "kind": "source", "source_id": "s-channel", "value_id": "sc-hd-conv" }, "format": { "kind": "number" } },
+        { "pointer": "/panels/0/series/0/values/2", "target": { "kind": "source", "source_id": "s-channel", "value_id": "sc-hb-conv" }, "format": { "kind": "number" } },
+        { "pointer": "/panels/0/series/0/values/3", "target": { "kind": "source", "source_id": "s-channel", "value_id": "sc-xn-conv" }, "format": { "kind": "number" } }
+      ]
+    },
+    {
+      "id": "mm-annotated",
+      "order": 5,
+      "question": "截图文字如何标注而不冒充可编辑数据？",
+      "title_mode": "descriptive",
+      "claim_ids": ["c-limits"],
+      "source_ids": ["s-interview"],
+      "transition": "从原文标注进入来源覆盖表",
+      "communication_intent": "标注绑定原文区域，截图保持嵌入",
+      "visual_intent": "image_evidence",
+      "appendix": false,
+      "spec": {
+        "type": "document-evidence",
+        "title": "标注绑定原文区域，截图文字保持嵌入",
+        "asset_ids": ["interview"],
+        "annotations": [
+          { "text": "试驾后的下一步说明出现断点", "source_region": { "x": 0.045, "y": 0.28, "w": 0.91, "h": 0.26 } },
+          { "text": "样本与方法限制随证据保留", "source_region": { "x": 0.045, "y": 0.64, "w": 0.91, "h": 0.27 } }
+        ],
+        "source": "Synthetic multi-source fixture · Apache-2.0"
+      },
+      "bindings": []
+    },
+    {
+      "id": "mm-source-table",
+      "order": 6,
+      "question": "重复内容的规范来源是什么？",
+      "title_mode": "descriptive",
+      "claim_ids": ["c-dedup", "c-limits", "c-recommendation"],
+      "source_ids": ["s-channel", "s-chart", "s-interview"],
+      "transition": "附录保留完整来源与限制",
+      "communication_intent": "用显式表格说明保留、去重与覆盖",
+      "visual_intent": "evidence_table",
+      "appendix": false,
+      "spec": {
+        "type": "table",
+        "title": "表格为规范来源，图表截图按重复内容去重",
+        "headers": ["来源单元", "处理", "覆盖说明"],
+        "rows": [
+          ["渠道表截图", "保留", "九列数值的规范来源，正文与附录均引用"],
+          ["图表截图", "去重", "成交率与渠道表重复；原生图作为派生视图"],
+          ["访谈截图", "保留", "用于提出跟进假设，保留样本与方法限制"],
+          ["合成视觉", "保留", "仅封面氛围，明确不是业务证据"]
+        ],
+        "columnWidths": [0.22, 0.14, 0.64],
+        "source": "Synthetic multi-source fixture · Apache-2.0"
+      },
+      "bindings": []
+    },
+    {
+      "id": "mm-appendix",
+      "order": 7,
+      "question": "来源、哈希与限制是否完整？",
+      "title_mode": "descriptive",
+      "claim_ids": ["c-limits", "c-visual-fact"],
+      "source_ids": ["s-channel", "s-chart", "s-interview", "s-visual"],
+      "transition": "结束",
+      "communication_intent": "提供可追溯的来源清单和使用边界",
+      "visual_intent": "evidence_table",
+      "appendix": true,
+      "spec": {
+        "type": "table",
+        "title": "附录：来源、规范关系与限制",
+        "headers": ["来源", "类型与规范关系", "限制"],
+        "rows": [
+          ["渠道表截图", "规范来源（保留）", "截图嵌入，数值由原生表重建"],
+          ["图表截图", "派生视图（去重至渠道表）", "与渠道表成交率重复"],
+          ["访谈截图", "定性证据（保留）", "24位样本，不能证明因果"],
+          ["合成视觉", "封面氛围（保留）", "AI生成，不是业务证据"]
+        ],
+        "columnWidths": [0.22, 0.34, 0.44],
+        "source": "Synthetic multi-source fixture · Apache-2.0"
+      },
+      "bindings": []
+    }
+  ]
+}

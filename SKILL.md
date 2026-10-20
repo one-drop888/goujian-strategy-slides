@@ -34,7 +34,7 @@ For research, consider Question → Method / sample → Quantitative evidence �
 
 ## Compose the argument
 
-Read [content planning](skill/references/content-planning.md), [visualization rules](skill/references/visualization-rules.md) and [anti-AI-PPT guidance](skill/references/anti-ai-ppt.md) as needed.
+Read [content planning](skill/references/content-planning.md), [visualization rules](skill/references/visualization-rules.md) and [anti-AI-PPT guidance](skill/references/anti-ai-ppt.md) as needed. For auditable sourcing, calculations, coverage and theme decisions, use the optional [reasoning plan](skill/references/reasoning-plan.md); legacy deck JSON remains supported.
 
 Use conclusion-bearing action titles when evidence supports them. Cover, methodology and exploratory pages may use descriptive titles. Distinguish observation, interpretation and hypothesis. Do not invent evidence or infer causality from frequency alone.
 

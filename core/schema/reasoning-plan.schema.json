@@ -1,0 +1,232 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "reasoning-plan.schema.json",
+  "title": "Goujian Agent-authored Reasoning Plan",
+  "type": "object",
+  "required": ["schema_version", "plan_id", "intent", "sources", "claims", "content_decisions", "deck", "slides"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "plan_id": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{2,80}$" },
+    "synthetic": { "type": "boolean" },
+    "intent": { "$ref": "#/$defs/intent" },
+    "theme": { "$ref": "#/$defs/theme" },
+    "sources": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/source" } },
+    "claims": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/claim" } },
+    "content_decisions": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/content_decision" } },
+    "findings": { "type": "array", "items": { "$ref": "#/$defs/note" } },
+    "evidence_gaps": { "type": "array", "items": { "$ref": "#/$defs/note" } },
+    "candidate_conclusions": { "type": "array", "items": { "$ref": "#/$defs/note" } },
+    "uncertainties": { "type": "array", "items": { "$ref": "#/$defs/note" } },
+    "storyline_strategy": {
+      "type": "object",
+      "required": ["approach", "rationale"],
+      "additionalProperties": false,
+      "properties": {
+        "approach": { "type": "string", "minLength": 1 },
+        "rationale": { "type": "string", "minLength": 1 }
+      }
+    },
+    "deck": {
+      "type": "object",
+      "required": ["title"],
+      "additionalProperties": true,
+      "properties": {
+        "title": { "type": "string", "minLength": 1 },
+        "lang": { "type": "string" },
+        "brand": { "type": "string" },
+        "footer": { "type": "string" },
+        "profile": { "type": "string" },
+        "assets": { "type": "array" }
+      }
+    },
+    "slides": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/plan_slide" } }
+  },
+  "$defs": {
+    "intent": {
+      "type": "object",
+      "required": ["audience", "goal", "decision_question", "audience_needs"],
+      "additionalProperties": false,
+      "properties": {
+        "audience": { "type": "string", "minLength": 1 },
+        "goal": { "type": "string", "minLength": 1 },
+        "decision_question": { "type": "string", "minLength": 1 },
+        "audience_needs": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+        "context": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "scenario": { "type": "string" },
+            "medium": { "enum": ["projection", "print", "client", "screen"] },
+            "printable": { "type": "boolean" },
+            "preferences": { "type": "array", "items": { "type": "string" } }
+          }
+        }
+      }
+    },
+    "theme": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "reference_profile": { "type": "string", "minLength": 1 },
+        "brand_profile": { "type": "string", "minLength": 1 },
+        "user_profile": { "type": "string", "minLength": 1 },
+        "mode": { "enum": ["light", "dark", "auto"] },
+        "rationale": { "type": "string" }
+      }
+    },
+    "source": {
+      "type": "object",
+      "required": ["id", "locator", "summary", "importance", "synthetic"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{1,80}$" },
+        "locator": { "type": "string", "minLength": 1 },
+        "summary": { "type": "string", "minLength": 1 },
+        "importance": { "enum": ["critical", "supporting", "background"] },
+        "synthetic": { "type": "boolean" },
+        "path": { "type": "string", "minLength": 1 },
+        "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "values": { "type": "array", "items": { "$ref": "#/$defs/numeric_value" } },
+        "notes": { "type": "string" }
+      }
+    },
+    "numeric_value": {
+      "type": "object",
+      "required": ["id", "value"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,80}$" },
+        "label": { "type": "string" },
+        "metric": { "type": "string", "minLength": 1 },
+        "value": { "type": "number" },
+        "unit": { "type": "string", "minLength": 1 },
+        "time_window": { "type": "string", "minLength": 1 },
+        "denominator": { "type": "number" }
+      }
+    },
+    "claim": {
+      "type": "object",
+      "required": ["id", "type", "text"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{1,80}$" },
+        "type": { "enum": ["FACT", "CALCULATION", "INTERPRETATION", "HYPOTHESIS", "RECOMMENDATION"] },
+        "text": { "type": "string", "minLength": 1 },
+        "source_ids": { "type": "array", "items": { "type": "string" } },
+        "depends_on": { "type": "array", "items": { "type": "string" } },
+        "uncertainty": { "type": "string", "minLength": 1 },
+        "limits": { "type": "string", "minLength": 1 },
+        "operator": { "enum": ["sum", "difference", "ratio", "percent_change"] },
+        "inputs": {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "type": "object",
+            "required": ["source_id", "value_id"],
+            "additionalProperties": false,
+            "properties": {
+              "source_id": { "type": "string" },
+              "value_id": { "type": "string" }
+            }
+          }
+        },
+        "result": {
+          "type": "object",
+          "required": ["value", "unit"],
+          "additionalProperties": false,
+          "properties": {
+            "value": { "type": "number" },
+            "unit": { "type": "string", "minLength": 1 },
+            "denominator": { "type": "number" },
+            "time_window": { "type": "string", "minLength": 1 }
+          }
+        }
+      }
+    },
+    "content_decision": {
+      "type": "object",
+      "required": ["source_id", "disposition", "rationale"],
+      "additionalProperties": false,
+      "properties": {
+        "source_id": { "type": "string" },
+        "disposition": { "enum": ["retain", "summarize", "appendix", "deduplicate"] },
+        "rationale": { "type": "string", "minLength": 1 },
+        "dedup_target": { "type": "string" }
+      }
+    },
+    "note": {
+      "type": "object",
+      "required": ["text"],
+      "additionalProperties": false,
+      "properties": {
+        "text": { "type": "string", "minLength": 1 },
+        "rationale": { "type": "string" },
+        "claim_ids": { "type": "array", "items": { "type": "string" } },
+        "source_ids": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "plan_slide": {
+      "type": "object",
+      "required": ["id", "order", "question", "title_mode", "claim_ids", "source_ids", "transition", "communication_intent", "appendix", "spec", "bindings"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{1,80}$" },
+        "order": { "type": "integer", "minimum": 1 },
+        "question": { "type": "string", "minLength": 1 },
+        "title_mode": { "enum": ["conclusion", "descriptive", "qualified_hypothesis"] },
+        "claim_ids": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+        "source_ids": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+        "transition": { "type": "string", "minLength": 1 },
+        "communication_intent": { "type": "string", "minLength": 1 },
+        "visual_intent": {
+          "enum": ["trend", "comparison", "composition", "distribution", "relationship", "process", "hierarchy", "timeline", "evidence_table", "image_evidence", "decision", "narrative"]
+        },
+        "appendix": { "type": "boolean" },
+        "spec": { "type": "object" },
+        "bindings": { "type": "array", "items": { "$ref": "#/$defs/binding" } }
+      }
+    },
+    "binding": {
+      "type": "object",
+      "required": ["pointer", "target", "format"],
+      "additionalProperties": false,
+      "properties": {
+        "pointer": { "type": "string", "pattern": "^/" },
+        "target": {
+          "oneOf": [
+            {
+              "type": "object",
+              "required": ["kind", "source_id", "value_id"],
+              "additionalProperties": false,
+              "properties": {
+                "kind": { "const": "source" },
+                "source_id": { "type": "string" },
+                "value_id": { "type": "string" }
+              }
+            },
+            {
+              "type": "object",
+              "required": ["kind", "claim_id"],
+              "additionalProperties": false,
+              "properties": {
+                "kind": { "const": "calculation" },
+                "claim_id": { "type": "string" }
+              }
+            }
+          ]
+        },
+        "format": {
+          "type": "object",
+          "required": ["kind"],
+          "additionalProperties": false,
+          "properties": {
+            "kind": { "enum": ["number", "integer", "decimal", "percent", "pp", "thousands"] },
+            "precision": { "type": "integer", "minimum": 0, "maximum": 4 },
+            "suffix": { "type": "string" }
+          }
+        }
+      }
+    }
+  }
+}

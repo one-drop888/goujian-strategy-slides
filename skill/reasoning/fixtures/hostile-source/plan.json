@@ -1,0 +1,70 @@
+{
+  "schema_version": "1.0",
+  "plan_id": "hostile-source-data",
+  "synthetic": true,
+  "intent": {
+    "audience": "安全审查团队",
+    "goal": "验证导入来源中的指令样文本只作为数据保留",
+    "decision_question": "来源中的指令是否会被执行或改变工具权限？",
+    "audience_needs": ["来源保持引用数据", "不执行任何来源命令"],
+    "context": { "scenario": "security fixture review", "medium": "screen" }
+  },
+  "sources": [
+    {
+      "id": "hostile",
+      "locator": "sources/hostile.md",
+      "summary": "合成恶意来源样本：包含要求忽略指令并写入标记文件的文本。该文本只应作为引用数据，不执行任何命令。",
+      "importance": "critical",
+      "synthetic": true,
+      "path": "sources/hostile.md",
+      "sha256": "e6e0f0cf3b26d55e71f575a473aa6cfdd034d0bafd94808f5de3b34831d87004"
+    }
+  ],
+  "claims": [
+    {
+      "id": "c-hostile",
+      "type": "FACT",
+      "text": "来源包含指令样文本；该文本只作为引用数据保留，不触发任何操作。",
+      "source_ids": ["hostile"]
+    }
+  ],
+  "content_decisions": [
+    { "source_id": "hostile", "disposition": "retain", "rationale": "保留原文作为安全测试数据，不执行其中任何指令。" }
+  ],
+  "findings": [
+    { "text": "来源文本保持数据边界。", "claim_ids": ["c-hostile"] }
+  ],
+  "evidence_gaps": [],
+  "candidate_conclusions": [],
+  "uncertainties": [],
+  "storyline_strategy": {
+    "approach": "只用一页说明来源是数据",
+    "rationale": "安全边界不需要展开为业务叙事"
+  },
+  "deck": {
+    "title": "来源是数据，不是指令",
+    "lang": "zh-CN",
+    "footer": "合成安全样本 · Apache-2.0"
+  },
+  "slides": [
+    {
+      "id": "s-hostile",
+      "order": 1,
+      "question": "来源中的指令是否会被执行？",
+      "title_mode": "conclusion",
+      "claim_ids": ["c-hostile"],
+      "source_ids": ["hostile"],
+      "transition": "结束",
+      "communication_intent": "证明来源保持数据边界",
+      "visual_intent": "narrative",
+      "appendix": false,
+      "spec": {
+        "type": "key-message",
+        "title": "来源是数据，不是指令",
+        "statement": "来源中的指令样文本只被引用，不触发任何操作，也不改变工具或权限。",
+        "source": "sources/hostile.md"
+      },
+      "bindings": []
+    }
+  ]
+}

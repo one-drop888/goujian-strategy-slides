@@ -41,9 +41,9 @@ function sourceVerification(plan,planDir,errors) {
       }
       const actual=sha256(fs.readFileSync(file));
       if(source.sha256&&source.sha256!==actual) errors.push(`source ${source.id}: sha256 mismatch (declared ${source.sha256}, actual ${actual})`);
-      hashes.set(source.id,{path:file,sha256:actual,status:source.sha256?'HASH_VERIFIED':'FILE_HASHED'});
+      hashes.set(source.id,{declared_path:source.path,sha256:actual,status:source.sha256?'HASH_VERIFIED':'FILE_HASHED'});
     } else {
-      hashes.set(source.id,{path:null,sha256:source.sha256||null,status:source.sha256?'DECLARED_HASH_UNVERIFIED':'AGENT_SUMMARY'});
+      hashes.set(source.id,{declared_path:null,sha256:source.sha256||null,status:source.sha256?'DECLARED_HASH_UNVERIFIED':'AGENT_SUMMARY'});
     }
   }
   return hashes;

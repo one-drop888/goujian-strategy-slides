@@ -1,7 +1,10 @@
 const { W, H, M } = require('../compositions/layout');
 const {resolveTitle}=require('../../planner/title');
 function createPrimitives(pptx, style) {
-  const C = style.colors, F = style.font, L = style.layout;
+  const T = style.tokens;
+  const C = { ...style.colors, text: T.text, muted: T.muted, accent: T.accent,
+    accentSoft: T.accentSoft, panel: T.surface, line: T.divider };
+  const F = style.font, L = style.layout;
   const left = L.marginX, right = left, width = W-left-right;
   function text(slide, value, x, y, w, h, options = {}) {
     slide.addText(String(value ?? ''), { x, y, w, h, fontFace: F.cjk,

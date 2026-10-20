@@ -27,43 +27,27 @@ function mix(a,b,amount) {
 }
 function ensureContrast(foreground,background,minimum) {
   if(contrastRatio(foreground,background)>=minimum) return rgbToHex(foreground);
-  const target=relativeLuminance(background)<.45?'FFFFFF':'000000';
+  const black=contrastRatio('000000',background),white=contrastRatio('FFFFFF',background);
+  const target=black>=white?'000000':'FFFFFF';
   let low=0,high=1,best=target;
   for(let i=0;i<24;i++) {
     const mid=(low+high)/2,candidate=mix(foreground,target,mid);
     if(contrastRatio(candidate,background)>=minimum){best=candidate;high=mid;} else low=mid;
   }
-  return best;
+  return contrastRatio(best,background)>=minimum?best:target;
 }
-function rgbToHsl(value) {
-  const {r,g,b}=hexToRgb(value),rn=r/255,gn=g/255,bn=b/255;
-  const max=Math.max(rn,gn,bn),min=Math.min(rn,gn,bn),l=(max+min)/2;
-  if(max===min) return [0,0,l];
-  const d=max-min,s=l>.5?d/(2-max-min):d/(max+min);
-  let h=max===rn?(gn-bn)/d+(gn<bn?6:0):max===gn?(bn-rn)/d+2:(rn-gn)/d+4;
-  return [h/6,s,l];
-}
-function hslToHex(h,s,l) {
-  function hue(p,q,t){if(t<0)t+=1;if(t>1)t-=1;if(t<1/6)return p+(q-p)*6*t;if(t<1/2)return q;if(t<2/3)return p+(q-p)*(2/3-t)*6;return p;}
-  if(s===0) return rgbToHex({r:l*255,g:l*255,b:l*255});
-  const q=l<.5?l*(1+s):l+s-l*s,p=2*l-q;
-  return rgbToHex({r:hue(p,q,h+1/3)*255,g:hue(p,q,h)*255,b:hue(p,q,h-1/3)*255});
-}
-function rotateHue(value,degrees) {
-  const [h,s,l]=rgbToHsl(value);
-  return hslToHex((h+degrees/360)%1,s,l);
-}
-function uniquePalette(seeds,background,text) {
-  const dark=relativeLuminance(background)<.45,palette=[];
+// Bounded, deterministic palette: related tones of the accent plus one neutral.
+function chartPalette(accent,secondary,background,text) {
+  const seeds=[accent,secondary,mix(accent,background,.5),mix(text,background,.45)];
+  const palette=[];
   for(const seed of seeds) {
-    let color=ensureContrast(seed,background,3),attempt=0;
-    while(palette.includes(color)) {
-      color=ensureContrast(mix(color,dark?'FFFFFF':'000000',.1+attempt*.06),background,3);
-      attempt++;
+    let color=ensureContrast(seed,background,3);
+    for(let attempt=1;palette.includes(color)&&attempt<=4;attempt++) {
+      const toward=attempt%2?'FFFFFF':'000000';
+      color=ensureContrast(mix(color,toward,.15*Math.ceil(attempt/2)),background,3);
     }
     palette.push(color);
   }
-  if(palette.length<4) palette.push(ensureContrast(mix(text,background,.45),background,3));
   return palette;
 }
 
@@ -75,15 +59,10 @@ function deriveTokens(colors,background,styleTokens={}) {
   const accentSoft=colors.accent_soft||colors.accentSoft||colors.panel||background;
   const surface=colors.panel||mix(background,text,.06);
   const divider=colors.line||mix(background,text,.2);
-  const secondarySeed=colors.secondary_accent||colors.secondaryAccent||rotateHue(accent,180);
+  const secondarySeed=colors.secondary_accent||colors.secondaryAccent||mix(accent,text,.55);
   const secondaryAccent=ensureContrast(secondarySeed,background,3);
   const neutral=ensureContrast(mix(text,background,.45),background,3);
-  const palette=uniquePalette([
-    accent,
-    secondaryAccent,
-    mix(accent,text,.45),
-    mix(secondaryAccent,text,.45),
-  ],background,text);
+  const palette=chartPalette(accent,secondaryAccent,background,text);
   const solidHeader=styleTokens.table_header==='solid';
   const headerFill=solidHeader?text:accentSoft;
   return {

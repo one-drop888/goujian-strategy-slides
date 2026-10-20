@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import importlib.util, json, sys, tempfile, unittest
+import importlib.util, json, subprocess, sys, tempfile, unittest
 from pathlib import Path
 from types import SimpleNamespace
 ROOT=Path(__file__).resolve().parents[1]
@@ -18,6 +18,9 @@ class Runner:
             code=args[args.index('-c')+1]
             if 'sys.version_info' in code:output='3.14.4\n'
             elif 'importlib.metadata' in code:output='12.1.1\n'
+            elif 'sys.prefix' in code:
+                prefix=str(Path(args[0]).resolve().parent.parent)
+                output=json.dumps({'prefix':prefix,'base':'/usr'})+'\n'
         return SimpleNamespace(returncode=0,stdout=output,stderr='')
     def pip_calls(self):
         return [call for call in self.calls if len(call['args'])>2 and call['args'][1:3]==['-m','pip']]
@@ -98,5 +101,45 @@ class BootstrapTests(unittest.TestCase):
                     return call
             with self.assertRaises(bootstrap.BootstrapError):bootstrap.bootstrap(root,python=sys.executable,runner=Failing(),emit=lambda line:None)
             self.assertFalse((root/'.venv/.goujian-bootstrap.json').exists())
+    def test_lockfile_change_invalidates_npm_ci_skip(self):
+        with tempfile.TemporaryDirectory(prefix='构见 Q4 bootstrap ') as directory:
+            root=make_root(directory);venv_python=root/'.venv/bin/python';venv_python.parent.mkdir(parents=True);venv_python.write_text('')
+            runner=Runner();bootstrap.bootstrap(root,python=sys.executable,runner=runner,emit=lambda line:None)
+            (root/'package-lock.json').write_text('{"lockfileVersion":3,"changed":true}\n',encoding='utf-8')
+            second=bootstrap.bootstrap(root,python=sys.executable,runner=runner,emit=lambda line:None)
+            self.assertEqual({a['step']:a['status'] for a in second['actions']}['npm-ci'],'OK')
+            self.assertEqual(second['status'],'READY')
+    def test_global_interpreter_is_rejected_for_pip(self):
+        with tempfile.TemporaryDirectory(prefix='构见 Q4 bootstrap ') as directory:
+            venv=Path(directory)/'.venv';target=venv/'bin/python';target.parent.mkdir(parents=True)
+            target.symlink_to(Path(sys.executable))
+            with self.assertRaisesRegex(bootstrap.BootstrapError,r'outside the isolated \.venv'):
+                bootstrap.verify_venv_python(target,venv)
+    def test_real_venv_install_rerun_and_interrupted_recovery(self):
+        with tempfile.TemporaryDirectory(prefix='构见 Q4 bootstrap real ') as directory:
+            root=Path(directory)
+            for name in ('package.json','package-lock.json','requirements-render.txt'):
+                (root/name).write_bytes((ROOT/name).read_bytes())
+            (root/'node_modules').symlink_to(ROOT/'node_modules',target_is_directory=True)
+            class RealRunner:
+                def __call__(self,args,cwd=None,env=None,capture_output=False,text=False,**kwargs):
+                    if str(args[0]).endswith('npm') or str(args[0]).endswith('npm.cmd'):
+                        return SimpleNamespace(returncode=0,stdout='',stderr='')
+                    return subprocess.run(args,cwd=cwd,env=env,capture_output=True,text=True,**kwargs)
+            runner=RealRunner()
+            first=bootstrap.bootstrap(root,python=sys.executable,runner=runner,emit=lambda line:None)
+            self.assertEqual(first['status'],'READY')
+            python_path=root/'.venv/bin/python'
+            self.assertTrue(python_path.exists())
+            self.assertTrue((root/'.venv/.goujian-bootstrap.json').is_file())
+            self.assertIsNotNone(first['pillow'])
+            second=bootstrap.bootstrap(root,python=sys.executable,runner=runner,emit=lambda line:None)
+            self.assertEqual({a['step']:a['status'] for a in second['actions']}['pip-install'],'SKIPPED')
+            python_path.unlink()
+            third=bootstrap.bootstrap(root,python=sys.executable,runner=runner,emit=lambda line:None)
+            steps={a['step']:a['status'] for a in third['actions']}
+            self.assertEqual(steps['venv'],'OK')
+            self.assertEqual(third['status'],'READY')
+            self.assertTrue(python_path.exists())
 
 if __name__=='__main__':unittest.main()

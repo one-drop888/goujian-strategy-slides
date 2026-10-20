@@ -44,16 +44,10 @@ function balancedWrap(text,font,size,width) {
   return best;
 }
 function resolveTitle(s,font,width) {
-  const original=s.title||'';let title=(s.title_short||original).replace(/\s*\n\s*/g,' '),subtitle=s.subtitle||'',strategy=s.title_short?'author-rewrite':'original';
+  const original=s.title||'';
+  let title=(s.title_short||original).replace(/\s*\n\s*/g,' '),subtitle=s.subtitle||'';
+  let strategy=s.title_short?'author-rewrite':'original';
   const base=font.titleSize,minimum=base*.92;
-  if(!s.title_short&&measure(title,font.cjk,base).width>width) {
-    const match=title.match(/^(Q[1-4])重点攻坚行动[：:]\s*([\s\S]+?)(?:全面推进)?$/);
-    if(match){title=`${match[1]}聚焦${match[2].replace(/全面推进$/,'')}`;strategy='remove-redundant-context';}
-    if(measure(title,font.cjk,base).width>width) {
-      const parts=title.match(/^(.{4,}?)[：:]\s*(.+)$/s);
-      if(parts&&measure(parts[1],font.cjk,base).width<=width){title=parts[1];subtitle=subtitle||parts[2];strategy='title-subtitle';}
-    }
-  }
   if(s.title_short&&!subtitle)subtitle=original;
   let size=base;
   if(measure(title,font.cjk,size).width>width && measure(title,font.cjk,minimum).width<=width){size=minimum;strategy+='-safe-font-adjustment';}

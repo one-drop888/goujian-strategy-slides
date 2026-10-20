@@ -1,9 +1,12 @@
-const assert=require('node:assert/strict'),fs=require('fs'),path=require('path'),JSZip=require('jszip');
+const assert=require('node:assert/strict'),fs=require('fs'),path=require('path'),JSZip=require('jszip'),{execFileSync}=require('child_process');
 const {buildDeck}=require('../core/renderer');
-const {resolveStyle,contrastRatio}=require('../core/style/resolve-style');
-const {createChartHelper}=require('../core/renderer/charts');
+const {resolveStyle,contrastRatio,deriveTokens}=require('../core/style/resolve-style');
+const {createChartHelper,normalizeChartXml}=require('../core/renderer/charts');
 const {loadProfile}=require('../core/style/profile-loader');
 const root=path.resolve(__dirname,'..');
+function assertXml(text){
+  execFileSync('python3',['-c','import sys,xml.etree.ElementTree as ET;ET.fromstring(sys.stdin.read())'],{input:text});
+}
 
 const series=(name,labels,values)=>({name,labels,values});
 const specFor=(profile)=>({
@@ -62,6 +65,29 @@ async function slideXml(file,index){
 }
 
 async function main(){
+  // P0 regressions: bounded deterministic palettes and best black/white contrast choice.
+  const mono=deriveTokens({text:'000000',muted:'000000',accent:'000000'},'FFFFFF',{});
+  assert.equal(mono.chart.palette.length,4);
+  assert(mono.chart.palette.every(color=>contrastRatio(color,'FFFFFF')>=3));
+  const inverse=deriveTokens({text:'FFFFFF',muted:'FFFFFF',accent:'FFFFFF'},'000000',{});
+  assert.equal(inverse.chart.palette.length,4);
+  assert(inverse.chart.palette.every(color=>contrastRatio(color,'000000')>=3));
+  execFileSync(process.execPath,['-e',`const {deriveTokens}=require(${JSON.stringify(path.join(root,'core/style/resolve-style'))});deriveTokens({text:'000000',muted:'000000',accent:'000000'},'FFFFFF',{});deriveTokens({text:'FFFFFF',muted:'FFFFFF',accent:'FFFFFF'},'000000',{});`],{cwd:root,timeout:5000});
+  const mid=deriveTokens({text:'888888',accent:'888888'},'808080',{});
+  assert(contrastRatio(mid.text,'808080')>=4.5,`midgray text contrast ${contrastRatio(mid.text,'808080')}`);
+  assert(contrastRatio(mid.accent,'808080')>=3);
+
+  // The chart postprocessor touches only the pie/doughnut global label block.
+  const sampleChart='<?xml version="1.0" encoding="UTF-8"?><c:chartSpace xmlns:c="http://schemas.openxmlformats.org/drawingml/2006/chart" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><c:chart><c:title><a:p><a:r><a:rPr><a:latin typeface="Arial"/></a:rPr></a:r></a:p></c:title><c:plotArea><c:pieChart><c:ser><c:spPr><a:solidFill><a:srgbClr val="000000"/></a:solidFill><a:ln><a:solidFill><a:srgbClr val="000000"/></a:solidFill></a:ln></c:spPr><c:cat><c:strRef><c:strCache><c:pt idx="0"><c:v>A</c:v></c:pt></c:strCache></c:strRef></c:cat><c:val><c:numRef><c:numCache><c:pt idx="0"><c:v>40</c:v></c:pt></c:numCache></c:numRef></c:val></c:ser><c:dLbls><c:dLbl><c:idx val="0"/><c:txPr><a:p><a:pPr><a:defRPr><a:solidFill><a:srgbClr val="000000"/></a:solidFill><a:latin typeface="Arial"/></a:defRPr></a:pPr></a:p></c:txPr></c:dLbl><c:txPr><a:p><a:pPr><a:defRPr><a:solidFill><a:srgbClr val="000000"/></a:solidFill><a:latin typeface="Arial"/></a:defRPr></a:pPr></a:p></c:txPr></c:dLbls></c:pieChart></c:plotArea></c:chart></c:chartSpace>';
+  const sampleZip=new JSZip();sampleZip.file('ppt/charts/chart1.xml',sampleChart);
+  const normalized=await normalizeChartXml(await sampleZip.generateAsync({type:'nodebuffer'}),{tokens:{chart:{dataLabel:'F9FAFB'}},font:{latin:'A&B Serif'}});
+  const normalizedXml=await (await JSZip.loadAsync(normalized)).file('ppt/charts/chart1.xml').async('string');
+  assertXml(normalizedXml);
+  assert.equal((normalizedXml.match(/srgbClr val="000000"/g)||[]).length,3,'explicit series fill, border and point label stay black');
+  assert.equal((normalizedXml.match(/typeface="Arial"/g)||[]).length,2,'per-point label and title keep their explicit font');
+  assert(normalizedXml.includes('typeface="A&amp;B Serif"'),'global label font is XML-escaped');
+  assert(normalizedXml.includes('<c:v>40</c:v>'),'chart data cache is unchanged');
+
   const profiles=['executive-clean','dark-executive'];
   const expectedCharts=[
     {cats:['7月','8月','9月'],nums:[100,117.4,135.7,100,103.3,105.5]},
@@ -107,10 +133,15 @@ async function main(){
       if(catAxis)assert(catAxis.includes(T.chart.labels),`${profile} chart${i+1} category labels`);
       if(valAxis)assert(valAxis.includes(T.chart.labels),`${profile} chart${i+1} value labels`);
       const dataLabels=block(chart.xml,'dLbls');
-      if(dataLabels)assert(dataLabels.includes(T.chart.dataLabel),`${profile} chart${i+1} data labels`);
+      if(dataLabels) {
+        assert(dataLabels.includes(T.chart.dataLabel),`${profile} chart${i+1} data labels`);
+        const labelColors=[...dataLabels.matchAll(/<a:srgbClr val="([0-9A-Fa-f]{6})"\/>/g)].map(m=>m[1].toUpperCase());
+        assert(labelColors.every(color=>color===T.chart.dataLabel),`${profile} chart${i+1} label paint stays tokenized`);
+      }
+      const seriesBlock=block(chart.xml,'ser');
+      if(seriesBlock)assert(seriesBlock.includes(T.chart.palette[0])||seriesBlock.includes(T.chart.highlight),`${profile} chart${i+1} series paint`);
       const legend=block(chart.xml,'legend');
       if(legend)assert(legend.includes(T.chart.labels),`${profile} chart${i+1} legend`);
-      if(T.mode==='dark')assert(!colors.has('000000'),`${profile} chart${i+1} default black`);
     }
     const tableSlide=await slideXml(file,8);
     assert(tableSlide.includes(T.table.bodyFill)&&tableSlide.includes(T.table.bodyText),`${profile} table body tokens`);

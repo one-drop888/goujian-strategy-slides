@@ -44,6 +44,7 @@ class DoctorTests(unittest.TestCase):
         self.assertEqual((node['requirement'],node['status']),('REQUIRED','MISSING'))
         self.assertTrue(result['summary']['blocked'])
         self.assertEqual(result['capabilities']['ladder']['VISUAL_REVIEW']['status'],'REQUIRES_REVIEWER')
+        self.assertEqual(result['capabilities']['ladder']['SPEC_ONLY']['status'],'UNAVAILABLE')
         self.assertNotEqual(result['visual_qa'],'PASS')
     def test_missing_optional_explains_impact_and_never_claims_visual_pass(self):
         probe=FakeProbe(commands={'node':'/usr/bin/node','npm':'/usr/bin/npm'},pillow=(None,'Pillow is not installed'),specs={'PIL':False})
@@ -67,6 +68,22 @@ class DoctorTests(unittest.TestCase):
         self.assertIn('not proven',result['capabilities']['ladder']['NATIVE_RENDER']['note'])
         self.assertEqual(result['visual_qa'],'NOT_RUN')
         self.assertEqual(result['status'],'READY_WITH_NOTES')
+        self.assertEqual(result['capabilities']['ladder']['SPEC_ONLY']['status'],'AVAILABLE')
+        font=next(c for c in result['checks'] if c['id']=='fonts')
+        self.assertIn('heuristic',font['detail'])
+        self.assertIn('glyph coverage is not verified',font['detail'])
+    def test_missing_js_dependencies_disable_spec_capability(self):
+        probe=FakeProbe();probe.versions={}
+        result=doctor.inspect(probe)
+        self.assertEqual(result['status'],'BLOCKED')
+        self.assertEqual(result['capabilities']['ladder']['SPEC_ONLY']['status'],'UNAVAILABLE')
+        js=next(c for c in result['checks'] if c['id']=='js-dependencies')
+        self.assertEqual(js['status'],'MISSING')
+    def test_missing_pillow_metadata_is_missing_not_broken(self):
+        probe=FakeProbe(pillow=(None,None),specs={'PIL':False})
+        result=doctor.inspect(probe)
+        pillow=next(c for c in result['checks'] if c['id']=='pillow')
+        self.assertEqual(pillow['status'],'MISSING')
     def test_platform_and_wsl_reporting(self):
         probe=FakeProbe();probe.platform_info=lambda:{'system':'Linux','release':'test','machine':'x86_64','platform':'linux',
                                                        'current':'linux','wsl':True,'wsl_distro':'Ubuntu'}

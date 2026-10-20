@@ -19,12 +19,23 @@ async function main(){
   const over=structuredClone(example);over.slides[1].items.push({label:'Seventh',value:7});assert.match(validateDeck(over).join('\n'),/capacity 6/);
   const missing=structuredClone(example);missing.assets[0].id='different';assert.match(validateDeck(missing).join('\n'),/Unknown asset|source_asset/);
   const pixelText=structuredClone(example);pixelText.assets[0].provenance[0].confidence=undefined;assert.match(validateDeck(pixelText).join('\n'),/confidence/);
-  // G/H: safe rewriting or explicit title/subtitle, measured line width, dynamic divider gap.
+  // G/H: no semantic rewrite; every original title character is retained.
   const title='Q4重点攻坚行动：九城收单、保客增换、库存去化、新车蓄势全面推进';
-  const resolved=resolveTitle({title,subtitle:'六项重点行动分战区推进，覆盖收单窗口、专人专岗、库存清理与新品战役'},font,11.77);
-  assert.equal(resolved.lines.length,1);assert.equal(resolved.original,title);assert(resolved.size>=font.titleSize*.92);
+  const subtitle='六项重点行动分战区推进，覆盖收单窗口、专人专岗、库存清理与新品战役';
+  const resolved=resolveTitle({title,subtitle},font,11.77);
+  assert.equal(resolved.original,title);
+  assert.equal(resolved.title,title);
+  assert.equal(resolved.subtitle,subtitle);
+  assert.equal(resolved.lines.join(''),title);
+  assert(!resolved.strategy.includes('remove-redundant')&&!resolved.strategy.includes('title-subtitle'));
+  assert(resolved.size>=font.titleSize*.92);
   assert(resolved.dividerY>=resolved.subtitleY+resolved.subtitleH+resolved.gap-1e-5);
   assert(resolved.bodyTop>resolveTitle({title:'经营复盘'},font,11.77).bodyTop);
+  const explicit=resolveTitle({title,title_short:'Q4 六项行动先定顺序与责任人',subtitle},font,11.77);
+  assert.equal(explicit.original,title);assert.equal(explicit.title,'Q4 六项行动先定顺序与责任人');
+  assert.equal(explicit.subtitle,subtitle);assert.equal(explicit.strategy,'author-rewrite');
+  const shortWithOriginal=resolveTitle({title,title_short:'Q4 六项行动'},font,11.77);
+  assert.equal(shortWithOriginal.subtitle,title,'author rewrite keeps the original title as auditable subtitle');
   assert.throws(()=>resolveTitle({title:'W'.repeat(90)},font,11.77),/unbreakable|title_short/);
   const quote='“功能很多，但我没听明白跟我每天通勤、带家人有什么关系。”';
   const quoteLines=balancedWrap(quote,font.cjk,24,4.97);assert.equal(quoteLines.join(''),quote);assert(quoteLines.every(l=>l.length>5));

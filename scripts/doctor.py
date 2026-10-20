@@ -29,6 +29,7 @@ class SystemProbe:
         except (OSError,ValueError):return None
     def pillow_version(self):
         try:return importlib.metadata.version('Pillow'),None
+        except importlib.metadata.PackageNotFoundError:return None,None
         except Exception as error:return None,str(error)
     def exists(self,path):return Path(path).exists()
     def venv_python(self,venv):
@@ -133,9 +134,10 @@ def font_check(probe):
     detected={'requested':'Noto Sans CJK SC','matched_family':family,'matched_style':style,
               'bold_family':bold_family,'bold_style':bold_style,'fc_list':fc_list,'fc_match':fc_match}
     if cjk_ok and bold_ok:
-        return check(id='fonts',requirement='OPTIONAL',status='PRESENT',detected=detected,detail='CJK match and CJK bold match found')
+        return check(id='fonts',requirement='OPTIONAL',status='PRESENT',detected=detected,
+                     detail='fc-match family heuristic found a CJK family and bold style; glyph coverage is not verified')
     return check(id='fonts',requirement='OPTIONAL',status='BROKEN',detected=detected,
-                 detail='CJK or CJK bold font not matched; rendered text may be substituted',
+                 detail='fc-match family heuristic did not match CJK or CJK bold; rendered text may be substituted; glyph coverage is not verified',
                  impact='CJK/bold substitution checks and reliable visual review',
                  recovery='Install Noto Sans CJK SC with bold weight, then rerun npm run doctor')
 
@@ -160,7 +162,8 @@ def inspect(probe=None):
     checks=[]
     checks.append(platform_check(probe))
     checks.append(version_check(probe,'node',['node'],minimum=(18,0,0),impact='Deck build unavailable',recovery='Install Node.js 18+'))
-    checks.append(version_check(probe,'npm',['npm','npm.cmd'],impact='Dependency bootstrap unavailable',recovery='Install npm with Node.js 18+'))
+    checks.append(version_check(probe,'npm',['npm','npm.cmd'],impact='Dependency bootstrap unavailable',
+                                recovery='Install Node.js 18+ (includes npm); if Node/npm is installed later, run python3 scripts/bootstrap.py directly'))
     python=probe.python_version();python_tuple=tuple(python[:3]) if python else None
     if not python_tuple or python_tuple<(3,9):
         checks.append(check(id='python',requirement='REQUIRED',status='BROKEN',detected=version_text(python_tuple),
@@ -200,7 +203,8 @@ def inspect(probe=None):
     checks.append(font_check(probe))
     checks.append(writable_check(probe,'cwd-writable',os.getcwd()))
     checks.append(writable_check(probe,'temp-writable',tempfile.gettempdir()))
-    capabilities=load_capabilities().detect(probe=probe)
+    python_ready=next(item['status']=='PRESENT' for item in checks if item['id']=='python')
+    capabilities=load_capabilities().detect(probe=probe,python_ready=python_ready)
     required_missing=[item for item in checks if item['requirement']=='REQUIRED' and item['status']!='PRESENT']
     optional_gaps=[item for item in checks if item['requirement']=='OPTIONAL' and item['status']!='PRESENT']
     status='BLOCKED' if required_missing else ('READY_WITH_NOTES' if optional_gaps else 'READY')

@@ -57,6 +57,25 @@ def venv_python(venv):
     candidate=Path(venv)/('Scripts/python.exe' if platform.system()=='Windows' else 'bin/python')
     return candidate if candidate.is_file() else None
 
+def python_inside_venv(venv,python):
+    try:Path(os.path.abspath(str(python))).relative_to(Path(os.path.abspath(str(venv))));return True
+    except ValueError:return False
+
+def verify_venv_python(python,venv,runner=None):
+    """The Unix venv interpreter is a symlink to the base runtime, so validate
+    the executed interpreter's sys.prefix rather than the symlink target."""
+    probe=run_command([str(python),'-c',
+        'import json,sys;print(json.dumps({"prefix":sys.prefix,"base":sys.base_prefix}))'],Path.cwd(),runner=runner)
+    if probe.returncode!=0:raise BootstrapError(f'Cannot execute isolated Python at {python}: {(probe.stderr or probe.stdout).strip()}')
+    try:info=json.loads(probe.stdout.strip().splitlines()[-1])
+    except (ValueError,IndexError):raise BootstrapError(f'Isolated Python at {python} did not report sys.prefix')
+    prefix=Path(info.get('prefix','')).resolve();base=Path(info.get('base','')).resolve()
+    if prefix!=Path(venv).resolve() or prefix==base:
+        raise BootstrapError(f'Refusing pip outside the isolated .venv: {python} reports sys.prefix={prefix}')
+    if not python_inside_venv(venv,python):
+        raise BootstrapError(f'Refusing pip outside the isolated .venv: {python}')
+    return info
+
 def venv_pillow(python,runner=None):
     result=run_command([str(python),'-c','import importlib.metadata as m; print(m.version("Pillow"))'],Path.cwd(),runner=runner)
     return result.stdout.strip() if result.returncode==0 else None
@@ -78,24 +97,37 @@ def bootstrap(root=ROOT,python=None,dry_run=False,force=False,runner=None,emit=p
     selected,reason=choose_python(python)
     python_version=verify_python(selected,runner)
     actions=[]
-    # 1. JavaScript dependencies from the lockfile.
+    venv=root/'.venv'
+    state=read_state(venv) if venv.is_dir() else {}
+    lockfile=root/'package-lock.json'
+    lock_hash=file_hash(lockfile) if lockfile.is_file() else None
+    # 1. JavaScript dependencies from the lockfile. Skip only when the last
+    # successful npm-ci used this exact lockfile; top-level versions alone are
+    # insufficient because transitives may have changed.
     status=js_status(root)
-    if status['ready'] and not force:
-        actions.append({'step':'npm-ci','status':'SKIPPED','reason':'exact dependency versions already installed'})
+    js_state_current=(state.get('npm_ready') is True and state.get('lock_sha256') is not None
+                      and state.get('lock_sha256')==lock_hash)
+    if status['ready'] and js_state_current and not force:
+        actions.append({'step':'npm-ci','status':'SKIPPED','reason':'exact dependency versions installed for this lockfile hash'})
     else:
         npm=npm_command()
-        if not npm:raise BootstrapError('npm not found; install Node.js 18+ or restore node_modules manually')
-        lockfile=root/'package-lock.json'
+        if not npm:raise BootstrapError('npm not found; install Node.js 18+ (includes npm), then rerun python3 scripts/bootstrap.py')
         if not lockfile.is_file():raise BootstrapError('package-lock.json is required for npm ci')
         command=[npm,'ci','--no-audit','--no-fund']
         if dry_run:actions.append({'step':'npm-ci','status':'PLANNED','command':command})
         else:
             result=run_command(command,root,runner=runner)
             if result.returncode!=0:raise BootstrapError(f'npm ci failed: {(result.stderr or result.stdout).strip()}')
+            status=js_status(root)
+            if not status['ready']:
+                raise BootstrapError('npm ci completed but required JS dependencies are missing or mismatched: '
+                                     + ', '.join(status['missing']+status['mismatched']))
             actions.append({'step':'npm-ci','status':'OK','command':command})
+    js_ready=status['ready']
     # 2. Isolated virtual environment (repairing an interrupted partial venv is safe).
-    venv=root/'.venv';python_path=venv_python(venv)
+    python_path=venv_python(venv)
     if python_path:
+        if not dry_run:verify_venv_python(python_path,venv,runner)
         actions.append({'step':'venv','status':'SKIPPED','path':str(venv),'reason':'virtual environment already present'})
     else:
         command=[selected,'-m','venv',str(venv)]
@@ -105,13 +137,13 @@ def bootstrap(root=ROOT,python=None,dry_run=False,force=False,runner=None,emit=p
             if result.returncode!=0:raise BootstrapError(f'venv creation failed: {(result.stderr or result.stdout).strip()}')
             python_path=venv_python(venv)
             if not python_path:raise BootstrapError('venv created without a Python interpreter; rerun bootstrap')
+            verify_venv_python(python_path,venv,runner)
             actions.append({'step':'venv','status':'OK','path':str(python_path)})
     requirements=root/'requirements-render.txt'
     if not requirements.is_file():raise BootstrapError('requirements-render.txt is required for the isolated environment')
-    requirement_hash=file_hash(requirements);lock_hash=file_hash(root/'package-lock.json') if (root/'package-lock.json').is_file() else None
-    state=read_state(venv) if venv.is_dir() else {}
+    requirement_hash=file_hash(requirements)
     state_matches=(state.get('requirements_sha256')==requirement_hash and state.get('lock_sha256')==lock_hash
-                   and state.get('python_version')==python_version and state.get('npm_ready'))
+                   and state.get('python_version')==python_version and state.get('npm_ready') is True and js_ready)
     pillow=venv_pillow(python_path,runner) if python_path else None
     # 3. Isolated Python dependencies, never global pip.
     if state_matches and pillow and not force:
@@ -122,8 +154,9 @@ def bootstrap(root=ROOT,python=None,dry_run=False,force=False,runner=None,emit=p
             suffix='Scripts/python.exe' if platform.system()=='Windows' else 'bin/python'
             planned_python=venv/suffix
         if planned_python is None:raise BootstrapError('virtual environment Python is unavailable')
-        if venv.resolve() not in Path(planned_python).resolve().parents:
+        if not python_inside_venv(venv,planned_python):
             raise BootstrapError('Refusing pip outside the isolated .venv')
+        if not dry_run:verify_venv_python(planned_python,venv,runner)
         command=[str(planned_python),'-m','pip','install','--disable-pip-version-check','--no-input','-r',str(requirements)]
         env={**os.environ,'PYTHONNOUSERSITE':'1','PIP_NO_INPUT':'1','PIP_DISABLE_PIP_VERSION_CHECK':'1','PIP_USER':'0'}
         if dry_run:actions.append({'step':'pip-install','status':'PLANNED','command':command,'env':{'PYTHONNOUSERSITE':'1'}})
@@ -131,11 +164,12 @@ def bootstrap(root=ROOT,python=None,dry_run=False,force=False,runner=None,emit=p
             result=run_command(command,root,env=env,runner=runner)
             if result.returncode!=0:raise BootstrapError(f'pip install failed: {(result.stderr or result.stdout).strip()}')
             pillow=venv_pillow(planned_python,runner)
+            if not pillow:raise BootstrapError('pip install completed but Pillow is not importable in the isolated .venv')
             actions.append({'step':'pip-install','status':'OK','command':command,'pillow':pillow})
     if not dry_run:
         state={'schema_version':1,'completed_at':datetime.datetime.now().astimezone().isoformat(timespec='seconds'),
                'python':str(selected),'python_version':python_version,'venv_python':str(python_path or venv_python(venv)),
-               'requirements_sha256':requirement_hash,'lock_sha256':lock_hash,'npm_ready':js_status(root)['ready'],'pillow':pillow}
+               'requirements_sha256':requirement_hash,'lock_sha256':lock_hash,'npm_ready':js_ready,'pillow':pillow}
         write_state(venv,state)
         actions.append({'step':'state','status':'OK','path':str(state_path(venv))})
     result={'status':'DRY_RUN' if dry_run else 'READY','root':str(root),'python':str(selected),

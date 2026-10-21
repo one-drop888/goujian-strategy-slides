@@ -1,6 +1,6 @@
 # Goujian Strategy Slides｜构见·战略演示
 
-[简体中文（本页）](README.md) · [简体中文镜像](README.zh-CN.md) · [English](README.en.md) · [安装](#安装) · [推理计划](#推理计划agent-判断确定性校验) · [能力边界](#能力边界) · [Benchmark A–J](docs/BENCHMARKS_V1_2.md)
+[简体中文（本页）](README.zh-CN.md) · [仓库首页](README.md) · [English](README.en.md) · [安装](#安装) · [推理计划](#推理计划agent-判断确定性校验) · [能力边界](#能力边界) · [Benchmark A–J](docs/BENCHMARKS_V1_2.md)
 
 **面向 AI Agent 的 Presentation Intelligence**
 

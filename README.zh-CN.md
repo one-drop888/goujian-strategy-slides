@@ -1,6 +1,6 @@
 # Goujian Strategy Slides｜构见·战略演示
 
-[简体中文（本页）](README.zh-CN.md) · [简体中文根目录](README.md) · [English](README.en.md) · [安装](#安装) · [推理计划](#推理计划agent-判断确定性校验) · [能力边界](#能力边界) · [Benchmark A–J](docs/BENCHMARKS_V1_2.md)
+[简体中文（本页）](README.md) · [简体中文镜像](README.zh-CN.md) · [English](README.en.md) · [安装](#安装) · [推理计划](#推理计划agent-判断确定性校验) · [能力边界](#能力边界) · [Benchmark A–J](docs/BENCHMARKS_V1_2.md)
 
 **面向 AI Agent 的 Presentation Intelligence**
 
@@ -32,7 +32,7 @@
 - **可复现打包**：轻量安装 ZIP 只含一个根目录 `SKILL.md`，固定顺序、时间戳和权限；展示 ZIP 单独交付，不进入安装包。
 - 28 个管理 Storyline、86 个语义条目（74 IMPLEMENTED / 6 PARTIAL / 6 DESIGNED）、27 个 Composition Recipe、15 个 Profile、15 个 Template Recipe；数量是表达词汇范围，不是 86 套独立版式。
 
-独立最终视觉验收已在写入停止后完成：Codex 检查了 8 个案例的全部 58 页实际 LibreOffice 渲染（Linux x86_64、合成素材），结论为 `PASS_WITH_KNOWN_LIMITATIONS`，并绑定精确 PPTX 与页面 PNG 哈希。该验收不等于出版批准，公开发布尚未执行。
+代表性案例已完成 8 套、58 页 Linux LibreOffice 实际视觉复核，结论为 `PASS_WITH_KNOWN_LIMITATIONS`，记录绑定对应 PPTX 与页面 PNG 哈希。发行制品以 [GitHub Releases](https://github.com/one-drop888/goujian-strategy-slides/releases) 和随附校验清单为准；跨平台范围见下方能力边界。
 
 ## 推理计划：Agent 判断，确定性校验
 
@@ -121,7 +121,7 @@ npm run package:showcase   # dist/goujian-strategy-slides-v1.2.0-showcase.zip
 
 安装 ZIP 解压后是一个 `goujian-strategy-slides/` 文件夹，只有根目录一个 [SKILL.md](SKILL.md)，包含完整运行时、示例、Profile、Schema 与测试，不包含 `node_modules/`、`.venv/`、`out/`、缓存或 PPTX。展示 ZIP 是单独的可选复核资产；正常使用不需要它。平台导入与安全扫描仍须在目标平台复测。
 
-V1.2.0 的公开标签与 Release 由独立的发布任务执行，本阶段不推送、不打标签、不发布。发布流程只接受 `workflow_dispatch` 的已批准主分支 SHA，不因普通 push 自动发布。
+正式版本、安装包与校验值从 [GitHub Releases](https://github.com/one-drop888/goujian-strategy-slides/releases) 获取。发布流程只接受明确版本与获批的主分支 SHA，不因普通 push 自动发布，也不覆盖既有标签或发行制品。
 
 ## Benchmark A–J
 
@@ -167,9 +167,9 @@ V1.2.0 的公开标签与 Release 由独立的发布任务执行，本阶段不�
 
 ## 展示、复核与商业边界
 
-八个案例的实际渲染、输入、哈希与前后对比见[展示说明](docs/SHOWCASE_V1_2.md)与 `docs/visual/v1.2/`。Codex 的 15/15 独立引擎验收、最终 8 案例/58 页实际视觉验收和来源字节等价证明保存在 [docs/evidence/v1.2/reviews/](docs/evidence/v1.2/reviews/)。最终验收仅覆盖 Linux LibreOffice 与合成素材，历史构建 `3f65ee6` 的 dirty 元数据保持不变；它不是出版批准，GitHub 公开发布尚未执行。
+八个案例的实际渲染、输入、哈希与前后对比见[展示说明](docs/SHOWCASE_V1_2.md)与 `docs/visual/v1.2/`。独立验收记录包括 15/15 引擎检查、8 套/58 页视觉复核与来源字节核对，保存在 [docs/evidence/v1.2/reviews/](docs/evidence/v1.2/reviews/)。结论仅覆盖声明的合成素材和 Linux 环境；来源语义、因果与接收端效果仍需复核。
 
-Community 核心（含 doctor、QA 与缺陷修复）保持 Apache-2.0 免费。Supporter 与 Pro 是未来候选，不在本仓库开户、收款或上架，也不承诺发布日期；Pro 不引入第二套渲染引擎。Agensi 的 Agent 托管运行与本地 Node/Python 全运行时尚未实际验证，不能表述为已认证。详见[商业就绪说明](docs/COMMERCIAL_READINESS.md)。
+Community 核心（含 doctor、QA 与缺陷修复）保持 Apache-2.0 免费。Supporter 与 Pro 是未来候选，不在本仓库开户、收款或上架，也不承诺发布日期；Pro 不引入第二套渲染引擎。在 Agensi 环境运行本项目完整 Node/Python 流程尚未实际验证，不能表述为已认证。详见[商业就绪说明](docs/COMMERCIAL_READINESS.md)。
 
 ## 架构与贡献
 

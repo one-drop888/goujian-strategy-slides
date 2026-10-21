@@ -37,6 +37,8 @@ Late content corrections:
 - **Executive trend title:** the title is now exactly `收入逐月升至960万元，环比6.67%，仍差目标40万元`. Six observed monthly points are not presented as six proven growth intervals; no data, chart or layout changed.
 - **Source ledgers:** affected fixture source hashes and locators were updated deterministically; all reasoning-plan validation and source-closure checks pass.
 
+The optional ZIP also retains the first V1.2 dogfood montages for all three representative decks under `out/v1.2-showcase/before/*-first-round-montage.png`. These are explicitly unapproved historical synthetic outputs, provided to compare the full iteration with the final case montages. Exact intermediate Git commits are not asserted; original render timestamps and PNG hashes are recorded in `before/README.json`.
+
 Before/after:
 
 | Fix | Preview |

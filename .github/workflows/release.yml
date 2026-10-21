@@ -68,7 +68,7 @@ jobs:
           npm run validate:example
           npm run build:example
           npm run benchmark -- --render
-          npm run doctor -- --json > out/release-doctor.json
+          npm run --silent doctor -- --json > out/release-doctor.json
           npm run qa:example
           npm run package
       - name: Verify deterministic installer and single Skill entry

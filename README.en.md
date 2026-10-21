@@ -30,7 +30,7 @@ It combines management storytelling, storylines, action titles, semantic archety
 - **Reproducible packaging:** the lightweight installer has one root `SKILL.md`, stable ordering, timestamps and permissions. The showcase is a separate optional artifact and never enters the installer.
 - 28 management storylines, 86 semantic entries (74 IMPLEMENTED / 6 PARTIAL / 6 DESIGNED), 27 composition recipes, 15 profiles and 15 template recipes. Counts describe vocabulary, not 86 independent layouts.
 
-Independent final visual acceptance was completed after writing stopped: Codex reviewed all 58 pages across the 8 cases from actual LibreOffice renders on Linux x86_64 with synthetic fixtures, with a `PASS_WITH_KNOWN_LIMITATIONS` result bound to exact PPTX and page hashes. This is not publication approval, and no public release has been made.
+The eight representative cases (58 pages) completed actual Linux LibreOffice visual review with `PASS_WITH_KNOWN_LIMITATIONS`, bound to the exact PPTX and page PNG hashes. Obtain release artifacts and checksums from [GitHub Releases](https://github.com/one-drop888/goujian-strategy-slides/releases); platform boundaries are stated below.
 
 ## Reasoning plan: agent judgment, deterministic checks
 
@@ -119,7 +119,7 @@ npm run package:showcase   # dist/goujian-strategy-slides-v1.2.0-showcase.zip
 
 The installer extracts to one `goujian-strategy-slides/` folder with a single root [SKILL.md](SKILL.md). It contains the full runtime, examples, profiles, schemas and tests, but no `node_modules/`, `.venv/`, `out/`, caches or PPTX. The showcase ZIP is a separate optional review artifact, not a runtime requirement. Platform import and security scanning still require target-platform tests.
 
-The v1.2.0 public tag and Release are handled by a separate release task. This phase does not push, tag or publish. The workflow accepts a `workflow_dispatch` approved main-branch SHA; an ordinary push does not publish.
+Obtain official versions, installers and checksums from [GitHub Releases](https://github.com/one-drop888/goujian-strategy-slides/releases). Publication requires an explicit version and approved main-branch SHA; ordinary pushes do not publish, and existing tags and assets are never overwritten.
 
 ## Benchmarks A–J
 
@@ -165,9 +165,9 @@ Waterfall/bridge, combo, scatter/bubble and heatmap have no faithful implementat
 
 ## Showcase, review and commercial scope
 
-The eight actual renders, inputs, hashes and before/after comparisons are in the [showcase documentation](docs/SHOWCASE_V1_2.md) and `docs/visual/v1.2/`. Codex's 15/15 independent engine acceptance, final 8-case/58-page actual visual acceptance and source-byte equivalence attestation are recorded under [docs/evidence/v1.2/reviews/](docs/evidence/v1.2/reviews/). The final acceptance covers Linux LibreOffice and synthetic fixtures only; the historical dirty-build metadata at `3f65ee6` is preserved. It is not publication approval, and no GitHub publication has occurred.
+The eight actual renders, inputs, hashes and before/after comparisons are in the [showcase documentation](docs/SHOWCASE_V1_2.md) and `docs/visual/v1.2/`. Independent evidence includes 15/15 engine checks, final 8-case/58-page visual review and source-byte checks under [docs/evidence/v1.2/reviews/](docs/evidence/v1.2/reviews/). These results cover the declared synthetic fixtures on Linux; source semantics, causality and recipient rendering still require review.
 
-The Community core, including doctor, QA and defect fixes, remains free under Apache-2.0. Supporter and Pro are future candidates only: this repository opens no account, collects no payment and lists no product, and no launch date is promised. Pro adds business workflow packs, not a second rendering engine. Agensi's agent-hosted runtime and the full local Node/Python runtime have not been tested and are not certified. See [Commercial readiness](docs/COMMERCIAL_READINESS.md).
+The Community core, including doctor, QA and defect fixes, remains free under Apache-2.0. Supporter and Pro are future candidates only: no account, payment, listing or launch date is provided. Pro would reuse the same rendering engine. Running this project's complete Node/Python workflow inside Agensi has not been verified or certified. See [Commercial readiness](docs/COMMERCIAL_READINESS.md).
 
 ## Architecture and contributing
 

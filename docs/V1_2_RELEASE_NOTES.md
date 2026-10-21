@@ -13,7 +13,7 @@
 - **Layered source verification:** JSON sources can be checked against source bytes with hashes and JSON Pointers. PDF/image/text/native-PPTX ledgers remain reviewer-required; citations are not source truth.
 - **Final hash verification:** with a trusted expected SHA256, verification checks the exact PPTX bytes, chart caches, tables, KPI text, notes and embedded report. It does not prove source authenticity or visual quality.
 - **Theme decisions:** reference > brand > explicit user > automatic > default, with dark/printable conflict disclosure. Three theme variants and eight dark native chart types were built and rendered.
-- **Showcase and copy fixes:** eight synthetic cases with actual renders, inputs, specs, sidecars, QA and hash manifests. The Q4 orphan-word wrap and the overlong multimodal subtitle were corrected; detailed limitations remain in claims, notes and appendix.
+- **Showcase and copy fixes:** eight synthetic cases with actual renders, inputs, specs, sidecars, QA and hash manifests. The Q4 orphan-word wrap and the overlong multimodal subtitle were corrected. Late content corrections aligned Q4 dependency arrows on one explicit 前置→后续 convention (source keeps its labeled 行动→前置 order), removed an unsupported “copy South workflow” claim in favor of verifying definitions and actual workflows before a candidate pilot with pre-defined evaluation and all outcomes recorded, and replaced the executive title that implied six proven growth intervals. Detailed limitations remain in claims, notes and appendix.
 - **Packaging and release gate:** deterministic single-SKILL installer, separate optional showcase, fixed timestamps/permissions, no caches/PPTX in the installer, and a manual approved-SHA release workflow with immutable annotated tag and no overwrite of existing assets/history.
 
 ### Artifacts
@@ -46,7 +46,7 @@ Replace the installed folder with the new ZIP; do not merge over an old director
 - **分层来源核对：** 结构化 JSON 可用哈希与 JSON Pointer 对照源字节；PDF/图片/文本/原生 PPTX 台账仍需复核者提取。引用不等于来源为真。
 - **最终哈希校验：** 在可信期望 SHA256 下检查精确 PPTX 字节、图表缓存、表格、KPI 文本、备注和内嵌报告；不证明来源真实性或视觉质量。
 - **主题决策：** reference > brand > 显式用户 > automatic > default，dark 与 printable 冲突会披露。三条主题变体与八类深色原生图表已构建渲染。
-- **展示与文案修复：** 八个合成案例，含实际渲染、输入、Spec、sidecar、QA 与哈希清单。Q4 单字换行与过长的多模态副标题已修复；详细限制保留在 claim、备注和附录。
+- **展示与文案修复：** 八个合成案例，含实际渲染、输入、Spec、sidecar、QA 与哈希清单。Q4 单字换行与过长的多模态副标题已修复。后期内容修正包括：Q4 依赖箭头统一为明确的“前置→后续”约定（源材料保留带标注的“行动→前置”写法）；移除无依据的“复制华南流程”主张，改为先核验口径与两区实际流程，再评估候选试点，试点前定义评估口径并记录全部结果；执行摘要标题不再暗示六段已证明的增长区间。详细限制保留在 claim、备注和附录。
 - **打包与发布门禁：** 确定性单 SKILL 安装包、独立可选展示包、固定时间戳/权限、安装包不含缓存/PPTX；发布仅接受获批 SHA 的手动工作流，注解标签不可变，不覆盖既有资产/历史。
 
 ### 交付物

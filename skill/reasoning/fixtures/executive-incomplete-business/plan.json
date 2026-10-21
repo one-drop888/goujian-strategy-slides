@@ -339,14 +339,14 @@
       "claim_ids": ["c-trend-fact", "c-revenue-mom", "c-rev-gap"],
       "source_ids": ["revenue"],
       "transition": "从趋势进入逐项目标差异",
-      "communication_intent": "展示连续增长与环比，同时锁定九月40万元缺口",
+      "communication_intent": "展示逐月上升与环比，同时锁定九月40万元缺口",
       "summary_rationale": "环比6.67%由8月900万元与9月960万元的可追溯数值计算；40万元缺口为960万元与1,000万元之差；趋势不用于证明缺口原因。",
       "visual_intent": "trend",
       "appendix": false,
       "spec": {
         "type": "chart",
         "chartType": "line",
-        "title": "收入连续六个月增至960万元，环比6.67%，仍差目标40万元",
+        "title": "收入逐月升至960万元，环比6.67%，仍差目标40万元",
         "labels": ["2026-04", "2026-05", "2026-06", "2026-07", "2026-08", "2026-09"],
         "series": [
           { "name": "收入", "values": [780, 820, 850, 870, 900, 960] }

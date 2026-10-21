@@ -4,12 +4,12 @@
   "synthetic": true,
   "intent": {
     "audience": "区域运营与管理层",
-    "goal": "管理简报：用规范渠道数据呈现3.3pp区域差异，明确未提供的口径，区分访谈假设与因果，并提出待确认的两周跟进试点。",
-    "decision_question": "是否先在西南做两周跟进试点，并在不预设ROI的前提下按周复盘？",
+    "goal": "管理简报：用规范渠道数据呈现3.3pp区域差异，明确未提供的口径，区分访谈假设与因果；先核对口径与两区实际跟进流程，再提出待确认的两周跟进试点候选。",
+    "decision_question": "是否先补齐成交率分母与跨期口径、核实两区实际跟进流程，再评审两周跟进试点候选，并按预先定义的评估记录所有结果？",
     "audience_needs": [
       "一眼看到差异与口径限制",
       "知道哪些只是假设",
-      "明确下一步负责人和时间"
+      "明确待确认的下一步责任角色与时间"
     ],
     "context": {
       "scenario": "multimodal consolidation review",
@@ -21,12 +21,12 @@
     {
       "id": "s-channel",
       "locator": "技能示例截图 channel-evidence.png；对应合成源表",
-      "summary": "合成渠道表：四个战区的线索、到店、试驾、成交率、库存、跟进、负责人与复核日；九列全部保留。成交率分母、cohort、去重与跨期口径未提供；报告期2026-Q3由合成简报定义。",
+      "summary": "合成渠道表：四个战区的线索、到店、试驾、成交率、库存、跟进、负责人与复核日；九列全部保留。成交率分母、cohort、去重与跨期口径未提供；跟进列只有比例，不提供跟进流程或可复制做法；报告期2026-Q3由合成简报定义。",
       "importance": "critical",
       "synthetic": true,
       "path": "../../../examples/assets/channel-evidence.png",
       "sha256": "0f8cf0ed2062e449ecceb7b4db850b7833966b531a0ce80e1f6e7589ba30c204",
-      "notes": "九列数值来自原生源PPTX/截图的人工复核抽取，仍属审查者复核项；截图与原生源PPTX均未定义成交率分母、cohort、去重或跨期口径。",
+      "notes": "九列数值来自原生源PPTX/截图的人工复核抽取，仍属审查者复核项；截图与原生源PPTX均未定义成交率分母、cohort、去重或跨期口径，也不包含跟进流程或可复制做法。",
       "values": [
         {
           "id": "sc-hn-leads",
@@ -225,11 +225,11 @@
     {
       "id": "s-context",
       "locator": "sources/synthetic-context.md",
-      "summary": "项目自撰合成简报：定义报告期为2026-Q3；明确成交率分母、cohort、去重与跨期口径均未提供（NOT_PROVIDED）；试点安排为建议待确认。",
+      "summary": "项目自撰合成简报：定义报告期为2026-Q3；明确成交率分母、cohort、去重与跨期口径均未提供（NOT_PROVIDED），也不提供两区实际跟进流程或华南可复制做法；先核对口径与流程、再评审试点候选，试点安排为建议待确认，评估口径需在试点前定义并记录全部结果。",
       "importance": "supporting",
       "synthetic": true,
       "path": "sources/synthetic-context.md",
-      "sha256": "a292dcb24aa099cb2b5a5fd299f3ae1eef9828710bd7a41469b4e16192673c70"
+      "sha256": "93f3b534ddd4f0e9f5339adc15a1de3e50e5b973a097524491c2d9d6a0a7b526"
     },
     {
       "id": "s-chart",
@@ -312,12 +312,12 @@
     {
       "id": "c-rate-limits",
       "type": "INTERPRETATION",
-      "text": "成交率分母、客户cohort、去重口径与跨期比较定义均未提供（NOT_PROVIDED）；不能由线索量与成交率反推订单数、计算加权转化或判断显著性。",
+      "text": "成交率分母、客户cohort、去重口径与跨期比较定义均未提供（NOT_PROVIDED）；源表只有跟进率，不提供两区实际跟进流程或华南可复制做法；较高比率不构成流程证据；不能由线索量与成交率反推订单数、计算加权转化或判断显著性。",
       "source_ids": [
         "s-channel",
         "s-context"
       ],
-      "limits": "只说明源表缺失的口径，不补造分母、订单或总体比例。"
+      "limits": "只说明源表缺失的口径与流程，不补造分母、订单、总体比例或跟进做法。"
     },
     {
       "id": "c-interview-hypothesis",
@@ -349,10 +349,11 @@
     {
       "id": "c-recommendation",
       "type": "RECOMMENDATION",
-      "text": "建议（待确认）：先在西南复刻华南的试驾后跟进动作，做两周试点并按周复盘；不把访谈频次或3.3pp差异当作因果证据，也不预设ROI。负责人、日期与48小时安排均为建议。",
+      "text": "建议（待确认）：先补齐成交率分母、客户队列、去重与跨期口径，并核实华南与西南实际跟进流程，再设计并评审西南两周跟进试点候选；试点前预先定义对照与评估口径，记录正面与负面全部结果；不把访谈频次或3.3pp差异当作因果证据，也不预设ROI。责任角色、时间与48小时安排均为建议（待确认）。",
       "source_ids": [
         "s-channel",
-        "s-interview"
+        "s-interview",
+        "s-context"
       ],
       "depends_on": [
         "c-interview-hypothesis",
@@ -377,7 +378,7 @@
     {
       "source_id": "s-context",
       "disposition": "retain",
-      "rationale": "报告期与口径缺口由项目合成简报定义；不据此补造分母或订单。"
+      "rationale": "报告期与口径缺口由项目合成简报定义；不据此补造分母、订单或跟进流程。"
     },
     {
       "source_id": "s-chart",
@@ -420,6 +421,13 @@
       ]
     },
     {
+      "text": "源表只有跟进率，不提供华南或西南的实际跟进流程、可复制做法及对照设计；较高成交率本身不能证明存在成功做法。",
+      "source_ids": [
+        "s-channel",
+        "s-context"
+      ]
+    },
+    {
       "text": "渠道截图的九列数值抽取仍属审查者复核项；原生源PPTX的SHA、形状定位与嵌入图片SHA见 source-inspection.json。",
       "source_ids": [
         "s-channel"
@@ -428,9 +436,10 @@
   ],
   "candidate_conclusions": [
     {
-      "text": "先做西南跟进试点，再根据周度结果决定是否扩大。",
+      "text": "先补齐口径并核实两区实际跟进流程，再评审西南跟进试点候选；按预先定义的评估记录全部结果后，再决定是否扩大。",
       "claim_ids": [
-        "c-recommendation"
+        "c-recommendation",
+        "c-rate-limits"
       ]
     }
   ],
@@ -447,7 +456,7 @@
     "rationale": "把规范数值、定性假设和行动决定分开，避免重复截图或不必要的因果推断"
   },
   "deck": {
-    "title": "成交率差3.3pp：先做跟进试点，再验证原因",
+    "title": "成交率差3.3pp：先核对口径与流程，再评审试点",
     "lang": "zh-CN",
     "footer": "合成材料 · Project-authored synthetic fixture / Apache-2.0",
     "assets": [
@@ -512,13 +521,14 @@
       "source_ids": [
         "s-visual",
         "s-channel",
-        "s-interview"
+        "s-interview",
+        "s-context"
       ],
       "transition": "先看差异与决定，再看证据",
       "communication_intent": "用一页封面给出结论与边界，并声明合成视觉不是业务证据",
       "spec": {
         "type": "image-hero",
-        "title": "成交率差3.3pp：先做跟进试点，再验证原因",
+        "title": "成交率差3.3pp：先核对口径与流程，再评审试点",
         "subtitle": "管理简报 · 华南 vs 西南 · 合成数据 · 24位访谈仅作假设来源",
         "asset_ids": [
           "showroom"
@@ -550,8 +560,8 @@
       "communication_intent": "用结论页锁定事实、建议与边界，不展开所有表格",
       "spec": {
         "type": "key-message",
-        "title": "建议（待确认）先做西南跟进试点，再验证原因",
-        "statement": "华南与西南成交率差3.3pp，源表不能解释原因；建议（待确认）做两周跟进试点并按周复盘。",
+        "title": "建议（待确认）先核对口径与流程，再评审西南试点",
+        "statement": "华南与西南成交率差3.3pp，源表不能解释原因；建议（待确认）先核对口径与两区实际跟进流程，再评审两周试点。",
         "decision_points": [
           {
             "title": "事实",
@@ -559,7 +569,7 @@
           },
           {
             "title": "决定",
-            "note": "建议（待确认）在西南复刻华南的试驾后跟进动作，做两周试点；周度复核成交率，不预设提升或ROI。"
+            "note": "建议（待确认）先补齐成交率分母、队列、去重与跨期口径，并核实两区实际跟进流程，再评审西南两周试点候选；周度复盘，不预设提升或ROI。"
           },
           {
             "title": "边界",
@@ -657,7 +667,7 @@
       "source_ids": [
         "s-interview"
       ],
-      "transition": "假设之后给出可执行的两周试点",
+      "transition": "假设之后给出先核验、再评审的试点路径",
       "communication_intent": "用一张标注截图保留原文与样本限制，解释文字保持可编辑",
       "spec": {
         "type": "document-evidence",
@@ -703,37 +713,38 @@
       ],
       "source_ids": [
         "s-channel",
-        "s-interview"
+        "s-interview",
+        "s-context"
       ],
       "transition": "行动确定后，附录保留完整表格与来源",
-      "communication_intent": "用三项有负责人和时间的建议行动收口，不预设收益",
+      "communication_intent": "用三项待确认行动收口，不预设收益",
       "spec": {
         "type": "action",
-        "title": "建议（待确认）：先在西南做两周跟进试点，不预设成交提升或ROI",
+        "title": "建议（待确认）：先核对口径与流程，再评审西南跟进试点",
         "items": [
           {
-            "title": "西南两周跟进试点",
-            "owner": "区域运营",
-            "time": "10月27日–11月07日",
-            "note": "复刻华南试驾后跟进动作：48小时内给出明确下一步（建议）；只记录执行率与客户反馈。",
+            "title": "补齐口径与核实流程",
+            "owner": "经营分析",
+            "time": "试点评审前",
+            "note": "先补成交率分母、客户队列、去重与跨期口径，再核实两区实际跟进流程；之后评审试点。",
             "status": "建议安排 · 待确认"
           },
           {
-            "title": "周度口径复盘",
-            "owner": "经营分析",
-            "time": "每周五",
-            "note": "以渠道表为规范来源复核线索、到店、试驾、成交；图表只作派生视图。",
+            "title": "候选试点与周度复盘",
+            "owner": "区域运营",
+            "time": "两周（建议待确认）",
+            "note": "西南试点为候选；48小时内给出明确下一步仅为建议；按周记录执行率与客户反馈。",
             "status": "建议安排 · 待确认"
           },
           {
             "title": "保留因果边界",
             "owner": "管理层",
-            "time": "试点结束后",
-            "note": "24位访谈只用于提出假设；若指标无改善，扩大样本并做对照验证，不预设ROI。",
+            "time": "试点前定义",
+            "note": "试点前定义对照与评估口径；记录全部结果（含负面）；24位访谈只生成假设，不预设ROI。",
             "status": "建议安排 · 待确认"
           }
         ],
-        "source": "项目建议 · 非源表事实 · 负责人、日期与48小时/两周安排待管理层确认"
+        "source": "项目建议 · 非源表事实 · 责任角色、时间与48小时/两周安排待确认"
       }
     },
     {

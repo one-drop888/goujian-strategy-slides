@@ -20,15 +20,15 @@ SHA-256 of the exact PNGs used for composition:
 | Render | SHA-256 |
 |---|---|
 | `out/v1.2-showcase/decks/executive-incomplete-business-render/slide-1.png` | `a2951391c9c6d447f453972268fe8e0e11cb612debca7524c753de42aee51d8c` |
-| `out/v1.2-showcase/decks/q4-six-actions-render/slide-2.png` | `c3fb1a575979378dcbf317348b5e3aeb6b213ef157cd0eb6d73ab03457537ac4` |
+| `out/v1.2-showcase/decks/q4-six-actions-render/slide-2.png` | `c24aaa63a2d3502e4f1a7090210f259fbb5d3adfd16a9a7227e09c00fe690887` |
 | `out/v1.2-showcase/decks/multimodal-consolidation-render/slide-3.png` | `a0c911dca95ce46db9ccfe8949a1ec16f4c390f7f2e6deb8937d2dd64f8040ad` |
 | `out/v1.2-showcase/before/q4-summary-theme-dark-before.png` | `dbd785b78c5a6ee0b298d1a8afbacffe3eb17dfdc871753d94c384c4fc73f3c9` |
-| `out/v1.2-showcase/theme-variants/theme-dark/slide-2.png` | `54899595e41d5356629e9d534d3debe8119248c898f34ff5b531541c4e10c39c` |
+| `out/v1.2-showcase/theme-variants/theme-dark/slide-2.png` | `470d51248c8844f74048e07358a0a84409730ecef25eae285136956f41662ffa` |
 | `out/v1.2-showcase/before/multimodal-chart-page3-before.png` | `85a3a687885b120b98d122a9e7d5a598fe96d61e72344e7a12fbf909b4bfc578` |
-| `out/v1.2-showcase/theme-variants/theme-light/slide-2.png` | `c3fb1a575979378dcbf317348b5e3aeb6b213ef157cd0eb6d73ab03457537ac4` |
-| `out/v1.2-showcase/theme-variants/theme-brand-blue/slide-2.png` | `5e0d44ec37992ffb9bdec8d34f2c300efd7a3ab6d8ff2de64b7e603a41025ca3` |
+| `out/v1.2-showcase/theme-variants/theme-light/slide-2.png` | `c24aaa63a2d3502e4f1a7090210f259fbb5d3adfd16a9a7227e09c00fe690887` |
+| `out/v1.2-showcase/theme-variants/theme-brand-blue/slide-2.png` | `3cc9fb9e7bdcb0695d3fc33d2eef1fa1ff72d462d95cb29587a7ece58b024035` |
 | `out/v1.2-showcase/decks/executive-incomplete-business-render/slide-3.png` | `9db61f79ca5a19a2fdea7798c988e51ad671316f011ad5f59dd62fec54aeb3a4` |
-| `out/v1.2-showcase/decks/q4-six-actions-render/slide-3.png` | `ef497bebf0a6bb55bbc8d0f5086fa3a85a3a84c84477a36586cb89210c19bade` |
+| `out/v1.2-showcase/decks/q4-six-actions-render/slide-3.png` | `94a32a422d6c8449f0acc1eb3a35f138379349221565a63e96998540f309b0bb` |
 | `out/v1.2-showcase/decks/multimodal-consolidation-render/slide-6.png` | `a7366bcec644b5a4918828b77f9394bacff722cb06e2d99092ae3afdeb0c1b18` |
 | `out/v1.2-showcase/dark-chart-types/render/slide-5.png` | `dd942c33e093fb41b536450af5a20335939155bcfa6dbc7a9d495ef1110c24c3` |
 | `out/v1.2-showcase/long-title/render/slide-2.png` | `a23e27bbdb5fac2d0bbf47731fd1541680490d1f771d08217e10110832eaa600` |

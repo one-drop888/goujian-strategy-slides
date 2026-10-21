@@ -24,15 +24,33 @@
       "artifact": "skill/reasoning/fixtures/multimodal-consolidation/plan.json"
     },
     {
+      "step": "late bounded copy correction: Q4 dependency and approval wording",
+      "status": "DONE",
+      "detail": "Roadmap and appendix now share one explicit prereq-to-next convention (A1->A2, A2->A3, A4->A5, A1->A6); the synthetic source keeps its original action-to-prereq order under an explicit label. Replaced unsupported approval-count wording with the supported phrase. Six dates, three groups and four edges preserved.",
+      "artifact": "skill/reasoning/fixtures/q4-six-actions/"
+    },
+    {
+      "step": "late bounded copy correction: multimodal followup and pilot boundaries",
+      "status": "DONE",
+      "detail": "Removed the unsupported South-workflow-copy claim. The proposal now verifies denominator, cohort, dedup, cross-period and actual regional workflow before evaluating a candidate Southwest pilot; comparison/evaluation is defined before the pilot, all outcomes are recorded, roles/timing are marked 待确认, and the 24 convenience interviews remain hypothesis-only.",
+      "artifact": "skill/reasoning/fixtures/multimodal-consolidation/"
+    },
+    {
+      "step": "late bounded copy correction: executive trend title",
+      "status": "DONE",
+      "detail": "Title now states the observed monthly rise, month-over-month rate and remaining target gap without implying six proven growth intervals. No data, chart or layout change.",
+      "artifact": "skill/reasoning/fixtures/executive-incomplete-business/plan.json"
+    },
+    {
       "step": "rebuild affected decks and theme variants",
       "status": "PASS",
-      "detail": "The Q4 deck and all three theme variants plus the multimodal deck were rebuilt and rerendered through the existing dogfood script. No engine or renderer source changed.",
-      "artifacts": ["out/v1.2-showcase/decks/q4-six-actions-render/", "out/v1.2-showcase/theme-variants/", "out/v1.2-showcase/decks/multimodal-consolidation-render/"]
+      "detail": "After the late corrections, the showcase was rebuilt once through the existing dogfood script. Q4, all three theme variants, multimodal and executive decks rerendered; no engine or renderer source changed.",
+      "artifacts": ["out/v1.2-showcase/decks/q4-six-actions-render/", "out/v1.2-showcase/theme-variants/", "out/v1.2-showcase/decks/multimodal-consolidation-render/", "out/v1.2-showcase/decks/executive-incomplete-business-render/"]
     },
     {
       "step": "actual render and visual critique",
       "status": "DONE",
-      "detail": "Inspected actual LibreOffice PNGs and montages; confirmed the Q4 orphan word is gone and the multimodal subtitle is one line clear of the divider. Representative pages were also reviewed at full size. No claim of complete-deck visual approval.",
+      "detail": "Inspected actual LibreOffice PNGs and montages for the changed pages: executive page 4; Q4 summary, roadmap and appendix pages plus all theme variants; multimodal summary, chart, actions and appendix pages. Copy renders as intended and no clipping was observed. No claim of complete-deck visual approval.",
       "artifacts": ["out/v1.2-showcase/before/README.json", "docs/visual/v1.2/q4-before-after.png", "docs/visual/v1.2/multimodal-before-after.png"]
     },
     {
@@ -44,7 +62,7 @@
     {
       "step": "end-to-end regression suite",
       "status": "PASS",
-      "detail": "npm test exits 0 on the final tree: legacy and V1.1 regressions, 24/24 analytics tests, theme/chart XML tests, reasoning-plan positive and adversarial tests, doctor and bootstrap tests. One opt-in network integration test is skipped by default and was executed separately at 9/9.",
+      "detail": "npm test exits 0 on the final tree: legacy and V1.1 regressions, 24/24 analytics tests, theme/chart XML tests, reasoning-plan positive and adversarial tests, doctor and bootstrap tests. One opt-in network integration test is skipped by default in this run.",
       "artifact": "docs/evidence/v1.2/installation.json"
     },
     {
@@ -56,7 +74,7 @@
     {
       "step": "documentation previews",
       "status": "DONE",
-      "detail": "Composed hero, before/after, theme, scenario and 1280x640 social previews only from actual renders. Source render SHA256 values are recorded with the previews.",
+      "detail": "Recomposed hero, before/after, theme, scenario and 1280x640 social previews from the current actual renders after the late corrections. Source render SHA256 values were refreshed with the previews.",
       "artifact": "docs/visual/v1.2/README.md"
     },
     {

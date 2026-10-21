@@ -1,0 +1,103 @@
+{
+  "schema_version": "1.0",
+  "reviewer": "Codex independent actual rendered-page and semantic review",
+  "reviewed_at": "2026-10-21T04:44:55.393066+00:00",
+  "status": "PASS",
+  "case_id": "dark-chart-types",
+  "pptx_sha256": "d46d99493dc69a0c72d798636127999e9f9a4d00a61d034e9457a4cfa504f5e5",
+  "source_commit_at_final_acceptance": "020226c49d3ecdc3d66c0647ca1d20bc94192439",
+  "engine_source_aggregate_sha256": "c2e3435ac01ea0a0e23d7ce21807cb553335c5637ee46fe6ad0bf3fa49212ac7",
+  "slides_reviewed": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+  ],
+  "page_evidence": [
+    {
+      "page": 1,
+      "path": "out/v1.2-showcase/dark-chart-types/render/slide-1.png",
+      "sha256": "4ef4379b4dff13aa28981f0ca51b36f8fd374e4976df25a35d3eceb14a26ac20",
+      "actual_inspection_evidence": {
+        "record": "codex-fullsize-round3-reviewed.json",
+        "page": "dark-chart-types/1"
+      }
+    },
+    {
+      "page": 2,
+      "path": "out/v1.2-showcase/dark-chart-types/render/slide-2.png",
+      "sha256": "2ba7ee97125198cf9a66b80e7d55cc844892f9082f50cba371bdc29442308ab6",
+      "actual_inspection_evidence": {
+        "record": "codex-fullsize-round3-reviewed.json",
+        "page": "dark-chart-types/2"
+      }
+    },
+    {
+      "page": 3,
+      "path": "out/v1.2-showcase/dark-chart-types/render/slide-3.png",
+      "sha256": "8d623c3a32cdd50ef2320f90d42d4feb15b87f5477161a51aee993a1ec24be75",
+      "actual_inspection_evidence": {
+        "record": "codex-fullsize-round3-reviewed.json",
+        "page": "dark-chart-types/3"
+      }
+    },
+    {
+      "page": 4,
+      "path": "out/v1.2-showcase/dark-chart-types/render/slide-4.png",
+      "sha256": "e53c6b38999df483ff4bbdb0d58b714de121e29d21ae57814a61a9da13042e57",
+      "actual_inspection_evidence": {
+        "record": "codex-fullsize-round3-reviewed.json",
+        "page": "dark-chart-types/4"
+      }
+    },
+    {
+      "page": 5,
+      "path": "out/v1.2-showcase/dark-chart-types/render/slide-5.png",
+      "sha256": "dd942c33e093fb41b536450af5a20335939155bcfa6dbc7a9d495ef1110c24c3",
+      "actual_inspection_evidence": {
+        "record": "codex-fullsize-round3-reviewed.json",
+        "page": "dark-chart-types/5"
+      }
+    },
+    {
+      "page": 6,
+      "path": "out/v1.2-showcase/dark-chart-types/render/slide-6.png",
+      "sha256": "4e48a250f87de847689cf599d6bb815ddc462c3edf42aaecfa61c2ae352d8fc9",
+      "actual_inspection_evidence": {
+        "record": "codex-fullsize-round3-reviewed.json",
+        "page": "dark-chart-types/6"
+      }
+    },
+    {
+      "page": 7,
+      "path": "out/v1.2-showcase/dark-chart-types/render/slide-7.png",
+      "sha256": "b8533c5a433d889562246edc179e34e1df2b9cdfbe7795c1073de01a28b83bbd",
+      "actual_inspection_evidence": {
+        "record": "codex-fullsize-round3-reviewed.json",
+        "page": "dark-chart-types/7"
+      }
+    },
+    {
+      "page": 8,
+      "path": "out/v1.2-showcase/dark-chart-types/render/slide-8.png",
+      "sha256": "3b465e0820051ed553d646584301b5e54ecd6b0e7dd2252a7a1ec3bc42627448",
+      "actual_inspection_evidence": {
+        "record": "codex-fullsize-round3-reviewed.json",
+        "page": "dark-chart-types/8"
+      }
+    }
+  ],
+  "method": "Actual full-size PNG inspection and deck montage review. Previously viewed pages are reused only after exact SHA256 equality; new or changed pages were viewed again. This is reviewer attestation, not automated visual judgment.",
+  "notes": "Accepted within this synthetic Linux LibreOffice case: readable titles/subtitles/dividers, data/units/labels, native tables and dependencies, screenshot evidence and source boundaries; proposed actions distinct from supplied facts. Six Q4 actions and four dependencies preserved. Multisource rates do not establish denominators or a successful playbook;24 convenience interviews support hypotheses only; pilot evaluation precedes trial. No blocking visible clipping or evidence occlusion observed.",
+  "limits": [
+    "Native PowerPoint, macOS, Windows and ARM64 NOT_RUN; fonts not embedded.",
+    "Native doughnut labels have restrained but dense boxed LibreOffice styling; no hidden values.",
+    "Diagnostic decks are regression fixtures, not page-variety design examples.",
+    "Screenshot pixels remain noneditable; source extraction requires reviewer confirmation.",
+    "This attestation applies to the exact PPTX/render hashes only; newly regenerated output requires review."
+  ]
+}

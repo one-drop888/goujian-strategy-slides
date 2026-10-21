@@ -1,0 +1,93 @@
+{
+  "schema_version": "1.0",
+  "reviewer": "Codex independent actual rendered-page and semantic review",
+  "reviewed_at": "2026-10-21T04:44:55.393066+00:00",
+  "status": "PASS",
+  "case_id": "theme-light",
+  "pptx_sha256": "6a5cfa2c5cada52bd19c4402b5af184f8d26c36ac8b98bf9cc033aefa89543b6",
+  "source_commit_at_final_acceptance": "020226c49d3ecdc3d66c0647ca1d20bc94192439",
+  "engine_source_aggregate_sha256": "c2e3435ac01ea0a0e23d7ce21807cb553335c5637ee46fe6ad0bf3fa49212ac7",
+  "slides_reviewed": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+  ],
+  "page_evidence": [
+    {
+      "page": 1,
+      "path": "out/v1.2-showcase/theme-variants/theme-light/slide-1.png",
+      "sha256": "c311b7cfdadd3c25dfb161b99d86dd410b537ae0240647f9581ade40c2a3eef7",
+      "actual_inspection_evidence": {
+        "record": "codex-final-changed-pages-viewed.json",
+        "page": "out/v1.2-showcase/decks/q4-six-actions-render/slide-1.png"
+      }
+    },
+    {
+      "page": 2,
+      "path": "out/v1.2-showcase/theme-variants/theme-light/slide-2.png",
+      "sha256": "c24aaa63a2d3502e4f1a7090210f259fbb5d3adfd16a9a7227e09c00fe690887",
+      "actual_inspection_evidence": {
+        "record": "codex-final-changed-pages-viewed.json",
+        "page": "out/v1.2-showcase/decks/q4-six-actions-render/slide-2.png"
+      }
+    },
+    {
+      "page": 3,
+      "path": "out/v1.2-showcase/theme-variants/theme-light/slide-3.png",
+      "sha256": "94a32a422d6c8449f0acc1eb3a35f138379349221565a63e96998540f309b0bb",
+      "actual_inspection_evidence": {
+        "record": "codex-final-changed-pages-viewed.json",
+        "page": "out/v1.2-showcase/decks/q4-six-actions-render/slide-3.png"
+      }
+    },
+    {
+      "page": 4,
+      "path": "out/v1.2-showcase/theme-variants/theme-light/slide-4.png",
+      "sha256": "8797a698abf98b41f8a942b51c92691fff87c5cb5a27d2e05d1f115d06495227",
+      "actual_inspection_evidence": {
+        "record": "codex-final-changed-pages-viewed.json",
+        "page": "out/v1.2-showcase/decks/q4-six-actions-render/slide-4.png"
+      }
+    },
+    {
+      "page": 5,
+      "path": "out/v1.2-showcase/theme-variants/theme-light/slide-5.png",
+      "sha256": "c7e39f7a7e2dddbd26c0e59ae3070ac9cdb726522176ff63dad1592d091369cf",
+      "actual_inspection_evidence": {
+        "record": "codex-final-changed-pages-viewed.json",
+        "page": "out/v1.2-showcase/decks/q4-six-actions-render/slide-5.png"
+      }
+    },
+    {
+      "page": 6,
+      "path": "out/v1.2-showcase/theme-variants/theme-light/slide-6.png",
+      "sha256": "72a0ab57d31f1e55f815334ac6a470061261afbf3318a296911f1c4001a58c17",
+      "actual_inspection_evidence": {
+        "record": "codex-final-changed-pages-viewed.json",
+        "page": "out/v1.2-showcase/decks/q4-six-actions-render/slide-6.png"
+      }
+    },
+    {
+      "page": 7,
+      "path": "out/v1.2-showcase/theme-variants/theme-light/slide-7.png",
+      "sha256": "b8c56070965873410644e9db2ebf5b2b941483f94419341782542200aa71a577",
+      "actual_inspection_evidence": {
+        "record": "codex-final-changed-pages-viewed.json",
+        "page": "out/v1.2-showcase/decks/q4-six-actions-render/slide-7.png"
+      }
+    }
+  ],
+  "method": "Actual full-size PNG inspection and deck montage review. Previously viewed pages are reused only after exact SHA256 equality; new or changed pages were viewed again. This is reviewer attestation, not automated visual judgment.",
+  "notes": "Accepted within this synthetic Linux LibreOffice case: readable titles/subtitles/dividers, data/units/labels, native tables and dependencies, screenshot evidence and source boundaries; proposed actions distinct from supplied facts. Six Q4 actions and four dependencies preserved. Multisource rates do not establish denominators or a successful playbook;24 convenience interviews support hypotheses only; pilot evaluation precedes trial. No blocking visible clipping or evidence occlusion observed.",
+  "limits": [
+    "Native PowerPoint, macOS, Windows and ARM64 NOT_RUN; fonts not embedded.",
+    "Native doughnut labels have restrained but dense boxed LibreOffice styling; no hidden values.",
+    "Diagnostic decks are regression fixtures, not page-variety design examples.",
+    "Screenshot pixels remain noneditable; source extraction requires reviewer confirmation.",
+    "This attestation applies to the exact PPTX/render hashes only; newly regenerated output requires review."
+  ]
+}

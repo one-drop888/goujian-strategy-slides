@@ -33,8 +33,8 @@ SHA-256 of the exact PNGs used for composition:
 | `out/v1.2-showcase/dark-chart-types/render/slide-5.png` | `dd942c33e093fb41b536450af5a20335939155bcfa6dbc7a9d495ef1110c24c3` |
 | `out/v1.2-showcase/long-title/render/slide-2.png` | `a23e27bbdb5fac2d0bbf47731fd1541680490d1f771d08217e10110832eaa600` |
 
-If any fixture or engine source changes, these previews must be rebuilt from the new renders. They are illustrations of the built bytes, not a visual approval of every page.
+If any fixture or engine source changes, these previews must be rebuilt from the new renders. They are illustrations of the built bytes, not a visual approval of every page. After final acceptance, only the documentary footer labels were refreshed; the slide pixels inside the cards were byte-identical to the previously composed previews.
 
 ## Status
 
-Final independent full-size visual QA by Codex is **pending** and occurs after the writer stops. These previews do not claim that review. The previews show actual pixels; they are not editable and carry no source provenance beyond the render and input hashes recorded in the showcase manifests.
+Final independent full-size visual QA by Codex is **complete**: all 58 pages across the 8 showcase cases were reviewed from actual Linux LibreOffice renders of synthetic fixtures, with status `PASS_WITH_KNOWN_LIMITATIONS` bound to exact PPTX and page hashes. This does not cover native PowerPoint, the 15 legacy benchmark scenarios or all 15 profiles. These previews show actual pixels; they are not editable and carry no source provenance beyond the render and input hashes recorded in the showcase manifests.

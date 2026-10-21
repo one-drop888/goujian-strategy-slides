@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0",
+  "status": "PASS",
+  "generated_at": "2026-10-21",
+  "scope": "Byte equivalence of committed engine/render inputs for the final 8-case / 58-page showcase VQA",
+  "final_acceptance_commit": "020226c49d3ecdc3d66c0647ca1d20bc94192439",
+  "tracked_tree_at_acceptance": "clean",
+  "engine_source_fingerprint": {
+    "path": "out/v1.2-showcase/engine-source-fingerprint.json",
+    "sha256": "b8a8e45edbcf426eb2f35ac049e86b1d429c55fc2e8035901c6817e966a6576a",
+    "bytes": 13613,
+    "files": 91,
+    "aggregate_sha256": "c2e3435ac01ea0a0e23d7ce21807cb553335c5637ee46fe6ad0bf3fa49212ac7",
+    "scope": "runtime core, profiles, reasoning fixtures, registries, CLI scripts, dogfood/showcase builders, package metadata"
+  },
+  "verification": {
+    "checked_at": "2026-10-21T04:53:25.411233+00:00",
+    "files_checked": 91,
+    "mismatches": 0,
+    "method": "Recomputed SHA-256 for every path in the recorded engine fingerprint and compared it with the working tree before docs-only phase-5 edits.",
+    "page_hash_check": "All eight PPTX files and all 58 reviewed page PNGs matched the final review records; a dry re-render reproduced every reviewed page PNG and montage hash exactly.",
+    "pdf_note": "PDF container bytes may vary across LibreOffice runs; reviewed evidence binds PPTX and page PNGs, not PDF metadata."
+  },
+  "historical_build_provenance": {
+    "source_head_at_build": "3f65ee6479c7e10eb37ed7feebb4c1ee68adc336",
+    "source_dirty_at_build": true,
+    "generated_at": "2026-10-21T04:41:00.596Z",
+    "note": "Preserved historical build metadata. It is not relabeled clean and does not describe the final acceptance commit."
+  },
+  "engine_acceptance": "15/15 independent adversarial/native/export checks at 2c622db52ff53d2f3f90a6581550f69a978022ef; runtime engine unchanged",
+  "limits": [
+    "This attestation covers source/render byte equivalence, not native PowerPoint or other host execution.",
+    "Docs-only edits after the acceptance commit are outside the 91-file engine fingerprint.",
+    "It is not publication approval; final installer/source/security checks remain separate."
+  ]
+}

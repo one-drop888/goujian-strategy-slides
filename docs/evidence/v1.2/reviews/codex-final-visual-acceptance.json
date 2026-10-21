@@ -1,0 +1,105 @@
+{
+  "reviewer": "Codex independent release owner",
+  "status": "PASS_WITH_KNOWN_LIMITATIONS",
+  "source_commit": "020226c49d3ecdc3d66c0647ca1d20bc94192439",
+  "reviewed_at": "2026-10-21T04:44:55.393066+00:00",
+  "cases": [
+    {
+      "case_id": "executive-incomplete-business",
+      "pptx": {
+        "path": "out/v1.2-showcase/decks/executive-incomplete-business.pptx",
+        "sha256": "1903100b891b0b468ad8a88d6775c27a547616226a5bdde735e33f582a40eb08",
+        "bytes": 49199
+      },
+      "pages": 7,
+      "review": "docs/evidence/v1.2/reviews/executive-incomplete-business.visual-review.json"
+    },
+    {
+      "case_id": "q4-six-actions",
+      "pptx": {
+        "path": "out/v1.2-showcase/decks/q4-six-actions.pptx",
+        "sha256": "ac853f520f9b5dd791143344f6b2d6e5fb09b68cbb73fd4ee4878e818c2bc898",
+        "bytes": 41951
+      },
+      "pages": 7,
+      "review": "docs/evidence/v1.2/reviews/q4-six-actions.visual-review.json"
+    },
+    {
+      "case_id": "multimodal-consolidation",
+      "pptx": {
+        "path": "out/v1.2-showcase/decks/multimodal-consolidation.pptx",
+        "sha256": "57a6c26f578657dea5cfa238c1626494d2166ad6edf03bd88d1d2271a2dd26e6",
+        "bytes": 2084232
+      },
+      "pages": 7,
+      "review": "docs/evidence/v1.2/reviews/multimodal-consolidation.visual-review.json"
+    },
+    {
+      "case_id": "theme-light",
+      "pptx": {
+        "path": "out/v1.2-showcase/theme-variants/light.pptx",
+        "sha256": "6a5cfa2c5cada52bd19c4402b5af184f8d26c36ac8b98bf9cc033aefa89543b6",
+        "bytes": 41947
+      },
+      "pages": 7,
+      "review": "docs/evidence/v1.2/reviews/theme-light.visual-review.json"
+    },
+    {
+      "case_id": "theme-brand-blue",
+      "pptx": {
+        "path": "out/v1.2-showcase/theme-variants/brand-blue.pptx",
+        "sha256": "93c5a7f635db69869668f644c2be3e2b248d572b6f95892dfd2190f542a0c52c",
+        "bytes": 42012
+      },
+      "pages": 7,
+      "review": "docs/evidence/v1.2/reviews/theme-brand-blue.visual-review.json"
+    },
+    {
+      "case_id": "theme-dark",
+      "pptx": {
+        "path": "out/v1.2-showcase/theme-variants/dark.pptx",
+        "sha256": "c4f9d16e9ff78fef2129744d039ffd13c709f74e230f0f0cbbbe4ac63a99f870",
+        "bytes": 42127
+      },
+      "pages": 7,
+      "review": "docs/evidence/v1.2/reviews/theme-dark.visual-review.json"
+    },
+    {
+      "case_id": "long-title",
+      "pptx": {
+        "path": "out/v1.2-showcase/long-title/long-title.pptx",
+        "sha256": "a09da2a51adb826cf7485aa95d6ef2f288f89f749e763da1e982285f0c25d612",
+        "bytes": 152855
+      },
+      "pages": 8,
+      "review": "docs/evidence/v1.2/reviews/long-title.visual-review.json"
+    },
+    {
+      "case_id": "dark-chart-types",
+      "pptx": {
+        "path": "out/v1.2-showcase/dark-chart-types/dark-chart-types.pptx",
+        "sha256": "d46d99493dc69a0c72d798636127999e9f9a4d00a61d034e9457a4cfa504f5e5",
+        "bytes": 82780
+      },
+      "pages": 8,
+      "review": "docs/evidence/v1.2/reviews/dark-chart-types.visual-review.json"
+    }
+  ],
+  "cases_reviewed": 8,
+  "pages_reviewed": 58,
+  "source_fingerprint": {
+    "path": "out/v1.2-showcase/engine-source-fingerprint.json",
+    "sha256": "b8a8e45edbcf426eb2f35ac049e86b1d429c55fc2e8035901c6817e966a6576a",
+    "bytes": 13613
+  },
+  "engine_acceptance": "15/15 independent adversarial/native/export checks at2c622db; runtime engine unchanged",
+  "content_review": "PASS within supplied synthetic sources and explicitly qualified recommendations",
+  "visual_review": "PASS for the exact8cases/58pages, through actual view or verified pixel identity to an actual view",
+  "publication_approval": "Final installer/source/security checks still required; no publication executed by this record",
+  "known_limits": [
+    "Linux LibreOffice only; native PowerPoint/macOS/Windows/ARM64 NOT_RUN.",
+    "15 legacy benchmark renders are not15 final visual approvals.",
+    "No autonomous source interpretation, causal inference, OCR, losslessediting or automatic visual repair.",
+    "Agensi/companyplatform NOT_VERIFIED; social-preview setting not uploaded."
+  ]
+}

@@ -56,13 +56,13 @@
     {
       "step": "QA and structural verification",
       "status": "PASS",
-      "detail": "All showcase cases report structural QA PASS or PASS_WITH_NOTES, native verification PASS where applicable, and visual status FINAL_CODEX_VQA_PENDING. No case is marked as visually approved.",
+      "detail": "All showcase cases report structural QA PASS or PASS_WITH_NOTES, native verification PASS where applicable, and final hash-bound visual review PASS. The current 8 cases / 58 pages were inspected by Codex after the writer stopped.",
       "artifact": "out/v1.2-showcase/showcase.manifest.json"
     },
     {
       "step": "end-to-end regression suite",
       "status": "PASS",
-      "detail": "npm test exits 0 on the final tree: legacy and V1.1 regressions, 24/24 analytics tests, theme/chart XML tests, reasoning-plan positive and adversarial tests, doctor and bootstrap tests. One opt-in network integration test is skipped by default in this run.",
+      "detail": "npm test exits 0 on the final tree: legacy and V1.1 regressions, 24/24 analytics tests, theme/chart XML tests, reasoning-plan positive and adversarial tests, doctor and bootstrap tests. Python discovery reports 34 passed plus 1 opt-in network skip, not 35 passed; the separate real clean-install bootstrap integration passed 9/9.",
       "artifact": "docs/evidence/v1.2/installation.json"
     },
     {
@@ -78,9 +78,10 @@
       "artifact": "docs/visual/v1.2/README.md"
     },
     {
-      "step": "final review boundary",
-      "status": "PENDING_INDEPENDENT_REVIEW",
-      "detail": "Codex performs final actual VQA after the writer stops. This record must not be cited as visual PASS or publication approval. Native PowerPoint macOS/Windows/ARM64 is NOT_RUN; Agensi hosted runtime is NOT_VERIFIED."
+      "step": "final independent review boundary",
+      "status": "PASS_WITH_KNOWN_LIMITATIONS",
+      "detail": "Codex completed final actual VQA after the writer stopped: 8 cases / 58 pages from actual Linux LibreOffice renders of synthetic fixtures, bound to exact PPTX and page hashes. The source-byte equivalence attestation matched 91/91 engine files. This is not publication approval. Native PowerPoint macOS/Windows/ARM64 is NOT_RUN; Agensi hosted runtime is NOT_VERIFIED; the 15 legacy benchmark scenarios remain visual NOT_RUN and all 15 profiles were not fully visually tested.",
+      "artifact": "docs/evidence/v1.2/reviews/codex-final-visual-acceptance.json"
     }
   ],
   "counts": {
@@ -90,12 +91,15 @@
     "native_dark_chart_pages": 8,
     "long_title_pages": 8,
     "before_variants": 5,
-    "review_records_copied": 7,
+    "review_records_copied": 21,
+    "final_visual_review_records": 8,
+    "final_visual_review_pages": 58,
     "generated_review_status_files": 1
   },
   "source_binding": {
     "engine_source_fingerprint": "Recorded in out/v1.2-showcase/engine-source-fingerprint.json and showcase.manifest.json for the final showcase build.",
-    "final_artifact_hashes": "Recorded in out/v12-control/phase4-evidence.json and release SHA256SUMS.txt after the final deterministic rebuild.",
+    "source_byte_equivalence": "docs/evidence/v1.2/reviews/final-source-provenance.json",
+    "final_artifact_hashes": "Recorded in dist/SHA256SUMS.txt, dist/SHA256SUMS-showcase.txt and out/v12-control/phase5-evidence.json after the final deterministic rebuild.",
     "review_records": "docs/evidence/v1.2/reviews/"
   },
   "not_claimed": [

@@ -20,7 +20,7 @@
 | 标题/布局 | PROVEN，契约内 | 字形测量/等价估算、短标题/副标题、动态分割线与正文流、显式标题容量错误。长标题回归已渲染；估算不等于 PowerPoint 精确排字。 |
 | 来源与场景 | PROVEN | 原生、像素、标注、数据与判断来源类型，以及实际原生对象关系。 |
 | 空间 QA | PROVEN，显式场景内 | 原生坐标/顺序读回、遮挡、安全区、文字/横线间距、密度与保守文字容量警告。不推断任意导入稿意图。 |
-| 视觉质量 | PARTIAL | 当前有八个展示案例与实际 LibreOffice 渲染。Codex 已检查代表性页面并记录预最终问题；写入停止后仍需最终全尺寸 VQA。八个渲染不等于八个视觉批准。 |
+| 视觉质量 | PARTIAL | 最终独立实际 VQA 覆盖 Linux LibreOffice 上 8 个案例/58 页合成素材，绑定精确 PPTX 与页面哈希，状态 `PASS_WITH_KNOWN_LIMITATIONS`。这不覆盖全部 15 个 Profile、15 个历史 Benchmark 场景或原生 PowerPoint；八个渲染不等于八个通用视觉批准。 |
 | 打包 | PROVEN（本地） | 确定性安装包测试可生成相同字节，检查单一根 SKILL、固定时间戳/权限、必需资产、无 PPTX/PDF/缓存。最终干净解压安装证据单独记录。 |
 | 安装 | PROVEN，Linux x86_64 | 从安装 ZIP 在 Unicode/空格、无符号链接路径执行隔离 `.venv`、`npm ci`/bootstrap、doctor、测试、示例构建与渲染。macOS/Windows/ARM64 未验证。 |
 | 可维护性 | PROVEN，结构层面 | 推理、资产、标题、场景由小型共享模块实现；未整体重写引擎或增加重量级运行时依赖。 |
@@ -39,6 +39,8 @@
 ## 证据锚点
 
 - 引擎验收：[Codex final acceptance](evidence/v1.2/reviews/codex-final-acceptance.json) — `2c622db` 处 15/15，仅代表引擎验收。
+- 最终实际视觉验收：[Codex final visual acceptance](evidence/v1.2/reviews/codex-final-visual-acceptance.json) — 8 案例/58 页，`PASS_WITH_KNOWN_LIMITATIONS`，仅 Linux LibreOffice。
+- 已验收渲染的来源字节等价性：[final source provenance](evidence/v1.2/reviews/final-source-provenance.json) — 91 个文件、0 不一致；历史 dirty 构建元数据单独保留。
 - 部分全尺寸复核与剩余文案问题：[round-2 preview review](evidence/v1.2/reviews/codex-round2-preview-review.md)；修复后文案已进入展示构建。
 - 来源 PPTX 范围：[source acceptance](evidence/v1.2/reviews/codex-source-pptx-acceptance.md)；实际检查记录在可选展示包的 `source-inspection.json`。
 - 依赖审计：[official npm audit record](evidence/v1.2/reviews/codex-dependency-audit-official.json) — 官方 registry 下 0 已知漏洞。
@@ -47,8 +49,8 @@
 
 ## 结论
 
-**V1.2 为文档化 Agent 辅助工作流的 RELEASE CANDIDATE。**
+**V1.2 为文档化 Agent 辅助工作流的 READY WITH KNOWN LIMITATIONS。**
 
-推理契约、有限算术、原生构建、主题选择、来源检查与打包在各自声明范围内已证明。语义忠实度、来源真实性、因果结论、视觉质量与跨平台渲染不由代码认证；最终独立视觉验收与公开发布仍是两个独立门禁。
+推理契约、有限算术、原生构建、主题选择、来源检查与打包在各自声明范围内已证明。语义忠实度、来源真实性、因果结论、视觉质量与跨平台渲染不由代码认证。最终独立视觉验收已在 8 案例/58 页的 Linux LibreOffice 范围内完成；15 个历史 Benchmark 场景的视觉验收仍为 `NOT_RUN`，15 个 Profile 也未全部完成视觉测试。公开发布仍是独立门禁，尚未执行。
 
 三类可运行分析在声明 Schema 内仍为 PROVEN：完整月份经营数据、成熟非线性销售队列及 CNY 项目累计快照。来源真实性与因果推断不在代码认证范围内。参阅[分析边界](ANALYTICAL_LIBRARY.md)。

@@ -106,6 +106,7 @@ jobs:
         run: |
           set -euo pipefail
           git fetch --tags origin
+          test "$(git ls-remote origin refs/heads/main | cut -f1)" = "$EXPECTED_SHA"
           if git rev-parse -q --verify "refs/tags/v$VERSION" >/dev/null; then
             test "$(git cat-file -t "refs/tags/v$VERSION")" = tag
             test "$(git rev-parse "v$VERSION^{commit}")" = "$EXPECTED_SHA"
@@ -120,8 +121,10 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           VERSION: ${{ inputs.version }}
+          EXPECTED_SHA: ${{ inputs.expected_sha }}
         run: |
           set -euo pipefail
+          test "$(git ls-remote origin refs/heads/main | cut -f1)" = "$EXPECTED_SHA"
           cd dist
           sha256sum "goujian-strategy-slides-v$VERSION.zip" > SHA256SUMS.txt
           gh release create "v$VERSION" --verify-tag \

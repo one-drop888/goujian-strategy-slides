@@ -1,0 +1,63 @@
+{
+  "reviewer": "Codex independent actual full-size inspection",
+  "status": "ADDITIONAL_PAGES_VIEWED_NOT_FINAL_RELEASE_APPROVAL",
+  "pages": [
+    {
+      "path": "out/v12-control/dogfood-round3/long-title/render/slide-1.png",
+      "sha256": "be3278600437e4ea153db7c8a74517c41b30e146ff30c31f7235f404709d5701"
+    },
+    {
+      "path": "out/v12-control/dogfood-round3/long-title/render/slide-2.png",
+      "sha256": "a23e27bbdb5fac2d0bbf47731fd1541680490d1f771d08217e10110832eaa600"
+    },
+    {
+      "path": "out/v12-control/dogfood-round3/long-title/render/slide-3.png",
+      "sha256": "0c8ec6a00b4d20a577c65c38ee72fdc84384f47baed2976c492762c2df4f1580"
+    },
+    {
+      "path": "out/v12-control/dogfood-round3/long-title/render/slide-4.png",
+      "sha256": "f0e6fac2d327edaa2cb6c0db7a97b5b09419ea689df0ae826df65c6cc79ccc82"
+    },
+    {
+      "path": "out/v12-control/dogfood-round3/long-title/render/slide-5.png",
+      "sha256": "446fd7a8a4c36de1d2f3f7bbfd0b7e19363e8f486a1fd0587bebbc0c707bf2f9"
+    },
+    {
+      "path": "out/v12-control/dogfood-round3/long-title/render/slide-6.png",
+      "sha256": "19e57396547e29a028705d510728e25df97a82ff467ac1ff1ba3d2e32551858b"
+    },
+    {
+      "path": "out/v12-control/dogfood-round3/long-title/render/slide-7.png",
+      "sha256": "08d7c8d49e167ba3a8a8ccb047bf8e5b76d5948a4b1cc86469f6c1b791adee42"
+    },
+    {
+      "path": "out/v12-control/dogfood-round3/long-title/render/slide-8.png",
+      "sha256": "5a72c7c05893e360d2a7540391a5b454ff30a3b886520cb1762159cc0cb60276"
+    },
+    {
+      "path": "out/v12-control/dogfood-round3/theme-variants/theme-brand-blue/slide-3.png",
+      "sha256": "7003906a8798a7e1bb22aeb15c6c6f2da660a1c8d9df8ad18c614db5fa5cdaa5"
+    },
+    {
+      "path": "out/v12-control/dogfood-round3/theme-variants/theme-brand-blue/slide-4.png",
+      "sha256": "6e52f45ee2302d9f01feb1cf639adf175e14c374d0f06674f6da2b0e3a9f2549"
+    },
+    {
+      "path": "out/v12-control/dogfood-round3/theme-variants/theme-brand-blue/slide-5.png",
+      "sha256": "d8e820e9da5ccd9e9822e92dc169f5ce92d3410c7c84565ee3398a506119be18"
+    },
+    {
+      "path": "out/v12-control/dogfood-round3/theme-variants/theme-dark/slide-3.png",
+      "sha256": "7d03b8abb024a977d8fa3f500f6bd4c8a8caa4b94af8d439d42c9249ebbae345"
+    },
+    {
+      "path": "out/v12-control/dogfood-round3/theme-variants/theme-dark/slide-4.png",
+      "sha256": "75fa26d6308290d0f445350ccfc505364886185557132de443f6d2c59af11046"
+    },
+    {
+      "path": "out/v12-control/dogfood-round3/theme-variants/theme-dark/slide-5.png",
+      "sha256": "a3ffcf0ed3c3080323ae4c166f80f6b39bf48c1f5430ef7f489cf99b85a71d28"
+    }
+  ],
+  "findings": "Long-title all8pages clear of divider, distinct hierarchy; English two-line balanced title. Theme native DAG all4arrows and6owners/dates legible; tables and risk labels readable. Remaining copyissues8-11 assigned separately. Montages brand/dark/long personally viewed."
+}

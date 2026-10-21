@@ -47,7 +47,7 @@ V1.2 展示包含三条主题变体和八类深色原生图表。标题使用字
 
 八个展示案例覆盖高管经营复盘、Q4 行动、多源整合、三套主题、八类深色图表和长标题。每例保留输入参考、导出 Spec、PPTX、推理 sidecar、QA、实际 LibreOffice 渲染、Montage 与哈希清单。安装 ZIP 是独立轻量运行时，展示 ZIP 是可选复核资产。
 
-最终视觉验收由独立复核者在写入停止后执行。仓库中的预最终复核记录不被表述为出版批准；原生 PowerPoint（macOS/Windows/ARM64）未执行，Agensi/公司平台托管运行未验证。
+独立最终视觉验收已在写入停止后完成：Codex 在 Linux LibreOffice 上检查了 8 个展示案例的全部 58 页合成素材，结论为 `PASS_WITH_KNOWN_LIMITATIONS`，并绑定精确 PPTX 与页面哈希。该验收不等于出版批准。15 个历史 Benchmark 场景的视觉验收仍为 `NOT_RUN`，15 个 Profile 也未全部完成视觉测试；原生 PowerPoint（macOS/Windows/ARM64）未执行，Agensi/公司平台托管运行未验证。
 
 Community 核心（含 doctor、QA 与缺陷修复）保持 Apache-2.0 免费。Supporter 与 Pro 是未来候选，不在本仓库开户、收款或上架；Pro 增加业务工作流包，不引入第二套渲染引擎。详见[商业就绪说明](COMMERCIAL_READINESS.md)。
 

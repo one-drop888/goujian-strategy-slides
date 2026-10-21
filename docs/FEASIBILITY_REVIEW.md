@@ -20,7 +20,7 @@ Status vocabulary: **PROVEN** within the stated evidence and scope; **PARTIAL** 
 | Title/layout | PROVEN within contract | Measured/equivalent estimates, short-title/subtitle, dynamic divider/body flow, explicit header-capacity errors. Long-title regression rendered; measurement is not exact PowerPoint shaping. |
 | Provenance / scene | PROVEN | Native, pixel, annotation, data and insight provenance plus actual native object relationships. |
 | Spatial QA | PROVEN within explicit scenes | Native geometry/order readback, occlusion, safe area, text/rule gap, density and conservative text-fit warnings. No arbitrary imported-intent inference. |
-| Visual quality | PARTIAL | Eight current showcase cases and actual LibreOffice renders exist. Codex inspected representative pages and recorded pre-final findings; full-size final VQA is pending after writing stops. Eight renders are not eight visual approvals. |
+| Visual quality | PARTIAL | Final independent actual VQA covers 8 cases / 58 pages on Linux LibreOffice with synthetic fixtures, bound to exact PPTX and page hashes, status `PASS_WITH_KNOWN_LIMITATIONS`. This is not all 15 profiles, not the 15 legacy benchmark scenarios and not native PowerPoint. Eight renders are not eight universal visual approvals. |
 | Packaging | PROVEN locally | Deterministic installer test builds identical bytes and checks one root SKILL, fixed timestamps/permissions, required assets, no PPTX/PDF or caches. Final clean-unzip installation evidence is recorded separately. |
 | Installation | PROVEN on Linux x86_64 | isolate `.venv`, `npm ci`/bootstrap, doctor, tests, example build and render were executed from the installer ZIP in a Unicode/space path without symlinks. macOS/Windows/ARM64 are not verified. |
 | Maintainability | PROVEN structurally | Small shared modules for reasoning, assets, titles and scene capture. No wholesale engine rewrite or heavyweight runtime dependency. |
@@ -39,6 +39,8 @@ Status vocabulary: **PROVEN** within the stated evidence and scope; **PARTIAL** 
 ## Evidence anchors
 
 - Engine acceptance: [Codex final acceptance](evidence/v1.2/reviews/codex-final-acceptance.json) — 15/15 at `2c622db`, engine acceptance only.
+- Final actual visual acceptance: [Codex final visual acceptance](evidence/v1.2/reviews/codex-final-visual-acceptance.json) — 8 cases / 58 pages, `PASS_WITH_KNOWN_LIMITATIONS`, Linux LibreOffice only.
+- Source-byte equivalence for the accepted renders: [final source provenance](evidence/v1.2/reviews/final-source-provenance.json) — 91 files, 0 mismatches; historical dirty-build metadata preserved separately.
 - Partial full-size review and remaining copy defects: [round-2 preview review](evidence/v1.2/reviews/codex-round2-preview-review.md); fixed copy is reflected in the showcase build.
 - Source PPTX scope: [source acceptance](evidence/v1.2/reviews/codex-source-pptx-acceptance.md); actual inspection records are in the optional showcase (`source-inspection.json`).
 - Dependency audit: [official npm audit record](evidence/v1.2/reviews/codex-dependency-audit-official.json) — 0 known advisories with the official registry.
@@ -47,8 +49,8 @@ Status vocabulary: **PROVEN** within the stated evidence and scope; **PARTIAL** 
 
 ## Verdict
 
-**V1.2 RELEASE CANDIDATE for the documented Agent-assisted workflow.**
+**V1.2 READY WITH KNOWN LIMITATIONS for the documented Agent-assisted workflow.**
 
-The reasoning contract, bounded arithmetic, native build, theme selection, source inspection and packaging are proven within their declared scopes. Semantic faithfulness, source truth, causal claims, visual quality and cross-platform rendering are not certified by code. Final independent visual acceptance and public publication remain separate gates.
+The reasoning contract, bounded arithmetic, native build, theme selection, source inspection and packaging are proven within their declared scopes. Semantic faithfulness, source truth, causal claims, visual quality and cross-platform rendering are not certified by code. Final independent visual acceptance is complete within the 8-case/58-page Linux LibreOffice scope; the 15 legacy benchmark scenarios remain visual `NOT_RUN`, and all 15 profiles were not fully visually tested. Public publication remains a separate gate and has not occurred.
 
 Three runnable analytical families remain PROVEN for their declared schemas: business monthly data, mature nonlinear sales cohorts and CNY project snapshots. Source truth and causal inference are outside code certification. See [analytical boundaries](ANALYTICAL_LIBRARY.md).

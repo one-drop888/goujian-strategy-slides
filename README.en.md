@@ -30,7 +30,7 @@ It combines management storytelling, storylines, action titles, semantic archety
 - **Reproducible packaging:** the lightweight installer has one root `SKILL.md`, stable ordering, timestamps and permissions. The showcase is a separate optional artifact and never enters the installer.
 - 28 management storylines, 86 semantic entries (74 IMPLEMENTED / 6 PARTIAL / 6 DESIGNED), 27 composition recipes, 15 profiles and 15 template recipes. Counts describe vocabulary, not 86 independent layouts.
 
-Final visual acceptance is performed by an independent reviewer after writing stops. This repository records real renders, structural QA and review scope; it does not treat an intermediate build as publication approval.
+Independent final visual acceptance was completed after writing stopped: Codex reviewed all 58 pages across the 8 cases from actual LibreOffice renders on Linux x86_64 with synthetic fixtures, with a `PASS_WITH_KNOWN_LIMITATIONS` result bound to exact PPTX and page hashes. This is not publication approval, and no public release has been made.
 
 ## Reasoning plan: agent judgment, deterministic checks
 
@@ -129,14 +129,14 @@ The v1.2.0 public tag and Release are handled by a separate release task. This p
 | B | Q4 six actions | Six action IDs, three groups and four dependency edges; actually rendered |
 | C | Nonlinear sales analytics | Existing analytics family plus 24 analytics tests |
 | D | Multisource consolidation | Nine-column native table, owner/review date, native chart and screenshot evidence |
-| E | Eight dark native charts | Eight-page native-chart diagnostic; final full-size VQA pending |
+| E | Eight dark native charts | Eight-page native-chart diagnostic; included in the final independent 58-page VQA |
 | F | Long title and dynamic subtitle | Eight-page title/divider regression |
 | G | Three theme variants | light / brand-blue / dark, seven rendered pages each |
 | H | Native source-PPTX inspection | File/slide/shape locators, nine columns, chart values and embedded image hashes |
 | I | Clean install and recovery | Unicode/space path, no symlinks, doctor/build/QA record |
 | J | Agent end-to-end | Qoder through plan, build, render, QA, critique and bounded repair |
 
-Exact evidence paths, statuses and limitations are in [Benchmarks A–J](docs/BENCHMARKS_V1_2.md). A–J is an evidence matrix, not a claim that every deck passed visual review. Native PowerPoint on macOS/Windows/ARM64 is `NOT_RUN`; Agensi/company-hosted runtime is `NOT_VERIFIED`.
+Exact evidence paths, statuses and limitations are in [Benchmarks A–J](docs/BENCHMARKS_V1_2.md). A–J is an evidence matrix; the final independent VQA covers the 8 showcase cases and 58 pages only. The 15 legacy benchmark scenarios remain visual `NOT_RUN`, and all 15 profiles were not fully visually tested. Native PowerPoint on macOS/Windows/ARM64 is `NOT_RUN`; Agensi/company-hosted runtime is `NOT_VERIFIED`.
 
 ## Capability boundaries
 
@@ -165,7 +165,7 @@ Waterfall/bridge, combo, scatter/bubble and heatmap have no faithful implementat
 
 ## Showcase, review and commercial scope
 
-The eight actual renders, inputs, hashes and before/after comparisons are in the [showcase documentation](docs/SHOWCASE_V1_2.md) and `docs/visual/v1.2/`. Codex's independent engine acceptance, partial full-size review and source-PPTX acceptance are recorded under [docs/evidence/v1.2/reviews/](docs/evidence/v1.2/reviews/). They are pre-final reviews, not publication approval; final actual VQA happens after writing stops.
+The eight actual renders, inputs, hashes and before/after comparisons are in the [showcase documentation](docs/SHOWCASE_V1_2.md) and `docs/visual/v1.2/`. Codex's 15/15 independent engine acceptance, final 8-case/58-page actual visual acceptance and source-byte equivalence attestation are recorded under [docs/evidence/v1.2/reviews/](docs/evidence/v1.2/reviews/). The final acceptance covers Linux LibreOffice and synthetic fixtures only; the historical dirty-build metadata at `3f65ee6` is preserved. It is not publication approval, and no GitHub publication has occurred.
 
 The Community core, including doctor, QA and defect fixes, remains free under Apache-2.0. Supporter and Pro are future candidates only: this repository opens no account, collects no payment and lists no product, and no launch date is promised. Pro adds business workflow packs, not a second rendering engine. Agensi's agent-hosted runtime and the full local Node/Python runtime have not been tested and are not certified. See [Commercial readiness](docs/COMMERCIAL_READINESS.md).
 

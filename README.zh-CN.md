@@ -32,7 +32,7 @@
 - **可复现打包**：轻量安装 ZIP 只含一个根目录 `SKILL.md`，固定顺序、时间戳和权限；展示 ZIP 单独交付，不进入安装包。
 - 28 个管理 Storyline、86 个语义条目（74 IMPLEMENTED / 6 PARTIAL / 6 DESIGNED）、27 个 Composition Recipe、15 个 Profile、15 个 Template Recipe；数量是表达词汇范围，不是 86 套独立版式。
 
-最终视觉验收由独立复核者在写入停止后执行。本仓库记录的是实际渲染、结构 QA 和复核范围，不把中间构建宣称为出版批准。
+独立最终视觉验收已在写入停止后完成：Codex 检查了 8 个案例的全部 58 页实际 LibreOffice 渲染（Linux x86_64、合成素材），结论为 `PASS_WITH_KNOWN_LIMITATIONS`，并绑定精确 PPTX 与页面 PNG 哈希。该验收不等于出版批准，公开发布尚未执行。
 
 ## 推理计划：Agent 判断，确定性校验
 
@@ -131,7 +131,7 @@ V1.2.0 的公开标签与 Release 由独立的发布任务执行，本阶段不�
 | B | Q4 六项行动 | 6 个行动 ID、3 个分组、4 条依赖边；实际渲染 |
 | C | 非线性销售分析 | 既有分析库与 24 项 analytics 测试 |
 | D | 多源整合 | 9 列原生表、负责人/复核日、原生图表与截图证据 |
-| E | 八类深色原生图表 | 8 页原生图表诊断；最终全尺寸 VQA 待复核 |
+| E | 八类深色原生图表 | 8 页原生图表诊断；已纳入最终独立 58 页 VQA |
 | F | 长标题与动态副标题 | 8 页标题/分割线回归 |
 | G | 三套主题变体 | light / brand-blue / dark 各 7 页实际渲染 |
 | H | 原生来源 PPTX 检查 | 文件/页/形状定位、9 列、图表值与内嵌图片哈希 |
@@ -167,7 +167,7 @@ V1.2.0 的公开标签与 Release 由独立的发布任务执行，本阶段不�
 
 ## 展示、复核与商业边界
 
-八个案例的实际渲染、输入、哈希与前后对比见[展示说明](docs/SHOWCASE_V1_2.md)与 `docs/visual/v1.2/`。Codex 的独立引擎验收记录、部分全尺寸复核和来源 PPTX 验收保存在 [docs/evidence/v1.2/reviews/](docs/evidence/v1.2/reviews/)。这些是预最终复核，不是出版批准；最终实际 VQA 在写入停止后执行。
+八个案例的实际渲染、输入、哈希与前后对比见[展示说明](docs/SHOWCASE_V1_2.md)与 `docs/visual/v1.2/`。Codex 的 15/15 独立引擎验收、最终 8 案例/58 页实际视觉验收和来源字节等价证明保存在 [docs/evidence/v1.2/reviews/](docs/evidence/v1.2/reviews/)。最终验收仅覆盖 Linux LibreOffice 与合成素材，历史构建 `3f65ee6` 的 dirty 元数据保持不变；它不是出版批准，GitHub 公开发布尚未执行。
 
 Community 核心（含 doctor、QA 与缺陷修复）保持 Apache-2.0 免费。Supporter 与 Pro 是未来候选，不在本仓库开户、收款或上架，也不承诺发布日期；Pro 不引入第二套渲染引擎。Agensi 的 Agent 托管运行与本地 Node/Python 全运行时尚未实际验证，不能表述为已认证。详见[商业就绪说明](docs/COMMERCIAL_READINESS.md)。
 

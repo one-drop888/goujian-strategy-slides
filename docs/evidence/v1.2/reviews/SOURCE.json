@@ -1,10 +1,25 @@
 {
   "source": "Codex review artifacts from out/v12-control, copied read-only for public review evidence",
   "sanitization": "The checkout root prefix was replaced with repo-relative paths and the home prefix with ~; review verdicts and hashes were not altered.",
-  "status": "PRE_FINAL_REVIEWS_ONLY",
+  "status": "FINAL_ACCEPTANCE_RECORDED",
+  "final_acceptance": {
+    "record": "codex-final-visual-acceptance.json",
+    "status": "PASS_WITH_KNOWN_LIMITATIONS",
+    "source_commit": "020226c49d3ecdc3d66c0647ca1d20bc94192439",
+    "cases_reviewed": 8,
+    "pages_reviewed": 58,
+    "scope": "Actual Linux x86_64 LibreOffice renders of synthetic fixtures, bound to exact PPTX and page PNG hashes; not native PowerPoint, not the 15 legacy benchmark scenarios and not all 15 profiles.",
+    "publication_approval": false
+  },
+  "source_provenance": {
+    "record": "final-source-provenance.json",
+    "result": "91/91 engine-source files matched the committed final acceptance source; every page PNG and montage hash was reproduced by a dry rerender.",
+    "historical_build": "The generated showcase records source_head_at_build 3f65ee6 with source_dirty_at_build true; that historical metadata is preserved and is not relabeled clean."
+  },
   "notes": [
     "codex-final-acceptance.json records 15/15 independent engine acceptance at commit 2c622db; it is not publication approval.",
-    "codex-round2-preview-review.md and codex-fullsize-round2-reviewed.json are partial visual reviews; final VQA is pending after the writer stops.",
+    "codex-round2-preview-review.md and codex-fullsize-round2-reviewed.json are historical partial visual reviews; final acceptance is recorded separately and does not rewrite them.",
+    "codex-final-visual-acceptance.json and the eight case review records were supplied by Codex after the writer stopped; the final records bind the exact PPTX and page hashes.",
     "codex-source-pptx-acceptance.md records native source PPTX provenance requirements and accepted scope.",
     "No raw phase35 self-report is copied or presented as Codex approval."
   ]

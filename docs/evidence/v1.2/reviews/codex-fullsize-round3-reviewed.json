@@ -1,0 +1,103 @@
+{
+  "reviewer": "Codex actual full-size inspection",
+  "status": "NOT_RELEASE_APPROVAL",
+  "findings_file": "out/v12-control/codex-round2-preview-review.md",
+  "decks": {
+    "executive-incomplete-business": {
+      "pptx_sha256": "e2f12186f5770932249f3a31cfdf501083ec53a84cc5af281f81586c0eb3f1ac",
+      "fullsize_pages_seen": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "page_hashes": {
+        "1": "a2951391c9c6d447f453972268fe8e0e11cb612debca7524c753de42aee51d8c",
+        "2": "f6cd50db604e2a3b5d0518776abb43c63f7463dd0d67784c73016acc99212b79",
+        "3": "9db61f79ca5a19a2fdea7798c988e51ad671316f011ad5f59dd62fec54aeb3a4",
+        "4": "ed63310c576634cb4bf60fe09311d633a96eefc69dc30ce55647ea6eb204795b",
+        "5": "befab80f139d16de1c75e963e3702ce628ad346a44c6f0e4682c5e740e7f6aa0",
+        "6": "b1e274be2bd5a329ed407d042ec8cffa4a2a9534b06086b30cc6df692887a37d",
+        "7": "4cbc362b25bfa5d08c79dab2c4ff231cadb29d95e989dd3641931b7a4b48b903"
+      }
+    },
+    "q4-six-actions": {
+      "pptx_sha256": "bf3bbfa1b60e3c6831253c9672b5de3b2e762a8f75af5eb222b2b93e993d5a5c",
+      "fullsize_pages_seen": [
+        1,
+        4,
+        5,
+        6,
+        7
+      ],
+      "page_hashes": {
+        "1": "67ae20f2e30ddbafa962b13f54825ee7147147d4d629364d585c46229d6713d8",
+        "4": "0d97717354487787b187564a3668ee0fce3a54a742489e0de5d6bc27d23cf9d5",
+        "5": "9b33e2dd03b558a7b251f13de79d9f3e24172e7ef86daaab7fb045fd4431551b",
+        "6": "00781a925e45d9adb206d67623089ed54a4e6794b8e4308f175d615cd949a247",
+        "7": "14b0e3cfd94703d5108ab1025969177cb9e6867aed903fed4359270cbe5ed0fd"
+      }
+    },
+    "multimodal-consolidation": {
+      "pptx_sha256": "f3ed522da66a1f429ef76fa784ef98f5e36a441bd11378bbeb108818fed64dad",
+      "fullsize_pages_seen": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "page_hashes": {
+        "1": "8c984ab5dae44b2b6e12ed65755cae2c57517189db454089a253add4a970ab56",
+        "2": "7ec7c803749e7e16ec18fe355e2187b14829fe2273522309733c71907d25ed39",
+        "3": "85a3a687885b120b98d122a9e7d5a598fe96d61e72344e7a12fbf909b4bfc578",
+        "4": "d251b81de84f760c0a937e0e1ff0b55bea0f9bdfcc1069928328860718400f5a",
+        "5": "e83d2a49e3924c788207b7f8228718e9662c4dc43729e650ac26c2c077dba160",
+        "6": "a7366bcec644b5a4918828b77f9394bacff722cb06e2d99092ae3afdeb0c1b18",
+        "7": "c620056849bff0ae9e018f27c623621ea62b2df42f93ccb01794133dc4956247"
+      }
+    },
+    "dark-chart-types": {
+      "fullsize_pages_seen": [
+        1,
+        2,
+        3,
+        4,
+        8
+      ],
+      "previously_fullsize_viewed_pages": [
+        5,
+        6,
+        7
+      ],
+      "previous_view_png_identical_to_round3": {
+        "5": true,
+        "6": true,
+        "7": true
+      },
+      "page_hashes": {
+        "1": "4ef4379b4dff13aa28981f0ca51b36f8fd374e4976df25a35d3eceb14a26ac20",
+        "2": "2ba7ee97125198cf9a66b80e7d55cc844892f9082f50cba371bdc29442308ab6",
+        "3": "8d623c3a32cdd50ef2320f90d42d4feb15b87f5477161a51aee993a1ec24be75",
+        "4": "e53c6b38999df483ff4bbdb0d58b714de121e29d21ae57814a61a9da13042e57",
+        "5": "dd942c33e093fb41b536450af5a20335939155bcfa6dbc7a9d495ef1110c24c3",
+        "6": "4e48a250f87de847689cf599d6bb815ddc462c3edf42aaecfa61c2ae352d8fc9",
+        "7": "b8533c5a433d889562246edc179e34e1df2b9cdfbe7795c1073de01a28b83bbd",
+        "8": "3b465e0820051ed553d646584301b5e54ecd6b0e7dd2252a7a1ec3bc42627448"
+      },
+      "pptx_sha256": "6ba50cbb9a6a9f6ee5921fc9d91abddeaf9dce0994c2c1737833b1907a7962fb",
+      "findings": "All8charttypes visuallyreadable; botharea series, nativeaxes/legend/tablelabelscorrect; pie/doughnutchips remainminor knownstylinglimit, nothiddenseries."
+    }
+  },
+  "notes": "Q4page3 graph seen fullsize inround2, comparepixels onfinal; Q4summarypage2 pendingcopyrepair. Multimodalpage3 collision and unsupportedpractice recommendation requirecopyrepair; allactualpagesseen, no finalPASS until fixes.",
+  "phase4_preview_pages_actually_seen": {
+    "theme-variants/theme-dark/slide-2.png": "54899595e41d5356629e9d534d3debe8119248c898f34ff5b531541c4e10c39c",
+    "decks/multimodal-consolidation-render/slide-3.png": "a0c911dca95ce46db9ccfe8949a1ec16f4c390f7f2e6deb8937d2dd64f8040ad"
+  },
+  "phase4_preview_findings": "Q4darksummary loneword fixed; multimodalbriefsubtitle one line andclear ofdivider, detailedunknownboundaries remainbody. Further sourcecopyissues8/9/10/11 requirecheckingbeforefinalPASS."
+}

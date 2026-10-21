@@ -1,8 +1,8 @@
 # Goujian Strategy Slides v1.2.0 — Release Notes / 发布说明
 
-**Status: release candidate.** Public tag and GitHub Release are created only by the approved `workflow_dispatch` release task. This document does not claim that publication has occurred; final independent visual acceptance is a separate gate.
+**Status: READY WITH KNOWN LIMITATIONS for the documented Agent-assisted workflow.** Public tag and GitHub Release are created only by the approved `workflow_dispatch` release task. This document does not claim that publication has occurred; final independent visual acceptance has been completed within the stated scope, and publication remains a separate gate.
 
-**状态：发布候选。** 公开标签与 GitHub Release 只由获批的 `workflow_dispatch` 发布任务创建；本文不代表已经发布，最终独立视觉验收仍是独立门禁。
+**状态：文档化 Agent 辅助工作流的 READY WITH KNOWN LIMITATIONS。** 公开标签与 GitHub Release 只由获批的 `workflow_dispatch` 发布任务创建；本文不代表已经发布，最终独立视觉验收已在声明范围内完成，公开发布仍是独立门禁。
 
 ## English
 
@@ -20,7 +20,7 @@
 
 - `goujian-strategy-slides-v1.2.0.zip` — lightweight runtime, one root `SKILL.md`, no PPTX or build caches.
 - `SHA256SUMS.txt` — installer checksum.
-- Optional showcase: `goujian-strategy-slides-v1.2.0-showcase.zip` with its own checksum filename when uploaded after final review.
+- Optional showcase: `goujian-strategy-slides-v1.2.0-showcase.zip` with its own checksum filename, carrying the final reviewed hashes; upload belongs to the separate release task.
 
 ### Verification and limits
 
@@ -28,7 +28,8 @@
 - Actual Linux host: Ubuntu 26.04.1 LTS x86_64; Node 24.18.0; Python 3.14.4; LibreOfficeDev 26.8.0.0 alpha0; Poppler 26.05.0.
 - Native Microsoft PowerPoint on macOS/Windows/ARM64: `NOT_RUN`.
 - Agensi/company-hosted runtime: `NOT_VERIFIED`.
-- Final full-size visual VQA after the writer stops: `PENDING`.
+- Final independent actual VQA: `PASS_WITH_KNOWN_LIMITATIONS` for 8 cases / 58 pages, Linux LibreOffice with synthetic fixtures, bound to exact PPTX and page hashes. Not native PowerPoint, not all 15 profiles, not the 15 legacy benchmark scenarios.
+- Python test discovery: 34 passed plus 1 opt-in network skip; the separate real clean-install bootstrap integration passed 9/9.
 - No font is bundled or embedded. Font measurement is an estimate; recipient rendering may differ.
 - No HTML renderer, automatic OCR, arbitrary lossless PPTX editing, autonomous visual repair or second rendering engine.
 - No dependency version upgrades in this release.
@@ -53,7 +54,7 @@ Replace the installed folder with the new ZIP; do not merge over an old director
 
 - `goujian-strategy-slides-v1.2.0.zip` — 轻量运行时，一个根目录 `SKILL.md`，无 PPTX 或构建缓存。
 - `SHA256SUMS.txt` — 安装包校验和。
-- 可选展示包：最终复核后另行上传 `goujian-strategy-slides-v1.2.0-showcase.zip`，使用独立校验和文件名。
+- 可选展示包：`goujian-strategy-slides-v1.2.0-showcase.zip`，使用独立校验和文件名并携带最终复核哈希；上传属于独立发布任务。
 
 ### 验证与边界
 
@@ -61,7 +62,8 @@ Replace the installed folder with the new ZIP; do not merge over an old director
 - 实际 Linux 主机：Ubuntu 26.04.1 LTS x86_64；Node 24.18.0；Python 3.14.4；LibreOfficeDev 26.8.0.0 alpha0；Poppler 26.05.0。
 - macOS/Windows/ARM64 原生 Microsoft PowerPoint：`NOT_RUN`。
 - Agensi/公司平台托管运行：`NOT_VERIFIED`。
-- 写入停止后的最终全尺寸视觉 VQA：`PENDING`。
+- 最终独立实际 VQA：8 案例/58 页 `PASS_WITH_KNOWN_LIMITATIONS`，Linux LibreOffice 合成素材，绑定精确 PPTX 与页面哈希；不覆盖原生 PowerPoint、全部 15 个 Profile 或 15 个历史 Benchmark 场景。
+- Python 测试发现：34 通过 + 1 个需显式启用的网络跳过；独立的真实干净安装 bootstrap 集成测试 9/9 通过。
 - 字体不随包分发、不嵌入；字形测量为估算，接收端渲染可能不同。
 - 无 HTML Renderer、自动 OCR、任意 PPTX 无损编辑、自主视觉修复或第二套渲染引擎。
 - 本次不升级依赖版本。

@@ -45,7 +45,7 @@ Images, native charts, tables and interpretation share one pipeline with source,
 
 Eight showcase cases cover an executive review, Q4 actions, multisource consolidation, three theme variants, eight dark charts and a long-title regression. Each case preserves reference inputs, exported spec, PPTX, reasoning sidecar, QA, actual LibreOffice render, montage and hash manifest. The install ZIP is a separate lightweight runtime; the showcase ZIP is an optional review artifact.
 
-Final visual acceptance is performed by an independent reviewer after writing stops. Pre-final review records in this repository are not publication approval. Native PowerPoint on macOS/Windows/ARM64 was not executed; Agensi/company-hosted runtime is not verified.
+Independent final visual acceptance was completed after writing stopped: Codex reviewed all 58 pages across the 8 showcase cases on Linux LibreOffice with synthetic fixtures, with `PASS_WITH_KNOWN_LIMITATIONS` bound to exact PPTX and page hashes. This is not publication approval. The 15 legacy benchmark scenarios remain visual `NOT_RUN`, and all 15 profiles were not fully visually tested. Native PowerPoint on macOS/Windows/ARM64 was not executed; Agensi/company-hosted runtime is not verified.
 
 The Community core, including doctor, QA and defect fixes, remains free under Apache-2.0. Supporter and Pro are future candidates only: no account, payment or listing exists in this repository. Pro adds business workflow packs, not a second rendering engine. See [Commercial readiness](COMMERCIAL_READINESS.md).
 

@@ -1,0 +1,103 @@
+{
+  "schema_version": "1.0",
+  "reviewer": "Codex independent actual rendered-page and semantic review",
+  "reviewed_at": "2026-10-21T04:44:55.393066+00:00",
+  "status": "PASS",
+  "case_id": "long-title",
+  "pptx_sha256": "a09da2a51adb826cf7485aa95d6ef2f288f89f749e763da1e982285f0c25d612",
+  "source_commit_at_final_acceptance": "020226c49d3ecdc3d66c0647ca1d20bc94192439",
+  "engine_source_aggregate_sha256": "c2e3435ac01ea0a0e23d7ce21807cb553335c5637ee46fe6ad0bf3fa49212ac7",
+  "slides_reviewed": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+  ],
+  "page_evidence": [
+    {
+      "page": 1,
+      "path": "out/v1.2-showcase/long-title/render/slide-1.png",
+      "sha256": "be3278600437e4ea153db7c8a74517c41b30e146ff30c31f7235f404709d5701",
+      "actual_inspection_evidence": {
+        "record": "codex-additional-pages-reviewed.json",
+        "page": "out/v12-control/dogfood-round3/long-title/render/slide-1.png"
+      }
+    },
+    {
+      "page": 2,
+      "path": "out/v1.2-showcase/long-title/render/slide-2.png",
+      "sha256": "a23e27bbdb5fac2d0bbf47731fd1541680490d1f771d08217e10110832eaa600",
+      "actual_inspection_evidence": {
+        "record": "codex-additional-pages-reviewed.json",
+        "page": "out/v12-control/dogfood-round3/long-title/render/slide-2.png"
+      }
+    },
+    {
+      "page": 3,
+      "path": "out/v1.2-showcase/long-title/render/slide-3.png",
+      "sha256": "0c8ec6a00b4d20a577c65c38ee72fdc84384f47baed2976c492762c2df4f1580",
+      "actual_inspection_evidence": {
+        "record": "codex-additional-pages-reviewed.json",
+        "page": "out/v12-control/dogfood-round3/long-title/render/slide-3.png"
+      }
+    },
+    {
+      "page": 4,
+      "path": "out/v1.2-showcase/long-title/render/slide-4.png",
+      "sha256": "f0e6fac2d327edaa2cb6c0db7a97b5b09419ea689df0ae826df65c6cc79ccc82",
+      "actual_inspection_evidence": {
+        "record": "codex-additional-pages-reviewed.json",
+        "page": "out/v12-control/dogfood-round3/long-title/render/slide-4.png"
+      }
+    },
+    {
+      "page": 5,
+      "path": "out/v1.2-showcase/long-title/render/slide-5.png",
+      "sha256": "446fd7a8a4c36de1d2f3f7bbfd0b7e19363e8f486a1fd0587bebbc0c707bf2f9",
+      "actual_inspection_evidence": {
+        "record": "codex-additional-pages-reviewed.json",
+        "page": "out/v12-control/dogfood-round3/long-title/render/slide-5.png"
+      }
+    },
+    {
+      "page": 6,
+      "path": "out/v1.2-showcase/long-title/render/slide-6.png",
+      "sha256": "19e57396547e29a028705d510728e25df97a82ff467ac1ff1ba3d2e32551858b",
+      "actual_inspection_evidence": {
+        "record": "codex-additional-pages-reviewed.json",
+        "page": "out/v12-control/dogfood-round3/long-title/render/slide-6.png"
+      }
+    },
+    {
+      "page": 7,
+      "path": "out/v1.2-showcase/long-title/render/slide-7.png",
+      "sha256": "08d7c8d49e167ba3a8a8ccb047bf8e5b76d5948a4b1cc86469f6c1b791adee42",
+      "actual_inspection_evidence": {
+        "record": "codex-additional-pages-reviewed.json",
+        "page": "out/v12-control/dogfood-round3/long-title/render/slide-7.png"
+      }
+    },
+    {
+      "page": 8,
+      "path": "out/v1.2-showcase/long-title/render/slide-8.png",
+      "sha256": "5a72c7c05893e360d2a7540391a5b454ff30a3b886520cb1762159cc0cb60276",
+      "actual_inspection_evidence": {
+        "record": "codex-additional-pages-reviewed.json",
+        "page": "out/v12-control/dogfood-round3/long-title/render/slide-8.png"
+      }
+    }
+  ],
+  "method": "Actual full-size PNG inspection and deck montage review. Previously viewed pages are reused only after exact SHA256 equality; new or changed pages were viewed again. This is reviewer attestation, not automated visual judgment.",
+  "notes": "Accepted within this synthetic Linux LibreOffice case: readable titles/subtitles/dividers, data/units/labels, native tables and dependencies, screenshot evidence and source boundaries; proposed actions distinct from supplied facts. Six Q4 actions and four dependencies preserved. Multisource rates do not establish denominators or a successful playbook;24 convenience interviews support hypotheses only; pilot evaluation precedes trial. No blocking visible clipping or evidence occlusion observed.",
+  "limits": [
+    "Native PowerPoint, macOS, Windows and ARM64 NOT_RUN; fonts not embedded.",
+    "Native doughnut labels have restrained but dense boxed LibreOffice styling; no hidden values.",
+    "Diagnostic decks are regression fixtures, not page-variety design examples.",
+    "Screenshot pixels remain noneditable; source extraction requires reviewer confirmation.",
+    "This attestation applies to the exact PPTX/render hashes only; newly regenerated output requires review."
+  ]
+}

@@ -3,11 +3,11 @@
   "status": "PASS",
   "executed_at": "2026-10-21",
   "scope": {
-    "repository": "All git-tracked files plus non-ignored new files for the v1.2.0 release candidate; out/ and dist/ scratch artifacts are excluded from the source scan.",
-    "repository_files": 279,
-    "text_files_scanned": 243,
+    "repository": "All git-tracked files plus non-ignored new files for the v1.2.0 release-ready source tree; out/ and dist/ scratch artifacts are excluded from the source scan.",
+    "repository_files": 292,
+    "text_files_scanned": 256,
     "binary_files_skipped": 36,
-    "installer": "dist/goujian-strategy-slides-v1.2.0.zip, rebuilt deterministically after this record was added; final SHA256 and entry count are recorded in SHA256SUMS.txt and out/v12-control/phase4-evidence.json.",
+    "installer": "dist/goujian-strategy-slides-v1.2.0.zip, rebuilt deterministically from the final phase-5 source commit; final SHA256 and entry count are recorded in SHA256SUMS.txt and out/v12-control/phase5-evidence.json. Codex performs the independent final ZIP install check.",
     "not_scanned": "The optional showcase ZIP and generated PPTX/PDF artifacts are not part of the installer; their manifests and review records are covered separately."
   },
   "method": [
@@ -31,7 +31,7 @@
     "installer_node_modules_or_venv_or_out": 0,
     "installer_root_skill_entries": 1
   },
-  "privacy_note": "Fifteen historical v1.1-release QA JSON files had absolute home prefixes replaced with ~ in recorder tool paths only; verdicts, counts, hashes and timestamps were not changed. No other historical release document was rewritten.",
+  "privacy_note": "Fifteen historical v1.1-release QA JSON files had absolute home prefixes replaced with ~ in recorder tool paths only; verdicts, counts, hashes and timestamps were not changed. The final Codex review copies were rebased to repository-relative paths and their home prefixes replaced with ~ without changing verdicts or hashes. No historical release document was rewritten.",
   "licenses": {
     "pptxgenjs": {"version": "4.0.0", "license": "MIT"},
     "ajv": {"version": "8.20.0", "license": "MIT"},

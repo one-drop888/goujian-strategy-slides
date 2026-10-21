@@ -52,8 +52,8 @@ The `before/` folder in the showcase keeps the pre-fix round-3 renders separate 
 
 - Independent engine acceptance: 15/15 checks at `2c622db`, recorded in [docs/evidence/v1.2/reviews/](evidence/v1.2/reviews/). This is engine acceptance, not publication approval.
 - Partial full-size visual review from an earlier render round: pages 4–7 of the Q4 deck, pages 5–7 of the dark chart diagnostic and the round-2 montages. Those findings drove fixes but do not approve the current rebuild.
-- Final actual VQA of the current build: **PENDING**. It occurs after the writer stops; this repository does not report it as passed.
-- Native PowerPoint macOS/Windows/ARM64: `NOT_RUN`. Agensi hosted runtime: `NOT_VERIFIED`.
+- Final independent actual VQA of the current build: **PASS_WITH_KNOWN_LIMITATIONS**. Codex reviewed all 58 pages across the 8 cases from actual Linux LibreOffice renders with synthetic fixtures, bound to exact PPTX and page hashes; the source-byte equivalence attestation is recorded separately. This is not publication approval.
+- The 15 legacy benchmark scenarios remain visual `NOT_RUN`; all 15 profiles were not fully visually tested. Native PowerPoint macOS/Windows/ARM64: `NOT_RUN`. Agensi hosted runtime: `NOT_VERIFIED`.
 
 The showcase `review/review-status.json`, `showcase.manifest.json`, `before/README.json` and `engine-source-fingerprint.json` state this scope explicitly. The manifest binds exact artifact hashes and the accepted engine/source fingerprint; it does not make PPTX bytes reproducible across PptxGenJS/Office versions.
 
@@ -82,4 +82,4 @@ All fixtures, screenshots, charts and illustrations are synthetic or project-aut
 
 ## Release use
 
-The showcase may be attached to the v1.2.0 Release as an optional asset after final review, with a separate checksum filename so it cannot overwrite the installer's `SHA256SUMS.txt`. Do not upload a freshly regenerated showcase with an old visual PASS; bind the exact reviewed hashes. Publication is a separate task and is not performed by this phase.
+The showcase may be attached to the v1.2.0 Release as an optional asset carrying the final reviewed hashes, with a separate checksum filename so it cannot overwrite the installer's `SHA256SUMS.txt`. Do not upload a freshly regenerated showcase with an old visual PASS; bind the exact reviewed hashes. Publication is a separate task and is not performed by this phase; no GitHub Release exists yet.

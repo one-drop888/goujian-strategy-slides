@@ -5,7 +5,7 @@
   "executed_at": "2026-10-21",
   "artifact": {
     "name": "goujian-strategy-slides-v1.2.0.zip",
-    "sha256": "Recorded in the release SHA256SUMS.txt and out/v12-control/phase4-evidence.json after the final deterministic rebuild. The archive embeds this evidence file, so its own hash is intentionally not self-referenced here."
+    "sha256": "Recorded in the release SHA256SUMS.txt and out/v12-control/phase5-evidence.json after the final deterministic rebuild. The archive embeds this evidence file, so its own hash is intentionally not self-referenced here. This record documents the clean install of the pre-final deterministic build; the final rebuilt installer requires Codex's independent install check."
   },
   "host": {
     "os": "Ubuntu 26.04.1 LTS",
@@ -49,7 +49,7 @@
     {"command": "npm run bootstrap -- --dry-run --json", "exit": 0, "result": "DRY_RUN; planned npm ci, isolated venv and pip install without creating files"},
     {"command": "npm run bootstrap", "exit": 0, "result": "READY; npm ci OK, venv OK, pip install OK, Pillow 12.1.1, state written"},
     {"command": "npm run doctor -- --json", "exit": 0, "result": "READY; required checks 7/7, optional gaps 0, VISUAL_QA NOT_RUN"},
-    {"command": "npm test", "exit": 0, "result": "PASS; all named suites passed, 24/24 analytics tests passed, one opt-in network bootstrap test skipped by default"},
+    {"command": "npm test", "exit": 0, "result": "PASS; all named suites passed, 24/24 analytics tests passed; Python discovery reports 34 passed plus 1 opt-in network skip (not 35 passed)"},
     {"command": "npm run validate:example", "exit": 0, "result": "PASS; 8 slides, 0 issues"},
     {"command": "npm run build:example", "exit": 0, "result": "PASS; out/executive-review.pptx, profile executive-dense, 8 slides, VISUAL_QA NOT_RUN"},
     {"command": "npm run qa:example", "exit": 0, "result": "PASS process; visual_review NOT_RUN because no hash-bound reviewer record exists"},
@@ -69,14 +69,15 @@
     "status": "PASS",
     "tests_passed": 9,
     "tests_total": 9,
-    "scope": "Real npm ci and pip install in a temporary path containing spaces; second bootstrap skipped completed npm/venv/pip steps; deleting the venv interpreter triggered a repair and the third bootstrap reported READY.",
+    "scope": "Real npm ci and pip install in a temporary path containing spaces; second bootstrap skipped completed npm/venv/pip steps; deleting the venv interpreter triggered a repair and the third bootstrap reported READY. This separate integration passed 9/9.",
     "local_evidence": "out/v12-control/qoder-scratch/opt-in-clean-install.json"
   },
   "limitations": [
     "Only Linux x86_64 was executed.",
     "No native Microsoft PowerPoint, macOS, Windows, ARM64 or company-platform import was run.",
-    "Doctor presence checks and a successful render process are not visual approval.",
+    "Doctor presence checks and a successful render process are not visual approval. The separate 8-case/58-page final VQA is visual acceptance within its Linux LibreOffice scope, not native PowerPoint approval.",
     "The clean-install run used an isolated empty npm user config because of the host's global npmrc; the lockfile itself resolves 23/23 tarballs from registry.npmjs.org.",
-    "The installer cannot be installed over an existing directory without stale-file risk; the migration guide requires a fresh folder."
+    "The installer cannot be installed over an existing directory without stale-file risk; the migration guide requires a fresh folder.",
+    "The final rebuilt installer has not been clean-installed in this docs/package phase; Codex performs the independent final ZIP install check."
   ]
 }

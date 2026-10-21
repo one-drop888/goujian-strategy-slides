@@ -120,7 +120,7 @@ async function main() {
     decks:built};
   fs.writeFileSync(path.join(out,'dogfood.json'),JSON.stringify(summary,null,2)+'\n');
   fs.writeFileSync(path.join(out,'dogfood.sha256'),[...built.map(item=>`${item.hashes.pptx.sha256}  ${item.pptx}`),
-    ...inspections.map(item=>`${item.sha256}  sources/${item.source}`)].join('\n')+'\n');
+    ...inspections.map(item=>`${item.sha256}  ${rel(path.join(sources,item.source))}`)].join('\n')+'\n');
   console.log(`PASS: ${built.length} decks built, rendered and QA-checked; visual review NOT_RUN`);
   for(const item of built)console.log(`- ${item.kind} ${item.name}: ${item.qa.status} / ${item.qa.visual} / ${item.render.montage}`);
 }

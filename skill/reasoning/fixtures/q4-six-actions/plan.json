@@ -101,7 +101,7 @@
       "spec": {
         "type": "key-message",
         "title": "先批准顺序与责任人，预算另行审议",
-        "statement": "六项行动全部保留；以A1、A2、A4为经营基础，A3、A5做转化测试，A6作为上市闸门。",
+        "statement": "六项行动全部保留：A1、A2、A4经营基础；A3、A5转化测试；A6上市闸门。",
         "decision_points": [
           { "title": "批准顺序", "note": "按A1→A2→A3与A1→A6、A4→A5的依赖推进。" },
           { "title": "批准责任人", "note": "区域运营、CRM、门店、财务、供应链与产品各自负责。" },

@@ -1,33 +1,54 @@
-# 构见·战略演示 V1.1 可行性复核
+# 构见·战略演示 V1.2 可行性复核
 
-2026-10-16 · Multimodal Composition & Visual Intelligence.
+2026-10-21 · 战略推理、确定性校验与发布打包。
 
-| Dimension / 维度 | Status | Evidence / 边界 |
+[English](FEASIBILITY_REVIEW.md) · [产品介绍](PRODUCT_OVERVIEW.zh-CN.md) · [Benchmark A–J](BENCHMARKS_V1_2.md) · [质量与验证](QUALITY_AND_VALIDATION.md)
+
+状态词：**PROVEN** 表示在声明的证据与范围内已执行；**PARTIAL** 表示覆盖有限或不完整；**DESIGNED** 表示契约存在但无忠实实现；**BLOCKED** 表示必需能力无法运行；**NOT_VERIFIED** 表示未实际执行。状态由证据范围限定，不是产品级保证。
+
+| 维度 | 状态 | 证据与边界 |
 |---|---|---|
-| Architecture / 架构 | PROVEN | 沿用共享 V1 引擎，资产/Spec、组合、原生 PPTX、场景与 QA 连通。 |
-| Native images / 原生图片 | PROVEN | 原生图片、裁剪/焦点/透明度/遮罩、证据保护与图注；不二次打开 PPTX 插图。 |
-| Multimodal / 多模态 | PROVEN | 九种入口复用四种组合，覆盖原生证据与截图、图文解释和关联标注。 |
-| Asset reasoning / 资产理解 | PARTIAL | Agent 提供分类与来源，代码执行策略；无内置分类器或 OCR。 |
-| Title/layout / 标题布局 | PROVEN within contract | 字形测量/披露估算、短标题/副标题、安全字号、动态分割线/正文流及明确容量错误。 |
-| Provenance/scene / 来源场景 | PROVEN | 区分原生/像素/OCR/标注/数据/判断，保存来源区域、置信度、模式与原生关系。 |
-| Spatial QA / 空间检查 | PROVEN within explicit scenes | 读回原生坐标/顺序，检查遮挡、安全区、字形/横线间距、密度与文字容量风险。 |
-| Visual quality / 视觉质量 | PROVEN for 6 decks | 六套实际构建/渲染/检查，代表性版式完成修复与重渲染，绑定当前哈希；十五套渲染不等于十五套视觉通过。 |
-| Installation / 安装 | PROVEN | 新虚拟环境安装 Pillow 与 npm 依赖，完整测试、示例及多模态构建/渲染通过。 |
-| Maintainability / 可维护性 | PROVEN structurally | 小型共享资产/标题/场景模块；未整体重写引擎或增加大型依赖。 |
-| Profiles/fonts / 风格字体 | PARTIAL | 十五个真实 token 变体，Linux 字体解析已验证；未嵌入字体，不能证明全部字形/接收环境。 |
-| PPT ingestion/fidelity / PPT 接入保真 | PARTIAL | 文字/图片/图表/表格/组/母版候选可映射；复杂恢复与歧义语义仍不完整。 |
-| Extensibility / 可扩展性 | PROVEN at boundary | 资产/来源/关系为无 PptxGenJS 类型的 JSON；原生适配位于渲染边界。 |
-| Multi-renderer / 多输出 | DESIGNED | HTML/Web Renderer 未实现。 |
-| Open source / 开源就绪 | PARTIAL | 单一 Skill 入口、合成资产声明与本地证据齐备；GitHub 发布与远端验证状态以正式 Release 和交付报告为准。 |
-| Documentation / 文档准确性 | PROVEN for audited claims | Create/image-insight 实际可执行；Edit/Rebuild/Reference/Vision/Repair 明确边界。 |
-| QA reliability / QA 可靠性 | PARTIAL | 负向回归与真实复核均执行；不能精确证明 PowerPoint 排字、通用美学或自主修复。 |
+| 架构 | PROVEN | 共享 Schema → Composition → 原生 PPTX → 哈希绑定 Scene → QA；推理层为增量，Renderer 核心保留。 |
+| Reasoning Plan 契约 | PROVEN，契约内 | Agent 编写来源、主张、取舍、计算、绑定与主题，编译前校验。Codex 在 `2c622db` 独立重跑 15/15 引擎检查。未宣称独立推理模型。 |
+| 确定性算术 | PROVEN，四种算子 | `sum`、`difference`、`ratio`、`percent_change`，检查单位/指标/窗口/分母/零值并给出容差。无任意公式、统计显著性检验或因果推断。 |
+| 来源核对 | PARTIAL | 结构化 JSON 可用 JSON Pointer 对照源字节并校验 SHA256。PDF/图片/文本/原生 PPTX 台账为 `REVIEWER_REQUIRED`；定位或引用不等于来源为真。 |
+| 最终产物校验 | PROVEN，信任范围受限 | 给定可信期望哈希后，读取精确 PPTX 字节，检查图表缓存、表格、KPI 文本、备注、内嵌报告及计划/Spec 哈希。不证明来源真实性或视觉质量。 |
+| 主题决策 | PROVEN，选择层面 | reference > brand > 显式用户 > automatic > default；显式 dark 与 printable 冲突会记录。light/brand-blue/dark 三变体已构建渲染。配置差异不等于 15 套视觉批准设计。 |
+| 多模态/原生图片 | PROVEN，契约内 | 原生 PNG/JPEG/WEBP、保护性裁剪/焦点/透明度/遮罩、图注与像素文字来源。无 PPTX 图像后处理。 |
+| 资产理解 | PARTIAL | 分类与来源由 Agent 提供，代码执行策略。无分类器、OCR 或通用视觉理解。 |
+| 原生来源检查 | PROVEN，限定样例 | 两份合成原生来源 PPTX 保留 9 列表格（含负责人/复核日）、4 个图表值及内嵌图片，并给出文件/页/形状定位。任意复杂来源重建仍为 Partial。 |
+| 标题/布局 | PROVEN，契约内 | 字形测量/等价估算、短标题/副标题、动态分割线与正文流、显式标题容量错误。长标题回归已渲染；估算不等于 PowerPoint 精确排字。 |
+| 来源与场景 | PROVEN | 原生、像素、标注、数据与判断来源类型，以及实际原生对象关系。 |
+| 空间 QA | PROVEN，显式场景内 | 原生坐标/顺序读回、遮挡、安全区、文字/横线间距、密度与保守文字容量警告。不推断任意导入稿意图。 |
+| 视觉质量 | PARTIAL | 当前有八个展示案例与实际 LibreOffice 渲染。Codex 已检查代表性页面并记录预最终问题；写入停止后仍需最终全尺寸 VQA。八个渲染不等于八个视觉批准。 |
+| 打包 | PROVEN（本地） | 确定性安装包测试可生成相同字节，检查单一根 SKILL、固定时间戳/权限、必需资产、无 PPTX/PDF/缓存。最终干净解压安装证据单独记录。 |
+| 安装 | PROVEN，Linux x86_64 | 从安装 ZIP 在 Unicode/空格、无符号链接路径执行隔离 `.venv`、`npm ci`/bootstrap、doctor、测试、示例构建与渲染。macOS/Windows/ARM64 未验证。 |
+| 可维护性 | PROVEN，结构层面 | 推理、资产、标题、场景由小型共享模块实现；未整体重写引擎或增加重量级运行时依赖。 |
+| Profile/字体 | PARTIAL | 15 个真实 token 配置（不止配色）；Linux 字体解析已验证。未嵌入字体，不证明完整字形覆盖与接收端效果。 |
+| PPT 接入/保真 | PARTIAL | 文字、图片、图表、表格、组、母版/布局候选可映射；复杂重建与歧义语义仍不完整。 |
+| 可扩展性 | PROVEN，边界层面 | 资产、来源、关系与推理 JSON 不导入 PptxGenJS；原生适配位于渲染边界。 |
+| 多输出 | DESIGNED | HTML/Web Renderer 未实现。 |
+| QA 可靠性 | PARTIAL | 有负向回归、哈希绑定与实际复核；无精确 PowerPoint 排字、通用美学标准或自主修复。 |
+| 发布流程 | NOT_VERIFIED | 手动 `workflow_dispatch` 流程已更新并静态检查，但本阶段未派发，未创建标签或公开 Release。 |
+| 开源就绪 | PARTIAL | 单一 Skill 入口、合成声明、安装包与展示包已本地构建检查；GitHub 发布设置与匿名资产下载仍是待执行手工步骤。 |
+| 商业就绪 | PARTIAL | 仅文档。Community 保持 Apache-2.0；Supporter/Pro 为未来候选，无收款、账户或上架。Agensi 托管运行未验证。 |
+| 文档准确性 | PROVEN，审计声明内 | Create、推理、原生图片与有限 QA 路径可执行；Edit/Rebuild/Reference/Vision/Repair 边界已声明。历史发布文档不改写。 |
 
-28 Storylines · 86 semantic entries (74 IMPLEMENTED / 6 PARTIAL / 6 DESIGNED) · 27 Compositions · 15 Profiles · 15 Template Recipes · 15 Benchmarks.
+28 Storylines · 86 semantic entries（74 IMPLEMENTED / 6 PARTIAL / 6 DESIGNED）· 27 Compositions · 15 Profiles · 15 Template Recipes · 15 Benchmark scenarios。
 
-[Validation / 本轮验证](V1_1_RELEASE_VALIDATION.md). [V1.0 history / 历史](V1_0_FEASIBILITY_REVIEW.zh-CN.md).
+## 证据锚点
 
-分类、结论改写、语义理解和修复仍由 Agent 参与；本轮使用授权的合成等价企业任务。未验证非 Linux 环境与公司平台；GitHub 发布结果单独记录。
+- 引擎验收：[Codex final acceptance](evidence/v1.2/reviews/codex-final-acceptance.json) — `2c622db` 处 15/15，仅代表引擎验收。
+- 部分全尺寸复核与剩余文案问题：[round-2 preview review](evidence/v1.2/reviews/codex-round2-preview-review.md)；修复后文案已进入展示构建。
+- 来源 PPTX 范围：[source acceptance](evidence/v1.2/reviews/codex-source-pptx-acceptance.md)；实际检查记录在可选展示包的 `source-inspection.json`。
+- 依赖审计：[official npm audit record](evidence/v1.2/reviews/codex-dependency-audit-official.json) — 官方 registry 下 0 已知漏洞。
+- 展示与预览：[展示说明](SHOWCASE_V1_2.md)、`docs/visual/v1.2/`。
+- A–J 证据矩阵：[Benchmark A–J](BENCHMARKS_V1_2.md)。
 
-**结论：V1.1 READY（已文档化的 Agent 辅助工作流；公开发布状态另行记录）。**
+## 结论
 
-三类可运行分析在声明的 Schema 范围内为 PROVEN：完整月份经营数据、成熟销售队列及 CNY 项目累计快照。来源真实性与因果推断不在代码认证范围内。参阅[分析边界](ANALYTICAL_LIBRARY.md)。
+**V1.2 为文档化 Agent 辅助工作流的 RELEASE CANDIDATE。**
+
+推理契约、有限算术、原生构建、主题选择、来源检查与打包在各自声明范围内已证明。语义忠实度、来源真实性、因果结论、视觉质量与跨平台渲染不由代码认证；最终独立视觉验收与公开发布仍是两个独立门禁。
+
+三类可运行分析在声明 Schema 内仍为 PROVEN：完整月份经营数据、成熟非线性销售队列及 CNY 项目累计快照。来源真实性与因果推断不在代码认证范围内。参阅[分析边界](ANALYTICAL_LIBRARY.md)。

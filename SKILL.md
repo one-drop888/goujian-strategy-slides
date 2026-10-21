@@ -1,7 +1,7 @@
 ---
 name: goujian-strategy-slides
 metadata:
-  version: "1.1.1"
+  version: "1.2.0"
 description: "专业AI PPT制作技能，适用于经营分析、战略规划、销售汇报、市场研究、项目复盘及技术方案等场景。结合结构化思考、证据分析、汇报叙事与可视化设计，辅助生成原生可编辑PPTX，并提供质量检查与视觉复核流程。"
 license: Apache-2.0
 ---
@@ -17,9 +17,9 @@ High information density ≠ high text density. Preserve the user's decision, ev
 
 ## Runtime and paths
 
-Install the **entire repository**, including `core/`, `skill/`, `package.json` and the lockfile. Run commands from the repository root. Run `npm install` once. Core QA also requires Python 3.9+. Image preparation and the full test suite require Pillow. Optional rendering additionally needs LibreOffice and Poppler; use [installation instructions](README.en.md#installation).
+Install the **entire repository**, including `core/`, `skill/`, `package.json` and the lockfile. Run commands from the repository root. Prefer `npm ci` for the committed lockfile, or run `npm run bootstrap` to create an isolated `.venv` and install from the lockfile; `npm run bootstrap -- --dry-run --json` previews the actions. Run `npm run doctor -- --json` to report tool presence and recovery without claiming execution. Core QA also requires Python 3.9+. Image preparation and the full test suite require Pillow. Optional rendering additionally needs LibreOffice, Poppler and Noto fonts; use [installation instructions](README.en.md#installation).
 
-The repository root contains the only `SKILL.md`. Resolve relative links against that root.
+The repository root contains the only `SKILL.md`. Resolve relative links against that root. The install ZIP is a complete lightweight runtime; the optional showcase ZIP is a separate review artifact and is not required for normal use.
 
 ## Route and plan
 
@@ -34,7 +34,9 @@ For research, consider Question → Method / sample → Quantitative evidence �
 
 ## Compose the argument
 
-Read [content planning](skill/references/content-planning.md), [visualization rules](skill/references/visualization-rules.md) and [anti-AI-PPT guidance](skill/references/anti-ai-ppt.md) as needed. For auditable sourcing, calculations, coverage and theme decisions, use the optional [reasoning plan](skill/references/reasoning-plan.md); legacy deck JSON remains supported.
+Read [content planning](skill/references/content-planning.md), [visualization rules](skill/references/visualization-rules.md) and [anti-AI-PPT guidance](skill/references/anti-ai-ppt.md) as needed. For auditable sourcing, calculations, coverage and theme decisions, use the optional [reasoning plan](skill/references/reasoning-plan.md); legacy deck JSON remains supported. The plan is **Agent-authored**: there is no independent generic reasoning model. Deterministic code validates the plan, arithmetic, references, coverage, bindings and theme selection before compiling a native PPTX.
+
+Use `node skill/scripts/validate_plan.js plan.json` for schema/semantic validation (add `--json` for machine output). Compile with `node skill/scripts/compile_plan.js plan.json --out out/deck.pptx --spec-out out/deck.spec.json [--profile id-or-path] [--force]`. Outputs include the PPTX, exported spec, hash-bound scene, reasoning sidecar and an embedded report. Never overwrite the plan, a source file, an asset or another declared output; write a separate file and use `--force` only to replace an intended existing output. Recovery: rerun validation, read the first error, correct the plan or source, then recompile. A semantic or visual reviewer is still required; validation does not prove source truth or aesthetics.
 
 Use conclusion-bearing action titles when evidence supports them. Cover, methodology and exploratory pages may use descriptive titles. Distinguish observation, interpretation and hypothesis. Do not invent evidence or infer causality from frequency alone.
 
@@ -56,7 +58,7 @@ Document, UI, chart and table screenshots default to contain. Cropping requires 
 
 Keep the main title on one line when possible. Rewrite while preserving the conclusion, remove redundant context, or use `title_short` and `subtitle`. The original title remains in the scene record. The limited deterministic resolver cannot invent a faithful semantic rewrite for every sentence. Balanced two-line titles are allowed after measurement; excessive headers must be rewritten or split, never reduced to tiny type. Subtitle, divider and body follow the measured header height.
 
-Build writes a hash-bound `.pptx.scene.json` with actual native objects and relationships. Keep it with the PPTX for spatial QA. Six KPIs use 3 × 2, nine-column tables preserve all columns; over-capacity content fails explicitly. Repeated regional pages can share `analytical_series` id, metrics and task to preserve a consistent comparison layout.
+Build writes a hash-bound `.pptx.scene.json` with actual native objects and relationships. Keep it with the PPTX for spatial QA. Six KPIs use 3 × 2, nine-column tables preserve all columns; over-capacity content fails explicitly. Repeated regional pages can share `analytical_series` id, metrics and task to preserve a consistent comparison layout. Keep slide-visible subtitle copy in plain business Chinese; put backend status tokens such as `NOT_PROVIDED`, extraction limits and method caveats in the report, notes or appendix instead of the business subtitle.
 
 See [spec contract](docs/SPEC_CONTRACT.md) for fields, capacity limits and a minimal example. Keep chart series in the same unit or normalize with a disclosed calculation. Matrix coordinates must come from the author, not arbitrary placement. Funnel values must share a denominator. Split over-capacity pages; the builder will not silently discard content.
 
@@ -74,7 +76,7 @@ python3 skill/scripts/quality_gate.py out/deck.pptx --spec deck.json --out out/q
 
 The builder validates schema and composition payloads before writing. Output uses native editable shapes, text, tables and supported charts; the renderer supports a 16:9 wide canvas only.
 
-Inspect **both** the montage for page rhythm and individual pages for titles, small labels, evidence, text fit, Chinese glyphs and relationships. Fix the source spec or shared renderer and rebuild. Render success is not visual approval. Geometry checks do not measure text overflow or understand intended overlaps.
+Inspect **both** the montage for page rhythm and individual pages for titles, small labels, evidence, text fit, Chinese glyphs and relationships. Fix the source spec or shared renderer and rebuild. Render success is not visual approval. Geometry checks do not measure text overflow or understand intended overlaps. Font measurement is an estimate: structural QA cannot prove the absence of rendered text collisions, so inspect the actual LibreOffice/PowerPoint render at full size.
 
 After actual inspection, record the current PPTX SHA256, reviewer, reviewed slide numbers and concrete findings as described in [QA documentation](docs/QUALITY_AND_VALIDATION.md). Use `--visual-review review.json` to attach that review. A prior review cannot approve a rebuilt file with a different hash.
 

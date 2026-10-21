@@ -1,0 +1,119 @@
+{
+  "status": "PASS",
+  "checks_passed": 15,
+  "checks_total": 15,
+  "checks": [
+    {
+      "name": "valid unchanged executive",
+      "status": "PASS",
+      "details": true
+    },
+    {
+      "name": "incompatible unit ratio rejected",
+      "status": "PASS",
+      "details": [
+        "source revenue value rev-target: declared unit 元 does not match source bytes unit 万元",
+        "c-rev-gap: difference inputs must share one compatible unit, received 万元 / 元",
+        "c-rev-attain: ratio inputs must share one compatible unit, received 万元 / 元",
+        "slides[s-table].bindings[2]: unknown calculation c-rev-gap (or claim failed validation)",
+        "slides[s-table].bindings[3]: unknown calculation c-rev-attain (or claim failed validation)",
+        "slides[s-appendix].bindings[3]: format suffix 万元 does not match source unit 元"
+      ]
+    },
+    {
+      "name": "arithmetic engine independently rejects incompatible units",
+      "status": "PASS",
+      "details": "c-rev-attain: ratio inputs must share one compatible unit, received 万元 / 元"
+    },
+    {
+      "name": "false slide source closure rejected",
+      "status": "PASS",
+      "details": [
+        "slide s-kpi: source closure missing margin required by its claims or bindings",
+        "slide s-kpi: source closure missing orders required by its claims or bindings",
+        "slide s-kpi: source closure missing revenue required by its claims or bindings",
+        "slide s-kpi: source gap-note is not referenced by its claim or binding closure"
+      ]
+    },
+    {
+      "name": "critical numeric evidence not covered by ID alone",
+      "status": "PASS",
+      "details": [
+        "slide s-appendix: source unreferenced-critical is not referenced by its claim or binding closure",
+        "critical numeric value unreferenced-critical.unseen (新增指标): not bound, used by a visible validated calculation, or explicitly classified noncritical/background/appendix"
+      ]
+    },
+    {
+      "name": "novel numeric evidence cannot be deduplicated",
+      "status": "PASS",
+      "details": [
+        "source unreferenced-critical value unseen: novel numeric evidence (label/metric/unit/time_window/value) is not preserved by dedup_target revenue; add a matching value_map entry or retain this source",
+        "critical numeric value unreferenced-critical.unseen (新增指标): not bound, used by a visible validated calculation, or explicitly classified noncritical/background/appendix"
+      ]
+    },
+    {
+      "name": "reasoning sidecar cannot overwrite plan under force",
+      "status": "PASS",
+      "details": "Reasoning sidecar must not overwrite input out/v12-control/codex-final-ZB3pak/guard/candidate.pptx.reasoning.json"
+    },
+    {
+      "name": "guard preserves original bytes",
+      "status": "PASS",
+      "details": {
+        "before": "1d336c837453a951674f7f9238c7291c46d3dbbc1f4bd21a5ee7918725624904",
+        "after": "1d336c837453a951674f7f9238c7291c46d3dbbc1f4bd21a5ee7918725624904"
+      }
+    },
+    {
+      "name": "valid compile/native verification",
+      "status": "PASS",
+      "details": {
+        "status": "PASS",
+        "pptx_sha256": "f8ed2482a3fbcfe65d076a0459eb81907cde52188a64e2f3b97192aa4a7bbba1",
+        "charts": 1,
+        "chart_series": 1,
+        "chart_labels": 6,
+        "tables": 2,
+        "table_cells": 44,
+        "kpis": 3,
+        "notes": 7,
+        "embedded_report": "docProps/goujian-reasoning.json"
+      }
+    },
+    {
+      "name": "trusted final hash rejects native edit",
+      "status": "PASS",
+      "details": "final PPTX sha256 f63de3d93f46912cd863d0f2dde24da20b01eda4575b7d9aa47a93b8bdd2a8be does not match expected f8ed2482a3fbcfe65d076a0459eb81907cde52188a64e2f3b97192aa4a7bbba1"
+    },
+    {
+      "name": "native table compared even with updated expected hash",
+      "status": "PASS",
+      "details": "slide 5 table 1 row 1 cells do not match spec (收入（万元） | 969 | 1,000 | -40 | 96% != 收入（万元） | 960 | 1,000 | -40 | 96%)"
+    },
+    {
+      "name": "validated boolean alone rejected",
+      "status": "PASS",
+      "details": "Reasoning metadata must include the source plan and planDir for independent validation; a validated flag alone is not accepted"
+    },
+    {
+      "name": "export persists selected profile",
+      "status": "PASS",
+      "details": "../../../../skill/reasoning/fixtures/themes/brand-blue.profile.json"
+    },
+    {
+      "name": "all exported assets resolve",
+      "status": "PASS",
+      "details": []
+    },
+    {
+      "name": "exported spec builds from unrelated cwd and Unicode path",
+      "status": "PASS",
+      "details": {
+        "profile": "brand-blue",
+        "selected": "brand-blue"
+      }
+    }
+  ],
+  "artifacts": "out/v12-control/codex-final-ZB3pak",
+  "source_head": "2c622db52ff53d2f3f90a6581550f69a978022ef"
+}

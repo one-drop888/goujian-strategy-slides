@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.2.0 — 2026-10-21
+
+- Add the optional Agent-authored Reasoning Plan: sources, claims, content dispositions, deterministic calculations, JSON-Pointer numeric bindings, coverage/dependency validation and theme decisions. Compile to native PPTX, exported spec, hash-bound scene, reasoning sidecar, embedded report and claim-linked notes.
+- Support `sum`, `difference`, `ratio` and `percent_change` with explicit unit/metric/time-window/denominator checks. JSON source values can be verified against source bytes; unstructured and native-PPTX ledgers remain reviewer-required. No causal, significance, OCR or autonomous reasoning claims.
+- Add theme precedence and conflict records, including explicit dark selection; build light/brand-blue/dark variants and an eight-type dark native-chart diagnostic.
+- Add final exact-byte verification against a trusted expected PPTX hash, plus native chart/table/KPI/notes and embedded-report checks.
+- Correct the Q4 summary orphan-word wrap and the overlong multimodal business subtitle in synthetic fixtures; preserve all six action IDs/groups and move detailed backend limits to claims, notes and appendix.
+- Add the eight-case optional showcase with actual LibreOffice renders, inputs, exported specs, QA, before variants, review records, source-PPTX inspection and hash manifests.
+- Add deterministic single-SKILL packaging with fixed ordering/timestamps/permissions, safe-path checks, no caches/PPTX, and a separate showcase artifact. Add package tests and doctor/bootstrap/recovery evidence.
+- Replace the release workflow with manual approved-SHA dispatch, exact-SHA checkout, clean tests/build/benchmark/doctor/package, deterministic rebuild check, immutable annotated tag and no existing-asset/history overwrite. Publication is not performed by this changelog.
+- Update bilingual README/product/feasibility docs, architecture, reasoning-plan reference, QA ladder, migration, benchmarks A–J, commercial readiness and third-party notices. No dependency version upgrades; historical release documents remain unchanged.
+
 ## 1.1.1 — 2026-10-16
 
 - Reject contradictory primary-metric trend observations and separately supplied previous-month/year baselines before calculating or building.

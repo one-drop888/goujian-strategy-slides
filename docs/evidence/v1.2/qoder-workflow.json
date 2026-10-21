@@ -1,0 +1,90 @@
+{
+  "schema_version": "1.0",
+  "scope": "Qoder agent end-to-end workflow evidence on the v1.2 branch. This is an execution record, not independent visual approval.",
+  "executed_at": "2026-10-21",
+  "branch": "feat/v1.2-strategic-intelligence",
+  "engine_acceptance_base": "2c622db52ff53d2f3f90a6581550f69a978022ef (Codex 15/15 engine acceptance; not publication approval)",
+  "workflow": [
+    {
+      "step": "read source-PPTX acceptance boundaries",
+      "status": "DONE",
+      "detail": "Read docs/evidence/v1.2/reviews/codex-source-pptx-acceptance.md before building the final showcase; native file/slide/shape provenance kept distinct from image hashes.",
+      "artifact": "docs/evidence/v1.2/reviews/codex-source-pptx-acceptance.md"
+    },
+    {
+      "step": "bounded copy repair: Q4 summary",
+      "status": "DONE",
+      "detail": "Shortened the summary statement to remove the lone wrapped body word while preserving all six action IDs A1-A6, the three groups and four dependency edges. No layout engine change and no font shrinking.",
+      "artifact": "skill/reasoning/fixtures/q4-six-actions/plan.json"
+    },
+    {
+      "step": "bounded copy repair: multimodal subtitle",
+      "status": "DONE",
+      "detail": "Replaced the long backend-status subtitle with a short business Chinese line; denominator, cohort, dedup, cross-period and significance limits remain in claims, speaker notes and appendix.",
+      "artifact": "skill/reasoning/fixtures/multimodal-consolidation/plan.json"
+    },
+    {
+      "step": "rebuild affected decks and theme variants",
+      "status": "PASS",
+      "detail": "The Q4 deck and all three theme variants plus the multimodal deck were rebuilt and rerendered through the existing dogfood script. No engine or renderer source changed.",
+      "artifacts": ["out/v1.2-showcase/decks/q4-six-actions-render/", "out/v1.2-showcase/theme-variants/", "out/v1.2-showcase/decks/multimodal-consolidation-render/"]
+    },
+    {
+      "step": "actual render and visual critique",
+      "status": "DONE",
+      "detail": "Inspected actual LibreOffice PNGs and montages; confirmed the Q4 orphan word is gone and the multimodal subtitle is one line clear of the divider. Representative pages were also reviewed at full size. No claim of complete-deck visual approval.",
+      "artifacts": ["out/v1.2-showcase/before/README.json", "docs/visual/v1.2/q4-before-after.png", "docs/visual/v1.2/multimodal-before-after.png"]
+    },
+    {
+      "step": "QA and structural verification",
+      "status": "PASS",
+      "detail": "All showcase cases report structural QA PASS or PASS_WITH_NOTES, native verification PASS where applicable, and visual status FINAL_CODEX_VQA_PENDING. No case is marked as visually approved.",
+      "artifact": "out/v1.2-showcase/showcase.manifest.json"
+    },
+    {
+      "step": "end-to-end regression suite",
+      "status": "PASS",
+      "detail": "npm test exits 0 on the final tree: legacy and V1.1 regressions, 24/24 analytics tests, theme/chart XML tests, reasoning-plan positive and adversarial tests, doctor and bootstrap tests. One opt-in network integration test is skipped by default and was executed separately at 9/9.",
+      "artifact": "docs/evidence/v1.2/installation.json"
+    },
+    {
+      "step": "deterministic packaging and clean install",
+      "status": "PASS",
+      "detail": "Installer ZIP built twice with identical bytes by the package test; extracted into a Unicode/space path with zero symlinks; bootstrap, doctor, tests, example build/render and plan compile all succeeded. Linux x86_64 only.",
+      "artifact": "docs/evidence/v1.2/installation.json"
+    },
+    {
+      "step": "documentation previews",
+      "status": "DONE",
+      "detail": "Composed hero, before/after, theme, scenario and 1280x640 social previews only from actual renders. Source render SHA256 values are recorded with the previews.",
+      "artifact": "docs/visual/v1.2/README.md"
+    },
+    {
+      "step": "final review boundary",
+      "status": "PENDING_INDEPENDENT_REVIEW",
+      "detail": "Codex performs final actual VQA after the writer stops. This record must not be cited as visual PASS or publication approval. Native PowerPoint macOS/Windows/ARM64 is NOT_RUN; Agensi hosted runtime is NOT_VERIFIED."
+    }
+  ],
+  "counts": {
+    "showcase_cases": 8,
+    "reasoning_decks": 3,
+    "theme_variants": 3,
+    "native_dark_chart_pages": 8,
+    "long_title_pages": 8,
+    "before_variants": 5,
+    "review_records_copied": 7,
+    "generated_review_status_files": 1
+  },
+  "source_binding": {
+    "engine_source_fingerprint": "Recorded in out/v1.2-showcase/engine-source-fingerprint.json and showcase.manifest.json for the final showcase build.",
+    "final_artifact_hashes": "Recorded in out/v12-control/phase4-evidence.json and release SHA256SUMS.txt after the final deterministic rebuild.",
+    "review_records": "docs/evidence/v1.2/reviews/"
+  },
+  "not_claimed": [
+    "Automated visual quality or autonomous visual repair",
+    "Independent semantic approval of the synthetic business story",
+    "Native Microsoft PowerPoint fidelity or cross-platform parity",
+    "Agensi or company-platform certification",
+    "Publication, tag or release"
+  ]
+}

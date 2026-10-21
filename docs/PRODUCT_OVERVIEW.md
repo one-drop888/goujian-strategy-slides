@@ -1,49 +1,52 @@
 # Goujian Strategy Slides
 
-[English](PRODUCT_OVERVIEW.md) | [简体中文](PRODUCT_OVERVIEW.zh-CN.md)
+[English](PRODUCT_OVERVIEW.md) | [简体中文](PRODUCT_OVERVIEW.zh-CN.md) | [Repository root](../README.en.md) · [Installation](../README.en.md#installation) · [Benchmarks A–J](BENCHMARKS_V1_2.md) · [Feasibility review](FEASIBILITY_REVIEW.md)
 
 ## Presentation Intelligence for AI Agents
 
-Goujian Strategy Slides is an open-source, production-oriented presentation skill designed to help AI agents turn complex information into clear, structured and decision-useful presentations.
+Goujian Strategy Slides is an open-source presentation skill designed to help AI agents turn complex information into clear, structured and decision-useful presentations.
 
 **Think clearly. Structure strategically. Present decisively.**
 
-Instead of treating presentation creation as a simple text-to-slide task, Goujian models the reasoning process behind strong professional presentations:
+It models the reasoning behind a strong professional presentation:
 
 **Think → Structure → Visualize → Build → Validate**
 
-It combines management storytelling, storyline planning, semantic slide archetypes, reusable composition grammar, visualization logic, profile-driven design, native editable PPTX generation and quality validation into one presentation workflow.
+It combines management storytelling, storylines, action titles, semantic archetypes, composition grammar, data visualization, profile-driven design, native editable PPTX generation and quality gates into one workflow. The agent supplies judgment; deterministic code validates, builds and exposes boundaries.
 
-> Great presentations are not collections of beautiful slides. They are structured arguments designed to make complex information understandable and actionable.
+> Great presentations are not collections of beautiful slides. They are structured arguments designed to help people understand complex information and act.
 
-Its management reasoning model is **Question → Evidence → Judgment → Action**. High information density ≠ high text density: the chart, comparison, framework or table should carry the argument, with text reserved for interpretation and action.
+Its management reasoning model is **Question → Evidence → Judgment → Action**. High information density ≠ high text density: charts, comparisons, frameworks and tables should carry the argument, with text reserved for interpretation and action.
 
 ## Who it serves
 
 - Management teams reviewing results, diagnosing gaps and assigning owned actions.
-- Research teams connecting sample design, quantitative signals, quotations and qualified interpretations.
+- Research teams connecting sample design, quantitative signals, quotations and qualified interpretation.
 - Product and technology teams explaining choices, risks, operating models and staged implementation.
 - AI agents that need a reusable presentation workflow instead of ad hoc slide-generation scripts.
 
-## How the product works
+## How V1.2 works
 
-The agent first establishes the decision, evidence and constraints. It chooses a storyline and semantic slide purpose, then creates a JSON presentation spec. Reusable compositions and an explicit visual profile drive the PPTX backend. Executable validation rejects malformed or over-capacity payloads. Rendering and visual inspection close the loop.
+The agent establishes the decision, evidence, constraints and content dispositions, then authors a Reasoning Plan. Deterministic validation checks structure, arithmetic, referential closure, coverage, numeric bindings and theme selection. Compilation produces an exported spec and a native editable PPTX. A hash-bound scene and reasoning sidecar support structural QA and actual rendering for semantic/visual review.
 
-The library contains 28 storylines, 86 semantic entries, 27 composition recipes, 15 profiles and 15 starting recipes. **74 semantic entries are implemented, 6 are partial, and 6 are designed only.** The last group cannot be built. Counts describe a vocabulary, not a promise of 86 independently designed or equally expressive layouts.
+The Reasoning Plan is an **agent-authored** input; this project has no independent general reasoning model. Validation supports `sum`, `difference`, `ratio` and `percent_change`, including unit, time-window, metric and denominator checks. There is no arbitrary formula engine, significance test or causal inference. Structured JSON sources can be compared with source bytes through JSON Pointers. Numeric ledgers extracted from images, PDFs, text or native PPTX remain reviewer-required. A citation is not proof of source truth.
 
-## V1 scope
+The library contains 28 storylines, 86 semantic entries, 27 composition recipes, 15 profiles and 15 starting recipes. **74 semantic entries are implemented, 6 are partial, and 6 are designed only.** The last group cannot be built. Counts describe vocabulary, not a promise of 86 independently designed layouts.
 
-V1 focuses on PowerPoint/PPTX. Native text, shapes, tables and supported chart data remain editable. Basic text edits, agent-led reconstruction and style statistics support existing-deck workflows, within explicit limits.
+## Theme and visual system
 
-The planner is a small heuristic helper, not an autonomous analyst. Evidence selection, causal judgment, template interpretation and visual repair remain agent/human responsibilities. The full [capability matrix](../README.en.md#capability-boundaries) and [feasibility review](FEASIBILITY_REVIEW.md) state those limits.
+Theme precedence is reference profile > brand profile > explicit user profile > automatic intent matching > default. An explicit dark request can override automatic light selection, but dark versus printable and related conflicts are recorded rather than hidden. The selected profile drives typography, spacing, tables, metrics, chart grids and colors.
 
-The Presentation Intelligence layer is independent of PptxGenJS. It leaves a path to HTML and web-based renderers, while the reusable cross-renderer geometry engine is future work. V1 does not implement HTML output, animations, arbitrary lossless PPTX editing or deterministic visual repair.
+V1.2 showcases three theme variants and eight dark native chart types. Titles use glyph measurement and conservative estimation, with short-title/subtitle support, a dynamic divider and body flow. Measurement is not proof of exact PowerPoint shaping; structural QA cannot prove the absence of rendered text collisions. The final frame requires inspection.
 
-There is one product and one Presentation Library. Platform adapters provide thin execution guidance, not different public/company/personal editions.
+Images, native charts, tables and interpretation share one pipeline with source, pixel-text, crop and scene relationships. Asset classification, semantic rewriting and visual repair remain agent-assisted. There is no automatic OCR, arbitrary lossless PPTX editor, autonomous visual repair or cross-renderer layout engine.
 
+## V1.2 delivery and review
 
-## V1.1 multimodal boundary
+Eight showcase cases cover an executive review, Q4 actions, multisource consolidation, three theme variants, eight dark charts and a long-title regression. Each case preserves reference inputs, exported spec, PPTX, reasoning sidecar, QA, actual LibreOffice render, montage and hash manifest. The install ZIP is a separate lightweight runtime; the showcase ZIP is an optional review artifact.
 
-Images, native charts/tables and interpretation share one build pipeline with source, pixel-text, crop and scene relationships. Measured title/subtitle/divider flow and spatial QA use actual native PPTX geometry. Asset classification, semantic rewriting and visual repair remain agent-assisted; OCR, complete SmartArt/master recovery and autonomous visual repair are not implemented. See the [contract](MULTIMODAL_CONTRACT.md) and [validation](V1_1_VALIDATION.md).
+Final visual acceptance is performed by an independent reviewer after writing stops. Pre-final review records in this repository are not publication approval. Native PowerPoint on macOS/Windows/ARM64 was not executed; Agensi/company-hosted runtime is not verified.
 
-Three runnable analytical families turn replaceable JSON data into native editable presentations: business performance, nonlinear sales conversion and project analytics. Their 18 tasks define fields, formulas, units, windows, denominators, missing-data rules and fidelity gates. See [analytical library](ANALYTICAL_LIBRARY.md) and [final release validation](V1_1_RELEASE_VALIDATION.md).
+The Community core, including doctor, QA and defect fixes, remains free under Apache-2.0. Supporter and Pro are future candidates only: no account, payment or listing exists in this repository. Pro adds business workflow packs, not a second rendering engine. See [Commercial readiness](COMMERCIAL_READINESS.md).
+
+For exact limits, read the [feasibility review](FEASIBILITY_REVIEW.md), [quality and validation](QUALITY_AND_VALIDATION.md), [Benchmarks A–J](BENCHMARKS_V1_2.md) and [root README](../README.en.md). V1.1 and earlier release documents remain historical records and are not retroactively rewritten.

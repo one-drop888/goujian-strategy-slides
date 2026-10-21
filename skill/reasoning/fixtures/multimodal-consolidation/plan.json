@@ -563,7 +563,7 @@
           },
           {
             "title": "边界",
-            "note": "24位访谈为便利样本，只提出假设；分母/cohort/去重/跨期口径均未提供（NOT_PROVIDED）；未做显著性检验。"
+            "note": "24位访谈为便利样本，只提出假设；分母/cohort/去重/跨期口径均未提供；未做显著性检验。"
           }
         ],
         "source": "Synthetic multi-source fixture · Apache-2.0"
@@ -615,7 +615,7 @@
       "spec": {
         "type": "chart",
         "title": "华南成交率较西南高3.3pp，源表不足以解释原因",
-        "subtitle": "2026-Q3（合成简报定义） · 源表为一位小数 · 分母/cohort/去重/跨期口径 NOT_PROVIDED · 未做显著性检验",
+        "subtitle": "合成简报2026-Q3 · 源表比例，转化分母与统计口径待补充",
         "chartType": "bar",
         "labels": [
           "华南",
@@ -1153,7 +1153,7 @@
           [
             "渠道表截图",
             "规范来源（保留）",
-            "24个数值在附录逐一绑定；分母/cohort/去重/跨期口径 NOT_PROVIDED",
+            "24个数值在附录逐一绑定；分母/cohort/去重/跨期口径未提供",
             "0f8cf0ed2062"
           ],
           [

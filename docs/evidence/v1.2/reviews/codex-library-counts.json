@@ -1,0 +1,35 @@
+{
+  "archetypes": {
+    "declared": 86,
+    "actual": 86,
+    "statuses": {
+      "IMPLEMENTED": 74,
+      "PARTIAL": 6,
+      "DESIGNED": 6
+    }
+  },
+  "storylines": {
+    "declared": 28,
+    "actual": 28,
+    "statuses": {
+      "not_declared": 28
+    }
+  },
+  "compositions": {
+    "declared": 27,
+    "actual": 27,
+    "statuses": {
+      "not_declared": 27
+    }
+  },
+  "templates": {
+    "declared": 15,
+    "actual": 15,
+    "statuses": {
+      "not_declared": 15
+    }
+  },
+  "profiles": {
+    "actual": 15
+  }
+}

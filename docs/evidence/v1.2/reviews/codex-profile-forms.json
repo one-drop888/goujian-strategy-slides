@@ -1,0 +1,462 @@
+{
+  "report": {
+    "profiles": 15,
+    "non_color_forms": 15,
+    "groups": [
+      [
+        "consulting"
+      ],
+      [
+        "corporate"
+      ],
+      [
+        "dark-executive"
+      ],
+      [
+        "executive-clean"
+      ],
+      [
+        "executive-dense"
+      ],
+      [
+        "finance"
+      ],
+      [
+        "launch"
+      ],
+      [
+        "luxury"
+      ],
+      [
+        "marketing"
+      ],
+      [
+        "minimal"
+      ],
+      [
+        "product-tech"
+      ],
+      [
+        "research"
+      ],
+      [
+        "sales"
+      ],
+      [
+        "strategy"
+      ],
+      [
+        "training"
+      ]
+    ],
+    "scope": "Actual font/style/canvas configuration signatures excluding all names/purpose/colors/background. Configuration diversity, not proof of15distinct professionally reviewed designs.",
+    "canonical_key_order": true
+  },
+  "summary": [
+    {
+      "id": "consulting",
+      "form": {
+        "font": {
+          "latin": "Noto Sans",
+          "cjk": "Noto Sans CJK SC",
+          "title_size": 26,
+          "body_size": 17
+        },
+        "style": {
+          "density": "high",
+          "margin_x": 0.65,
+          "title_rule": "accent",
+          "table_header": "solid",
+          "table_banding": false,
+          "metric_style": "open",
+          "chart_grid": "none",
+          "cover_treatment": "editorial",
+          "table_size": 14,
+          "chart_size": 12,
+          "image_gap": 0.35,
+          "image_caption_size": 11,
+          "image_border": "none"
+        },
+        "canvas": "wide"
+      }
+    },
+    {
+      "id": "corporate",
+      "form": {
+        "font": {
+          "latin": "Noto Sans",
+          "cjk": "Noto Sans CJK SC",
+          "title_size": 29,
+          "body_size": 19
+        },
+        "style": {
+          "density": "medium",
+          "margin_x": 0.78,
+          "title_rule": "line",
+          "table_header": "solid",
+          "table_banding": true,
+          "metric_style": "panel",
+          "chart_grid": "light",
+          "cover_treatment": "band",
+          "table_size": 16,
+          "chart_size": 14,
+          "image_gap": 0.5,
+          "image_caption_size": 11,
+          "image_border": "none"
+        },
+        "canvas": "wide"
+      }
+    },
+    {
+      "id": "dark-executive",
+      "form": {
+        "font": {
+          "latin": "Noto Sans",
+          "cjk": "Noto Sans CJK SC",
+          "title_size": 29,
+          "body_size": 19
+        },
+        "style": {
+          "density": "medium-low",
+          "margin_x": 0.85,
+          "title_rule": "accent",
+          "table_header": "soft",
+          "table_banding": true,
+          "metric_style": "open",
+          "chart_grid": "none",
+          "cover_treatment": "band",
+          "table_size": 16,
+          "chart_size": 14,
+          "image_gap": 0.5,
+          "image_caption_size": 11,
+          "image_border": "none"
+        },
+        "canvas": "wide"
+      }
+    },
+    {
+      "id": "executive-clean",
+      "form": {
+        "font": {
+          "latin": "Noto Sans",
+          "cjk": "Noto Sans CJK SC",
+          "title_size": 28,
+          "body_size": 18
+        },
+        "style": {
+          "density": "medium-high",
+          "margin_x": 0.78,
+          "title_rule": "accent",
+          "table_header": "soft",
+          "table_banding": false,
+          "metric_style": "open",
+          "chart_grid": "light",
+          "cover_treatment": "editorial",
+          "table_size": 14,
+          "chart_size": 12,
+          "image_gap": 0.5,
+          "image_caption_size": 11,
+          "image_border": "none"
+        },
+        "canvas": "wide"
+      }
+    },
+    {
+      "id": "executive-dense",
+      "form": {
+        "font": {
+          "latin": "Noto Sans",
+          "cjk": "Noto Sans CJK SC",
+          "title_size": 26,
+          "body_size": 17
+        },
+        "style": {
+          "density": "high",
+          "margin_x": 0.65,
+          "title_rule": "line",
+          "table_header": "solid",
+          "table_banding": false,
+          "metric_style": "open",
+          "chart_grid": "light",
+          "cover_treatment": "band",
+          "table_size": 14,
+          "chart_size": 12,
+          "image_gap": 0.35,
+          "image_caption_size": 11,
+          "image_border": "none"
+        },
+        "canvas": "wide"
+      }
+    },
+    {
+      "id": "finance",
+      "form": {
+        "font": {
+          "latin": "Noto Sans",
+          "cjk": "Noto Sans CJK SC",
+          "title_size": 26,
+          "body_size": 17
+        },
+        "style": {
+          "density": "high",
+          "margin_x": 0.65,
+          "title_rule": "line",
+          "table_header": "solid",
+          "table_banding": true,
+          "metric_style": "open",
+          "chart_grid": "light",
+          "cover_treatment": "editorial",
+          "table_size": 14,
+          "chart_size": 12,
+          "image_gap": 0.35,
+          "image_caption_size": 11,
+          "image_border": "line"
+        },
+        "canvas": "wide"
+      }
+    },
+    {
+      "id": "launch",
+      "form": {
+        "font": {
+          "latin": "Noto Sans",
+          "cjk": "Noto Sans CJK SC",
+          "title_size": 32,
+          "body_size": 21
+        },
+        "style": {
+          "density": "medium-low",
+          "margin_x": 0.85,
+          "title_rule": "none",
+          "table_header": "soft",
+          "table_banding": false,
+          "metric_style": "open",
+          "chart_grid": "none",
+          "cover_treatment": "band",
+          "table_size": 16,
+          "chart_size": 14,
+          "image_gap": 0.5,
+          "image_caption_size": 11,
+          "image_border": "none"
+        },
+        "canvas": "wide"
+      }
+    },
+    {
+      "id": "luxury",
+      "form": {
+        "font": {
+          "latin": "Noto Sans",
+          "cjk": "Noto Sans CJK SC",
+          "title_size": 31,
+          "body_size": 20
+        },
+        "style": {
+          "density": "medium-low",
+          "margin_x": 0.9,
+          "title_rule": "none",
+          "table_header": "soft",
+          "table_banding": false,
+          "metric_style": "open",
+          "chart_grid": "none",
+          "cover_treatment": "editorial",
+          "table_size": 16,
+          "chart_size": 14,
+          "image_gap": 0.5,
+          "image_caption_size": 12,
+          "image_border": "none"
+        },
+        "canvas": "wide"
+      }
+    },
+    {
+      "id": "marketing",
+      "form": {
+        "font": {
+          "latin": "Noto Sans",
+          "cjk": "Noto Sans CJK SC",
+          "title_size": 30,
+          "body_size": 19
+        },
+        "style": {
+          "density": "medium",
+          "margin_x": 0.8,
+          "title_rule": "accent",
+          "table_header": "soft",
+          "table_banding": false,
+          "metric_style": "panel",
+          "chart_grid": "none",
+          "cover_treatment": "band",
+          "table_size": 16,
+          "chart_size": 14,
+          "image_gap": 0.5,
+          "image_caption_size": 11,
+          "image_border": "none"
+        },
+        "canvas": "wide"
+      }
+    },
+    {
+      "id": "minimal",
+      "form": {
+        "font": {
+          "latin": "Noto Sans",
+          "cjk": "Noto Sans CJK SC",
+          "title_size": 30,
+          "body_size": 20
+        },
+        "style": {
+          "density": "low",
+          "margin_x": 0.9,
+          "title_rule": "none",
+          "table_header": "soft",
+          "table_banding": false,
+          "metric_style": "open",
+          "chart_grid": "none",
+          "cover_treatment": "editorial",
+          "table_size": 16,
+          "chart_size": 14,
+          "image_gap": 0.5,
+          "image_caption_size": 12,
+          "image_border": "none"
+        },
+        "canvas": "wide"
+      }
+    },
+    {
+      "id": "product-tech",
+      "form": {
+        "font": {
+          "latin": "Noto Sans",
+          "cjk": "Noto Sans CJK SC",
+          "title_size": 28,
+          "body_size": 18
+        },
+        "style": {
+          "density": "medium",
+          "margin_x": 0.75,
+          "title_rule": "accent",
+          "table_header": "solid",
+          "table_banding": true,
+          "metric_style": "open",
+          "chart_grid": "light",
+          "cover_treatment": "band",
+          "table_size": 14,
+          "chart_size": 12,
+          "image_gap": 0.5,
+          "image_caption_size": 11,
+          "image_border": "line"
+        },
+        "canvas": "wide"
+      }
+    },
+    {
+      "id": "research",
+      "form": {
+        "font": {
+          "latin": "Noto Sans",
+          "cjk": "Noto Sans CJK SC",
+          "title_size": 26,
+          "body_size": 18
+        },
+        "style": {
+          "density": "high",
+          "margin_x": 0.7,
+          "title_rule": "line",
+          "table_header": "soft",
+          "table_banding": true,
+          "metric_style": "open",
+          "chart_grid": "none",
+          "cover_treatment": "editorial",
+          "table_size": 14,
+          "chart_size": 12,
+          "image_gap": 0.35,
+          "image_caption_size": 12,
+          "image_border": "line"
+        },
+        "canvas": "wide"
+      }
+    },
+    {
+      "id": "sales",
+      "form": {
+        "font": {
+          "latin": "Noto Sans",
+          "cjk": "Noto Sans CJK SC",
+          "title_size": 28,
+          "body_size": 19
+        },
+        "style": {
+          "density": "medium-high",
+          "margin_x": 0.75,
+          "title_rule": "accent",
+          "table_header": "soft",
+          "table_banding": false,
+          "metric_style": "panel",
+          "chart_grid": "none",
+          "cover_treatment": "editorial",
+          "table_size": 16,
+          "chart_size": 14,
+          "image_gap": 0.5,
+          "image_caption_size": 11,
+          "image_border": "none"
+        },
+        "canvas": "wide"
+      }
+    },
+    {
+      "id": "strategy",
+      "form": {
+        "font": {
+          "latin": "Noto Sans",
+          "cjk": "Noto Sans CJK SC",
+          "title_size": 28,
+          "body_size": 19
+        },
+        "style": {
+          "density": "medium-high",
+          "margin_x": 0.78,
+          "title_rule": "accent",
+          "table_header": "solid",
+          "table_banding": false,
+          "metric_style": "open",
+          "chart_grid": "light",
+          "cover_treatment": "editorial",
+          "table_size": 16,
+          "chart_size": 14,
+          "image_gap": 0.5,
+          "image_caption_size": 11,
+          "image_border": "none"
+        },
+        "canvas": "wide"
+      }
+    },
+    {
+      "id": "training",
+      "form": {
+        "font": {
+          "latin": "Noto Sans",
+          "cjk": "Noto Sans CJK SC",
+          "title_size": 30,
+          "body_size": 21
+        },
+        "style": {
+          "density": "medium",
+          "margin_x": 0.8,
+          "title_rule": "line",
+          "table_header": "soft",
+          "table_banding": true,
+          "metric_style": "panel",
+          "chart_grid": "light",
+          "cover_treatment": "band",
+          "table_size": 16,
+          "chart_size": 14,
+          "image_gap": 0.5,
+          "image_caption_size": 11,
+          "image_border": "none"
+        },
+        "canvas": "wide"
+      }
+    }
+  ]
+}

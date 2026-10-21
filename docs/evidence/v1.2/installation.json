@@ -1,0 +1,82 @@
+{
+  "schema_version": "1.0",
+  "status": "PASS",
+  "scope": "Actual clean install of the v1.2.0 installer ZIP on Linux x86_64. macOS, Windows, ARM64, native Microsoft PowerPoint and Agensi-hosted execution were not run.",
+  "executed_at": "2026-10-21",
+  "artifact": {
+    "name": "goujian-strategy-slides-v1.2.0.zip",
+    "sha256": "Recorded in the release SHA256SUMS.txt and out/v12-control/phase4-evidence.json after the final deterministic rebuild. The archive embeds this evidence file, so its own hash is intentionally not self-referenced here."
+  },
+  "host": {
+    "os": "Ubuntu 26.04.1 LTS",
+    "kernel": "7.0.0-38-generic",
+    "architecture": "x86_64",
+    "node": "24.18.0",
+    "npm": "11.19.1",
+    "python": "3.14.4",
+    "pillow": "12.1.1",
+    "libreoffice_cli": "LibreOfficeDev 26.8.0.0.alpha0",
+    "poppler": "26.05.0",
+    "native_powerpoint": "NOT_RUN"
+  },
+  "clean_path": {
+    "description": "The ZIP was extracted into a directory whose path contains a space and Chinese characters under the ignored out/v12-control/qoder-scratch area. The extracted repository tree had zero symlinks before bootstrap. The generated .venv and node_modules/.bin links are installation outputs and are not archive entries.",
+    "extracted_symlinks": 0,
+    "top_level_entries": [
+      ".github", ".gitignore", "CHANGELOG.md", "CONTRIBUTING.md", "LICENSE",
+      "README.en.md", "README.md", "README.zh-CN.md", "SKILL.md", "THIRD_PARTY_NOTICE.md",
+      "adapters", "core", "docs", "package-lock.json", "package.json",
+      "requirements-render.txt", "scripts", "skill", "tests"
+    ],
+    "skill_entries": ["SKILL.md"]
+  },
+  "npm_isolation": {
+    "userconfig": "An empty NPM_CONFIG_USERCONFIG was used for the clean-install run.",
+    "reason": "The executed host has a global .npmrc containing an npm 11 allow-scripts array that project-scoped installs reject. Isolating user config proves the repository and lockfile do not depend on host-specific npm settings.",
+    "lockfile_resolved_tarballs": 23,
+    "lockfile_registry_hosts": {"registry.npmjs.org": 23},
+    "dependency_versions": {
+      "ajv": "8.20.0",
+      "image-size": "2.0.4",
+      "jszip": "3.10.2",
+      "pptxgenjs": "4.0.0"
+    }
+  },
+  "commands": [
+    {"command": "node --version", "exit": 0, "result": "v24.18.0"},
+    {"command": "npm --version", "exit": 0, "result": "11.19.1"},
+    {"command": "python3 -V", "exit": 0, "result": "Python 3.14.4"},
+    {"command": "npm run bootstrap -- --dry-run --json", "exit": 0, "result": "DRY_RUN; planned npm ci, isolated venv and pip install without creating files"},
+    {"command": "npm run bootstrap", "exit": 0, "result": "READY; npm ci OK, venv OK, pip install OK, Pillow 12.1.1, state written"},
+    {"command": "npm run doctor -- --json", "exit": 0, "result": "READY; required checks 7/7, optional gaps 0, VISUAL_QA NOT_RUN"},
+    {"command": "npm test", "exit": 0, "result": "PASS; all named suites passed, 24/24 analytics tests passed, one opt-in network bootstrap test skipped by default"},
+    {"command": "npm run validate:example", "exit": 0, "result": "PASS; 8 slides, 0 issues"},
+    {"command": "npm run build:example", "exit": 0, "result": "PASS; out/executive-review.pptx, profile executive-dense, 8 slides, VISUAL_QA NOT_RUN"},
+    {"command": "npm run qa:example", "exit": 0, "result": "PASS process; visual_review NOT_RUN because no hash-bound reviewer record exists"},
+    {"command": "node skill/scripts/validate_plan.js skill/reasoning/fixtures/q4-six-actions/plan.json --json", "exit": 0, "result": "PASS; automatic executive-clean light theme, no conflicts"},
+    {"command": "node skill/scripts/compile_plan.js skill/reasoning/fixtures/q4-six-actions/plan.json --out out/clean-q4.pptx --spec-out out/clean-q4.spec.json --force", "exit": 0, "result": "PASS; native PPTX, sidecars and embedded report; 7 notes; visual review NOT_RUN"}
+  ],
+  "generated_outputs": [
+    {"path": "out/executive-review.pptx", "bytes": 251750, "sha256": "afaf46aaf989d61dd9c2c188ce4808fabdd0729aad5ea9341a5d8f7bfd8bb4ff"},
+    {"path": "out/quality-report.json", "bytes": 6709},
+    {"path": "out/clean-q4.pptx", "bytes": 41854, "sha256": "ce1d21bceb5c4c09ab8ad5a26b7599773a3aa8ce13ebfd44e19fe72dba1dc78e"},
+    {"path": "out/clean-q4.spec.json", "bytes": 7036, "sha256": "47fdebff8d8067b3603bf8d71517d8e3994f322eeeb557b3fe11d0410a09ed8a"},
+    {"path": "out/clean-q4.pptx.reasoning.json", "bytes": 11154, "sha256": "5a40de5231dc5b5d52479b7f5c898f609567f54e5af1a453772b014b6cdaccb7"},
+    {"path": "out/clean-q4.pptx.scene.json", "bytes": 66847, "sha256": "bc43234e67f4b39ec1934c53eac7f19f5919d0718f79a98c00ac0f111f7f6ae1"}
+  ],
+  "recovery_integration": {
+    "command": "GOUJIAN_CLEAN_INSTALL=1 python3 tests/test_bootstrap.py",
+    "status": "PASS",
+    "tests_passed": 9,
+    "tests_total": 9,
+    "scope": "Real npm ci and pip install in a temporary path containing spaces; second bootstrap skipped completed npm/venv/pip steps; deleting the venv interpreter triggered a repair and the third bootstrap reported READY.",
+    "local_evidence": "out/v12-control/qoder-scratch/opt-in-clean-install.json"
+  },
+  "limitations": [
+    "Only Linux x86_64 was executed.",
+    "No native Microsoft PowerPoint, macOS, Windows, ARM64 or company-platform import was run.",
+    "Doctor presence checks and a successful render process are not visual approval.",
+    "The clean-install run used an isolated empty npm user config because of the host's global npmrc; the lockfile itself resolves 23/23 tarballs from registry.npmjs.org.",
+    "The installer cannot be installed over an existing directory without stale-file risk; the migration guide requires a fresh folder."
+  ]
+}

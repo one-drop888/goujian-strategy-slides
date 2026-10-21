@@ -27,8 +27,11 @@ def test_profile_contract():
 def test_unified_product():
     r=(ROOT/'README.en.md').read_text(encoding='utf-8'); zh=(ROOT/'README.md').read_text(encoding='utf-8'); a=(ROOT/'docs/architecture/ARCHITECTURE.md').read_text(encoding='utf-8')
     assert 'one product' in r.lower(); assert 'one product' in a.lower(); assert not (ROOT/'adapters/company-platform').exists()
-    assert '构见·战略演示' in zh and 'README.en.md' in zh
-    assert (ROOT/'README.zh-CN.md').read_text(encoding='utf-8') == zh
+    mirror=(ROOT/'README.zh-CN.md').read_text(encoding='utf-8')
+    assert '构见·战略演示' in zh and '[English](README.en.md)' in zh and 'README.zh-CN.md' in zh
+    assert '[简体中文（本页）](README.zh-CN.md)' in mirror and '[English](README.en.md)' in mirror
+    assert [line for line in zh.splitlines() if not line.startswith('[')] == [
+        line for line in mirror.splitlines() if not line.startswith('[')]
     assert (ROOT/'SKILL.md').exists()
 
 def test_example_build_and_geometry():

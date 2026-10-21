@@ -1,0 +1,55 @@
+{
+  "schema_version": "1.0",
+  "status": "PASS",
+  "executed_at": "2026-10-21",
+  "scope": {
+    "repository": "All git-tracked files plus non-ignored new files for the v1.2.0 release candidate; out/ and dist/ scratch artifacts are excluded from the source scan.",
+    "repository_files": 279,
+    "text_files_scanned": 243,
+    "binary_files_skipped": 36,
+    "installer": "dist/goujian-strategy-slides-v1.2.0.zip, rebuilt deterministically after this record was added; final SHA256 and entry count are recorded in SHA256SUMS.txt and out/v12-control/phase4-evidence.json.",
+    "not_scanned": "The optional showcase ZIP and generated PPTX/PDF artifacts are not part of the installer; their manifests and review records are covered separately."
+  },
+  "method": [
+    "Enumerated every git-tracked and non-ignored file outside out/ and dist/; refused symlinks, private filenames, disallowed binary suffixes, files over 5 MiB and secret-pattern matches.",
+    "Scanned UTF-8 text for private-key headers, GitHub/AWS/Slack token shapes, generic secret assignments and absolute user paths.",
+    "Inspected the installer archive for integrity, duplicate names, symlink entries, forbidden suffixes, cache/output directories and exactly one root SKILL.md.",
+    "Checked the four direct dependency licenses and the committed lockfile registry hosts.",
+    "No secret value is reproduced in this report."
+  ],
+  "results": {
+    "secret_pattern_matches": 0,
+    "absolute_user_paths": 0,
+    "symlinks_in_source": 0,
+    "forbidden_private_files": 0,
+    "disallowed_binary_suffixes": 0,
+    "files_over_5_mib": 0,
+    "installer_integrity": "PASS",
+    "installer_duplicate_entries": 0,
+    "installer_symlinks": 0,
+    "installer_pptx_or_pdf": 0,
+    "installer_node_modules_or_venv_or_out": 0,
+    "installer_root_skill_entries": 1
+  },
+  "privacy_note": "Fifteen historical v1.1-release QA JSON files had absolute home prefixes replaced with ~ in recorder tool paths only; verdicts, counts, hashes and timestamps were not changed. No other historical release document was rewritten.",
+  "licenses": {
+    "pptxgenjs": {"version": "4.0.0", "license": "MIT"},
+    "ajv": {"version": "8.20.0", "license": "MIT"},
+    "jszip": {"version": "3.10.2", "declared": "MIT OR GPL-3.0-or-later", "selected": "MIT"},
+    "image-size": {"version": "2.0.4", "license": "MIT", "role": "transitive override"},
+    "dependency_upgrades_in_v1_2": 0
+  },
+  "npm_audit": {
+    "command": "npm audit --omit=dev --registry=https://registry.npmjs.org --json",
+    "registry": "https://registry.npmjs.org",
+    "known_advisories": 0,
+    "record": "docs/evidence/v1.2/reviews/codex-dependency-audit-official.json",
+    "limit": "A zero result is a point-in-time audit, not a future security guarantee."
+  },
+  "distribution_boundaries": [
+    "No font file is distributed or embedded; fonts are referenced by family name only.",
+    "No private corpus, third-party corporate template, logo or licensed visual asset is included.",
+    "All showcase fixtures and screenshots are synthetic or project-authored under Apache-2.0.",
+    "No account credentials, tokens, payment data or private customer data are present."
+  ]
+}

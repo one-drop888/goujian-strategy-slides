@@ -1,0 +1,11 @@
+{
+  "source": "Codex review artifacts from out/v12-control, copied read-only for public review evidence",
+  "sanitization": "The checkout root prefix was replaced with repo-relative paths and the home prefix with ~; review verdicts and hashes were not altered.",
+  "status": "PRE_FINAL_REVIEWS_ONLY",
+  "notes": [
+    "codex-final-acceptance.json records 15/15 independent engine acceptance at commit 2c622db; it is not publication approval.",
+    "codex-round2-preview-review.md and codex-fullsize-round2-reviewed.json are partial visual reviews; final VQA is pending after the writer stops.",
+    "codex-source-pptx-acceptance.md records native source PPTX provenance requirements and accepted scope.",
+    "No raw phase35 self-report is copied or presented as Codex approval."
+  ]
+}

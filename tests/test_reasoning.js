@@ -66,7 +66,8 @@ async function main() {
     const multiAppendix=multi.slides.find(s=>s.id==='mm-appendix-table').spec;
     const multiVisible=JSON.stringify([multiSummary,multiChartPage,multiAppendix,multiActions]);
     assert.doesNotMatch(multiVisible,/分母线索|分母=/);
-    assert.match(multiVisible,/NOT_PROVIDED/);
+    assert.doesNotMatch(multiVisible,/NOT_PROVIDED/);
+    assert.match(multiVisible,/统计口径待补充/);
     assert.match(multi.claims.find(c=>c.id==='c-region-gap').text,/算术差/);
     assert.doesNotMatch(multi.claims.find(c=>c.id==='c-region-gap').text,/分母/);
     assert.match(multi.claims.find(c=>c.id==='c-interview-hypothesis').text,/便利样本/);

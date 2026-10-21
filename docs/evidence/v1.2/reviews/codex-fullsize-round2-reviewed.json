@@ -1,0 +1,15 @@
+{
+  "reviewer": "Codex actual full-size visual inspection",
+  "status": "PARTIAL_REVIEW_ONLY",
+  "pages": {
+    "decks/q4-six-actions-render/slide-3.png": "ef497bebf0a6bb55bbc8d0f5086fa3a85a3a84c84477a36586cb89210c19bade",
+    "dark-chart-types/render/slide-5.png": "dd942c33e093fb41b536450af5a20335939155bcfa6dbc7a9d495ef1110c24c3",
+    "dark-chart-types/render/slide-6.png": "4e48a250f87de847689cf599d6bb815ddc462c3edf42aaecfa61c2ae352d8fc9",
+    "dark-chart-types/render/slide-7.png": "b8533c5a433d889562246edc179e34e1df2b9cdfbe7795c1073de01a28b83bbd"
+  },
+  "findings": [
+    "Q4 all6tasktitles/owners/dates legible,4orthogonal sourceedges clear; header/subtitle/divider separate; stages representtopology nottimescale.",
+    "Area bothnative series visible; pie/doughnut category/value/sharelegible; labelchipsstylingminor knownLibreOffice compatibility limitation."
+  ],
+  "release_approval": false
+}

@@ -1,23 +1,53 @@
-name: Release v1.1.1
+name: Release
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
+    inputs:
+      version:
+        description: "Release version (must match package.json, currently 1.2.0)"
+        required: true
+        type: string
+      expected_sha:
+        description: "Approved 40-character commit SHA on main"
+        required: true
+        type: string
 permissions:
   contents: read
 concurrency:
-  group: release-v1.1.1
+  group: release-${{ inputs.version }}
   cancel-in-progress: false
 jobs:
   release:
-    if: "github.ref == 'refs/heads/main' && (github.event_name == 'workflow_dispatch' || github.event.head_commit.message == 'feat: release Goujian Strategy Slides v1.1.1')"
+    if: github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     permissions:
       contents: write
+    env:
+      VERSION: ${{ inputs.version }}
+      EXPECTED_SHA: ${{ inputs.expected_sha }}
     steps:
+      - name: Validate dispatch inputs
+        env:
+          VERSION: ${{ inputs.version }}
+          EXPECTED_SHA: ${{ inputs.expected_sha }}
+        run: |
+          set -euo pipefail
+          test "$VERSION" = "1.2.0"
+          printf '%s' "$EXPECTED_SHA" | grep -Eq '^[0-9a-f]{40}$'
       - uses: actions/checkout@v4
         with:
+          ref: ${{ env.EXPECTED_SHA }}
           fetch-depth: 0
+      - name: Verify approved commit, remote main and source version
+        env:
+          VERSION: ${{ inputs.version }}
+          EXPECTED_SHA: ${{ inputs.expected_sha }}
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$EXPECTED_SHA"
+          test "$(git ls-remote origin refs/heads/main | cut -f1)" = "$EXPECTED_SHA"
+          test "$(node -p "require('./package.json').version")" = "$VERSION"
+          test "$(node -p "require('./package-lock.json').version")" = "$VERSION"
+          test "$(node -p "require('./package-lock.json').packages[''].version")" = "$VERSION"
       - uses: actions/setup-node@v4
         with:
           node-version: 24
@@ -25,41 +55,90 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: Install declared Linux font prerequisites
-        run: sudo apt-get update -qq && sudo apt-get install -y fontconfig fonts-noto-core fonts-noto-cjk
-      - name: Install and test the release source
+      - name: Install declared Linux render prerequisites
         run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y fontconfig fonts-noto-core fonts-noto-cjk libreoffice-impress poppler-utils
+      - name: Clean install, test, build, benchmark, doctor and QA
+        run: |
+          set -euo pipefail
           npm ci
           python3 -m pip install -r requirements-render.txt
           npm test
           npm run validate:example
           npm run build:example
-          npm run benchmark
+          npm run benchmark -- --render
+          npm run doctor -- --json > out/release-doctor.json
+          npm run qa:example
           npm run package
-      - name: Create annotated tag and release
+      - name: Verify deterministic installer and single Skill entry
+        run: |
+          set -euo pipefail
+          python3 scripts/package_runtime.py out/release-rebuild.zip --json > out/release-package.json
+          python3 - <<'PY'
+          import hashlib, json, zipfile
+          from pathlib import Path
+          first = Path('dist/goujian-strategy-slides-v1.2.0.zip')
+          second = Path('out/release-rebuild.zip')
+          assert hashlib.sha256(first.read_bytes()).hexdigest() == hashlib.sha256(second.read_bytes()).hexdigest(), 'installer ZIP is not byte-reproducible'
+          with zipfile.ZipFile(first) as archive:
+              assert archive.testzip() is None
+              names = archive.namelist()
+              assert len(names) == len(set(names))
+              assert [name for name in names if name.endswith('/SKILL.md')] == ['goujian-strategy-slides/SKILL.md']
+              assert not any('/out/' in name or '/node_modules/' in name or '/.venv/' in name for name in names)
+          print('PASS: deterministic installer, one Skill entry, no generated output')
+          PY
+      - name: Stop before overwriting an existing release
         env:
           GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ inputs.version }}
         run: |
-          test "$(node -p "require('./package.json').version")" = '1.1.1'
-          if git rev-parse refs/tags/v1.1.1 >/dev/null 2>&1; then
-            test "$(git rev-parse 'v1.1.1^{commit}')" = "$GITHUB_SHA"
-            test "$(git cat-file -t refs/tags/v1.1.1)" = tag
+          set -euo pipefail
+          if gh release view "v$VERSION" >/dev/null 2>&1; then
+            echo "Release v$VERSION already exists; refusing to overwrite assets or history." >&2
+            exit 1
+          fi
+      - name: Create annotated tag if it does not exist
+        env:
+          VERSION: ${{ inputs.version }}
+          EXPECTED_SHA: ${{ inputs.expected_sha }}
+        run: |
+          set -euo pipefail
+          git fetch --tags origin
+          if git rev-parse -q --verify "refs/tags/v$VERSION" >/dev/null; then
+            test "$(git cat-file -t "refs/tags/v$VERSION")" = tag
+            test "$(git rev-parse "v$VERSION^{commit}")" = "$EXPECTED_SHA"
           else
             git config user.name 'Goujian release automation'
             git config user.email 'noreply@github.com'
-            git tag -a v1.1.1 "$GITHUB_SHA" -m 'Goujian Strategy Slides v1.1.1'
-            git push origin refs/tags/v1.1.1
+            git tag -a "v$VERSION" "$EXPECTED_SHA" -m "Goujian Strategy Slides v$VERSION"
+            git push origin "refs/tags/v$VERSION"
           fi
-          (cd dist && sha256sum goujian-strategy-slides-v1.1.1.zip > SHA256SUMS.txt)
-          if ! gh release view v1.1.1 >/dev/null 2>&1; then
-            gh release create v1.1.1 --verify-tag --title 'Goujian Strategy Slides v1.1.1' --notes-file docs/V1_1_1_RELEASE_NOTES.md dist/goujian-strategy-slides-v1.1.1.zip dist/SHA256SUMS.txt
-          fi
-      - name: Verify a fresh clone of the published tag
+          test "$(git rev-parse "v$VERSION^{commit}")" = "$EXPECTED_SHA"
+      - name: Publish installer and checksum
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ inputs.version }}
         run: |
-          git clone --depth 1 --branch v1.1.1 "https://github.com/$GITHUB_REPOSITORY.git" "$RUNNER_TEMP/goujian-remote-verify"
+          set -euo pipefail
+          cd dist
+          sha256sum "goujian-strategy-slides-v$VERSION.zip" > SHA256SUMS.txt
+          gh release create "v$VERSION" --verify-tag \
+            --title "Goujian Strategy Slides v$VERSION" \
+            --notes-file ../docs/V1_2_RELEASE_NOTES.md \
+            "goujian-strategy-slides-v$VERSION.zip" SHA256SUMS.txt
+      - name: Verify a fresh clone of the published tag
+        env:
+          VERSION: ${{ inputs.version }}
+          EXPECTED_SHA: ${{ inputs.expected_sha }}
+        run: |
+          set -euo pipefail
+          git clone --depth 1 --branch "v$VERSION" "https://github.com/$GITHUB_REPOSITORY.git" "$RUNNER_TEMP/goujian-remote-verify"
           cd "$RUNNER_TEMP/goujian-remote-verify"
-          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
-          npm install
+          test "$(git rev-parse HEAD)" = "$EXPECTED_SHA"
+          npm ci
+          python3 -m pip install -r requirements-render.txt
           npm test
           npm run validate:example
           npm run build:example

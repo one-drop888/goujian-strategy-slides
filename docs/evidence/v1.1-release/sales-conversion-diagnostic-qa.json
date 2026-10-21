@@ -4,8 +4,8 @@
   "capabilities": {
     "tools": {
       "libreoffice": "/usr/bin/libreoffice",
-      "soffice": "/home/zheyou/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/override/soffice",
-      "pdftoppm": "/home/zheyou/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/override/pdftoppm",
+      "soffice": "~/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/override/soffice",
+      "pdftoppm": "~/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/override/pdftoppm",
       "fc-list": "/usr/bin/fc-list",
       "pillow": true
     },

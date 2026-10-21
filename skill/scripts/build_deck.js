@@ -19,6 +19,6 @@ let visual='UNAVAILABLE';
 try {visual=JSON.parse(execFileSync('python3',[path.resolve(__dirname,'../../core/qa/capabilities.py')],{encoding:'utf8',timeout:5000})).VISUAL_QA;}catch {}
 console.log('VISUAL_QA='+visual);
 
-buildDeck(spec, outPath, { profile, repoRoot: path.resolve(__dirname, '../..'),specDir:path.dirname(path.resolve(specPath)) })
+buildDeck(spec, outPath, { profile, repoRoot: path.resolve(__dirname, '../..'),specDir:path.dirname(path.resolve(specPath)),specPath })
   .then(r => console.log(`PASS: built ${r.outPath} · profile=${r.profile} · slides=${r.slides}`))
   .catch(err => { console.error(`FAIL: ${err.message}`); process.exit(2); });

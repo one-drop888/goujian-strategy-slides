@@ -5,6 +5,8 @@ from types import SimpleNamespace
 ROOT=Path(__file__).resolve().parents[1]
 spec=importlib.util.spec_from_file_location('doctor',ROOT/'scripts/doctor.py')
 doctor=importlib.util.module_from_spec(spec);spec.loader.exec_module(doctor)
+cap_spec=importlib.util.spec_from_file_location('capabilities',ROOT/'core/qa/capabilities.py')
+capabilities=importlib.util.module_from_spec(cap_spec);cap_spec.loader.exec_module(capabilities)
 
 class FakeProbe:
     def __init__(self,commands=None,pillow=('12.1.1',None),specs=None,venv=False,cjk=True,writable=True):
@@ -92,6 +94,19 @@ class DoctorTests(unittest.TestCase):
         self.assertEqual(result['platform']['support'],{'linux':'AVAILABLE','darwin':'NOT_RUN','win32':'NOT_RUN'})
         platform_check=next(c for c in result['checks'] if c['id']=='platform')
         self.assertIn('WSL',platform_check['detail'])
+    def test_unknown_platform_is_reported_not_mapped_to_linux(self):
+        probe=FakeProbe();probe.platform_info=lambda:{'system':'FreeBSD','release':'test','machine':'amd64','platform':'freebsd13',
+                                                       'current':'freebsd13','wsl':False,'wsl_distro':None}
+        result=doctor.inspect(probe)
+        self.assertEqual(result['platform']['support'],{'linux':'NOT_RUN','darwin':'NOT_RUN','win32':'NOT_RUN'})
+        platform=next(c for c in result['checks'] if c['id']=='platform')
+        self.assertEqual(platform['status'],'UNSUPPORTED')
+        self.assertIn('without normalization',platform['detail'])
+    def test_standalone_capabilities_require_node(self):
+        original=capabilities.shutil.which
+        capabilities.shutil.which=lambda name:None if name=='node' else original(name)
+        try:self.assertFalse(capabilities.js_ready())
+        finally:capabilities.shutil.which=original
     def test_cli_missing_required_exits_nonzero(self):
         env={**os.environ,'PATH':''}
         process=subprocess.run([sys.executable,str(ROOT/'scripts/doctor.py'),'--json'],capture_output=True,text=True,env=env)

@@ -6,7 +6,8 @@ ROOT=Path(__file__).resolve().parents[2]
 JS_REQUIRED=('ajv','jszip','pptxgenjs')
 
 def js_ready(probe=None):
-    if probe is not None and hasattr(probe,'which') and not probe.which('node'):return False
+    which=probe.which if probe is not None and hasattr(probe,'which') else shutil.which
+    if not which('node'):return False
     for name in JS_REQUIRED:
         version=None
         if probe is not None and hasattr(probe,'package_version'):version=probe.package_version(name)

@@ -1,4 +1,5 @@
 const { columns } = require('../compositions/layout');
+const {buildRoadmapDag}=require('../../composition/roadmap-dag');
 const {resolveTitle,balancedWrap}=require('../../planner/title');
 const {createChartHelper}=require('../charts');
 
@@ -93,13 +94,13 @@ function createSlideRenderers(pptx, style, spec) {
         text(slide,it.label||it.title,x+.08,y,w-.16,.38,{fontSize:15,color:C.muted});
         text(slide,it.value,x+.08,y+.53,w-.16,.72,{fontFace:F.latin,fontSize:32,bold:true,color:emphasis?C.accent:C.text});
         line(slide,x+.08,y+1.4,w-.16,emphasis?C.accent:C.line,emphasis?2:1);
-        text(slide,it.note||it.delta||'',x+.08,y+1.57,w-.16,.43,{fontSize:13,color:C.muted});return;
+        text(slide,String(it.note||it.delta||'').replace(/ · /g,'\n'),x+.08,y+1.57,w-.16,.43,{fontSize:13,color:C.muted});return;
       }
       if(style.style.metric_style==='panel') slide.addShape(pptx.ShapeType.rect,{x,y:2.12,w,h:3.0,line:{color:C.panel},fill:{color:C.panel}});
       text(slide,it.label||it.title,x+.08,2.24,w-.16,.5,{fontSize:16,color:C.muted});
       text(slide,it.value,x+.08,3.06,w-.16,.88,{fontFace:F.latin,fontSize:s.items.length>4?30:38,bold:true,color:emphasis?C.accent:C.text});
       line(slide,x+.08,4.24,w-.16,emphasis?C.accent:C.line,emphasis?2:1);
-      text(slide,it.note||it.delta||'',x+.08,4.52,w-.16,.68,{fontSize:14,color:emphasis?C.accent:C.muted,valign:'top'});
+      text(slide,String(it.note||it.delta||'').replace(/ · /g,'\n'),x+.08,4.52,w-.16,.68,{fontSize:14,color:emphasis?C.accent:C.muted,valign:'top'});
     }); finish(slide,s);
   }
 
@@ -155,8 +156,67 @@ function createSlideRenderers(pptx, style, spec) {
     }); finish(slide,s);
   }
 
+  function roadmapDag(slide,s,b,dag) {
+    const stageCount=dag.stages,rows=Math.max(...dag.nodes.map(node=>node.lane))+1;
+    const headerH=.30,rowGap=.18,colGap=.44;
+    const rowH=Math.min(1.45,(b.h-headerH-rowGap*(rows-1))/rows);
+    const colW=(b.w-colGap*(stageCount-1))/stageCount;
+    const stageLabels=s.stage_labels||s.stages||[];
+    for(let stage=0;stage<stageCount;stage++) {
+      text(slide,String(stageLabels[stage]||`第${stage+1}阶段`),b.x+stage*(colW+colGap),b.y,colW,headerH,
+        {fontSize:11,bold:true,color:C.accent,scene:{role:'decoration',semantic_role:'stage_header',space:'slide'}});
+    }
+    const boxFor=node=>({x:b.x+node.stage*(colW+colGap),y:b.y+headerH+node.lane*(rowH+rowGap),w:colW,h:rowH});
+    const boxes=new Map(dag.nodes.map(node=>[node.id,boxFor(node)]));
+    for(const node of dag.nodes) {
+      const box=boxes.get(node.id);
+      slide.addShape(pptx.ShapeType.roundRect,{x:box.x,y:box.y,w:box.w,h:box.h,rectRadius:.05,
+        line:{color:C.line,width:.8},fill:{color:C.panel},
+        scene:{role:'decoration',semantic_role:'task_node',task_id:node.id,space:'slide'}});
+      slide.addShape(pptx.ShapeType.rect,{x:box.x,y:box.y,w:.06,h:box.h,line:{color:C.accent},fill:{color:C.accent},
+        scene:{role:'decoration',semantic_role:'task_accent',space:'slide'}});
+      text(slide,node.title.startsWith(node.id)?node.title:`${node.id} ${node.title}`,box.x+.18,box.y+.09,box.w-.3,box.h-.45,
+        {fontSize:13,bold:true,valign:'top',fit:'shrink',scene:{id:`task-${node.id}-title`,role:'evidence',task_id:node.id,space:'slide'}});
+      const meta=[node.owner,node.date].filter(Boolean).join(' · ');
+      if(meta)text(slide,meta,box.x+.18,box.y+box.h-.34,box.w-.3,.26,
+        {fontSize:10,color:C.muted,scene:{id:`task-${node.id}-meta`,role:'evidence',task_id:node.id,space:'slide'}});
+    }
+    const connector=(edge,x,y,w,h,last)=>{
+      slide.addShape(pptx.ShapeType.line,{x,y,w,h,line:{color:C.accent,width:1.5,endArrowType:last?'triangle':null},
+        scene:{role:'connector',semantic_role:'dependency',from:edge.from,to:edge.to,space:'slide'}});
+    };
+    for(const edge of dag.edges) {
+      const from=boxes.get(edge.from),to=boxes.get(edge.to);
+      if(from.y===to.y) {
+        if(to.x>from.x) {
+          if(to.x===from.x+from.w+colGap) connector(edge,from.x+from.w,from.y+from.h/2,to.x-from.x-from.w,0,true);
+          else {
+            const below=from.y+from.h+rowGap/2,above=from.y-rowGap/2;
+            const down=below<=b.y+b.h-.02,yGap=down?below:above,xApproach=to.x-colGap/2;
+            connector(edge,from.x+from.w/2,down?from.y+from.h:from.y,0,Math.abs(yGap-(down?from.y+from.h:from.y)),false);
+            connector(edge,Math.min(from.x+from.w/2,xApproach),yGap,Math.abs(xApproach-(from.x+from.w/2)),0,false);
+            connector(edge,xApproach,Math.min(yGap,to.y+to.h/2),0,Math.abs(yGap-(to.y+to.h/2)),false);
+            connector(edge,xApproach,to.y+to.h/2,to.x-xApproach,0,true);
+          }
+        }
+        continue;
+      }
+      const down=to.y>from.y;
+      const yStart=down?from.y+from.h:from.y,yGap=down?from.y+from.h+rowGap/2:from.y-rowGap/2;
+      const siblings=dag.edges.filter(other=>other.from===edge.from&&boxes.get(other.to).y!==from.y);
+      const xMid=from.x+from.w*((siblings.indexOf(edge)+1)/(siblings.length+1)),xApproach=to.x-colGap/2;
+      connector(edge,xMid,Math.min(yStart,yGap),0,Math.abs(yGap-yStart),false);
+      connector(edge,Math.min(xMid,xApproach),yGap,Math.abs(xApproach-xMid),0,false);
+      connector(edge,xApproach,Math.min(yGap,to.y+to.h/2),0,Math.abs(yGap-(to.y+to.h/2)),false);
+      connector(edge,xApproach,to.y+to.h/2,to.x-xApproach,0,true);
+    }
+  }
+
   function roadmap(s) {
-    const slide=pptx.addSlide(); base(slide,s);
+    const slide=pptx.addSlide(); const b=base(slide,s);
+    if(s.tasks!=null||s.dependencies!=null) {
+      roadmapDag(slide,s,b,buildRoadmapDag(s.tasks,s.dependencies));finish(slide,s);return;
+    }
     const lanes=s.lanes||s.items, h=Math.min(1.13,4.6/lanes.length-.1);
     lanes.forEach((lane,i)=>{
       const y=1.98+i*(h+.10);
@@ -206,15 +266,15 @@ function createSlideRenderers(pptx, style, spec) {
 
   function action(s) {
     const slide=pptx.addSlide(); base(slide,s);
-    const rh=Math.min(1.2,4.55/s.items.length);
+    const rh=Math.min(1.3,4.55/s.items.length);
     s.items.forEach((it,i)=>{
       const y=1.99+i*rh;
       text(slide,String(i+1).padStart(2,'0'),left,y,.5,.4,{fontSize:12,bold:true,color:C.accent});
       text(slide,itemTitle(it),left+.7,y,5.6,.56,{fontSize:F.bodySize,bold:true});
-      if(itemNote(it)) text(slide,itemNote(it),left+.7,y+.60,5.6,rh-.7,{fontSize:13,color:C.muted});
-      text(slide,[it.owner,it.time||it.period].filter(Boolean).join(' · '),left+6.7,y,3.15,.56,{fontSize:14,color:C.muted});
+      if(itemNote(it)) text(slide,itemNote(it),left+.7,y+.60,5.6,Math.max(.12,rh-.78),{fontSize:13,color:C.muted});
+      text(slide,[it.owner,it.time||it.period].filter(Boolean).join(' · '),left+6.55,y,3.3,.56,{fontSize:13,color:C.muted});
       if(it.status) text(slide,it.status,left+10.0,y,width-10,.56,{fontSize:14,bold:true,color:C.accent,align:'right'});
-      line(slide,left+.7,y+rh-.17,width-.7,C.line,.6);
+      line(slide,left+.7,y+rh-.12,width-.7,C.line,.6);
     }); finish(slide,s);
   }
 

@@ -44,4 +44,22 @@ function loadProfile(profileRef, repoRoot, seen = new Set(), projectDir) {
   return deepMerge(parent, child);
 }
 
-module.exports = { loadProfile, deepMerge, profileSearchDirs, resolveProfileFile };
+function profileChain(profileRef, repoRoot, projectDir) {
+  const base = repoRoot || path.resolve(__dirname, '../..');
+  const files = [], seen = new Set();
+  function visit(ref) {
+    const file = resolveProfileFile(ref, base, projectDir);
+    const key = fs.realpathSync(file);
+    if (seen.has(key)) throw new Error(`profile inheritance cycle: ${key}`);
+    seen.add(key);
+    files.push(file);
+    const data = JSON.parse(fs.readFileSync(file, 'utf8'));
+    if (!data.extends) return;
+    const relativeParent = path.resolve(path.dirname(file), data.extends);
+    visit(fs.existsSync(relativeParent) ? relativeParent : data.extends);
+  }
+  visit(profileRef || 'executive-clean');
+  return files;
+}
+
+module.exports = { loadProfile, profileChain, deepMerge, profileSearchDirs, resolveProfileFile };

@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const Ajv = require('ajv/dist/2020');
 const {resolveSlide} = require('../composition/resolver');
+const {buildRoadmapDag} = require('../composition/roadmap-dag');
 const ROOT = path.resolve(__dirname,'../..');
 const ajv = new Ajv({allErrors:true,strict:false});
 for(const name of ['asset','evidence','slide','deck','profile','composition','reasoning-plan']) ajv.addSchema(JSON.parse(fs.readFileSync(path.join(__dirname,`${name}.schema.json`),'utf8')));
@@ -55,7 +56,7 @@ function validateDeck(spec) {
         if(s.highlightIndex!=null && s.highlightIndex>=s.series?.[0]?.values.length) fail('highlightIndex is outside the data');
         if(s.axisMin!=null && !['line','trend','cohort'].includes(s.semanticType) && s.axisMin>0) fail('bar/area axes must include zero');
         if(s.axisMin!=null && s.series?.some(x=>x.values.some(v=>v<s.axisMin))) fail('axisMin would hide data');
-        if(['pie','doughnut'].includes(s.chartType) && (s.series?.length!==1 || s.series[0].values.some(v=>v<0))) fail('pie/doughnut requires one nonnegative series');
+        if(['pie','doughnut'].includes(s.chartType) && (s.series?.length!==1 || s.series[0].values.some(v=>v<0) || s.series[0].values.every(v=>v===0))) fail('pie/doughnut requires one nonnegative series with a positive total');
       }
       if(renderer==='table') {
         if(!s.headers?.length||!s.rows?.length) fail('headers and rows are required');
@@ -69,8 +70,16 @@ function validateDeck(spec) {
         if(vals.some((v,j)=>j&&v>vals[j-1])) fail('funnel counts must not increase between stages');
       }
       if(renderer==='roadmap') {
-        const lanes=s.lanes||s.items;
-        if(!lanes?.length||lanes.length>5||lanes.some(l=>!(l.phases||l.items)?.length || (l.phases||l.items).length>5)) fail('roadmap requires 1–5 lanes with 1–5 phases each');
+        if(s.tasks!=null||s.dependencies!=null) {
+          if(!Array.isArray(s.tasks)) fail('dependency roadmap requires a tasks array');
+          else {
+            if(s.stage_labels!=null&&(!Array.isArray(s.stage_labels)||s.stage_labels.length>3||s.stage_labels.some(x=>typeof x!=='string'||!x.trim())))fail('stage_labels must be up to three nonempty strings');
+            try {buildRoadmapDag(s.tasks,s.dependencies);} catch(e) {fail(e.message);}
+          }
+        } else {
+          const lanes=s.lanes||s.items;
+          if(!lanes?.length||lanes.length>5||lanes.some(l=>!(l.phases||l.items)?.length || (l.phases||l.items).length>5)) fail('roadmap requires 1–5 lanes with 1–5 phases each');
+        }
       }
       if(renderer==='architecture') {
         const layers=s.layers||[{items:s.items||s.nodes}];

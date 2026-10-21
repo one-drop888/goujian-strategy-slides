@@ -52,14 +52,17 @@ function createDataRenderers(pptx, style, spec) {
     const map={bar:pptx.ChartType.bar,column:pptx.ChartType.bar,line:pptx.ChartType.line,area:pptx.ChartType.area,
       pie:pptx.ChartType.pie,doughnut:pptx.ChartType.doughnut};
     const series=s.series.map(x=>({name:x.name||'',labels:x.labels||s.labels,values:x.values}));
+    const pieLike=['pie','doughnut'].includes(kind);
     const colors=series.length===1 && ['bar','column'].includes(kind)
       ? charts.categoryColors(series[0].values,s.highlightIndex)
       : charts.tokens.chart.palette;
     const options=charts.options({
       x:left,y:2.12,w:s.insight?8.25:width,h:4.32,
-      showLegend:series.length>1,showValue:['bar','column'].includes(kind),
-      dataLabelPosition:'outEnd',dataLabelFormatCode:s.numberFormat||'0.##',
+      showLegend:pieLike||series.length>1,showValue:['bar','column'].includes(kind)||pieLike,
+      showLabel:pieLike,showPercent:pieLike,showLeaderLines:pieLike,
+      dataLabelPosition:'outEnd',dataLabelFormatCode:pieLike?'0%':(s.numberFormat||'0.##'),
       chartColors:colors,
+      chartColorsOpacity:kind==='area'?55:undefined,
       valGridLine:{color:charts.tokens.chart.grid,size:.5,style:style.style.chart_grid==='none'?'none':'solid'},
       showMarker:true,lineSize:2.5,lineDataSymbol:'circle',lineDataSymbolSize:5,
       showCatName:false,showShadow:false,showSerName:false,

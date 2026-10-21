@@ -49,14 +49,29 @@ const PIE_DEFAULT_LABEL_BLOCK='<a:solidFill><a:srgbClr val="000000"/></a:solidFi
 function escapeXmlAttribute(value) {
   return String(value).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
-function replaceGlobalLabel(xml, replacement) {
-  return xml.replace(/<c:dLbls>[\s\S]*?<\/c:dLbls>/g, block => {
-    if (!block.includes(PIE_DEFAULT_LABEL_BLOCK)) return block;
+const PIE_CHART=/<c:(?:pie|doughnut)(?:3D)?Chart[ >]/;
+function replaceGlobalLabel(xml, replacement, kind, labelBackground) {
+  if (!PIE_CHART.test(xml)) return xml;
+  const plot=xml.match(/<c:plotArea[\s\S]*?<\/c:plotArea>/);
+  if(!plot) return xml;
+  const plotXml=plot[0],base=plot.index;
+  let out='',cursor=0;
+  for(const match of plotXml.matchAll(/<c:dLbls>[\s\S]*?<\/c:dLbls>/g)) {
+    const length=match[0].length;
+    let block=match[0];
+    if(!block.includes(PIE_DEFAULT_LABEL_BLOCK)) continue;
+    if(kind==='doughnut'&&!block.includes('<c:dLblPos'))block=block.replace('<c:dLbls>','<c:dLbls><c:dLblPos val="outEnd"/>');
+    if(kind==='doughnut')block=block.replace(/<c:dLbl>([\s\S]*?)<\/c:dLbl>/g,(all,inner)=>
+      `<c:dLbl>${inner.replace(/<c:idx val="\d+"\/>(?!<c:dLblPos)/,'$&<c:dLblPos val="outEnd"/>')}</c:dLbl>`);
+    if(kind==='doughnut'&&labelBackground)block=block.replace(/<c:spPr\/>/g,
+      `<c:spPr><a:solidFill><a:srgbClr val="${escapeXmlAttribute(labelBackground)}"/></a:solidFill></c:spPr>`);
     const split=block.lastIndexOf('</c:dLbl>');
     const head=split>=0?block.slice(0,split+'</c:dLbl>'.length):'';
     const tail=split>=0?block.slice(split+'</c:dLbl>'.length):block;
-    return head+tail.split(PIE_DEFAULT_LABEL_BLOCK).join(replacement);
-  });
+    out+=xml.slice(base+cursor,base+match.index)+head+tail.split(PIE_DEFAULT_LABEL_BLOCK).join(replacement);
+    cursor=match.index+length;
+  }
+  return out?xml.slice(0,base)+out+xml.slice(base+cursor):xml;
 }
 async function normalizeChartXml(buffer, style) {
   const JSZip = require('jszip');
@@ -67,7 +82,8 @@ async function normalizeChartXml(buffer, style) {
   for (const name of names) {
     const xml = await zip.file(name).async('string');
     if (!xml.includes(PIE_DEFAULT_LABEL_BLOCK)) continue;
-    const next = replaceGlobalLabel(xml,replacement);
+    const kind=/<c:doughnutChart[ >]/.test(xml)?'doughnut':'pie';
+    const next = replaceGlobalLabel(xml,replacement,kind,style.tokens.chart.background);
     if (next===xml) continue;
     zip.file(name, next); changed = true;
   }

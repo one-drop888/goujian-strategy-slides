@@ -102,7 +102,8 @@
         "value": { "type": "number" },
         "unit": { "type": "string", "minLength": 1 },
         "time_window": { "type": "string", "minLength": 1 },
-        "denominator": { "type": "number" }
+        "denominator": { "type": "number" },
+        "json_pointer": { "type": "string", "pattern": "^/" }
       }
     },
     "claim": {
@@ -138,6 +139,7 @@
           "properties": {
             "value": { "type": "number" },
             "unit": { "type": "string", "minLength": 1 },
+            "metric": { "type": "string", "minLength": 1 },
             "denominator": { "type": "number" },
             "time_window": { "type": "string", "minLength": 1 }
           }
@@ -152,7 +154,32 @@
         "source_id": { "type": "string" },
         "disposition": { "enum": ["retain", "summarize", "appendix", "deduplicate"] },
         "rationale": { "type": "string", "minLength": 1 },
-        "dedup_target": { "type": "string" }
+        "dedup_target": { "type": "string" },
+        "value_map": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["from_value_id", "to_value_id"],
+            "additionalProperties": false,
+            "properties": {
+              "from_value_id": { "type": "string" },
+              "to_value_id": { "type": "string" }
+            }
+          }
+        },
+        "value_dispositions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["value_id", "classification", "rationale"],
+            "additionalProperties": false,
+            "properties": {
+              "value_id": { "type": "string" },
+              "classification": { "enum": ["background", "noncritical", "appendix"] },
+              "rationale": { "type": "string", "minLength": 1 }
+            }
+          }
+        }
       }
     },
     "note": {
@@ -183,6 +210,7 @@
           "enum": ["trend", "comparison", "composition", "distribution", "relationship", "process", "hierarchy", "timeline", "evidence_table", "image_evidence", "decision", "narrative"]
         },
         "appendix": { "type": "boolean" },
+        "summary_rationale": { "type": "string", "minLength": 1 },
         "spec": { "type": "object" },
         "bindings": { "type": "array", "items": { "$ref": "#/$defs/binding" } }
       }

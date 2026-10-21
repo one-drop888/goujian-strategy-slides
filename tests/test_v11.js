@@ -52,7 +52,9 @@ async function main(){
     fs.writeFileSync(spec,JSON.stringify(example));
     const original=fs.readFileSync(spec);
     assert.throws(()=>execFileSync('node',[path.join(root,'skill/scripts/build_deck.js'),spec,spec],{stdio:'pipe'}));assert.deepEqual(fs.readFileSync(spec),original);
-    await assert.rejects(buildDeck(example,path.join(directory,example.assets[0].path),{specDir:directory}),/differ from every source asset/);
+    const assetBytes=fs.readFileSync(path.join(directory,example.assets[0].path));
+    await assert.rejects(buildDeck(example,path.join(directory,example.assets[0].path),{specDir:directory}),/must not overwrite input/);
+    assert.deepEqual(fs.readFileSync(path.join(directory,example.assets[0].path)),assetBytes);
     const cli=execFileSync('node',[path.join(root,'skill/scripts/build_deck.js'),spec,output],{cwd:os.tmpdir(),timeout:120000,encoding:'utf8'});assert.match(cli,/VISUAL_QA=(NOT_RUN|UNAVAILABLE)/);
     const graph=JSON.parse(fs.readFileSync(output+'.scene.json'));
     const values=graph.slides[1].nodes.filter(n=>n.kind==='text').map(n=>n.text);

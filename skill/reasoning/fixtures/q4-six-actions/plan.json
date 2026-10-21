@@ -114,39 +114,32 @@
     {
       "id": "q4-roadmap",
       "order": 3,
-      "question": "六项行动如何按依赖分组？",
+      "question": "六项行动如何按依赖顺序推进？",
       "title_mode": "descriptive",
-      "claim_ids": ["c-groups", "c-a1", "c-a2", "c-a3", "c-a4", "c-a5", "c-a6"],
+      "claim_ids": ["c-a1", "c-a2", "c-a3", "c-a4", "c-a5", "c-a6"],
       "source_ids": ["q4-source"],
-      "transition": "分组之后核对责任人与日期",
-      "communication_intent": "用三条推进线展示分组，而不是六张并列卡片",
+      "transition": "先看顺序，再核对责任人与日期",
+      "communication_intent": "用依赖箭头展示推进顺序，而不是六张并列卡片",
       "visual_intent": "process",
       "appendix": false,
       "spec": {
         "type": "roadmap",
-        "title": "按依赖关系分三条推进线，六项行动全部保留",
-        "lanes": [
-          {
-            "title": "经营基础",
-            "phases": [
-              { "title": "A1 九城收单窗口审计" },
-              { "title": "A2 客户保留专职角色" },
-              { "title": "A4 库存账龄与价格复核" }
-            ]
-          },
-          {
-            "title": "转化测试",
-            "phases": [
-              { "title": "A3 分群保客外呼" },
-              { "title": "A5 库存分配试点" }
-            ]
-          },
-          {
-            "title": "上市闸门",
-            "phases": [
-              { "title": "A6 新车上市准备度评审" }
-            ]
-          }
+        "title": "依赖决定顺序：A1→A2→A3 为主线，A4→A5 与 A6 并行",
+        "subtitle": "箭头=先后顺序：前置任务完成后启动后续任务；行仅为排布",
+        "stage_labels": ["第1阶段", "第2阶段", "第3阶段"],
+        "tasks": [
+          { "id": "A1", "title": "九城收单窗口审计", "owner": "区域运营", "date": "10月10日", "lane": 0 },
+          { "id": "A2", "title": "客户保留设置专职角色", "owner": "CRM", "date": "10月15日", "lane": 0 },
+          { "id": "A3", "title": "分群保客外呼", "owner": "门店", "date": "10月22日", "lane": 0 },
+          { "id": "A6", "title": "新车上市准备度评审", "owner": "产品", "date": "11月15日", "lane": 1 },
+          { "id": "A4", "title": "库存账龄与价格复核", "owner": "财务", "date": "10月12日", "lane": 2 },
+          { "id": "A5", "title": "库存分配试点", "owner": "供应链", "date": "11月01日", "lane": 2 }
+        ],
+        "dependencies": [
+          { "from": "A1", "to": "A2" },
+          { "from": "A2", "to": "A3" },
+          { "from": "A4", "to": "A5" },
+          { "from": "A1", "to": "A6" }
         ],
         "source": "合成材料 · Project-authored synthetic fixture / Apache-2.0"
       },

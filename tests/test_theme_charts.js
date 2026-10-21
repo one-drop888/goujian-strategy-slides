@@ -88,6 +88,21 @@ async function main(){
   assert(normalizedXml.includes('typeface="A&amp;B Serif"'),'global label font is XML-escaped');
   assert(normalizedXml.includes('<c:v>40</c:v>'),'chart data cache is unchanged');
 
+  // The workaround is scoped to pie/doughnut charts and their global label block.
+  const barChart=sampleChart.replace('<c:pieChart>','<c:barChart>').replace('</c:pieChart>','</c:barChart>');
+  const barZip=new JSZip();barZip.file('ppt/charts/chart1.xml',barChart);
+  const barBuffer=await barZip.generateAsync({type:'nodebuffer'});
+  assert.equal(await normalizeChartXml(barBuffer,{tokens:{chart:{dataLabel:'F9FAFB'}},font:{latin:'Noto Sans'}}),barBuffer,'non-pie charts are never rewritten');
+  const marker='<a:solidFill><a:srgbClr val="000000"/></a:solidFill><a:latin typeface="Arial"/>';
+  const pointBlock=`<c:dLbl><c:idx val="0"/><c:txPr><a:p><a:pPr><a:defRPr>${marker}</a:defRPr></a:pPr></a:p></c:txPr></c:dLbl>`;
+  const seriesScoped=sampleChart.replace('<c:ser>',`<c:ser><c:dLbls>${pointBlock}<c:txPr><a:p><a:pPr><a:defRPr>${marker}</a:defRPr></a:pPr></a:p></c:txPr></c:dLbls>`);
+  const scopedZip=new JSZip();scopedZip.file('ppt/charts/chart1.xml',seriesScoped);
+  const scopedXml=await (await JSZip.loadAsync(await normalizeChartXml(await scopedZip.generateAsync({type:'nodebuffer'}),{tokens:{chart:{dataLabel:'F9FAFB'}},font:{latin:'Noto Sans'}}))).file('ppt/charts/chart1.xml').async('string');
+  const seriesBlock=block(scopedXml,'ser');
+  assert(seriesBlock.includes(pointBlock),'explicit point label paint and font stay untouched');
+  assert.equal((scopedXml.match(/srgbClr val="000000"/g)||[]).length,4,'explicit point labels stay black while default blocks are tokenized');
+  assert.equal((scopedXml.match(/typeface="Arial"/g)||[]).length,3,'title and explicit point labels keep their fonts');
+
   // Shared tokens also drive text primitives, not only charts.
   const midProfile={id:'midgray',canvas:'wide',background:'808080',font:{latin:'Noto Sans',cjk:'Noto Sans CJK SC',title_size:27,body_size:18},
     colors:{text:'888888',muted:'888888',accent:'888888',accent_soft:'909090',panel:'808080',line:'808080'}};
@@ -150,12 +165,20 @@ async function main(){
       if(dataLabels) {
         assert(dataLabels.includes(T.chart.dataLabel),`${profile} chart${i+1} data labels`);
         const labelColors=[...dataLabels.matchAll(/<a:srgbClr val="([0-9A-Fa-f]{6})"\/>/g)].map(m=>m[1].toUpperCase());
-        assert(labelColors.every(color=>color===T.chart.dataLabel),`${profile} chart${i+1} label paint stays tokenized`);
+        assert(labelColors.every(color=>color===T.chart.dataLabel||color===T.chart.background),`${profile} chart${i+1} label paint stays tokenized`);
       }
       const seriesBlock=block(chart.xml,'ser');
       if(seriesBlock)assert(seriesBlock.includes(T.chart.palette[0])||seriesBlock.includes(T.chart.highlight),`${profile} chart${i+1} series paint`);
       const legend=block(chart.xml,'legend');
       if(legend)assert(legend.includes(T.chart.labels),`${profile} chart${i+1} legend`);
+      if(i===4)assert(chart.xml.includes('<a:alpha val="55000"/>'),`${profile} area opacity keeps both series visible`);
+      if(i===5||i===6){
+        const labels=block(chart.xml,'dLbls');
+        assert(labels.includes('<c:showVal val="1"/>')&&labels.includes('<c:showCatName val="1"/>')&&labels.includes('<c:showPercent val="1"/>'),`${profile} chart${i+1} native category/value/percent labels`);
+        assert(labels.includes('formatCode="0%"'),`${profile} chart${i+1} percent labels use percent format`);
+        assert(legend,`${profile} chart${i+1} category legend`);
+        if(i===6)assert(labels.includes('<c:dLblPos val="outEnd"/>')&&labels.includes(`<c:spPr><a:solidFill><a:srgbClr val="${T.chart.background}"/></a:solidFill></c:spPr>`),`${profile} doughnut labels carry native position and readable background`);
+      }
     }
     const tableSlide=await slideXml(file,8);
     assert(tableSlide.includes(T.table.bodyFill)&&tableSlide.includes(T.table.bodyText),`${profile} table body tokens`);

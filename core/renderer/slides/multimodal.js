@@ -30,8 +30,10 @@ function createMultimodalRenderers(pptx,style,spec,assets) {
   }
   function hero(slide,s) {
     const box={x:0,y:0,w:W,h:H};
-    const titleFont={...F,titleSize:Math.min(40,F.titleSize+8)},tw=width*.68;
-    const flow=resolveTitle(s,titleFont,tw),ty=4.45,sh=flow.h+(flow.subtitleH?flow.subtitleH+.2:0);
+    const titleFont={...F,titleSize:Math.min(40,F.titleSize+8)};
+    const fullTitle=resolveTitle(s,titleFont,width);
+    const tw=fullTitle.lines.length===1?width:width*.68;
+    const flow=tw===width?fullTitle:resolveTitle(s,titleFont,tw),ty=4.45,sh=flow.h+(flow.subtitleH?flow.subtitleH+.2:0);
     const overlay={x:(left-.2)/W,y:(ty-.2)/H,w:(tw+.4)/W,h:(sh+.4)/H};
     const r=assets.draw(slide,s.asset_ids[0],box,{id:'hero-image',role:'background',overlay,fit:'cover'});
     const c=r.contrast;slide._scene.title={...flow,titleY:ty};

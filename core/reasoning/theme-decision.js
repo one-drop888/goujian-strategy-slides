@@ -27,6 +27,28 @@ function automaticProfile(intent={}) {
   return best?{profile:best.profile,matched:best.matched}:{profile:null,matched:null};
 }
 
+function hex(value) { return String(value??'').replace(/^#/,'').toUpperCase(); }
+function assertPriorityOverrides(plan,profile,protectedSource) {
+  const deck=plan.deck||{},violations=[];
+  const profileBackground=profile.background||'FFFFFF';
+  if(deck.background&&hex(deck.background)!==hex(profileBackground)) {
+    violations.push(`background ${deck.background} conflicts with ${profileBackground}`);
+  }
+  for(const [key,value] of Object.entries(deck.colors||{})) {
+    const base=profile.colors?.[key]??profile.colors?.[key.replace(/_([a-z])/g,(_,letter)=>letter.toUpperCase())];
+    if(base==null) violations.push(`colors.${key} is not defined by the ${protectedSource} profile`);
+    else if(hex(value)!==hex(base)) violations.push(`colors.${key} ${value} conflicts with ${base}`);
+  }
+  const fontDefaults={latin:'Noto Sans',cjk:'Noto Sans CJK SC',title_size:27,body_size:18};
+  for(const key of ['latin','cjk','title_size','body_size']) {
+    if(deck.font?.[key]==null) continue;
+    const base=profile.font?.[key]??fontDefaults[key];
+    if(String(deck.font[key])!==String(base)) violations.push(`font.${key} ${deck.font[key]} conflicts with ${base}`);
+  }
+  if(violations.length) {
+    throw new Error(`${protectedSource} profile has highest priority; remove these deck overrides or move them into the ${protectedSource} profile: ${violations.join('; ')}`);
+  }
+}
 function selectTheme(plan,options={}) {
   const theme=plan.theme||{};
   const planDir=options.planDir||process.cwd();
@@ -55,6 +77,7 @@ function selectTheme(plan,options={}) {
   const profile=loadProfile(selected,repoRoot,new Set(),planDir);
   const errors=schemaErrors('profile',profile);
   if(errors.length) throw new Error(`Invalid selected profile ${selected}: ${errors.join('; ')}`);
+  if(source==='reference'||source==='brand') assertPriorityOverrides(plan,profile,source);
   const actual_mode=relativeLuminance(profile.background||'FFFFFF')<.45?'dark':'light';
   if(requested_mode==='light'&&actual_mode==='dark') {
     conflicts.push('requested light mode but the selected profile is dark; explicit profile priority retained');
@@ -71,7 +94,7 @@ function selectTheme(plan,options={}) {
     primary:colors.accent||colors.text||'176B87',background:profile.background||'FFFFFF',
     typography:{latin:profile.font?.latin||'Noto Sans',cjk:profile.font?.cjk||'Noto Sans CJK SC',
       title_size:profile.font?.title_size||27,body_size:profile.font?.body_size||18},
-    chart_strategy:'Palette derives from the accent with a WCAG 3.0 series / 4.5 text contrast guard; grid and labels use semantic tokens.',
+    chart_strategy:'Palette derives from the accent with a 3:1 series / 4.5:1 text contrast guard; grid and labels use semantic tokens.',
     evidence_strategy:'Editable native charts/tables; image evidence stays embedded with caption and provenance; speaker notes carry source/claim traceability.',
     rationale:reason,conflicts,
   };

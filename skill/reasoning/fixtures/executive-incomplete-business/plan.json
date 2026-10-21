@@ -19,16 +19,16 @@
       "path": "sources/business-performance.json",
       "sha256": "45d8a83d19a90ae7c04d26b663d199863b0acf498c3a6c3315774753c8e766eb",
       "values": [
-        { "id": "rev-actual", "label": "实际", "metric": "收入", "value": 960, "unit": "万元", "time_window": "2026-09" },
-        { "id": "rev-target", "label": "目标", "metric": "收入", "value": 1000, "unit": "万元", "time_window": "2026-09" },
-        { "id": "rev-prev-month", "label": "上月", "metric": "收入", "value": 900, "unit": "万元", "time_window": "2026-08" },
-        { "id": "rev-prev-year", "label": "去年同月", "metric": "收入", "value": 800, "unit": "万元", "time_window": "2025-09" },
-        { "id": "t-04", "label": "2026-04", "metric": "收入", "value": 780, "unit": "万元", "time_window": "2026-04" },
-        { "id": "t-05", "label": "2026-05", "metric": "收入", "value": 820, "unit": "万元", "time_window": "2026-05" },
-        { "id": "t-06", "label": "2026-06", "metric": "收入", "value": 850, "unit": "万元", "time_window": "2026-06" },
-        { "id": "t-07", "label": "2026-07", "metric": "收入", "value": 870, "unit": "万元", "time_window": "2026-07" },
-        { "id": "t-08", "label": "2026-08", "metric": "收入", "value": 900, "unit": "万元", "time_window": "2026-08" },
-        { "id": "t-09", "label": "2026-09", "metric": "收入", "value": 960, "unit": "万元", "time_window": "2026-09" }
+        { "id": "rev-actual", "label": "实际", "metric": "收入", "value": 960, "unit": "万元", "time_window": "2026-09", "json_pointer": "/metrics/0/actual" },
+        { "id": "rev-target", "label": "目标", "metric": "收入", "value": 1000, "unit": "万元", "time_window": "2026-09", "json_pointer": "/metrics/0/target" },
+        { "id": "rev-prev-month", "label": "上月", "metric": "收入", "value": 900, "unit": "万元", "time_window": "2026-08", "json_pointer": "/metrics/0/previous_month" },
+        { "id": "rev-prev-year", "label": "去年同月", "metric": "收入", "value": 800, "unit": "万元", "time_window": "2025-09", "json_pointer": "/metrics/0/previous_year" },
+        { "id": "t-04", "label": "2026-04", "metric": "收入", "value": 780, "unit": "万元", "time_window": "2026-04", "json_pointer": "/trend/0/actual" },
+        { "id": "t-05", "label": "2026-05", "metric": "收入", "value": 820, "unit": "万元", "time_window": "2026-05", "json_pointer": "/trend/1/actual" },
+        { "id": "t-06", "label": "2026-06", "metric": "收入", "value": 850, "unit": "万元", "time_window": "2026-06", "json_pointer": "/trend/2/actual" },
+        { "id": "t-07", "label": "2026-07", "metric": "收入", "value": 870, "unit": "万元", "time_window": "2026-07", "json_pointer": "/trend/3/actual" },
+        { "id": "t-08", "label": "2026-08", "metric": "收入", "value": 900, "unit": "万元", "time_window": "2026-08", "json_pointer": "/trend/4/actual" },
+        { "id": "t-09", "label": "2026-09", "metric": "收入", "value": 960, "unit": "万元", "time_window": "2026-09", "json_pointer": "/trend/5/actual" }
       ]
     },
     {
@@ -40,10 +40,10 @@
       "path": "sources/business-performance.json",
       "sha256": "45d8a83d19a90ae7c04d26b663d199863b0acf498c3a6c3315774753c8e766eb",
       "values": [
-        { "id": "ord-actual", "label": "实际", "metric": "订单", "value": 240, "unit": "单", "time_window": "2026-09" },
-        { "id": "ord-target", "label": "目标", "metric": "订单", "value": 250, "unit": "单", "time_window": "2026-09" },
-        { "id": "ord-prev-month", "label": "上月", "metric": "订单", "value": 225, "unit": "单", "time_window": "2026-08" },
-        { "id": "ord-prev-year", "label": "去年同月", "metric": "订单", "value": 200, "unit": "单", "time_window": "2025-09" }
+        { "id": "ord-actual", "label": "实际", "metric": "订单", "value": 240, "unit": "单", "time_window": "2026-09", "json_pointer": "/metrics/1/actual" },
+        { "id": "ord-target", "label": "目标", "metric": "订单", "value": 250, "unit": "单", "time_window": "2026-09", "json_pointer": "/metrics/1/target" },
+        { "id": "ord-prev-month", "label": "上月", "metric": "订单", "value": 225, "unit": "单", "time_window": "2026-08", "json_pointer": "/metrics/1/previous_month" },
+        { "id": "ord-prev-year", "label": "去年同月", "metric": "订单", "value": 200, "unit": "单", "time_window": "2025-09", "json_pointer": "/metrics/1/previous_year" }
       ]
     },
     {
@@ -55,9 +55,10 @@
       "path": "sources/business-performance.json",
       "sha256": "45d8a83d19a90ae7c04d26b663d199863b0acf498c3a6c3315774753c8e766eb",
       "values": [
-        { "id": "mar-actual", "label": "实际", "metric": "毛利率", "value": 22, "unit": "%", "time_window": "2026-09" },
-        { "id": "mar-target", "label": "目标", "metric": "毛利率", "value": 24, "unit": "%", "time_window": "2026-09" },
-        { "id": "mar-prev-year", "label": "去年同月", "metric": "毛利率", "value": 20, "unit": "%", "time_window": "2025-09" }
+        { "id": "mar-actual", "label": "实际", "metric": "毛利率", "value": 22, "unit": "%", "time_window": "2026-09", "json_pointer": "/metrics/2/actual" },
+        { "id": "mar-target", "label": "目标", "metric": "毛利率", "value": 24, "unit": "%", "time_window": "2026-09", "json_pointer": "/metrics/2/target" },
+        { "id": "mar-prev-month", "label": "上月", "metric": "毛利率", "value": 21, "unit": "%", "time_window": "2026-08", "json_pointer": "/metrics/2/previous_month" },
+        { "id": "mar-prev-year", "label": "去年同月", "metric": "毛利率", "value": 20, "unit": "%", "time_window": "2025-09", "json_pointer": "/metrics/2/previous_year" }
       ]
     },
     {
@@ -179,18 +180,6 @@
       "result": { "value": 6.666666666666667, "unit": "%", "time_window": "2026-08->2026-09" }
     },
     {
-      "id": "c-revenue-yoy",
-      "type": "CALCULATION",
-      "text": "收入较去年同月增长20%。",
-      "source_ids": ["revenue"],
-      "operator": "percent_change",
-      "inputs": [
-        { "source_id": "revenue", "value_id": "rev-prev-year" },
-        { "source_id": "revenue", "value_id": "rev-actual" }
-      ],
-      "result": { "value": 20, "unit": "%", "time_window": "2025-09->2026-09" }
-    },
-    {
       "id": "c-cause-hypothesis",
       "type": "HYPOTHESIS",
       "text": "收入与毛利率缺口可能来自产品结构或折扣执行，但现有材料尚不能验证。",
@@ -220,10 +209,37 @@
     }
   ],
   "content_decisions": [
-    { "source_id": "revenue", "disposition": "retain", "rationale": "关键实际、目标与趋势均需在正文和附录保留。" },
-    { "source_id": "orders", "disposition": "retain", "rationale": "订单达成与差异写入核对表。" },
-    { "source_id": "margin", "disposition": "retain", "rationale": "毛利率差异以pp呈现，避免与百分比降幅混淆。" },
-    { "source_id": "gap-note", "disposition": "retain", "rationale": "缺口说明进入不确定性页和附录，避免编造原因。" }
+    {
+      "source_id": "revenue",
+      "disposition": "retain",
+      "rationale": "关键实际、目标与趋势用于正文；上月与去年同月基线在附录完整呈现。",
+      "value_dispositions": [
+        { "value_id": "rev-prev-year", "classification": "appendix", "rationale": "去年同月800万元在附录基线表呈现，仅作背景核对，不进入因果推断。" }
+      ]
+    },
+    {
+      "source_id": "orders",
+      "disposition": "retain",
+      "rationale": "订单达成与差异写入核对表；上月与去年同月基线在附录完整呈现。",
+      "value_dispositions": [
+        { "value_id": "ord-prev-month", "classification": "appendix", "rationale": "上月225单在附录基线表呈现，仅作背景核对。" },
+        { "value_id": "ord-prev-year", "classification": "appendix", "rationale": "去年同月200单在附录基线表呈现，仅作背景核对。" }
+      ]
+    },
+    {
+      "source_id": "margin",
+      "disposition": "retain",
+      "rationale": "毛利率差异以pp呈现；上月与去年同月基线在附录完整呈现，避免与百分比降幅混淆。",
+      "value_dispositions": [
+        { "value_id": "mar-prev-month", "classification": "appendix", "rationale": "上月21%在附录基线表呈现，仅作背景核对。" },
+        { "value_id": "mar-prev-year", "classification": "appendix", "rationale": "去年同月20%在附录基线表呈现，仅作背景核对，不用于计算降幅。" }
+      ]
+    },
+    {
+      "source_id": "gap-note",
+      "disposition": "retain",
+      "rationale": "缺口说明进入行动页与附录，避免编造原因或影响金额。"
+    }
   ],
   "findings": [
     { "text": "收入与订单达成率均为96%，毛利率差2pp。", "claim_ids": ["c-rev-attain", "c-orders-attain", "c-margin-gap"] }
@@ -269,7 +285,7 @@
       "order": 2,
       "question": "管理层需要先确认什么？",
       "title_mode": "descriptive",
-      "claim_ids": ["c-revenue-fact", "c-rev-attain", "c-margin-gap", "c-cause-hypothesis", "c-decision"],
+      "claim_ids": ["c-revenue-fact", "c-orders-attain", "c-rev-attain", "c-margin-gap", "c-cause-hypothesis", "c-decision"],
       "source_ids": ["revenue", "orders", "margin", "gap-note"],
       "transition": "确认口径后再看趋势与核对表",
       "communication_intent": "把已知差异与未知原因分开陈述",
@@ -291,12 +307,12 @@
     {
       "id": "s-kpi",
       "order": 3,
-      "question": "三个核心指标与趋势是多少？",
+      "question": "三个核心指标的九月结果是多少？",
       "title_mode": "conclusion",
-      "claim_ids": ["c-revenue-fact", "c-orders-fact", "c-margin-fact", "c-rev-attain", "c-revenue-yoy", "c-margin-gap", "c-trend-fact"],
+      "claim_ids": ["c-revenue-fact", "c-orders-fact", "c-margin-fact", "c-rev-attain", "c-orders-attain", "c-margin-gap"],
       "source_ids": ["revenue", "orders", "margin"],
-      "transition": "从核心指标进入逐项目标差异",
-      "communication_intent": "用同一页建立指标全貌",
+      "transition": "指标全貌之后看收入走势",
+      "communication_intent": "用同一页锁定实际值、目标与达成/差异",
       "visual_intent": "trend",
       "appendix": false,
       "spec": {
@@ -307,42 +323,63 @@
           { "label": "订单", "value": "240单", "delta": "目标 250单 · 达成 96%" },
           { "label": "毛利率", "value": "22%", "delta": "目标 24% · 差 2pp" }
         ],
-        "dashboard": {
-          "unit": "万元 · 月度实际",
-          "labels": ["2026-04", "2026-05", "2026-06", "2026-07", "2026-08", "2026-09"],
-          "series": [
-            { "name": "收入", "values": [780, 820, 850, 870, 900, 960] }
-          ]
-        },
         "source": "合成数据 · Project-authored synthetic dataset / Apache-2.0"
       },
       "bindings": [
         { "pointer": "/items/0/value", "target": { "kind": "source", "source_id": "revenue", "value_id": "rev-actual" }, "format": { "kind": "integer", "suffix": "万元" } },
         { "pointer": "/items/1/value", "target": { "kind": "source", "source_id": "orders", "value_id": "ord-actual" }, "format": { "kind": "integer", "suffix": "单" } },
-        { "pointer": "/items/2/value", "target": { "kind": "source", "source_id": "margin", "value_id": "mar-actual" }, "format": { "kind": "percent", "precision": 0 } },
-        { "pointer": "/dashboard/series/0/values/0", "target": { "kind": "source", "source_id": "revenue", "value_id": "t-04" }, "format": { "kind": "number" } },
-        { "pointer": "/dashboard/series/0/values/1", "target": { "kind": "source", "source_id": "revenue", "value_id": "t-05" }, "format": { "kind": "number" } },
-        { "pointer": "/dashboard/series/0/values/2", "target": { "kind": "source", "source_id": "revenue", "value_id": "t-06" }, "format": { "kind": "number" } },
-        { "pointer": "/dashboard/series/0/values/3", "target": { "kind": "source", "source_id": "revenue", "value_id": "t-07" }, "format": { "kind": "number" } },
-        { "pointer": "/dashboard/series/0/values/4", "target": { "kind": "source", "source_id": "revenue", "value_id": "t-08" }, "format": { "kind": "number" } },
-        { "pointer": "/dashboard/series/0/values/5", "target": { "kind": "source", "source_id": "revenue", "value_id": "t-09" }, "format": { "kind": "number" } }
+        { "pointer": "/items/2/value", "target": { "kind": "source", "source_id": "margin", "value_id": "mar-actual" }, "format": { "kind": "percent", "precision": 0 } }
+      ]
+    },
+    {
+      "id": "s-trend",
+      "order": 4,
+      "question": "收入走势说明了什么，又不能说明什么？",
+      "title_mode": "conclusion",
+      "claim_ids": ["c-trend-fact", "c-revenue-mom", "c-rev-gap"],
+      "source_ids": ["revenue"],
+      "transition": "从趋势进入逐项目标差异",
+      "communication_intent": "展示连续增长与环比，同时锁定九月40万元缺口",
+      "summary_rationale": "环比6.67%由8月900万元与9月960万元的可追溯数值计算；40万元缺口为960万元与1,000万元之差；趋势不用于证明缺口原因。",
+      "visual_intent": "trend",
+      "appendix": false,
+      "spec": {
+        "type": "chart",
+        "chartType": "line",
+        "title": "收入连续六个月增至960万元，环比6.67%，仍差目标40万元",
+        "labels": ["2026-04", "2026-05", "2026-06", "2026-07", "2026-08", "2026-09"],
+        "series": [
+          { "name": "收入", "values": [780, 820, 850, 870, 900, 960] }
+        ],
+        "unit": "万元",
+        "period": "2026-04 至 2026-09",
+        "insight": "4月至9月收入由780万元升至960万元；40万元缺口是实际与目标之差，趋势本身不能解释原因。",
+        "source": "合成数据 · Project-authored synthetic dataset / Apache-2.0"
+      },
+      "bindings": [
+        { "pointer": "/series/0/values/0", "target": { "kind": "source", "source_id": "revenue", "value_id": "t-04" }, "format": { "kind": "number" } },
+        { "pointer": "/series/0/values/1", "target": { "kind": "source", "source_id": "revenue", "value_id": "t-05" }, "format": { "kind": "number" } },
+        { "pointer": "/series/0/values/2", "target": { "kind": "source", "source_id": "revenue", "value_id": "t-06" }, "format": { "kind": "number" } },
+        { "pointer": "/series/0/values/3", "target": { "kind": "source", "source_id": "revenue", "value_id": "t-07" }, "format": { "kind": "number" } },
+        { "pointer": "/series/0/values/4", "target": { "kind": "source", "source_id": "revenue", "value_id": "t-08" }, "format": { "kind": "number" } },
+        { "pointer": "/series/0/values/5", "target": { "kind": "source", "source_id": "revenue", "value_id": "t-09" }, "format": { "kind": "number" } }
       ]
     },
     {
       "id": "s-table",
-      "order": 4,
+      "order": 5,
       "question": "逐项目标差异如何核对？",
       "title_mode": "conclusion",
       "claim_ids": ["c-revenue-fact", "c-orders-fact", "c-margin-fact", "c-rev-gap", "c-rev-attain", "c-orders-gap", "c-orders-attain", "c-margin-gap", "c-margin-attain"],
       "source_ids": ["revenue", "orders", "margin"],
-      "transition": "核对表之后看趋势",
+      "transition": "核对表之后进入行动",
       "communication_intent": "用一个表把差异与达成口径锁定",
       "visual_intent": "evidence_table",
       "appendix": false,
       "spec": {
         "type": "table",
-        "title": "逐项目标差异：收入-40万元，毛利率-2pp",
-        "subtitle": "百分比指标差异用百分点（pp），达成率用相对目标计算",
+        "title": "逐项目标差异：收入-40万元、订单-10单、毛利率-2pp",
+        "subtitle": "差异=实际-目标；pp=百分点；达成率=实际/目标",
         "headers": ["指标", "实际", "目标", "差异", "达成"],
         "rows": [
           ["收入", "960", "1,000", "-40", "96%"],
@@ -368,78 +405,23 @@
       ]
     },
     {
-      "id": "s-trend",
-      "order": 5,
-      "question": "收入趋势是否支持调整目标？",
-      "title_mode": "descriptive",
-      "claim_ids": ["c-trend-fact", "c-revenue-mom", "c-cause-hypothesis"],
-      "source_ids": ["revenue", "gap-note"],
-      "transition": "趋势之后单独呈现不确定性",
-      "communication_intent": "展示趋势与环比，同时保留原因未知",
-      "visual_intent": "trend",
-      "appendix": false,
-      "spec": {
-        "type": "chart",
-        "chartType": "line",
-        "title": "收入环比6.67%，9月缺口成因尚需验证",
-        "labels": ["2026-04", "2026-05", "2026-06", "2026-07", "2026-08", "2026-09"],
-        "series": [
-          { "name": "收入", "values": [780, 820, 850, 870, 900, 960] }
-        ],
-        "unit": "万元",
-        "period": "2026-04 至 2026-09",
-        "insight": "连续六个月增长，但9月仍未达目标；趋势本身不能证明原因。",
-        "source": "合成数据 · Project-authored synthetic dataset / Apache-2.0"
-      },
-      "bindings": [
-        { "pointer": "/series/0/values/0", "target": { "kind": "source", "source_id": "revenue", "value_id": "t-04" }, "format": { "kind": "number" } },
-        { "pointer": "/series/0/values/1", "target": { "kind": "source", "source_id": "revenue", "value_id": "t-05" }, "format": { "kind": "number" } },
-        { "pointer": "/series/0/values/2", "target": { "kind": "source", "source_id": "revenue", "value_id": "t-06" }, "format": { "kind": "number" } },
-        { "pointer": "/series/0/values/3", "target": { "kind": "source", "source_id": "revenue", "value_id": "t-07" }, "format": { "kind": "number" } },
-        { "pointer": "/series/0/values/4", "target": { "kind": "source", "source_id": "revenue", "value_id": "t-08" }, "format": { "kind": "number" } },
-        { "pointer": "/series/0/values/5", "target": { "kind": "source", "source_id": "revenue", "value_id": "t-09" }, "format": { "kind": "number" } }
-      ]
-    },
-    {
-      "id": "s-uncertainty",
-      "order": 6,
-      "question": "哪些解释仍然只是假设？",
-      "title_mode": "qualified_hypothesis",
-      "claim_ids": ["c-cause-hypothesis", "c-missing", "c-margin-gap"],
-      "source_ids": ["gap-note", "margin"],
-      "transition": "从不确定性进入行动",
-      "communication_intent": "把假设与事实分开，避免把-2pp写成-2%",
-      "visual_intent": "narrative",
-      "appendix": false,
-      "spec": {
-        "type": "evidence-quote",
-        "title": "缺口可能与产品结构或折扣执行有关，现有材料尚不能验证",
-        "quote": "现有材料缺少产品结构与折扣执行明细，无法解释毛利率差的形成原因。",
-        "attribution": "合成业务简报 · Agent-provided gap statement",
-        "insight": "可以提出假设，但不能把假设写成结论；2个百分点差不是2%降幅。",
-        "note": "需要补齐产品结构与折扣明细后再判断。",
-        "source": "合成材料 · 非真实业务证据"
-      },
-      "bindings": []
-    },
-    {
       "id": "s-actions",
-      "order": 7,
-      "question": "本次会议可以批准什么？",
-      "title_mode": "descriptive",
-      "claim_ids": ["c-actions", "c-decision"],
-      "source_ids": ["gap-note"],
-      "transition": "行动只覆盖补数与复核",
-      "communication_intent": "批准低风险补数动作，不预设收益",
+      "order": 6,
+      "question": "原因未验证时，本次会议能决定什么？",
+      "title_mode": "qualified_hypothesis",
+      "claim_ids": ["c-cause-hypothesis", "c-missing", "c-actions", "c-decision"],
+      "source_ids": ["gap-note", "revenue", "margin"],
+      "transition": "先补数，Q4目标调整留待复核",
+      "communication_intent": "把假设、数据缺口与低风险动作放在同一页，不承诺收益",
       "visual_intent": "decision",
       "appendix": false,
       "spec": {
         "type": "action",
-        "title": "先补数据再定Q4动作，不预设影响金额",
+        "title": "原因仍待验证：先补产品结构与折扣明细，再复核Q4目标",
         "items": [
-          { "title": "补齐产品结构明细", "note": "按品类、价格带与销量拆分9月收入与毛利。", "owner": "财务", "time": "10月24日", "status": "待启动" },
-          { "title": "补齐折扣执行清单", "note": "核对审批、执行与核销差异，不以折扣推断全部原因。", "owner": "销售运营", "time": "10月24日", "status": "待启动" },
-          { "title": "联合复核Q4目标", "note": "补数完成后由财务与业务共同判断是否调整，不预设ROI。", "owner": "经营班子", "time": "10月31日", "status": "待补数" }
+          { "title": "补齐产品结构明细", "note": "按品类、价格带与销量拆分9月收入与毛利；缺口可能来自产品结构，尚不能验证。", "owner": "财务", "time": "10月24日", "status": "待启动" },
+          { "title": "补齐折扣执行清单", "note": "核对审批、执行与核销差异；2个百分点差不是2%降幅，不推断影响金额。", "owner": "销售运营", "time": "10月24日", "status": "待启动" },
+          { "title": "联合复核Q4目标", "note": "补数后由财务与业务共同判断；本次只确认责任人与时间，不批准目标调整或收益承诺。", "owner": "经营班子", "time": "10月31日", "status": "待补数" }
         ],
         "source": "合成材料 · 非真实业务证据"
       },
@@ -447,29 +429,44 @@
     },
     {
       "id": "s-appendix",
-      "order": 8,
-      "question": "来源、口径与缺口是否可追溯？",
+      "order": 7,
+      "question": "上月与去年同月基线是多少，口径与缺口是否可追溯？",
       "title_mode": "descriptive",
-      "claim_ids": ["c-missing"],
+      "claim_ids": ["c-revenue-fact", "c-orders-fact", "c-margin-fact", "c-missing"],
       "source_ids": ["revenue", "orders", "margin", "gap-note"],
       "transition": "结束",
-      "communication_intent": "提供来源与限制的完整清单",
+      "communication_intent": "完整呈现四期基线，并明确原因与影响金额仍未知",
       "visual_intent": "evidence_table",
       "appendix": true,
       "spec": {
         "type": "table",
-        "title": "附录：来源、口径与缺口",
-        "headers": ["来源", "范围与限制"],
+        "title": "附录：四期基线与数据边界",
+        "subtitle": "上月与去年同月仅作背景基线；缺口原因和影响金额仍未知（来源：业务表现 JSON）",
+        "headers": ["口径", "收入", "订单", "毛利率"],
         "rows": [
-          ["合成经营数据", "收入、订单、毛利率的实际、目标与月度趋势"],
-          ["Agent 缺口说明", "产品结构与折扣明细缺失，原因与影响金额未知"],
-          ["口径说明", "百分比指标差异用pp；达成率按相对目标计算"],
-          ["使用边界", "合成材料，不包含真实公司或客户数据"]
+          ["九月实际", "960万元", "240单", "22%"],
+          ["九月目标", "1,000万元", "250单", "24%"],
+          ["上月", "900万元", "225单", "21%"],
+          ["去年同月", "800万元", "200单", "20%"],
+          ["口径说明", "差异=实际-目标", "达成率=实际/目标", "原因与影响金额未知"]
         ],
-        "columnWidths": [0.28, 0.72],
+        "columnWidths": [0.16, 0.28, 0.28, 0.28],
         "source": "合成数据 · Project-authored synthetic dataset / Apache-2.0"
       },
-      "bindings": []
+      "bindings": [
+        { "pointer": "/rows/0/1", "target": { "kind": "source", "source_id": "revenue", "value_id": "rev-actual" }, "format": { "kind": "integer", "suffix": "万元" } },
+        { "pointer": "/rows/0/2", "target": { "kind": "source", "source_id": "orders", "value_id": "ord-actual" }, "format": { "kind": "integer", "suffix": "单" } },
+        { "pointer": "/rows/0/3", "target": { "kind": "source", "source_id": "margin", "value_id": "mar-actual" }, "format": { "kind": "percent", "precision": 0 } },
+        { "pointer": "/rows/1/1", "target": { "kind": "source", "source_id": "revenue", "value_id": "rev-target" }, "format": { "kind": "thousands", "suffix": "万元" } },
+        { "pointer": "/rows/1/2", "target": { "kind": "source", "source_id": "orders", "value_id": "ord-target" }, "format": { "kind": "integer", "suffix": "单" } },
+        { "pointer": "/rows/1/3", "target": { "kind": "source", "source_id": "margin", "value_id": "mar-target" }, "format": { "kind": "percent", "precision": 0 } },
+        { "pointer": "/rows/2/1", "target": { "kind": "source", "source_id": "revenue", "value_id": "rev-prev-month" }, "format": { "kind": "integer", "suffix": "万元" } },
+        { "pointer": "/rows/2/2", "target": { "kind": "source", "source_id": "orders", "value_id": "ord-prev-month" }, "format": { "kind": "integer", "suffix": "单" } },
+        { "pointer": "/rows/2/3", "target": { "kind": "source", "source_id": "margin", "value_id": "mar-prev-month" }, "format": { "kind": "percent", "precision": 0 } },
+        { "pointer": "/rows/3/1", "target": { "kind": "source", "source_id": "revenue", "value_id": "rev-prev-year" }, "format": { "kind": "integer", "suffix": "万元" } },
+        { "pointer": "/rows/3/2", "target": { "kind": "source", "source_id": "orders", "value_id": "ord-prev-year" }, "format": { "kind": "integer", "suffix": "单" } },
+        { "pointer": "/rows/3/3", "target": { "kind": "source", "source_id": "margin", "value_id": "mar-prev-year" }, "format": { "kind": "percent", "precision": 0 } }
+      ]
     }
   ]
 }

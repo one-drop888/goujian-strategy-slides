@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import importlib.util, json, subprocess, sys, tempfile, unittest
+import importlib.util, json, os, shutil, subprocess, sys, tempfile, time, unittest
 from pathlib import Path
 from types import SimpleNamespace
 ROOT=Path(__file__).resolve().parents[1]
@@ -115,31 +115,65 @@ class BootstrapTests(unittest.TestCase):
             target.symlink_to(Path(sys.executable))
             with self.assertRaisesRegex(bootstrap.BootstrapError,r'outside the isolated \.venv'):
                 bootstrap.verify_venv_python(target,venv)
-    def test_real_venv_install_rerun_and_interrupted_recovery(self):
-        with tempfile.TemporaryDirectory(prefix='构见 Q4 bootstrap real ') as directory:
-            root=Path(directory)
-            for name in ('package.json','package-lock.json','requirements-render.txt'):
-                (root/name).write_bytes((ROOT/name).read_bytes())
-            (root/'node_modules').symlink_to(ROOT/'node_modules',target_is_directory=True)
-            class RealRunner:
+    def test_offline_real_venv_creation_isolation_and_repair(self):
+        with tempfile.TemporaryDirectory(prefix='构见 Q4 bootstrap offline ') as directory:
+            root=make_root(directory)
+            class OfflineRunner:
                 def __call__(self,args,cwd=None,env=None,capture_output=False,text=False,**kwargs):
                     if str(args[0]).endswith('npm') or str(args[0]).endswith('npm.cmd'):
                         return SimpleNamespace(returncode=0,stdout='',stderr='')
+                    if len(args)>2 and args[1:3]==['-m','pip']:
+                        return SimpleNamespace(returncode=0,stdout='',stderr='')
+                    if '-c' in args and 'importlib.metadata' in args[args.index('-c')+1]:
+                        return SimpleNamespace(returncode=0,stdout='12.1.1\n',stderr='')
                     return subprocess.run(args,cwd=cwd,env=env,capture_output=True,text=True,**kwargs)
-            runner=RealRunner()
+            runner=OfflineRunner()
             first=bootstrap.bootstrap(root,python=sys.executable,runner=runner,emit=lambda line:None)
             self.assertEqual(first['status'],'READY')
-            python_path=root/'.venv/bin/python'
-            self.assertTrue(python_path.exists())
-            self.assertTrue((root/'.venv/.goujian-bootstrap.json').is_file())
-            self.assertIsNotNone(first['pillow'])
+            python_path=bootstrap.venv_python(root/'.venv')
+            self.assertIsNotNone(python_path)
+            probe=subprocess.run([str(python_path),'-c','import json,sys;print(json.dumps({"prefix":sys.prefix,"base":sys.base_prefix}))'],
+                                 capture_output=True,text=True,check=True)
+            info=json.loads(probe.stdout.strip().splitlines()[-1])
+            self.assertEqual(Path(info['prefix']).resolve(),(root/'.venv').resolve())
+            self.assertNotEqual(Path(info['prefix']).resolve(),Path(info['base']).resolve())
             second=bootstrap.bootstrap(root,python=sys.executable,runner=runner,emit=lambda line:None)
             self.assertEqual({a['step']:a['status'] for a in second['actions']}['pip-install'],'SKIPPED')
-            python_path.unlink()
+            Path(python_path).unlink()
             third=bootstrap.bootstrap(root,python=sys.executable,runner=runner,emit=lambda line:None)
-            steps={a['step']:a['status'] for a in third['actions']}
-            self.assertEqual(steps['venv'],'OK')
+            self.assertEqual({a['step']:a['status'] for a in third['actions']}['venv'],'OK')
             self.assertEqual(third['status'],'READY')
-            self.assertTrue(python_path.exists())
+            self.assertTrue(Path(python_path).exists())
+
+    @unittest.skipUnless(os.environ.get('GOUJIAN_CLEAN_INSTALL')=='1',
+                         'set GOUJIAN_CLEAN_INSTALL=1 to run the real npm ci/pip clean-install integration exactly once')
+    def test_opt_in_real_clean_install_rerun_and_partial_recovery(self):
+        with tempfile.TemporaryDirectory(prefix='goujian clean install ') as directory:
+            root=Path(directory)
+            for name in ('package.json','package-lock.json','requirements-render.txt'):
+                shutil.copy2(ROOT/name,root/name)
+            started=time.time()
+            first=bootstrap.bootstrap(root,python=sys.executable,emit=lambda line:None)
+            self.assertEqual(first['status'],'READY')
+            self.assertTrue((root/'node_modules').is_dir())
+            self.assertFalse((root/'node_modules').is_symlink())
+            self.assertTrue(bootstrap.js_status(root)['ready'])
+            python_path=bootstrap.venv_python(root/'.venv')
+            self.assertIsNotNone(python_path)
+            self.assertTrue(first['pillow'])
+            second=bootstrap.bootstrap(root,python=sys.executable,emit=lambda line:None)
+            steps={action['step']:action['status'] for action in second['actions']}
+            self.assertEqual((steps['npm-ci'],steps['pip-install']),('SKIPPED','SKIPPED'))
+            Path(python_path).unlink()
+            third=bootstrap.bootstrap(root,python=sys.executable,emit=lambda line:None)
+            steps={action['step']:action['status'] for action in third['actions']}
+            self.assertEqual((third['status'],steps['venv']),('READY','OK'))
+            self.assertTrue(Path(python_path).exists())
+            evidence=Path(os.environ.get('GOUJIAN_CLEAN_INSTALL_EVIDENCE',str(ROOT/'out/v12-control/clean-install-evidence.json')))
+            evidence.parent.mkdir(parents=True,exist_ok=True)
+            evidence.write_text(json.dumps({'status':third['status'],'elapsed_seconds':round(time.time()-started,1),
+                'node_modules_symlink':(root/'node_modules').is_symlink(),'dependencies':bootstrap.js_status(root)['installed'],
+                'pillow':first['pillow'],'first_actions':first['actions'],'second_actions':second['actions'],
+                'third_actions':third['actions'],'scope':'real npm ci and pip install in a temporary copy; rerun skipped both; deleted venv interpreter repaired'},ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
 
 if __name__=='__main__':unittest.main()

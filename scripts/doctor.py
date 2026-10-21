@@ -49,7 +49,8 @@ class SystemProbe:
             return True,None
         except OSError as error:return False,str(error)
     def platform_info(self):
-        current='win32' if sys.platform.startswith('win') else 'darwin' if sys.platform=='darwin' else 'linux'
+        current=('win32' if sys.platform.startswith('win') else 'darwin' if sys.platform=='darwin'
+                 else 'linux' if sys.platform.startswith('linux') else sys.platform)
         wsl=False
         try:wsl=bool(os.environ.get('WSL_DISTRO_NAME')) or 'microsoft' in Path('/proc/version').read_text(encoding='utf-8').lower()
         except OSError:pass
@@ -153,7 +154,7 @@ def platform_check(probe):
     status='PRESENT' if current in supported else 'UNSUPPORTED'
     info['support']={name:('AVAILABLE' if name==current else 'NOT_RUN') for name in ['linux','darwin','win32']}
     return check(id='platform',requirement='REQUIRED',status=status,detected=info,
-                 detail='WSL detected' if info.get('wsl') else 'Native platform',
+                 detail='WSL detected' if info.get('wsl') else ('Unrecognized platform reported without normalization' if status=='UNSUPPORTED' else 'Native platform'),
                  impact='Unexecuted platforms are NOT_RUN, not verified',recovery='Run npm run doctor on the target platform')
 
 def inspect(probe=None):

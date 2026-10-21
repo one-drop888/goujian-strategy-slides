@@ -37,24 +37,40 @@ function evaluateCalculation(claim,sources) {
   }
   const operands=claim.inputs.map(input=>{
     const {source,value}=lookupSourceValue(sources,input.source_id,input.value_id);
+    const unit=normalizeUnit(value.unit),metric=String(value.metric||'').trim(),time_window=String(value.time_window||'').trim();
+    if(!unit) throw new Error(`${claim.id}: input ${input.source_id}.${input.value_id} requires an explicit unit`);
+    if(!metric) throw new Error(`${claim.id}: input ${input.source_id}.${input.value_id} requires an explicit metric`);
+    if(!time_window) throw new Error(`${claim.id}: input ${input.source_id}.${input.value_id} requires an explicit time_window`);
     return {
       source_id:input.source_id,value_id:input.value_id,
       value:finite(value.value,`${claim.id} input ${input.source_id}.${input.value_id}`),
-      unit:normalizeUnit(value.unit),metric:value.metric||null,time_window:value.time_window||null,
-      denominator:value.denominator,
+      unit,metric,time_window,denominator:value.denominator,
     };
   });
+  const operandKeys=operands.map(op=>`${op.source_id}.${op.value_id}`);
+  if(new Set(operandKeys).size!==operandKeys.length) {
+    throw new Error(`${claim.id}: duplicate operands ${operandKeys.filter((key,index)=>operandKeys.indexOf(key)!==index).join(', ')}`);
+  }
   const resultUnit=normalizeUnit(claim.result.unit);
+  const operandMetrics=new Set(operands.map(op=>op.metric));
+  if(operandMetrics.size!==1) {
+    throw new Error(`${claim.id}: calculation operands use different source metrics: ${operands.map(op=>op.metric).join(' / ')}`);
+  }
+  const operandUnits=new Set(operands.map(op=>op.unit));
+  if(operandUnits.size!==1) {
+    throw new Error(`${claim.id}: ${operator} inputs must share one compatible unit, received ${operands.map(op=>op.unit).join(' / ')}`);
+  }
+  const unit=operands[0].unit,metric=operands[0].metric;
+  if(claim.result.metric&&String(claim.result.metric).trim()!==metric) {
+    throw new Error(`${claim.id}: result metric ${claim.result.metric} does not match operand metric ${metric}`);
+  }
   let expected;
   if(operator==='sum') {
-    const unit=operands[0].unit;
-    if(operands.some(op=>op.unit!==unit)) throw new Error(`${claim.id}: sum inputs must share one unit`);
+    if(['%','pp'].includes(unit)) throw new Error(`${claim.id}: sum of ${unit} values is not a valid aggregate; use raw counts or weighted totals`);
     if(resultUnit!==unit) throw new Error(`${claim.id}: sum result unit ${resultUnit} must equal input unit ${unit}`);
     expected=operands.reduce((total,op)=>total+op.value,0);
   }
   if(operator==='difference') {
-    const unit=operands[0].unit;
-    if(operands.some(op=>op.unit!==unit)) throw new Error(`${claim.id}: difference inputs must share one unit`);
     const required=unit==='%'?'pp':unit;
     if(resultUnit!==required) throw new Error(`${claim.id}: difference of ${unit} inputs requires result unit ${required}`);
     expected=operands[0].value-operands[1].value;
@@ -71,28 +87,26 @@ function evaluateCalculation(claim,sources) {
     }
   }
   if(operator==='percent_change') {
-    if(operands[0].value===0) throw new Error(`${claim.id}: percent_change baseline cannot be zero`);
-    const unit=operands[0].unit;
-    if(operands.some(op=>op.unit!==unit)) throw new Error(`${claim.id}: percent_change inputs must share one unit`);
+    if(operands[0].value<=0) throw new Error(`${claim.id}: percent_change baseline must be positive, received ${operands[0].value}`);
     if(resultUnit!=='%') throw new Error(`${claim.id}: percent_change result unit must be %`);
     expected=(operands[1].value-operands[0].value)/operands[0].value*100;
   }
-  const operandMetrics=operands.map(op=>op.metric).filter(Boolean);
-  if(operandMetrics.length>1&&new Set(operandMetrics).size>1) {
-    throw new Error(`${claim.id}: calculation operands use different source metrics: ${operandMetrics.join(' / ')}`);
-  }
-  const windows=operands.map(op=>op.time_window).filter(Boolean);
   if(operator==='percent_change') {
-    if(operands.some(op=>!op.time_window)) throw new Error(`${claim.id}: percent_change requires explicit baseline and current time windows`);
+    if(operands[0].time_window===operands[1].time_window) {
+      throw new Error(`${claim.id}: percent_change baseline and current time windows must differ`);
+    }
     if(!claim.result.time_window) throw new Error(`${claim.id}: percent_change result requires a time_window covering both periods`);
     if(!claim.result.time_window.includes(operands[0].time_window)||!claim.result.time_window.includes(operands[1].time_window)) {
       throw new Error(`${claim.id}: result time_window must include ${operands[0].time_window} and ${operands[1].time_window}`);
     }
-  } else if(windows.length) {
-    if(new Set(windows).size>1) throw new Error(`${claim.id}: calculation operands use different time windows`);
-    if(claim.result.time_window!==windows[0]) throw new Error(`${claim.id}: result time_window must be ${windows[0]}`);
-  } else if(claim.result.time_window) {
-    throw new Error(`${claim.id}: result time_window requires explicit input time windows`);
+  } else {
+    if(operands.some(op=>op.time_window!==operands[0].time_window)) {
+      throw new Error(`${claim.id}: calculation operands use different time windows`);
+    }
+    if(!claim.result.time_window) throw new Error(`${claim.id}: ${operator} result requires an explicit time_window`);
+    if(claim.result.time_window!==operands[0].time_window) {
+      throw new Error(`${claim.id}: result time_window must be ${operands[0].time_window}`);
+    }
   }
   finite(expected,`${claim.id} computed result`);
   finite(claim.result.value,`${claim.id} declared result`);

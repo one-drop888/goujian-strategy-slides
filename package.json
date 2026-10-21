@@ -1,6 +1,6 @@
 {
   "name": "goujian-strategy-slides",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "private": false,
   "description": "Goujian Strategy Slides — production-grade Presentation Intelligence for AI agents",
   "license": "Apache-2.0",

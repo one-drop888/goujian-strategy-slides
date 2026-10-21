@@ -1,7 +1,7 @@
 ---
 name: goujian-strategy-slides
 metadata:
-  version: "1.2.0"
+  version: "1.2.1"
 description: "专业AI PPT制作技能，适用于经营分析、战略规划、销售汇报、市场研究、项目复盘及技术方案等场景。结合结构化思考、证据分析、汇报叙事与可视化设计，辅助生成原生可编辑PPTX，并提供质量检查与视觉复核流程。"
 license: Apache-2.0
 ---

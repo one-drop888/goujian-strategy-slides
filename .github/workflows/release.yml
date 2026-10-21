@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: "Release version (must match package.json, currently 1.2.0)"
+        description: "Release version (must match package.json, currently 1.2.1)"
         required: true
         type: string
       expected_sha:
@@ -31,7 +31,7 @@ jobs:
           EXPECTED_SHA: ${{ inputs.expected_sha }}
         run: |
           set -euo pipefail
-          test "$VERSION" = "1.2.0"
+          test "$VERSION" = "1.2.1"
           printf '%s' "$EXPECTED_SHA" | grep -Eq '^[0-9a-f]{40}$'
       - uses: actions/checkout@v4
         with:
@@ -78,7 +78,7 @@ jobs:
           python3 - <<'PY'
           import hashlib, json, zipfile
           from pathlib import Path
-          first = Path('dist/goujian-strategy-slides-v1.2.0.zip')
+          first = Path('dist/goujian-strategy-slides-v1.2.1.zip')
           second = Path('out/release-rebuild.zip')
           assert hashlib.sha256(first.read_bytes()).hexdigest() == hashlib.sha256(second.read_bytes()).hexdigest(), 'installer ZIP is not byte-reproducible'
           with zipfile.ZipFile(first) as archive:
@@ -129,7 +129,7 @@ jobs:
           sha256sum "goujian-strategy-slides-v$VERSION.zip" > SHA256SUMS.txt
           gh release create "v$VERSION" --verify-tag \
             --title "Goujian Strategy Slides v$VERSION" \
-            --notes-file ../docs/V1_2_RELEASE_NOTES.md \
+            --notes-file ../docs/V1_2_1_RELEASE_NOTES.md \
             "goujian-strategy-slides-v$VERSION.zip" SHA256SUMS.txt
       - name: Verify a fresh clone of the published tag
         env:

@@ -114,12 +114,14 @@ python3 -m pip install -r requirements-render.txt
 ### 安装 ZIP 与展示 ZIP
 
 ```bash
-npm run package            # dist/goujian-strategy-slides-v1.2.0.zip
+npm run package            # dist/goujian-strategy-slides-v1.2.1.zip
 npm run showcase           # out/v1.2-showcase（可选展示构建）
-npm run package:showcase   # dist/goujian-strategy-slides-v1.2.0-showcase.zip
+npm run package:showcase   # dist/goujian-strategy-slides-v1.2.1-showcase.zip
 ```
 
 安装 ZIP 解压后是一个 `goujian-strategy-slides/` 文件夹，只有根目录一个 [SKILL.md](SKILL.md)，包含完整运行时、示例、Profile、Schema 与测试，不包含 `node_modules/`、`.venv/`、`out/`、缓存或 PPTX。展示 ZIP 是单独的可选复核资产；正常使用不需要它。平台导入与安全扫描仍须在目标平台复测。
+
+V1.2.1 是安全扫描兼容补丁：Doctor 时间戳改用静态导入，输出格式与引擎行为不变；详见 [V1.2.1 发布说明](docs/V1_2_1_RELEASE_NOTES.md)。
 
 正式版本、安装包与校验值从 [GitHub Releases](https://github.com/one-drop888/goujian-strategy-slides/releases) 获取。发布流程只接受明确版本与获批的主分支 SHA，不因普通 push 自动发布，也不覆盖既有标签或发行制品。
 

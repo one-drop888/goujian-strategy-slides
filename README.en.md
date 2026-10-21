@@ -112,12 +112,14 @@ Fonts are not bundled or embedded. Recipients must install the fonts or use a cu
 ### Installer and showcase
 
 ```bash
-npm run package            # dist/goujian-strategy-slides-v1.2.0.zip
+npm run package            # dist/goujian-strategy-slides-v1.2.1.zip
 npm run showcase           # out/v1.2-showcase (optional review build)
-npm run package:showcase   # dist/goujian-strategy-slides-v1.2.0-showcase.zip
+npm run package:showcase   # dist/goujian-strategy-slides-v1.2.1-showcase.zip
 ```
 
 The installer extracts to one `goujian-strategy-slides/` folder with a single root [SKILL.md](SKILL.md). It contains the full runtime, examples, profiles, schemas and tests, but no `node_modules/`, `.venv/`, `out/`, caches or PPTX. The showcase ZIP is a separate optional review artifact, not a runtime requirement. Platform import and security scanning still require target-platform tests.
+
+V1.2.1 is a security-scanner compatibility patch: the Doctor timestamp now uses a static import with unchanged output and engine behavior. See the [V1.2.1 release notes](docs/V1_2_1_RELEASE_NOTES.md).
 
 Obtain official versions, installers and checksums from [GitHub Releases](https://github.com/one-drop888/goujian-strategy-slides/releases). Publication requires an explicit version and approved main-branch SHA; ordinary pushes do not publish, and existing tags and assets are never overwritten.
 

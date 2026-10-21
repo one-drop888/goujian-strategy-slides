@@ -62,7 +62,7 @@ def main():
             frontmatter = package.read(PREFIX + 'SKILL.md').decode('utf-8').split('---', 2)[1]
             assert 'name: goujian-strategy-slides' in frontmatter
             version = json.loads(package.read(PREFIX + 'package.json'))['version']
-            assert version == '1.2.0'
+            assert version == '1.2.1'
             assert f'version: "{version}"' in frontmatter
             line = next(line for line in frontmatter.splitlines() if line.startswith('description: '))
             description = json.loads(line.removeprefix('description: '))

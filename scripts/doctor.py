@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Environment Doctor: report tool presence, not execution or visual approval."""
 import argparse, importlib.util, importlib.metadata, json, os, platform, re, shutil, subprocess, sys, tempfile
+from datetime import datetime
 from pathlib import Path
 
 ROOT=Path(__file__).resolve().parents[1]
@@ -209,7 +210,7 @@ def inspect(probe=None):
     required_missing=[item for item in checks if item['requirement']=='REQUIRED' and item['status']!='PRESENT']
     optional_gaps=[item for item in checks if item['requirement']=='OPTIONAL' and item['status']!='PRESENT']
     status='BLOCKED' if required_missing else ('READY_WITH_NOTES' if optional_gaps else 'READY')
-    result={'status':status,'generated_at':__import__('datetime').datetime.now().astimezone().isoformat(timespec='seconds'),
+    result={'status':status,'generated_at':datetime.now().astimezone().isoformat(timespec='seconds'),
             'platform':next(item['detected'] for item in checks if item['id']=='platform'),
             'checks':checks,
             'summary':{'required_ok':sum(1 for item in checks if item['requirement']=='REQUIRED' and item['status']=='PRESENT'),

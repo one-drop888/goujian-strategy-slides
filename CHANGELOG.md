@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.1 — 2026-10-21
+
+- Replace the Doctor's dynamic datetime import with an ordinary static import while preserving the timezone-aware ISO 8601 timestamp with seconds precision. Add a regression test for timezone awareness, second precision and freshness.
+- Update package, lockfile root, Skill metadata and release automation to 1.2.1. Add bilingual v1.2.1 release notes and current installer references.
+- Security-scanner compatibility patch only: no dependency changes and no changes to core or skill rendering, reasoning, themes, specification or example bytes. Company-platform upload and scanning are not claimed as passed; independent ZIP acceptance remains separate.
+
 ## 1.2.0 — 2026-10-21
 
 - Add the optional Agent-authored Reasoning Plan: sources, claims, content dispositions, deterministic calculations, JSON-Pointer numeric bindings, coverage/dependency validation and theme decisions. Compile to native PPTX, exported spec, hash-bound scene, reasoning sidecar, embedded report and claim-linked notes.

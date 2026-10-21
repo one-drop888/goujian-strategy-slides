@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import importlib.util, json, os, subprocess, sys, unittest
+from datetime import datetime, timezone
 from pathlib import Path
 from types import SimpleNamespace
 ROOT=Path(__file__).resolve().parents[1]
@@ -107,6 +108,14 @@ class DoctorTests(unittest.TestCase):
         capabilities.shutil.which=lambda name:None if name=='node' else original(name)
         try:self.assertFalse(capabilities.js_ready())
         finally:capabilities.shutil.which=original
+    def test_generated_at_is_timezone_aware_seconds_iso(self):
+        value=doctor.inspect(FakeProbe())['generated_at']
+        self.assertRegex(value,r'^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}[+-]\d{2}:\d{2}$')
+        parsed=datetime.fromisoformat(value)
+        self.assertIsNotNone(parsed.tzinfo)
+        self.assertEqual(parsed.microsecond,0)
+        self.assertEqual(parsed.isoformat(timespec='seconds'),value)
+        self.assertLess(abs((datetime.now(timezone.utc)-parsed.astimezone(timezone.utc)).total_seconds()),300)
     def test_cli_missing_required_exits_nonzero(self):
         env={**os.environ,'PATH':''}
         process=subprocess.run([sys.executable,str(ROOT/'scripts/doctor.py'),'--json'],capture_output=True,text=True,env=env)

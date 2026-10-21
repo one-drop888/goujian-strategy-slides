@@ -72,7 +72,8 @@ async function compilePlan(planPath,options={}) {
   const spec_sha256=sha256(stableStringify(spec));
   const inputs=[resolvedPlan,...sourcePaths(plan,planDir),...profileChain(theme.profile_path,repoRoot,planDir)];
   const outPath=assertNotInput(options.out||path.join(planDir,`${plan.plan_id}.pptx`),'PPTX output',inputs);
-  const scenePath=outPath+'.scene.json',reasoningPath=outPath+'.reasoning.json';
+  const scenePath=assertNotInput(outPath+'.scene.json','Scene output',inputs);
+  const reasoningPath=assertNotInput(outPath+'.reasoning.json','Reasoning sidecar',inputs);
   const specOut=options.specOut?assertNotInput(options.specOut,'Spec output',inputs):null;
   assertDistinctOutputs([{path:outPath,label:'PPTX output'},{path:scenePath,label:'Scene output'},
     {path:reasoningPath,label:'Reasoning sidecar'},...(specOut?[{path:specOut,label:'Spec output'}]:[])]);

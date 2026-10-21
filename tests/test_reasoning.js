@@ -52,6 +52,29 @@ async function main() {
     assert.equal(executive.claims.find(c=>c.id==='c-margin-gap').result.unit,'pp');
     assert.equal(executive.claims.find(c=>c.id==='c-rev-attain').result.value,96);
     assert.equal(multi.sources.find(s=>s.id==='s-channel').sha256,sha(path.join(multiDir,'../../../examples/assets/channel-evidence.png')));
+    const executiveTable=executive.slides.find(s=>s.id==='s-table').spec;
+    assert.deepEqual(executiveTable.rows.map(row=>row[0]),['收入（万元）','订单（单）','毛利率（%）']);
+    assert.deepEqual(executiveTable.rows.map(row=>row[1]),['960','240','22']);
+    const executiveActions=executive.slides.find(s=>s.id==='s-actions').spec;
+    assert(executiveActions.items.every(item=>/建议安排/.test(item.status)));
+    assert.match(executiveActions.source,/待管理层确认/);
+    const q4Risk=q4.slides.find(s=>s.id==='q4-risk').spec;
+    assert.match(q4Risk.title,/依赖风险/);assert.doesNotMatch(q4Risk.title,/关键路径/);assert.match(q4Risk.title,/可能/);
+    const multiSummary=multi.slides.find(s=>s.id==='mm-summary').spec;
+    const multiChartPage=multi.slides.find(s=>s.id==='mm-chart').spec;
+    const multiActions=multi.slides.find(s=>s.id==='mm-actions').spec;
+    const multiAppendix=multi.slides.find(s=>s.id==='mm-appendix-table').spec;
+    const multiVisible=JSON.stringify([multiSummary,multiChartPage,multiAppendix,multiActions]);
+    assert.doesNotMatch(multiVisible,/分母线索|分母=/);
+    assert.match(multiVisible,/NOT_PROVIDED/);
+    assert.match(multi.claims.find(c=>c.id==='c-region-gap').text,/算术差/);
+    assert.doesNotMatch(multi.claims.find(c=>c.id==='c-region-gap').text,/分母/);
+    assert.match(multi.claims.find(c=>c.id==='c-interview-hypothesis').text,/便利样本/);
+    assert.match(multi.claims.find(c=>c.id==='c-rate-limits').text,/NOT_PROVIDED/);
+    assert.match(multi.claims.find(c=>c.id==='c-report-context').text,/2026-Q3/);
+    assert(multiActions.items.every(item=>/建议安排/.test(item.status)));
+    assert.match(multiActions.source,/待管理层确认/);
+    assert.equal(multiAppendix.rows.length,4);assert.equal(multiAppendix.headers.length,9);
 
     // Theme priority, conflicts and applied rendering.
     const priority=clone(executive);
@@ -168,10 +191,11 @@ async function main() {
     assert.equal(rebuiltScene.reasoning.status,'NOT_RUN');
 
     const portable=path.join(temp,'portable 源'),portableAssets=path.join(portable,'assets');
-    fs.mkdirSync(portableAssets,{recursive:true});
+    fs.mkdirSync(portableAssets,{recursive:true});fs.mkdirSync(path.join(portable,'sources'),{recursive:true});
     for(const name of ['channel-evidence.png','chart-evidence.png','interview-evidence.png','showroom-illustration.png']) {
       fs.copyFileSync(path.join(root,'skill/examples/assets',name),path.join(portableAssets,name));
     }
+    fs.copyFileSync(path.join(multiDir,'sources/synthetic-context.md'),path.join(portable,'sources/synthetic-context.md'));
     fs.copyFileSync(path.join(root,'skill/reasoning/fixtures/themes/brand-blue.profile.json'),path.join(portable,'theme.profile.json'));
     const portablePlan=clone(multi);portablePlan.theme={user_profile:'theme.profile.json'};
     for(const source of portablePlan.sources) if(source.path) source.path=source.path.replace('../../../examples/assets/','assets/');
@@ -367,6 +391,28 @@ async function main() {
     await assert.rejects(compilePlan(planPath('q4-six-actions'),{out:customProfileFile,force:true,profile:customProfileFile}),/must not overwrite input/);
     const profileAlias=path.join(temp,'profile-alias.json');fs.symlinkSync(customProfileFile,profileAlias);
     await assert.rejects(compilePlan(planPath('q4-six-actions'),{out:profileAlias,force:true,profile:customProfileFile}),/must not overwrite input/);
+
+    // Every output path, including derived sidecars, is guarded against every input before any write.
+    const overwriteDir=path.join(temp,'sidecar-overwrite');fs.mkdirSync(overwriteDir);
+    fs.cpSync(executiveDir,overwriteDir,{recursive:true});
+    const selfPlan=path.join(overwriteDir,'candidate.pptx.reasoning.json');
+    fs.renameSync(path.join(overwriteDir,'plan.json'),selfPlan);
+    const planBefore=sha(selfPlan),localSource=path.join(overwriteDir,'sources/business-performance.json'),sourceBefore=sha(localSource),profileBefore=sha(customProfileFile);
+    await assert.rejects(compilePlan(selfPlan,{out:path.join(overwriteDir,'candidate.pptx'),force:true}),/must not overwrite input/);
+    assert.equal(sha(selfPlan),planBefore);
+    assert(!fs.existsSync(path.join(overwriteDir,'candidate.pptx')),'guard must reject before writing the PPTX');
+    assert(!fs.existsSync(path.join(overwriteDir,'candidate.pptx.scene.json')),'guard must reject before writing the scene');
+    for(const [name,target,extra] of [['plan',selfPlan,{}],['source',localSource,{}],['profile',customProfileFile,{profile:customProfileFile}]]) {
+      const aliasOut=path.join(overwriteDir,`sidecar-${name}.pptx`);
+      fs.symlinkSync(target,aliasOut+'.reasoning.json');
+      await assert.rejects(compilePlan(selfPlan,{out:aliasOut,force:true,...extra}),/must not overwrite input/);
+    }
+    const sceneAliasOut=path.join(overwriteDir,'scene-alias.pptx');
+    fs.symlinkSync(localSource,sceneAliasOut+'.scene.json');
+    await assert.rejects(compilePlan(selfPlan,{out:sceneAliasOut,force:true}),/must not overwrite input/);
+    assert.equal(sha(selfPlan),planBefore);
+    assert.equal(sha(localSource),sourceBefore);
+    assert.equal(sha(customProfileFile),profileBefore);
 
     // Reference extraction uses native chart paint and records limitations.
     const refFile=path.join(temp,'reference.pptx');

@@ -32,7 +32,7 @@
     {
       "id": "c-risk",
       "type": "INTERPRETATION",
-      "text": "若A1或A4延期，依赖它们的后续行动窗口会被压缩；材料未提供延误概率或损失金额。",
+      "text": "若A1或A4延期，依赖它们的后续行动窗口可能被压缩；材料未提供延误概率或损失金额，也未提供工期与浮动时间。",
       "source_ids": ["q4-source"],
       "depends_on": ["c-deps", "c-a1", "c-a4"],
       "limits": "仅说明依赖关系，不推断延误概率、因果或财务影响。"
@@ -152,7 +152,7 @@
       "title_mode": "conclusion",
       "claim_ids": ["c-a1", "c-a2", "c-a3", "c-a4", "c-a5", "c-a6", "c-deps"],
       "source_ids": ["q4-source"],
-      "transition": "责任锁定后看关键路径风险",
+      "transition": "责任锁定后看依赖风险",
       "communication_intent": "用一张表锁定六项行动与四条依赖边",
       "visual_intent": "evidence_table",
       "appendix": false,
@@ -186,7 +186,7 @@
       "appendix": false,
       "spec": {
         "type": "risk",
-        "title": "关键路径风险：A1或A4延期将压缩后续窗口",
+        "title": "依赖风险：A1或A4延期可能影响后续窗口",
         "items": [
           { "title": "A2与A6依赖A1", "likelihood": "待评估", "impact": "窗口缩短", "mitigation": "先锁定A1审计范围与完成标准", "owner": "区域运营" },
           { "title": "A3依赖A2", "likelihood": "待评估", "impact": "外呼推迟", "mitigation": "A2责任人按周复核专职角色到位", "owner": "CRM" },

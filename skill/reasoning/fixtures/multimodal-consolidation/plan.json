@@ -4,10 +4,10 @@
   "synthetic": true,
   "intent": {
     "audience": "区域运营与管理层",
-    "goal": "管理简报：用规范渠道数据呈现3.3pp区域差异，区分访谈假设与因果，给出两周跟进试点决定。",
+    "goal": "管理简报：用规范渠道数据呈现3.3pp区域差异，明确未提供的口径，区分访谈假设与因果，并提出待确认的两周跟进试点。",
     "decision_question": "是否先在西南做两周跟进试点，并在不预设ROI的前提下按周复盘？",
     "audience_needs": [
-      "一眼看到差异与分母",
+      "一眼看到差异与口径限制",
       "知道哪些只是假设",
       "明确下一步负责人和时间"
     ],
@@ -21,11 +21,12 @@
     {
       "id": "s-channel",
       "locator": "技能示例截图 channel-evidence.png；对应合成源表",
-      "summary": "合成渠道表：四个战区的线索、到店、试驾、成交率、库存、跟进、负责人与复核日；九列全部保留。",
+      "summary": "合成渠道表：四个战区的线索、到店、试驾、成交率、库存、跟进、负责人与复核日；九列全部保留。成交率分母、cohort、去重与跨期口径未提供；报告期2026-Q3由合成简报定义。",
       "importance": "critical",
       "synthetic": true,
       "path": "../../../examples/assets/channel-evidence.png",
       "sha256": "0f8cf0ed2062e449ecceb7b4db850b7833966b531a0ce80e1f6e7589ba30c204",
+      "notes": "九列数值来自原生源PPTX/截图的人工复核抽取，仍属审查者复核项；截图与原生源PPTX均未定义成交率分母、cohort、去重或跨期口径。",
       "values": [
         {
           "id": "sc-hn-leads",
@@ -222,6 +223,15 @@
       ]
     },
     {
+      "id": "s-context",
+      "locator": "sources/synthetic-context.md",
+      "summary": "项目自撰合成简报：定义报告期为2026-Q3；明确成交率分母、cohort、去重与跨期口径均未提供（NOT_PROVIDED）；试点安排为建议待确认。",
+      "importance": "supporting",
+      "synthetic": true,
+      "path": "sources/synthetic-context.md",
+      "sha256": "a292dcb24aa099cb2b5a5fd299f3ae1eef9828710bd7a41469b4e16192673c70"
+    },
+    {
       "id": "s-chart",
       "locator": "技能示例截图 chart-evidence.png；对应合成源图",
       "summary": "合成源图表截图，展示四个战区的成交率14.2%、13.8%、11.6%、10.9%，与渠道表数值重复。",
@@ -233,11 +243,12 @@
     {
       "id": "s-interview",
       "locator": "技能示例截图 interview-evidence.png；对应合成访谈摘录",
-      "summary": "合成访谈摘录：24位近期试驾客户，半结构化访谈；客户提到试驾后缺少下一步说明。定性频次不能证明因果。",
+      "summary": "合成访谈摘录：24位近期试驾客户的便利样本，半结构化访谈；客户提到试驾后缺少下一步说明。定性频次不能证明因果或代表总体。",
       "importance": "critical",
       "synthetic": true,
       "path": "../../../examples/assets/interview-evidence.png",
-      "sha256": "225067e67304cead2c462f379d07224eba837ba37dce94e4ba3bf3dcb377c8d2"
+      "sha256": "225067e67304cead2c462f379d07224eba837ba37dce94e4ba3bf3dcb377c8d2",
+      "notes": "便利样本，非随机抽样；只用于提出假设，不提供总体比例或因果证据。"
     },
     {
       "id": "s-visual",
@@ -253,15 +264,31 @@
     {
       "id": "c-table-fact",
       "type": "FACT",
-      "text": "九列渠道表覆盖四个战区：线索1,280/1,160/980/860，成交率14.2%/13.8%/11.6%/10.9%。",
+      "text": "九列渠道表覆盖四个战区：成交率14.2%/13.8%/11.6%/10.9%。",
       "source_ids": [
         "s-channel"
       ]
     },
     {
+      "id": "c-leads-fact",
+      "type": "FACT",
+      "text": "附录渠道表保留四区线索量1,280/1,160/980/860，仅作规模背景，不构成成交率分母。",
+      "source_ids": [
+        "s-channel"
+      ]
+    },
+    {
+      "id": "c-report-context",
+      "type": "FACT",
+      "text": "报告期为2026-Q3，由项目合成简报synthetic-context.md定义；截图本身不提供可机读的报告期或成交率分母。",
+      "source_ids": [
+        "s-context"
+      ]
+    },
+    {
       "id": "c-region-gap",
       "type": "CALCULATION",
-      "text": "华南成交率14.2%，西南10.9%，差3.3个百分点（pp）；分母线索量分别为1,280与860。",
+      "text": "华南成交率14.2%，西南10.9%，差3.3个百分点（pp）；这是两个既有比率的算术差，不能证明原因或统计显著性。",
       "source_ids": [
         "s-channel"
       ],
@@ -283,13 +310,23 @@
       }
     },
     {
+      "id": "c-rate-limits",
+      "type": "INTERPRETATION",
+      "text": "成交率分母、客户cohort、去重口径与跨期比较定义均未提供（NOT_PROVIDED）；不能由线索量与成交率反推订单数、计算加权转化或判断显著性。",
+      "source_ids": [
+        "s-channel",
+        "s-context"
+      ],
+      "limits": "只说明源表缺失的口径，不补造分母、订单或总体比例。"
+    },
+    {
       "id": "c-interview-hypothesis",
       "type": "HYPOTHESIS",
-      "text": "访谈提示试驾后的下一步说明不足，可能影响客户比较；24位样本尚不能证明因果。",
+      "text": "访谈提示试驾后的下一步说明不足，可能影响客户比较；24位近期试驾客户的便利样本尚不能证明因果或代表总体。",
       "source_ids": [
         "s-interview"
       ],
-      "uncertainty": "定性样本，不能代表总体比例或证明转化率差异。"
+      "uncertainty": "定性便利样本，不能代表总体比例或证明转化率差异。"
     },
     {
       "id": "c-limits",
@@ -312,7 +349,7 @@
     {
       "id": "c-recommendation",
       "type": "RECOMMENDATION",
-      "text": "先在西南复刻华南的试驾后跟进动作，做两周试点并按周复盘；不把访谈频次或3.3pp差异当作因果证据，也不预设ROI。",
+      "text": "建议（待确认）：先在西南复刻华南的试驾后跟进动作，做两周试点并按周复盘；不把访谈频次或3.3pp差异当作因果证据，也不预设ROI。负责人、日期与48小时安排均为建议。",
       "source_ids": [
         "s-channel",
         "s-interview"
@@ -336,6 +373,11 @@
       "source_id": "s-channel",
       "disposition": "retain",
       "rationale": "九列表格是24个数值的规范来源，正文图表与附录表均引用。"
+    },
+    {
+      "source_id": "s-context",
+      "disposition": "retain",
+      "rationale": "报告期与口径缺口由项目合成简报定义；不据此补造分母或订单。"
     },
     {
       "source_id": "s-chart",
@@ -365,9 +407,22 @@
   ],
   "evidence_gaps": [
     {
-      "text": "访谈为24位定性样本，不能提供总体比例或因果证据。",
+      "text": "访谈为24位近期试驾客户的便利样本，不能提供总体比例或因果证据。",
       "source_ids": [
         "s-interview"
+      ]
+    },
+    {
+      "text": "成交率分母、cohort、去重与跨期口径均未提供（NOT_PROVIDED）；线索量仅作背景，不能反推订单或显著性。",
+      "source_ids": [
+        "s-channel",
+        "s-context"
+      ]
+    },
+    {
+      "text": "渠道截图的九列数值抽取仍属审查者复核项；原生源PPTX的SHA、形状定位与嵌入图片SHA见 source-inspection.json。",
+      "source_ids": [
+        "s-channel"
       ]
     }
   ],
@@ -482,30 +537,33 @@
       "claim_ids": [
         "c-table-fact",
         "c-region-gap",
-        "c-recommendation"
+        "c-recommendation",
+        "c-report-context",
+        "c-rate-limits"
       ],
       "source_ids": [
         "s-channel",
-        "s-interview"
+        "s-interview",
+        "s-context"
       ],
-      "transition": "先看单一差异，再看可复核的分母与限制",
-      "communication_intent": "用结论页锁定事实、决定与边界，不展开所有表格",
+      "transition": "先看单一差异，再看可复核的样本与限制",
+      "communication_intent": "用结论页锁定事实、建议与边界，不展开所有表格",
       "spec": {
         "type": "key-message",
-        "title": "先做西南跟进试点，再验证原因",
-        "statement": "华南与西南成交率差3.3pp，源表不能解释原因；先做两周跟进试点，按周复盘。",
+        "title": "建议（待确认）先做西南跟进试点，再验证原因",
+        "statement": "华南与西南成交率差3.3pp，源表不能解释原因；建议（待确认）做两周跟进试点并按周复盘。",
         "decision_points": [
           {
             "title": "事实",
-            "note": "四区成交率10.9%–14.2%；华南14.2%比西南10.9%高3.3pp，分母线索分别为1,280与860。"
+            "note": "四区成交率10.9%–14.2%；华南14.2%比西南10.9%高3.3pp；这是既有比率的算术差，源表未提供成交率分母与口径。"
           },
           {
             "title": "决定",
-            "note": "在西南复刻华南的试驾后跟进动作，做两周试点；周度复核成交率，不预设提升或ROI。"
+            "note": "建议（待确认）在西南复刻华南的试驾后跟进动作，做两周试点；周度复核成交率，不预设提升或ROI。"
           },
           {
             "title": "边界",
-            "note": "24位访谈只提出假设；源表未做显著性检验，图表截图默认不重复嵌入。"
+            "note": "24位访谈为便利样本，只提出假设；分母/cohort/去重/跨期口径均未提供（NOT_PROVIDED）；未做显著性检验。"
           }
         ],
         "source": "Synthetic multi-source fixture · Apache-2.0"
@@ -544,17 +602,20 @@
       "question": "华南与西南的成交率差多少？",
       "claim_ids": [
         "c-table-fact",
-        "c-region-gap"
+        "c-region-gap",
+        "c-report-context",
+        "c-rate-limits"
       ],
       "source_ids": [
-        "s-channel"
+        "s-channel",
+        "s-context"
       ],
       "transition": "差异确定后，查看访谈能提供什么、不能提供什么",
-      "communication_intent": "只比较两个有代表性的战区，并把分母与限制放在同一页",
+      "communication_intent": "只比较两个有代表性的战区，并把口径限制放在同一页",
       "spec": {
         "type": "chart",
         "title": "华南成交率较西南高3.3pp，源表不足以解释原因",
-        "subtitle": "2026-Q3 · 分母=线索1,280与860 · 源表为一位小数 · 未做显著性检验",
+        "subtitle": "2026-Q3（合成简报定义） · 源表为一位小数 · 分母/cohort/去重/跨期口径 NOT_PROVIDED · 未做显著性检验",
         "chartType": "bar",
         "labels": [
           "华南",
@@ -576,8 +637,8 @@
         "numberFormat": "0.0\"%\"",
         "highlightIndex": 0,
         "axisMin": 0,
-        "insight": "分母：线索1,280（华南）与860（西南）。3.3pp是百分点差，不是3.3%；源表不能判断显著性，也不能解释原因。",
-        "summary_rationale": "完整24个渠道值在附录表逐一绑定；本图只比较华南与西南，分母与限制随图呈现。",
+        "insight": "3.3pp是两个既有成交率的算术差，不是3.3%；源表未定义成交率分母，不能证明原因或统计显著性。线索量仅见附录，不构成成交率分母。",
+        "summary_rationale": "完整24个渠道值在附录表逐一绑定；本图只比较华南与西南，口径限制随图呈现。",
         "source": "Synthetic multi-source fixture · Apache-2.0"
       }
     },
@@ -600,8 +661,8 @@
       "communication_intent": "用一张标注截图保留原文与样本限制，解释文字保持可编辑",
       "spec": {
         "type": "document-evidence",
-        "title": "访谈只提示跟进断点：24位样本不能证明因果",
-        "insight": "把“下一步说明不足”作为待验证假设；不将访谈频次当作区域差异的解释。",
+        "title": "访谈只提示跟进断点：24位试驾客户便利样本不能证明因果",
+        "insight": "把“下一步说明不足”作为待验证假设；不将访谈频次当作区域差异的解释，也不代表总体比例。",
         "asset_ids": [
           "interview"
         ],
@@ -645,34 +706,34 @@
         "s-interview"
       ],
       "transition": "行动确定后，附录保留完整表格与来源",
-      "communication_intent": "用三项有负责人和时间的行动收口，不预设收益",
+      "communication_intent": "用三项有负责人和时间的建议行动收口，不预设收益",
       "spec": {
         "type": "action",
-        "title": "先在西南做两周跟进试点，不预设成交提升或ROI",
+        "title": "建议（待确认）：先在西南做两周跟进试点，不预设成交提升或ROI",
         "items": [
           {
             "title": "西南两周跟进试点",
             "owner": "区域运营",
             "time": "10月27日–11月07日",
-            "note": "复刻华南试驾后跟进动作：48小时内给出明确下一步；只记录执行率与客户反馈。",
-            "status": "启动"
+            "note": "复刻华南试驾后跟进动作：48小时内给出明确下一步（建议）；只记录执行率与客户反馈。",
+            "status": "建议安排 · 待确认"
           },
           {
             "title": "周度口径复盘",
             "owner": "经营分析",
             "time": "每周五",
             "note": "以渠道表为规范来源复核线索、到店、试驾、成交；图表只作派生视图。",
-            "status": "并行"
+            "status": "建议安排 · 待确认"
           },
           {
             "title": "保留因果边界",
             "owner": "管理层",
             "time": "试点结束后",
             "note": "24位访谈只用于提出假设；若指标无改善，扩大样本并做对照验证，不预设ROI。",
-            "status": "闸门"
+            "status": "建议安排 · 待确认"
           }
         ],
-        "source": "Synthetic multi-source fixture · Apache-2.0"
+        "source": "项目建议 · 非源表事实 · 负责人、日期与48小时/两周安排待管理层确认"
       }
     },
     {
@@ -970,10 +1031,14 @@
       "question": "九列渠道表是否完整保留？",
       "claim_ids": [
         "c-table-fact",
-        "c-region-gap"
+        "c-leads-fact",
+        "c-region-gap",
+        "c-report-context",
+        "c-rate-limits"
       ],
       "source_ids": [
-        "s-channel"
+        "s-channel",
+        "s-context"
       ],
       "transition": "表格之后核对来源覆盖",
       "communication_intent": "用附录完整保留九列与24个数值，供复核",
@@ -1048,7 +1113,7 @@
           0.1,
           0.14
         ],
-        "source": "Synthetic multi-source fixture · Apache-2.0"
+        "source": "Synthetic multi-source fixture · Apache-2.0 · 线索量仅作背景，不构成成交率分母"
       }
     },
     {
@@ -1062,16 +1127,19 @@
       "claim_ids": [
         "c-dedup",
         "c-limits",
-        "c-visual-fact"
+        "c-visual-fact",
+        "c-report-context",
+        "c-rate-limits"
       ],
       "source_ids": [
         "s-channel",
         "s-chart",
         "s-interview",
-        "s-visual"
+        "s-visual",
+        "s-context"
       ],
       "transition": "结束",
-      "communication_intent": "用来源覆盖表说明保留、去重、限制和哈希位置",
+      "communication_intent": "用来源覆盖表说明保留、去重、限制、口径缺口和哈希位置",
       "spec": {
         "type": "table",
         "title": "附录：来源覆盖与限制",
@@ -1085,7 +1153,7 @@
           [
             "渠道表截图",
             "规范来源（保留）",
-            "24个数值在附录表逐一绑定；正文图表可复核",
+            "24个数值在附录逐一绑定；分母/cohort/去重/跨期口径 NOT_PROVIDED",
             "0f8cf0ed2062"
           ],
           [
@@ -1097,7 +1165,7 @@
           [
             "访谈截图",
             "定性证据（保留）",
-            "24位样本；仅提出假设，不能证明因果",
+            "24位试驾客户便利样本；仅提出假设，不证明因果",
             "225067e67304"
           ],
           [
@@ -1109,7 +1177,7 @@
           [
             "源材料 PPTX",
             "审计附件（保留）",
-            "含原生表/图与截图；完整哈希见交付包",
+            "原生9列表/图与嵌入截图；文件/形状/图片哈希见 source-inspection.json",
             "source-inspection.json"
           ]
         ],
@@ -1119,7 +1187,7 @@
           0.36,
           0.22
         ],
-        "source": "Synthetic multi-source fixture · Apache-2.0"
+        "source": "Synthetic multi-source fixture · Apache-2.0 · 原生源PPTX审计见交付包"
       }
     }
   ]

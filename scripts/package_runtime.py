@@ -1,28 +1,58 @@
 #!/usr/bin/env python3
-"""Build deterministic Goujian ZIPs: lightweight installer plus optional showcase."""
-from pathlib import Path
+"""Build deterministic Goujian ZIPs.
+
+Default output is the minimal runtime payload declared by
+`distribution/runtime-manifest.json`; its archive `package.json` is mapped from
+`distribution/runtime-package.json`. `--source` builds the complete
+source/development archive with the root package.json and full test workflow.
+`--showcase` adds the review-only `out/v1.3-showcase` subtree to the runtime.
+"""
+from pathlib import Path, PurePosixPath
 import argparse
 import hashlib
 import json
+import re
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
 PREFIX = 'goujian-strategy-slides'
-INCLUDE = ['SKILL.md', 'core', 'skill', 'adapters', 'docs', 'tests', 'scripts', '.github',
-           'package.json', 'package-lock.json', 'requirements-render.txt', 'README.md',
-           'README.zh-CN.md', 'README.en.md', 'CONTRIBUTING.md', 'CHANGELOG.md', 'LICENSE',
-           'THIRD_PARTY_NOTICE.md', '.gitignore']
+SOURCE_INCLUDE = ['SKILL.md', 'core', 'skill', 'adapters', 'docs', 'tests', 'scripts', '.github',
+                  'distribution', 'package.json', 'package-lock.json', 'requirements-render.txt',
+                  'README.md', 'README.zh-CN.md', 'README.en.md', 'CONTRIBUTING.md', 'CHANGELOG.md',
+                  'LICENSE', 'THIRD_PARTY_NOTICE.md', '.gitignore']
 EXCLUDE_DIRS = {'node_modules', '.venv', 'venv', 'out', 'dist', 'build', '__pycache__', '.git',
                 '.pytest_cache', '.mypy_cache', '.ruff_cache', '.cache', '.scratch', '.qoder'}
 FORBIDDEN_NAMES = {'.env', '.env.local', '.npmrc', '.netrc', '.DS_Store', 'id_rsa', 'id_ed25519'}
 FORBIDDEN_SUFFIXES = ('.pyc', '.pem', '.key', '.p12', '.pfx', '.zip')
 SHOWCASE_REL = Path('out/v1.3-showcase')
+RUNTIME_MANIFEST = Path('distribution/runtime-manifest.json')
 FIXED_TIME = (2026, 1, 1, 0, 0, 0)
 FILE_MODE = 0o644
+MAPPING_FIELDS = ('name', 'version', 'license', 'dependencies', 'engines', 'overrides', 'repository')
 
 
 def fail(message):
     raise ValueError(message)
+
+
+def read_json(path):
+    return json.loads(Path(path).read_text(encoding='utf-8'))
+
+
+def manifest_source(relative):
+    if (not isinstance(relative, str) or not relative or '\\' in relative
+            or any(ord(char) < 32 for char in relative)
+            or relative.startswith('/') or re.match(r'^[A-Za-z]:', relative)
+            or any(part in ('', '.', '..') for part in relative.split('/'))):
+        fail(f'Unsafe runtime manifest path: {relative!r}')
+    path = ROOT
+    for part in PurePosixPath(relative).parts:
+        path = path / part
+        if path.is_symlink():
+            fail(f'Refusing symlink in runtime manifest path: {relative}')
+    if not path.is_file():
+        fail(f'Declared runtime file is missing or not a regular file: {relative}')
+    return path
 
 
 def allowed_path(path, include_pptx, allow_out=False):
@@ -67,35 +97,131 @@ def write_entry(archive, source, archive_name):
     archive.writestr(info, data, compress_type=zipfile.ZIP_DEFLATED, compresslevel=9)
 
 
-def build(out, showcase=False):
+def load_runtime_manifest():
+    manifest = read_json(manifest_source(RUNTIME_MANIFEST.as_posix()))
+    if manifest.get('distribution') != 'runtime':
+        fail('Runtime manifest must declare distribution=runtime')
+    mapping = manifest.get('package_mapping') or {}
+    if mapping.get('archive_path') != 'package.json':
+        fail('Runtime package mapping must target archive package.json')
+    manifest_source(mapping.get('source_path'))
+    files = manifest.get('runtime_files')
+    if not isinstance(files, list) or not files or not all(isinstance(item, str) for item in files):
+        fail('Runtime manifest must declare a nonempty file list')
+    if len(files) != len(set(files)) or 'package.json' in files:
+        fail('Duplicate runtime manifest entry or mapped package.json collision')
+    return manifest
+
+
+def compare_package_mapping(source_package, runtime_package):
+    mismatches = []
+    for field in MAPPING_FIELDS:
+        if source_package.get(field) != runtime_package.get(field):
+            mismatches.append(field)
+    if mismatches:
+        fail(f'Runtime package mapping differs from package.json for: {", ".join(mismatches)}')
+
+
+def runtime_script_targets(command):
+    targets = []
+    for match in re.finditer(r'(?:^|\s)(?:python3|node)\s+([A-Za-z0-9_./-]+)', command):
+        target = match.group(1)
+        if target.startswith('-'):
+            continue
+        if target.endswith(('.py', '.js')):
+            targets.append(target)
+    return targets
+
+
+def validate_runtime_commands(manifest, entries):
+    package = read_json(manifest_source(manifest['package_mapping']['source_path']))
+    scripts = package.get('scripts') or {}
+    for name in manifest.get('omitted_commands') or []:
+        if name in scripts:
+            fail(f'Development command must be omitted from the runtime manifest: {name}')
+    archive_targets = {name for name in entries if name.startswith(PREFIX + '/')}
+    for name, command in scripts.items():
+        for target in runtime_script_targets(command):
+            if target.startswith('out/'):
+                continue
+            archive_name = f'{PREFIX}/{target}'
+            if archive_name not in archive_targets:
+                fail(f'Runtime command {name!r} references missing payload member: {target}')
+    for required in ('validate:all', 'package', 'preflight', 'test', 'test:core'):
+        if required not in scripts:
+            fail(f'Runtime manifest must keep production command: {required}')
+
+
+def runtime_entries(showcase=False):
+    manifest = load_runtime_manifest()
+    entries = {}
+    for rel in manifest.get('runtime_files') or []:
+        source = manifest_source(rel)
+        if not allowed_path(source, include_pptx=False):
+            fail(f'Declared runtime file is excluded by policy: {rel}')
+        entries[f'{PREFIX}/{rel}'] = source
+    mapping = manifest['package_mapping']
+    mapped = manifest_source(mapping['source_path'])
+    entries[f'{PREFIX}/{mapping["archive_path"]}'] = mapped
+    compare_package_mapping(read_json(ROOT / 'package.json'), read_json(mapped))
+    validate_runtime_commands(manifest, entries)
+    if showcase:
+        entries.update(showcase_entries(manifest))
+    return entries, manifest
+
+
+def showcase_entries(manifest):
+    showcase_root = ROOT / SHOWCASE_REL
+    if not showcase_root.is_dir():
+        fail(f'Showcase subtree not found: {SHOWCASE_REL.as_posix()}')
+    entries = {}
+    for source in collect(showcase_root, include_pptx=True, allow_out=True):
+        entries[f'{PREFIX}/{source.relative_to(ROOT).as_posix()}'] = source
+    version = read_json(ROOT / 'package.json')['version']
+    marker = f'{PREFIX}/{(SHOWCASE_REL / Path(manifest["showcase"]["archive_marker"]).name).as_posix()}'
+    entries[marker] = (
+        f'# Showcase review artifact\n\n'
+        f'- product: Goujian Strategy Slides\n'
+        f'- version: {version}\n'
+        f'- installation_required: false\n'
+        f'- purpose: Frozen review evidence only. Install from the runtime ZIP without this subtree.\n'
+    ).encode('utf-8')
+    return entries
+
+
+def source_entries():
     skill_entries = [p for p in ROOT.rglob('SKILL.md')
                      if not (set(p.relative_to(ROOT).parts) & EXCLUDE_DIRS)]
     if skill_entries != [ROOT / 'SKILL.md']:
         fail(f'Expected only root SKILL.md; found: {[str(p.relative_to(ROOT)) for p in skill_entries]}')
-    files = []
-    for rel in INCLUDE:
-        files.extend(collect(ROOT / rel, include_pptx=False))
-    if showcase:
-        showcase_root = ROOT / SHOWCASE_REL
-        if not showcase_root.is_dir():
-            fail(f'Showcase subtree not found: {SHOWCASE_REL.as_posix()}')
-        files.extend(collect(showcase_root, include_pptx=True, allow_out=True))
     entries = {}
-    for source in files:
-        archive_name = f'{PREFIX}/{(source.relative_to(ROOT)).as_posix()}'
-        if archive_name in entries:
-            fail(f'Duplicate archive entry: {archive_name}')
-        entries[archive_name] = source
+    for rel in SOURCE_INCLUDE:
+        for source in collect(ROOT / rel, include_pptx=False):
+            entries[f'{PREFIX}/{source.relative_to(ROOT).as_posix()}'] = source
+    return entries
+
+
+def write_entries(out, entries):
     ordered = sorted(entries)
     if [name for name in ordered if name.endswith('/SKILL.md')] != [f'{PREFIX}/SKILL.md']:
         fail('Archive must contain exactly one root SKILL.md')
     if any(name.startswith('/') or '/../' in name or name.startswith('../') for name in ordered):
         fail('Archive contains an unsafe path')
+    if len(ordered) != len(set(ordered)):
+        fail('Archive contains duplicate entries')
     out = Path(out)
     out.parent.mkdir(parents=True, exist_ok=True)
     with zipfile.ZipFile(out, 'w', compression=zipfile.ZIP_DEFLATED) as archive:
         for name in ordered:
-            write_entry(archive, entries[name], name)
+            value = entries[name]
+            if isinstance(value, bytes):
+                info = zipfile.ZipInfo(name, date_time=FIXED_TIME)
+                info.compress_type = zipfile.ZIP_DEFLATED
+                info.create_system = 3
+                info.external_attr = FILE_MODE << 16
+                archive.writestr(info, value, compress_type=zipfile.ZIP_DEFLATED, compresslevel=9)
+            else:
+                write_entry(archive, value, name)
     digest = hashlib.sha256(out.read_bytes()).hexdigest()
     with zipfile.ZipFile(out) as archive:
         if archive.testzip() is not None:
@@ -105,25 +231,40 @@ def build(out, showcase=False):
             fail('Archive contains duplicate entries')
         if any(info.is_dir() for info in archive.infolist()):
             fail('Archive unexpectedly contains directory entries')
-    return {'archive': str(out), 'entries': len(ordered), 'sha256': digest}
+    return digest, len(ordered)
+
+
+def build(out, showcase=False, source=False):
+    if showcase and source:
+        fail('--source and --showcase are mutually exclusive')
+    if source:
+        entries = source_entries()
+        mode = 'source'
+    else:
+        entries, _manifest = runtime_entries(showcase=showcase)
+        mode = 'showcase' if showcase else 'runtime'
+    digest, count = write_entries(out, entries)
+    return {'archive': str(out), 'mode': mode, 'entries': count, 'sha256': digest}
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('out', nargs='?', help='ZIP output path')
+    parser.add_argument('--source', action='store_true',
+                        help='Build the complete source/development archive instead of the runtime payload')
     parser.add_argument('--showcase', action='store_true',
-                        help='Include the approved out/v1.3-showcase subtree (PPTX/render/QA assets)')
+                        help='Add the approved out/v1.3-showcase review artifact to the runtime payload')
     parser.add_argument('--json', action='store_true', help='Print machine-readable JSON')
     args = parser.parse_args()
-    version = json.loads((ROOT / 'package.json').read_text(encoding='utf-8'))['version']
-    suffix = '-showcase' if args.showcase else ''
+    version = read_json(ROOT / 'package.json')['version']
+    suffix = '-source' if args.source else ('-showcase' if args.showcase else '')
     out = Path(args.out) if args.out else ROOT / 'dist' / f'goujian-strategy-slides-v{version}{suffix}.zip'
-    result = build(out, showcase=args.showcase)
+    result = build(out, showcase=args.showcase, source=args.source)
     if args.json:
         print(json.dumps(result, ensure_ascii=False, indent=2))
     else:
         print(result['archive'])
-        print(f"entries={result['entries']} sha256={result['sha256']}")
+        print(f"mode={result['mode']} entries={result['entries']} sha256={result['sha256']}")
 
 
 if __name__ == '__main__':

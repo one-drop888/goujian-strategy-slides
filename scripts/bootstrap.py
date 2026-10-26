@@ -1,9 +1,19 @@
 #!/usr/bin/env python3
-"""Idempotent local bootstrap: npm ci from the lockfile plus an isolated .venv."""
-import argparse, hashlib, importlib.util, json, os, platform, re, shutil, subprocess, sys, datetime
+"""Idempotent local bootstrap: npm ci from the lockfile plus an isolated .venv.
+
+Lifecycle commands are bounded by GOUJIAN_BOOTSTRAP_TIMEOUT seconds (default 1800)
+or the --timeout option; interpreter probes use a short fixed timeout.
+"""
+import argparse, hashlib, json, os, platform, re, shutil, subprocess, sys, datetime
 from pathlib import Path
 
 ROOT=Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:sys.path.insert(0,str(ROOT))
+from core.qa import secure_deps
+
+PROBE_ENV=ROOT/'scripts/probe_env.py'
+PROBE_TIMEOUT_SECONDS=10
+DEFAULT_LIFECYCLE_TIMEOUT_SECONDS=1800
 
 class BootstrapError(RuntimeError):pass
 
@@ -11,17 +21,27 @@ def read_json(path,default=None):
     try:return json.loads(Path(path).read_text(encoding='utf-8'))
     except (OSError,ValueError):return default
 
-def run_command(args,cwd,env=None,runner=None):
+def run_command(args,cwd,env=None,runner=None,timeout=None):
     runner=runner or subprocess.run
-    return runner(args,cwd=str(cwd),env=env,capture_output=True,text=True)
+    try:
+        return runner(args,cwd=str(cwd),env=env,capture_output=True,text=True,timeout=timeout,shell=False)
+    except subprocess.TimeoutExpired as error:
+        raise BootstrapError(f'Command timed out after {timeout}s: {args[0]}') from error
+
+def lifecycle_timeout():
+    raw=os.environ.get('GOUJIAN_BOOTSTRAP_TIMEOUT')
+    if not raw:return DEFAULT_LIFECYCLE_TIMEOUT_SECONDS
+    try:value=int(raw)
+    except ValueError:raise BootstrapError('GOUJIAN_BOOTSTRAP_TIMEOUT must be an integer number of seconds')
+    if value<=0:raise BootstrapError('GOUJIAN_BOOTSTRAP_TIMEOUT must be positive')
+    return value
 
 def version_tuple(text):
     match=re.search(r'(\d+)\.(\d+)\.(\d+)',str(text or ''))
     return tuple(int(x) for x in match.groups()) if match else None
 
 def load_secure_deps():
-    spec=importlib.util.spec_from_file_location('goujian_secure_deps',ROOT/'core/qa/secure_deps.py')
-    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);return module
+    return secure_deps
 
 def python_candidates():
     seen=set()
@@ -51,7 +71,7 @@ def choose_python(explicit=None,runner=None):
     raise BootstrapError(f'Python >= 3.9 not found; install Python 3.9+ (3.11+ for the secure image/render tier) or pass --python')
 
 def verify_python(path,runner=None):
-    result=run_command([path,'-c','import sys; print(".".join(map(str,sys.version_info[:3])))'],Path.cwd(),runner=runner)
+    result=run_command([path,str(PROBE_ENV),'python-version'],Path.cwd(),runner=runner,timeout=PROBE_TIMEOUT_SECONDS)
     version=version_tuple(result.stdout if result.returncode==0 else '')
     if result.returncode!=0 or not version:raise BootstrapError(f'Cannot execute Python at {path}: {(result.stderr or result.stdout).strip()}')
     if version<(3,9):raise BootstrapError(f'Python >= 3.9 required; {path} is {version[0]}.{version[1]}.{version[2]}')
@@ -86,8 +106,7 @@ def python_inside_venv(venv,python):
 def verify_venv_python(python,venv,runner=None):
     """The Unix venv interpreter is a symlink to the base runtime, so validate
     the executed interpreter's sys.prefix rather than the symlink target."""
-    probe=run_command([str(python),'-c',
-        'import json,sys;print(json.dumps({"prefix":sys.prefix,"base":sys.base_prefix}))'],Path.cwd(),runner=runner)
+    probe=run_command([str(python),str(PROBE_ENV),'venv-prefix'],Path.cwd(),runner=runner,timeout=PROBE_TIMEOUT_SECONDS)
     if probe.returncode!=0:raise BootstrapError(f'Cannot execute isolated Python at {python}: {(probe.stderr or probe.stdout).strip()}')
     try:info=json.loads(probe.stdout.strip().splitlines()[-1])
     except (ValueError,IndexError):raise BootstrapError(f'Isolated Python at {python} did not report sys.prefix')
@@ -99,14 +118,14 @@ def verify_venv_python(python,venv,runner=None):
     return info
 
 def verify_venv_version(python,runner=None):
-    result=run_command([str(python),'-c','import sys; print(".".join(map(str,sys.version_info[:3])))'],Path.cwd(),runner=runner)
+    result=run_command([str(python),str(PROBE_ENV),'python-version'],Path.cwd(),runner=runner,timeout=PROBE_TIMEOUT_SECONDS)
     version=version_tuple(result.stdout if result.returncode==0 else '')
     if result.returncode!=0 or not version:
         raise BootstrapError(f'Cannot read the isolated Python version at {python}: {(result.stderr or result.stdout).strip()}')
     return version
 
 def venv_pillow(python,runner=None):
-    result=run_command([str(python),'-c','import importlib.metadata as m; print(m.version("Pillow"))'],Path.cwd(),runner=runner)
+    result=run_command([str(python),str(PROBE_ENV),'pillow-version'],Path.cwd(),runner=runner,timeout=PROBE_TIMEOUT_SECONDS)
     return result.stdout.strip() if result.returncode==0 else None
 
 def file_hash(path):
@@ -121,8 +140,10 @@ def write_state(venv,state):
     temporary.write_text(json.dumps(state,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     os.replace(temporary,target)
 
-def bootstrap(root=ROOT,python=None,dry_run=False,force=False,runner=None,emit=print):
+def bootstrap(root=ROOT,python=None,dry_run=False,force=False,runner=None,emit=print,timeout=None):
     root=Path(root).resolve();runner=runner or subprocess.run
+    lifecycle=lifecycle_timeout() if timeout is None else timeout
+    if lifecycle<=0:raise BootstrapError('Lifecycle timeout must be positive')
     secure_deps=load_secure_deps()
     explicit=bool(python or os.environ.get('GOUJIAN_PYTHON'))
     selected,reason=choose_python(python,runner)
@@ -152,7 +173,7 @@ def bootstrap(root=ROOT,python=None,dry_run=False,force=False,runner=None,emit=p
         command=[npm,'ci','--no-audit','--no-fund']
         if dry_run:actions.append({'step':'npm-ci','status':'PLANNED','command':command})
         else:
-            result=run_command(command,root,runner=runner)
+            result=run_command(command,root,runner=runner,timeout=lifecycle)
             if result.returncode!=0:raise BootstrapError(f'npm ci failed: {(result.stderr or result.stdout).strip()}')
             status=js_status(root)
             if not status['ready']:
@@ -177,7 +198,7 @@ def bootstrap(root=ROOT,python=None,dry_run=False,force=False,runner=None,emit=p
         command=[selected,'-m','venv',str(venv)]
         if dry_run:actions.append({'step':'venv','status':'PLANNED','command':command})
         else:
-            result=run_command(command,root,runner=runner)
+            result=run_command(command,root,runner=runner,timeout=lifecycle)
             if result.returncode!=0:raise BootstrapError(f'venv creation failed: {(result.stderr or result.stdout).strip()}')
             python_path=venv_python(venv)
             if not python_path:raise BootstrapError('venv created without a Python interpreter; rerun bootstrap')
@@ -216,7 +237,7 @@ def bootstrap(root=ROOT,python=None,dry_run=False,force=False,runner=None,emit=p
             env={**os.environ,'PYTHONNOUSERSITE':'1','PIP_NO_INPUT':'1','PIP_DISABLE_PIP_VERSION_CHECK':'1','PIP_USER':'0'}
             if dry_run:actions.append({'step':'pip-install','status':'PLANNED','command':command,'env':{'PYTHONNOUSERSITE':'1'}})
             else:
-                result=run_command(command,root,env=env,runner=runner)
+                result=run_command(command,root,env=env,runner=runner,timeout=lifecycle)
                 if result.returncode!=0:raise BootstrapError(f'pip install failed: {(result.stderr or result.stdout).strip()}')
                 pillow=venv_pillow(planned_python,runner)
                 if not secure_deps.pillow_is_secure(pillow):
@@ -256,16 +277,18 @@ def main():
     parser.add_argument('--python',help='Python interpreter to create .venv (defaults to GOUJIAN_PYTHON or the current >=3.9 interpreter)')
     parser.add_argument('--dry-run',action='store_true',help='Show actions without creating files or downloading')
     parser.add_argument('--force',action='store_true',help='Reinstall even when dependency state matches')
+    parser.add_argument('--timeout',type=int,default=None,
+                        help='Maximum seconds per npm/venv/pip lifecycle command (default: GOUJIAN_BOOTSTRAP_TIMEOUT or 1800)')
     parser.add_argument('--json',action='store_true',help='Print machine-readable JSON')
     args=parser.parse_args()
     try:
         if args.json:
             result=None
             def capture(line):pass
-            result=bootstrap(Path(args.root),args.python,args.dry_run,args.force,emit=capture)
+            result=bootstrap(Path(args.root),args.python,args.dry_run,args.force,emit=capture,timeout=args.timeout)
             print(json.dumps(result,ensure_ascii=False,indent=2))
         else:
-            bootstrap(Path(args.root),args.python,args.dry_run,args.force)
+            bootstrap(Path(args.root),args.python,args.dry_run,args.force,timeout=args.timeout)
     except BootstrapError as error:
         if args.json:print(json.dumps({'status':'FAILED','error':str(error)},ensure_ascii=False,indent=2))
         else:print(f'Bootstrap failed: {error}',file=sys.stderr)

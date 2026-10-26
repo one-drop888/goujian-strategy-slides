@@ -1,9 +1,11 @@
 """Semantic/spatial checks against a hash-bound record of actual native draw calls."""
-import hashlib, json, re, sys, zipfile
+import hashlib, json, sys, zipfile
 from pathlib import Path
 from xml.etree import ElementTree as ET
-import importlib.util
-_s=importlib.util.spec_from_file_location('text_fit',Path(__file__).with_name('text_fit.py'));_fit=importlib.util.module_from_spec(_s);_s.loader.exec_module(_fit)
+
+ROOT=Path(__file__).resolve().parents[2]
+if str(ROOT) not in sys.path:sys.path.insert(0,str(ROOT))
+from core.qa import text_fit as _fit
 
 P='http://schemas.openxmlformats.org/presentationml/2006/main'
 

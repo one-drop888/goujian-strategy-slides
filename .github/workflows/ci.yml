@@ -27,24 +27,161 @@ jobs:
       - run: npm ci
       - name: Core tier without Pillow or render dependencies
         run: npm run test:core
-      - name: Package and preflight the actual installer
+      - name: Package and preflight the actual runtime and source archives
         run: |
           set -euo pipefail
           mkdir -p out dist
-          python3 scripts/package_runtime.py dist/installer.zip --json > out/package.json
+          python3 scripts/package_runtime.py dist/runtime.zip --json > out/runtime-package.json
+          python3 scripts/package_runtime.py dist/source.zip --source --json > out/source-package.json
           python3 - <<'PY'
-          import subprocess, zipfile
+          import json, subprocess, zipfile
           from pathlib import Path
           prefix = 'goujian-strategy-slides/'
-          with zipfile.ZipFile(Path('dist/installer.zip')) as archive:
-              for name in archive.namelist():
-                  relative = name[len(prefix):] if name.startswith(prefix) else None
-                  assert relative, f'archive member outside the declared prefix: {name}'
-                  expected = subprocess.run(['git', 'show', f'HEAD:{relative}'], check=True, capture_output=True).stdout
-                  assert archive.read(name) == expected, f'{relative} differs from HEAD'
-          print('PASS: installer members match HEAD')
+          mapping_path = Path('distribution/runtime-package.json')
+          mapping = json.loads(mapping_path.read_text(encoding='utf-8'))
+          root_package = json.loads(Path('package.json').read_text(encoding='utf-8'))
+          for field in ('name', 'version', 'license', 'dependencies', 'engines', 'overrides', 'repository'):
+              assert mapping.get(field) == root_package.get(field), f'runtime package mapping differs for {field}'
+          def verify(path, mapped_package):
+              with zipfile.ZipFile(Path(path)) as archive:
+                  names = archive.namelist()
+                  assert [name for name in names if name.endswith('/SKILL.md')] == [prefix + 'SKILL.md']
+                  for name in names:
+                      relative = name[len(prefix):] if name.startswith(prefix) else None
+                      assert relative, f'archive member outside the declared prefix: {name}'
+                      if relative == 'package.json' and mapped_package:
+                          expected = mapping_path.read_bytes()
+                      else:
+                          expected = subprocess.run(['git', 'show', f'HEAD:{relative}'],
+                                                    check=True, capture_output=True).stdout
+                      assert archive.read(name) == expected, f'{relative} differs from HEAD'
+                  return len(names)
+          runtime_count = verify('dist/runtime.zip', True)
+          source_count = verify('dist/source.zip', False)
+          print(f'PASS: runtime={runtime_count} source={source_count} members match HEAD; package.json mapped only for runtime')
           PY
-          python3 scripts/security_preflight.py dist/installer.zip --json out/preflight.json
+          python3 scripts/security_preflight.py dist/runtime.zip --profile runtime --strict-manifest --json out/runtime-preflight.json
+          python3 scripts/security_preflight.py dist/source.zip --profile source --json out/source-preflight.json
+      - name: Clean-install the actual runtime ZIP without linked node_modules
+        run: |
+          set -euo pipefail
+          install_root="$RUNNER_TEMP/构见-ci-runtime-clean-install"
+          rm -rf "$install_root"
+          python3 - "$install_root" dist/runtime.zip <<'PY'
+          import json
+          import stat
+          import sys
+          import zipfile
+          from pathlib import Path
+
+          target = Path(sys.argv[1])
+          archive = Path(sys.argv[2])
+          prefix = 'goujian-strategy-slides/'
+          with zipfile.ZipFile(archive) as source:
+              infos = source.infolist()
+              names = [info.filename for info in infos]
+              assert names and len(names) == len(set(names))
+              assert [name for name in names if name.endswith('/SKILL.md')] == [prefix + 'SKILL.md']
+              for info in infos:
+                  name = info.filename
+                  assert name.startswith(prefix), f'member outside the declared prefix: {name}'
+                  assert not info.is_dir(), f'unexpected directory entry: {name}'
+                  mode = (info.external_attr >> 16) & 0xFFFF
+                  assert not stat.S_ISLNK(mode), f'symlink member: {name}'
+                  relative = name[len(prefix):]
+                  assert not relative.startswith(('node_modules/', '.venv/', 'out/', 'dist/')), f'install-state member: {name}'
+              target.mkdir(parents=True)
+              source.extractall(target)
+          root = target / 'goujian-strategy-slides'
+          assert root.is_dir()
+          assert not (root / 'node_modules').exists()
+          assert not (root / '.venv').exists()
+          assert not (root / '.github').exists()
+          assert not (root / 'tests/test_capability_parity.py').exists()
+          manifest = json.loads((root / 'distribution/runtime-manifest.json').read_text(encoding='utf-8'))
+          files = manifest['runtime_files']
+          assert manifest['distribution'] == 'runtime'
+          assert len(files) == 189 and len(set(files)) == 189
+          assert 'package.json' not in files
+          assert len(names) == 190
+          assert (root / 'package.json').read_bytes() == (root / 'distribution/runtime-package.json').read_bytes()
+          print(f'PASS: extracted {len(names)} runtime members into a Unicode directory; no node_modules, .venv, symlink or development overlay')
+          PY
+          cd "$install_root/goujian-strategy-slides"
+          test -z "$(find . -type l -print -quit)"
+          test ! -e node_modules
+          test ! -e .venv
+          empty_npmrc="$RUNNER_TEMP/goujian-empty-npmrc"
+          : > "$empty_npmrc"
+          export NPM_CONFIG_USERCONFIG="$empty_npmrc"
+          python3 scripts/bootstrap.py --python "$(command -v python3)" --json > "$RUNNER_TEMP/ci-bootstrap.json"
+          python3 - "$RUNNER_TEMP/ci-bootstrap.json" <<'PY'
+          import json
+          import sys
+          from pathlib import Path
+
+          data = json.loads(Path(sys.argv[1]).read_text(encoding='utf-8'))
+          assert data['status'] == 'READY', data
+          assert data['tier'] == 'core', data['tier']
+          assert data['secure_image'] == 'UNAVAILABLE', data['secure_image']
+          assert data['pillow'] is None, data['pillow']
+          actions = {action['step']: action for action in data['actions']}
+          assert actions['npm-ci']['status'] == 'OK', actions['npm-ci']
+          assert actions['venv']['status'] == 'OK', actions['venv']
+          assert actions['pip-install']['status'] == 'SKIPPED', actions['pip-install']
+          print('PASS: core Bootstrap installed locked npm dependencies in the extracted runtime; no Pillow fallback was installed')
+          PY
+          . .venv/bin/activate
+          python3 - <<'PY'
+          import sys
+          assert sys.prefix != sys.base_prefix, sys.prefix
+          print(f'PASS: core runtime commands use isolated {sys.prefix}')
+          PY
+          npm run test:core | tee "$RUNNER_TEMP/ci-runtime-smoke-core.log"
+          python3 - "$RUNNER_TEMP/ci-runtime-smoke-core.log" <<'PY'
+          import sys
+          from pathlib import Path
+
+          text = Path(sys.argv[1]).read_text(encoding='utf-8')
+          lines = [line.rstrip() for line in text.splitlines() if line.strip()]
+          assert 'runtime smoke: PASS (core tier); VISUAL_QA=NOT_RUN' in text, text[-1200:]
+          assert not any(line.startswith('FAIL') for line in lines), [line for line in lines if line.startswith('FAIL')]
+          not_run = {line.split()[1].rstrip(':') for line in lines if line.startswith('NOT_RUN')}
+          expected = {'qa:analytics', 'plan:compile', 'font:measure', 'image:prepare',
+                      'build:multimodal', 'qa:multimodal', 'render:multimodal'}
+          assert not_run == expected, (not_run, expected)
+          print('PASS: core installed-runtime smoke passed and disclosed the seven Pillow/image steps as NOT_RUN')
+          PY
+          npm run validate:all
+          npm run --silent doctor -- --json > "$RUNNER_TEMP/ci-doctor.json"
+          python3 - "$RUNNER_TEMP/ci-doctor.json" <<'PY'
+          import json
+          import sys
+          from pathlib import Path
+
+          data = json.loads(Path(sys.argv[1]).read_text(encoding='utf-8'))
+          assert data['status'] in {'READY', 'READY_WITH_NOTES'}, data['status']
+          checks = {check['id']: check for check in data['checks']}
+          assert checks['js-dependencies']['status'] == 'PRESENT', checks['js-dependencies']
+          assert checks['venv']['status'] == 'PRESENT', checks['venv']
+          assert checks['secure-image']['status'] != 'PRESENT', checks['secure-image']
+          assert data['visual_qa'] in {'NOT_RUN', 'UNAVAILABLE'}, data['visual_qa']
+          print('PASS: Doctor reports the isolated core tier honestly; secure-image is not claimed; VISUAL_QA is not approved')
+          PY
+          python3 scripts/package_runtime.py "$RUNNER_TEMP/ci-runtime-rebuilt.zip" --json > "$RUNNER_TEMP/ci-runtime-rebuilt.json"
+          python3 - "$RUNNER_TEMP/ci-runtime-rebuilt.json" "$GITHUB_WORKSPACE/dist/runtime.zip" <<'PY'
+          import hashlib
+          import json
+          import sys
+          from pathlib import Path
+
+          rebuilt = json.loads(Path(sys.argv[1]).read_text(encoding='utf-8'))
+          original = Path(sys.argv[2])
+          digest = hashlib.sha256(original.read_bytes()).hexdigest()
+          assert rebuilt['entries'] == 190, rebuilt['entries']
+          assert rebuilt['sha256'] == digest, (rebuilt['sha256'], digest)
+          print('PASS: repackaging from the clean core installation is byte-identical to the runtime ZIP')
+          PY
 
   secure:
     name: Secure image tier (Node ${{ matrix.node }}, Python ${{ matrix.python }})
@@ -58,6 +195,8 @@ jobs:
             python: '3.14'
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node }}
@@ -83,9 +222,11 @@ jobs:
           node - <<'JS'
           const fs = require('fs');
           const manifest = JSON.parse(fs.readFileSync('out/v1.3-showcase/showcase.manifest.json', 'utf8'));
+          if (manifest.version !== '1.3.1') throw new Error('showcase version is not 1.3.1');
           if (manifest.baseline !== null) throw new Error('Public showcase must not use a baseline path');
           if (!manifest.scenarios.length || !manifest.scenarios.every(item => item.comparison.status === 'NOT_RUN')) throw new Error('Public showcase comparison must be NOT_RUN');
           if (!(manifest.matrix.status === 'PASS' && manifest.gallery.status === 'PASS' && manifest.ledger.status === 'PASS')) throw new Error('A public V1.3 suite is not PASS');
+          if (manifest.matrix?.fixture_counts?.cells !== 96 || manifest.matrix?.fixture_counts?.accepted !== 72 || manifest.matrix?.fixture_counts?.rejected !== 24) throw new Error('The native chart matrix no longer reports 96/72/24 outcomes');
           const relationships = JSON.parse(fs.readFileSync('out/v1.3-showcase/relationships/manifest.json', 'utf8'));
           if (relationships.status !== 'PASS' || relationships.outputs.length !== 8) throw new Error('Relationship evidence is incomplete');
           if (relationships.visual_qa !== 'NOT_RUN') throw new Error('Relationship evidence must not claim a visual pass');
@@ -94,6 +235,54 @@ jobs:
           const fingerprint = JSON.parse(fs.readFileSync('out/v1.3-showcase/engine-source-fingerprint.json', 'utf8'));
           if (preview.engine_source_fingerprint?.aggregate_sha256 !== fingerprint.aggregate_sha256) throw new Error('Checked-in previews are stale for this engine source');
           JS
+      - name: V1.3.0 tagged baseline and capability parity
+        if: matrix.node == 24
+        run: |
+          set -euo pipefail
+          V13_BASELINE_COMMIT=f592ff82b2399fb3e08f3d9128f92a1d82039065
+          V13_BASELINE_TAG_OBJECT=5af41b05281c043dded880fc2ffe19ddb69f667c
+          git fetch --tags origin
+          if ! git rev-parse -q --verify refs/tags/v1.3.0 >/dev/null; then
+            git fetch --tags "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY.git"
+          fi
+          test "$(git cat-file -t refs/tags/v1.3.0)" = tag
+          test "$(git rev-parse refs/tags/v1.3.0)" = "$V13_BASELINE_TAG_OBJECT"
+          test "$(git rev-parse 'v1.3.0^{commit}')" = "$V13_BASELINE_COMMIT"
+          baseline_parent="$RUNNER_TEMP/v1.3.0-source"
+          rm -rf "$baseline_parent"
+          mkdir -p "$baseline_parent"
+          git archive --format=tar.gz --prefix=content/ 'v1.3.0' -o "$RUNNER_TEMP/v1.3.0-tag.tar.gz"
+          tar -xzf "$RUNNER_TEMP/v1.3.0-tag.tar.gz" -C "$baseline_parent"
+          baseline_root="$baseline_parent/content"
+          ln -sfn "$GITHUB_WORKSPACE/node_modules" "$baseline_root/node_modules"
+          (
+            cd "$baseline_root"
+            node scripts/build_showcase.js --no-previews
+          )
+          node - <<'JS'
+          const fs = require('fs');
+          const path = require('path');
+          const baseline = JSON.parse(fs.readFileSync(path.join(process.env.RUNNER_TEMP, 'v1.3.0-source/content/out/v1.3-showcase/showcase.manifest.json'), 'utf8'));
+          if (baseline.version !== '1.3.0') throw new Error('V1.3.0 baseline showcase version is not 1.3.0');
+          if (!(baseline.matrix.status === 'PASS' && baseline.gallery.status === 'PASS' && baseline.ledger.status === 'PASS')) throw new Error('A V1.3.0 baseline suite is not PASS');
+          JS
+          curl --fail --location --proto "=https" --tlsv1.2 \
+            "https://github.com/one-drop888/goujian-strategy-slides/releases/download/v1.3.0/goujian-strategy-slides-v1.3.0.zip" \
+            --output "$RUNNER_TEMP/goujian-v1.3.0-installer.zip"
+          printf '7df25c241d74c3bb34fc5569e021320fec675bded72c1e44d439a6f8485ad519  %s\n' "$RUNNER_TEMP/goujian-v1.3.0-installer.zip" | sha256sum --check -
+          python3 scripts/capability_parity.py "$baseline_root" "$GITHUB_WORKSPACE" --baseline-zip "$RUNNER_TEMP/goujian-v1.3.0-installer.zip" --json out/capability-parity.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          result = json.loads(Path('out/capability-parity.json').read_text(encoding='utf-8'))
+          assert result['status'] == 'PASS', result['failures']
+          assert result['capability_parity'] == 'CAPABILITY_PARITY_V1_3_0_TO_V1_3_1'
+          assert result['baseline']['version'] == '1.3.0'
+          assert result['candidate']['version'] == '1.3.1'
+          assert result['visual_review'] == 'NOT_RUN'
+          assert result['company_platform_security'] == 'NOT_VERIFIED'
+          print('PASS: V1.3.0 -> V1.3.1 capability parity')
+          PY
       - name: Keep tracked source clean before packaging
         if: matrix.node == 24
         run: |
@@ -101,33 +290,51 @@ jobs:
           git diff --exit-code
           test -z "$(git status --porcelain)"
           echo 'PASS: showcase generation changed no tracked file'
-      - name: Package and preflight the actual installer
+      - name: Package and preflight the actual runtime and source archives
         run: |
           set -euo pipefail
           mkdir -p out dist
-          python3 scripts/package_runtime.py dist/installer.zip --json > out/package.json
+          python3 scripts/package_runtime.py dist/runtime.zip --json > out/runtime-package.json
+          python3 scripts/package_runtime.py dist/source.zip --source --json > out/source-package.json
           python3 - <<'PY'
-          import subprocess, zipfile
+          import json, subprocess, zipfile
           from pathlib import Path
           prefix = 'goujian-strategy-slides/'
-          with zipfile.ZipFile(Path('dist/installer.zip')) as archive:
-              for name in archive.namelist():
-                  relative = name[len(prefix):] if name.startswith(prefix) else None
-                  assert relative, f'archive member outside the declared prefix: {name}'
-                  expected = subprocess.run(['git', 'show', f'HEAD:{relative}'], check=True, capture_output=True).stdout
-                  assert archive.read(name) == expected, f'{relative} differs from HEAD'
-          print('PASS: installer members match HEAD')
+          mapping_path = Path('distribution/runtime-package.json')
+          mapping = json.loads(mapping_path.read_text(encoding='utf-8'))
+          root_package = json.loads(Path('package.json').read_text(encoding='utf-8'))
+          for field in ('name', 'version', 'license', 'dependencies', 'engines', 'overrides', 'repository'):
+              assert mapping.get(field) == root_package.get(field), f'runtime package mapping differs for {field}'
+          def verify(path, mapped_package):
+              with zipfile.ZipFile(Path(path)) as archive:
+                  names = archive.namelist()
+                  assert [name for name in names if name.endswith('/SKILL.md')] == [prefix + 'SKILL.md']
+                  for name in names:
+                      relative = name[len(prefix):] if name.startswith(prefix) else None
+                      assert relative, f'archive member outside the declared prefix: {name}'
+                      if relative == 'package.json' and mapped_package:
+                          expected = mapping_path.read_bytes()
+                      else:
+                          expected = subprocess.run(['git', 'show', f'HEAD:{relative}'],
+                                                    check=True, capture_output=True).stdout
+                      assert archive.read(name) == expected, f'{relative} differs from HEAD'
+                  return len(names)
+          runtime_count = verify('dist/runtime.zip', True)
+          source_count = verify('dist/source.zip', False)
+          print(f'PASS: runtime={runtime_count} source={source_count} members match HEAD; package.json mapped only for runtime')
           PY
-          python3 scripts/security_preflight.py dist/installer.zip --json out/preflight.json
+          python3 scripts/security_preflight.py dist/runtime.zip --profile runtime --strict-manifest --json out/runtime-preflight.json
+          python3 scripts/security_preflight.py dist/source.zip --profile source --json out/source-preflight.json
       - name: Package and preflight the optional V1.3 showcase
         if: matrix.node == 24
         run: |
           set -euo pipefail
           python3 scripts/package_runtime.py dist/showcase.zip --showcase --json > out/showcase-package.json
           python3 - <<'PY'
-          import subprocess, zipfile
+          import json, subprocess, zipfile
           from pathlib import Path
           prefix = 'goujian-strategy-slides/'
+          mapping_path = Path('distribution/runtime-package.json')
           with zipfile.ZipFile(Path('dist/showcase.zip')) as archive:
               names = archive.namelist()
               assert [name for name in names if name.endswith('/SKILL.md')] == [prefix + 'SKILL.md']
@@ -139,20 +346,27 @@ jobs:
                   assert relative, f'archive member outside the declared prefix: {name}'
                   if relative.startswith('out/v1.3-showcase/'):
                       continue
-                  expected = subprocess.run(['git', 'show', f'HEAD:{relative}'], check=True, capture_output=True).stdout
+                  if relative == 'package.json':
+                      expected = mapping_path.read_bytes()
+                  else:
+                      expected = subprocess.run(['git', 'show', f'HEAD:{relative}'],
+                                                check=True, capture_output=True).stdout
                   assert archive.read(name) == expected, f'{relative} differs from HEAD'
-          print('PASS: showcase source matches HEAD and only adds out/v1.3-showcase')
+          print('PASS: showcase source matches HEAD with package.json mapped and only out/v1.3-showcase added')
           PY
-          python3 scripts/security_preflight.py dist/showcase.zip --allow-showcase --json out/showcase-preflight.json
-      - name: Upload the real CI showcase for independent review
+          python3 scripts/security_preflight.py dist/showcase.zip --profile runtime --allow-showcase --json out/showcase-preflight.json
+      - name: Upload the real CI showcase and parity evidence for independent review
         if: matrix.node == 24
         uses: actions/upload-artifact@v4
         with:
-          name: v1.3-ci-showcase-node24-python314
+          name: v1.3.1-ci-showcase-node24-python314
           path: |
             out/v1.3-showcase
-            out/package.json
-            out/preflight.json
+            out/capability-parity.json
+            out/runtime-package.json
+            out/runtime-preflight.json
+            out/source-package.json
+            out/source-preflight.json
             out/showcase-package.json
             out/showcase-preflight.json
           if-no-files-found: error

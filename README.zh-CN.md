@@ -55,6 +55,8 @@ Bootstrap 只安装项目 npm 依赖并创建本地 `.venv`，不安装系统工
 
 也可从 [GitHub Releases](https://github.com/one-drop888/goujian-strategy-slides/releases) 下载带 SHA256 的安装 ZIP。解压后进入 `goujian-strategy-slides/`，在 Agent 平台中发现该目录唯一的根 `SKILL.md`，运行上述安装步骤。所有 Agent 平台使用同一套开源内核，无需公司专用分支。
 
+V1.3.1 是企业安全兼容补丁：主安装包为精简运行时，另提供完整源码包与可选评审包；产品能力、原生渲染和历史验收证据不变。公司平台与 Agensi 仍未实际验收，`COMPANY_PLATFORM_SECURITY=NOT_VERIFIED`。[补丁说明](docs/V1_3_1_RELEASE_NOTES.md) · [安全与能力对等](docs/SECURITY_PARITY_V1_3_1.md)
+
 ## 用起来
 
 先确定受众和决策问题，再交给 Agent 读取 `SKILL.md`。可以从一份分析输入、可审阅的推理计划，或现有 JSON Spec 开始：

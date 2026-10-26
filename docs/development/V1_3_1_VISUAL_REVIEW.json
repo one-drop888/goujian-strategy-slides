@@ -1,0 +1,78 @@
+{
+  "status": "PASS_WITH_NOTES",
+  "reviewer": "Codex",
+  "scope": "independent patch non-regression review; not a redesign or universal aesthetic certification",
+  "reviewed_montages": [
+    "candidate multimodal pages1-9",
+    "candidate gallery dark-executive pages1-12",
+    "candidate matrix light pages1-12",
+    "candidate close-date timeline light"
+  ],
+  "full_size_pages": [
+    "multimodal3: all9 columns readable/preserved",
+    "multimodal6: evidence quote/source and conclusion separated"
+  ],
+  "baseline_review": [
+    "executive-dense12",
+    "dark-executive12",
+    "business9",
+    "sales10",
+    "project8",
+    "branch swimlane light1",
+    "roadmap dark1"
+  ],
+  "findings": [
+    "No new title/divider, column omission or image/evidence readability regression observed in the reviewed pages.",
+    "Multimodal9 pages are byte-identical rendered PNGs under the same toolchain; native object counts match.",
+    "At montage size some chart labels and footer/source notes are small; original baseline behavior retained; recipient PowerPoint and projector readability require their own review."
+  ],
+  "unverified": [
+    "native Windows/macOS PowerPoint",
+    "company upload/security"
+  ],
+  "company_platform_security": "NOT_VERIFIED",
+  "reviewed_multimodal": {
+    "baseline": {
+      "pptx_sha256": "ec79ee1a5f4163480314ac5e735ef3c4e5a20ab9af0dcdbe841144c181c29ab2",
+      "slides": 9,
+      "native_objects": {
+        "sp": 90,
+        "pic": 9,
+        "graphicFrame": 3,
+        "cxnSp": 0,
+        "chart": 1,
+        "tbl": 2
+      },
+      "native_charts": 1,
+      "embedded_workbooks": 2
+    },
+    "candidate": {
+      "pptx_sha256": "824491a3d0b9bb17dcf83f11ede7cfab7fd800e6ce014551d43083f23c0c68be",
+      "slides": 9,
+      "native_objects": {
+        "sp": 90,
+        "pic": 9,
+        "graphicFrame": 3,
+        "cxnSp": 0,
+        "chart": 1,
+        "tbl": 2
+      },
+      "native_charts": 1,
+      "embedded_workbooks": 2
+    }
+  },
+  "multimodal_render_page_sha256": {
+    "slide-4.png": "c9397bd970b3d577ae70134c6f8be67789e82324a2188eef68f6ab797f670ab0",
+    "slide-8.png": "f9399169401ed4fa5a583cb8d503753f371c909a9d2b2102036ec5ba85da63d5",
+    "slide-2.png": "22c685cfa0dc64d6288eb472ee34fcd958a6712393a139480ee1a30045ea97d6",
+    "slide-3.png": "fd21033931d8b0d2609a28d2cd2c2971006d3606d0e1424fe05afecd3b122906",
+    "slide-7.png": "ee8a1ed8383159ee8ccaad9093826d51d861fe739c399ba2e7ef5f61fdd350de",
+    "slide-5.png": "c680ace26f52b149f1b3b6c766a359a81928a15adb675146c6d82b37ee078d1f",
+    "slide-6.png": "9dc2dd91a5611fccbdd655aef4da7e09404033b599b0fd5a6a2ed04d731c2f4b",
+    "slide-9.png": "94885637b96d61688a67d9a0f486cb43947f272bfed09503347ce2ba1dc12f4d",
+    "slide-1.png": "9bd9382623e8dbfe7cecb14703b69ec97bcce6ea34b26e0c42166133c49989b5"
+  },
+  "all_nine_pages_equal_to_baseline": true,
+  "reviewed_core_source_sha256": "3f69af0cabea36f01c680419d5f6f21d58b913180875fa0e110d5e9f0d40e3dd",
+  "automated_visual_qa": "NOT_RUN; this is a separate Codex sample review"
+}

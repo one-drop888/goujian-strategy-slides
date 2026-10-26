@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.3.1] — 2026-10-26
+
+### 企业安全兼容补丁 / Enterprise security compatibility patch
+
+- 将运行时内部路径模块加载改为普通静态导入，保留 `core/qa/spec-check.py` 兼容入口与公共符号；将固定 `node -e` 分析回读替换为静态 `core/qa/recompute_analytics.js`，将固定 `python -c` 探针替换为 `scripts/probe_env.py`。必要的字体测量、Pillow、LibreOffice/Poppler、fontconfig 和锁定依赖安装仍以已知可执行文件与参数数组显式执行，并补充超时与有界输出。
+- 主安装 ZIP 改为精简运行时，新增完整源码/开发 `-source` ZIP 与可选 `-showcase` 评审包。运行时 `npm test`/`test:core` 执行真实的已安装运行时冒烟，并披露未执行的可选图片步骤；完整源码包保留原有全量测试与基准工作流。运行时 `package.json` 由版本化的 `distribution/runtime-package.json` 显式映射，运行时清单逐文件声明，只有该映射允许与提交字节不同。
+- `scripts/security_preflight.py` 增加 runtime/source/legacy 画像，扫描最终 ZIP 的全部文本成员，输出成员、行号、上下文、分类与用途；区分可执行代码、惰性字符串/注释、文档和配置，并分别报告 `wxect` 精确/大小写不敏感字面量。危险的动态模块加载、动态 `require`、shell 字符串和固定内联载荷在运行时被拒绝；受控参数数组与固定静态模块保持透明。旧 v1.3.0 基线仍可按 legacy 结构画像审计。
+- 新增静态导入、静态分析和静态探针回归测试、别名/绕过负向测试、运行时/源码/基线三种画像预检和 `CAPABILITY_PARITY_V1_3_0_TO_V1_3_1` 对等验证入口。版本、锁文件、Skill 元数据、运行时元数据更新为 1.3.1；补充中英双语补丁说明、安装契约和安全/对等文档。
+- 未改变产品能力、原生渲染、图表、数值语义、艺术方向或历史验收证据；无依赖升级。Apache-2.0 与第三方说明保留。公司平台上传/安全与 Agensi 仍未实际验收：`COMPANY_PLATFORM_SECURITY=NOT_VERIFIED`。未知公司扫描规则不能由公开静态预检 PASS 推断；旧 tag/release 不被覆盖。
+
+- Replaced runtime internal path-module loading with ordinary static imports while retaining the `core/qa/spec-check.py` compatibility entry and its public symbols. Replaced the fixed `node -e` analytics readback with the static `core/qa/recompute_analytics.js` and the fixed `python -c` probes with `scripts/probe_env.py`. Necessary font measurement, Pillow, LibreOffice/Poppler, fontconfig and locked dependency installation remain explicit, using known executables and argument arrays with added timeouts and bounded output.
+- The primary installer is now the minimal runtime. Added a complete source/development `-source` ZIP and an optional `-showcase` review archive. Runtime `npm test`/`test:core` run a real installed-runtime smoke and disclose optional image steps that did not run; the source archive retains the original full test and benchmark workflow. Runtime `package.json` is explicitly mapped from versioned `distribution/runtime-package.json`, and the runtime manifest declares every file; only that mapping may differ from committed bytes.
+- `scripts/security_preflight.py` now supports runtime/source/legacy profiles over every text member of the final ZIP, recording member, line, context, classification and purpose. It separates executable code from inert strings/comments, documentation and configuration, and reports the `wxect` literal both exactly and case-insensitively. Dangerous dynamic module loading, dynamic `require`, shell strings and fixed inline payloads are rejected in the runtime; controlled argument arrays and fixed static modules remain transparent. The archived v1.3.0 baseline remains auditable under the legacy structural profile.
+- Added regression tests for static imports, static analysis and probes; alias/bypass negatives; runtime/source/baseline preflight profiles; and the `CAPABILITY_PARITY_V1_3_0_TO_V1_3_1` parity entry. Bumped version, lockfile, Skill metadata and runtime metadata to 1.3.1; added bilingual patch notes, installation contract and security/parity documentation.
+- Product capabilities, native rendering, charts, numeric semantics, art direction and historical acceptance evidence are unchanged; no dependencies were upgraded. Apache-2.0 and third-party notices are retained. Company-platform upload/security and Agensi remain unverified: `COMPANY_PLATFORM_SECURITY=NOT_VERIFIED`. An unknown company scanner rule cannot be inferred from a public static preflight PASS, and no old tag/release is replaced.
+
 ## [1.3.0] — 2026-10-26
 
 ### Analytical and visual intelligence

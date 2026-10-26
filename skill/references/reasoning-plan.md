@@ -85,7 +85,7 @@ node skill/scripts/validate_plan.js plan.json --json
 node skill/scripts/compile_plan.js plan.json --out out/deck.pptx --spec-out out/deck.spec.json
 node skill/scripts/compile_plan.js plan.json --out out/dark.pptx --profile dark-executive
 
-# Rebuild the synthetic fixtures and renders used by the project
+# Development checkout / complete source ZIP only: rebuild project fixtures
 node scripts/dogfood_phase2.js
 ```
 

@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
-import argparse, json, importlib.util, hashlib, shutil, subprocess, re
+import argparse, json, hashlib, shutil, subprocess, re, sys
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[2]
+if str(ROOT) not in sys.path:sys.path.insert(0,str(ROOT))
+from core.qa import capabilities as caps, data_fidelity as fidelity, font_check as fonts
+from core.qa import pptx_geometry as geom, spec_check as specmod, spatial
+from skill.scripts import render_deck as rend
 SEMANTIC_QA=ROOT/'skill/scripts/semantic_qa.js'
-def load(name,path):
-    s=importlib.util.spec_from_file_location(name,path); m=importlib.util.module_from_spec(s); s.loader.exec_module(m); return m
-specmod=load('specqa',ROOT/'core/qa/spec-check.py'); geom=load('geom',ROOT/'core/qa/pptx_geometry.py'); fonts=load('fonts',ROOT/'core/qa/font_check.py'); rend=load('render',ROOT/'skill/scripts/render_deck.py')
-fidelity=load('fidelity',ROOT/'core/qa/data_fidelity.py')
-spatial=load('spatial',ROOT/'core/qa/spatial.py');caps=load('capabilities',ROOT/'core/qa/capabilities.py')
 
 def semantic_qa(pptx,spec,out,scene=None,profile=None,plan=None):
     node=shutil.which('node')
@@ -19,7 +18,7 @@ def semantic_qa(pptx,spec,out,scene=None,profile=None,plan=None):
     if profile:cmd+=['--profile',str(profile)]
     if plan:cmd+=['--plan',str(plan)]
     try:
-        proc=subprocess.run(cmd,cwd=str(ROOT),capture_output=True,text=True,timeout=180,check=False)
+        proc=subprocess.run(cmd,cwd=str(ROOT),capture_output=True,text=True,timeout=180,check=False,shell=False)
     except (OSError,subprocess.TimeoutExpired) as error:
         return {'status':'FAIL','reason':f'local semantic QA runner failed: {error}','report':str(report)}
     if proc.returncode not in (0,1):

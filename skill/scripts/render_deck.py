@@ -1,16 +1,14 @@
 #!/usr/bin/env python3
 """Isolated LibreOffice conversion; fresh output only, optional Pillow montage."""
-import argparse, importlib.util, json, os, re, shutil, subprocess, tempfile
+import argparse, json, os, re, shutil, subprocess, sys, tempfile
 from pathlib import Path
 
 ROOT=Path(__file__).resolve().parents[2]
-
-def _secure_deps():
-    spec=importlib.util.spec_from_file_location('goujian_secure_deps',ROOT/'core/qa/secure_deps.py')
-    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);return module
+if str(ROOT) not in sys.path:sys.path.insert(0,str(ROOT))
+from core.qa import secure_deps
 
 def run(cmd):
-    return subprocess.run(cmd,text=True,capture_output=True,timeout=120,
+    return subprocess.run(cmd,text=True,capture_output=True,timeout=120,shell=False,
                           env={**os.environ,'SAL_USE_VCLPLUGIN':'svp'})
 
 def render(pptx,outdir,dpi=140):
@@ -19,7 +17,7 @@ def render(pptx,outdir,dpi=140):
     if not lo or not ppm:
         return {'status':'UNAVAILABLE','reason':'LibreOffice and pdftoppm are required','pages':[]}
     try:
-        _secure_deps().require_secure_image_stack('native render/montage')
+        secure_deps.require_secure_image_stack('native render/montage')
         from PIL import Image, ImageDraw
     except ImportError:
         return {'status':'UNAVAILABLE','reason':'Pillow is required: pip install -r requirements-render.txt in a Python >= 3.11 environment','pages':[]}

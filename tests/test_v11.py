@@ -1,14 +1,47 @@
-import copy, importlib.util, json, subprocess, sys, tempfile, unittest
+import copy, importlib.util, json, runpy, subprocess, sys, tempfile, unittest
 from pathlib import Path
 from PIL import Image
 from unittest.mock import patch
 ROOT=Path(__file__).resolve().parents[1]
 def load(name,rel):
     spec=importlib.util.spec_from_file_location(name,ROOT/rel);mod=importlib.util.module_from_spec(spec);spec.loader.exec_module(mod);return mod
-spatial=load('spatial','core/qa/spatial.py');specqa=load('specqa','core/qa/spec-check.py');prepare=load('prepare','core/renderer/prepare_asset.py');ingest=load('ingest','skill/scripts/inspect_pptx.py')
+spatial=load('spatial','core/qa/spatial.py');specqa=load('specqa','core/qa/spec_check.py');prepare=load('prepare','core/renderer/prepare_asset.py');ingest=load('ingest','skill/scripts/inspect_pptx.py')
 caps=load('caps','core/qa/capabilities.py')
 
 class Regression(unittest.TestCase):
+    def test_invalid_schema_retains_original_diagnostics(self):
+        data={'title':'Invalid chart','slides':[{'type':'chart','title':'Missing chart data'}]}
+        result=subprocess.run(['node',str(ROOT/'core/schema/validate.js')],input=json.dumps(data),capture_output=True,text=True,cwd=ROOT)
+        self.assertEqual(result.returncode,2)
+        errors=json.loads(result.stdout)['errors']
+        self.assertTrue(errors)
+        self.assertEqual(specqa.check(data),[('ERROR','schema',error) for error in errors])
+    def test_spec_validator_timeout_is_typed_error(self):
+        with patch.object(specqa.subprocess,'run',side_effect=subprocess.TimeoutExpired(['node'],specqa.SCHEMA_TIMEOUT_SECONDS)):
+            issues=specqa.check({'title':'Timeout','slides':[]})
+        self.assertTrue(any(severity=='ERROR' and path=='schema' and 'timed out' in message for severity,path,message in issues))
+    def test_script_and_module_entrypoints_and_legacy_shim_match(self):
+        example='skill/examples/executive-review.json'
+        script=subprocess.run([sys.executable,'core/qa/capabilities.py'],cwd=ROOT,capture_output=True,text=True)
+        module=subprocess.run([sys.executable,'-m','core.qa.capabilities'],cwd=ROOT,capture_output=True,text=True)
+        self.assertEqual(script.returncode,0,script.stderr)
+        self.assertEqual(module.returncode,0,module.stderr)
+        self.assertEqual(json.loads(script.stdout),json.loads(module.stdout))
+        outputs=[]
+        for args in ([sys.executable,'skill/scripts/validate_spec.py',example],[sys.executable,'-m','skill.scripts.validate_spec',example]):
+            result=subprocess.run(args,cwd=ROOT,capture_output=True,text=True)
+            self.assertEqual(result.returncode,0,result.stderr)
+            outputs.append(json.loads(result.stdout))
+        shim=subprocess.run([sys.executable,'core/qa/spec-check.py',example],cwd=ROOT,capture_output=True,text=True)
+        self.assertEqual(shim.returncode,0,shim.stderr)
+        self.assertEqual(outputs[0],outputs[1])
+        self.assertEqual(outputs[0],json.loads(shim.stdout))
+        static=runpy.run_path(str(ROOT/'core/qa/spec_check.py'),run_name='spec_check_static')
+        compat=runpy.run_path(str(ROOT/'core/qa/spec-check.py'),run_name='spec_check_compat')
+        for name in ('TOPIC_TITLES','ACTION_WORDS','DESCRIPTIVE_OK','load_ids','title_score','check','result_for','main','json','sys','subprocess','Path','ROOT'):
+            self.assertIn(name,compat)
+        self.assertEqual(compat['TOPIC_TITLES'],static['TOPIC_TITLES'])
+        self.assertEqual(compat['ACTION_WORDS'],static['ACTION_WORDS'])
     def test_render_capability_never_claims_visual_pass_without_tools(self):
         with patch.object(caps.shutil,'which',return_value=None):
             result=caps.detect();self.assertEqual(result['VISUAL_QA'],'UNAVAILABLE');self.assertEqual(result['levels']['3_native_render'],'UNAVAILABLE')

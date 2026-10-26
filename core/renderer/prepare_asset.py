@@ -1,12 +1,10 @@
 """Prepare local raster assets before native PPTX serialization; never edit source files."""
-import hashlib, importlib.util, json, math, sys, warnings
+import hashlib, json, math, sys, warnings
 from pathlib import Path
 
 ROOT=Path(__file__).resolve().parents[2]
-
-def _secure_deps():
-    spec=importlib.util.spec_from_file_location('goujian_secure_deps',ROOT/'core/qa/secure_deps.py')
-    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);return module
+if str(ROOT) not in sys.path:sys.path.insert(0,str(ROOT))
+from core.qa import secure_deps
 
 def luminance(pixel):
     values=[v/255 for v in pixel[:3]]
@@ -14,7 +12,7 @@ def luminance(pixel):
     return .2126*values[0]+.7152*values[1]+.0722*values[2]
 
 def prepare(data):
-    secure=_secure_deps();secure.require_secure_image_stack('raster asset preparation')
+    secure_deps.require_secure_image_stack('raster asset preparation')
     from PIL import Image, ImageDraw, ImageOps
     asset=data['asset']; source=Path(data['path']); out=Path(data['output'])
     if source.resolve()==out.resolve():raise ValueError('Prepared output must differ from source asset')

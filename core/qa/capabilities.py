@@ -3,15 +3,10 @@ import importlib.util, json, shutil, sys
 from pathlib import Path
 
 ROOT=Path(__file__).resolve().parents[2]
+if str(ROOT) not in sys.path:sys.path.insert(0,str(ROOT))
+from core.qa import secure_deps
+
 JS_REQUIRED=('ajv','jszip','pptxgenjs')
-
-def _load_secure_deps():
-    path=ROOT/'core/qa/secure_deps.py'
-    spec=importlib.util.spec_from_file_location('goujian_secure_deps',path)
-    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
-    return module
-
-secure_deps=_load_secure_deps()
 
 def js_ready(probe=None):
     which=probe.which if probe is not None and hasattr(probe,'which') else shutil.which

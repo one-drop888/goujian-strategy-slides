@@ -11,19 +11,22 @@ class Runner:
         self.calls=[]
     def __call__(self,args,cwd=None,env=None,capture_output=False,text=False,**kwargs):
         assert isinstance(args,list)
-        assert 'shell' not in kwargs
-        self.calls.append({'args':args,'cwd':cwd,'env':env})
+        assert kwargs.get('shell') is False
+        assert kwargs.get('timeout') is not None
+        self.calls.append({'args':args,'cwd':cwd,'env':env,'timeout':kwargs.get('timeout')})
         output=''
-        if '-c' in args:
-            code=args[args.index('-c')+1]
-            if 'sys.version_info' in code:output='3.14.4\n'
-            elif 'importlib.metadata' in code:output='13.0.0\n'
-            elif 'sys.prefix' in code:
+        if len(args)>2 and str(args[1]).endswith('probe_env.py'):
+            mode=args[2]
+            if mode=='python-version':output='3.14.4\n'
+            elif mode=='pillow-version':output='13.0.0\n'
+            elif mode=='venv-prefix':
                 prefix=str(Path(args[0]).resolve().parent.parent)
                 output=json.dumps({'prefix':prefix,'base':'/usr'})+'\n'
         return SimpleNamespace(returncode=0,stdout=output,stderr='')
     def pip_calls(self):
         return [call for call in self.calls if len(call['args'])>2 and call['args'][1:3]==['-m','pip']]
+    def probe_modes(self):
+        return [call['args'][2] for call in self.calls if len(call['args'])>2 and str(call['args'][1]).endswith('probe_env.py')]
 
 def make_root(directory,with_node_modules=True):
     root=Path(directory)
@@ -90,8 +93,39 @@ class BootstrapTests(unittest.TestCase):
     def test_no_shell_true_and_no_global_install_flags(self):
         source=(ROOT/'scripts/bootstrap.py').read_text(encoding='utf-8')
         self.assertNotIn('shell=True',source)
+        self.assertIn('shell=False',source)
         self.assertNotIn('--user',source)
         self.assertNotIn("'sudo'",source)
+    def test_public_loader_returns_static_module(self):
+        self.assertIs(bootstrap.load_secure_deps(),bootstrap.secure_deps)
+    def test_probes_use_static_module_modes_and_bounded_processes(self):
+        with tempfile.TemporaryDirectory(prefix='构见 Q4 bootstrap probe ') as directory:
+            root=make_root(directory);venv_python=root/'.venv/bin/python';venv_python.parent.mkdir(parents=True);venv_python.write_text('')
+            runner=Runner();result=bootstrap.bootstrap(root,python=sys.executable,runner=runner,emit=lambda line:None)
+            self.assertEqual(result['status'],'READY')
+            self.assertIn('python-version',runner.probe_modes())
+            self.assertIn('venv-prefix',runner.probe_modes())
+            self.assertIn('pillow-version',runner.probe_modes())
+            for call in runner.calls:
+                self.assertIsInstance(call['args'],list)
+                self.assertGreater(call['timeout'],0)
+    def test_lifecycle_timeout_is_typed_failure_not_hang(self):
+        with tempfile.TemporaryDirectory(prefix='构见 Q4 bootstrap timeout ') as directory:
+            root=make_root(directory,with_node_modules=False)
+            class TimingOut(Runner):
+                def __call__(self,args,cwd=None,env=None,capture_output=False,text=False,**kwargs):
+                    if str(args[0]).endswith('npm'):
+                        raise subprocess.TimeoutExpired(args,timeout=7)
+                    return super().__call__(args,cwd,env,capture_output,text,**kwargs)
+            with self.assertRaisesRegex(bootstrap.BootstrapError,r'timed out after 7s'):
+                bootstrap.bootstrap(root,runner=TimingOut(),emit=lambda line:None,timeout=7)
+    def test_lifecycle_timeout_env_is_validated(self):
+        with unittest.mock.patch.dict(os.environ,{'GOUJIAN_BOOTSTRAP_TIMEOUT':'42'}):
+            self.assertEqual(bootstrap.lifecycle_timeout(),42)
+        for value in ('0','-1','abc'):
+            with unittest.mock.patch.dict(os.environ,{'GOUJIAN_BOOTSTRAP_TIMEOUT':value}):
+                with self.assertRaises(bootstrap.BootstrapError):
+                    bootstrap.lifecycle_timeout()
     def test_failed_pip_does_not_write_state(self):
         with tempfile.TemporaryDirectory(prefix='构见 Q4 bootstrap ') as directory:
             root=make_root(directory);venv_python=root/'.venv/bin/python';venv_python.parent.mkdir(parents=True);venv_python.write_text('')
@@ -125,7 +159,7 @@ class BootstrapTests(unittest.TestCase):
                         return SimpleNamespace(returncode=0,stdout='',stderr='')
                     if len(args)>2 and args[1:3]==['-m','pip']:
                         return SimpleNamespace(returncode=0,stdout='',stderr='')
-                    if '-c' in args and 'importlib.metadata' in args[args.index('-c')+1]:
+                    if len(args)>2 and str(args[1]).endswith('probe_env.py') and args[2]=='pillow-version':
                         return SimpleNamespace(returncode=0,stdout='13.0.0\n',stderr='')
                     return subprocess.run(args,cwd=cwd,env=env,capture_output=True,text=True,**kwargs)
             runner=OfflineRunner()
@@ -152,8 +186,8 @@ class BootstrapTests(unittest.TestCase):
             class CoreRunner(Runner):
                 def __call__(self,args,cwd=None,env=None,capture_output=False,text=False,**kwargs):
                     call=super().__call__(args,cwd,env,capture_output,text,**kwargs)
-                    if '-c' in args and 'sys.version_info' in args[args.index('-c')+1]:call.stdout='3.10.4\n'
-                    if '-c' in args and 'importlib.metadata' in args[args.index('-c')+1]:call.returncode=1;call.stdout=''
+                    if len(args)>2 and str(args[1]).endswith('probe_env.py') and args[2]=='python-version':call.stdout='3.10.4\n'
+                    if len(args)>2 and str(args[1]).endswith('probe_env.py') and args[2]=='pillow-version':call.returncode=1;call.stdout=''
                     return call
             runner=CoreRunner()
             result=bootstrap.bootstrap(root,python=sys.executable,runner=runner,emit=lambda line:None)
@@ -176,7 +210,7 @@ class BootstrapTests(unittest.TestCase):
             class OldRunner(Runner):
                 def __call__(self,args,cwd=None,env=None,capture_output=False,text=False,**kwargs):
                     call=super().__call__(args,cwd,env,capture_output,text,**kwargs)
-                    if '-c' in args and 'sys.version_info' in args[args.index('-c')+1]:
+                    if len(args)>2 and str(args[1]).endswith('probe_env.py') and args[2]=='python-version':
                         call.stdout='3.14.4\n' if str(root/'.venv') in str(args[0]) else '3.10.4\n'
                     return call
             with self.assertRaisesRegex(bootstrap.BootstrapError,'does not match the existing .venv'):
@@ -187,7 +221,7 @@ class BootstrapTests(unittest.TestCase):
             class InsecureRunner(Runner):
                 def __call__(self,args,cwd=None,env=None,capture_output=False,text=False,**kwargs):
                     call=super().__call__(args,cwd,env,capture_output,text,**kwargs)
-                    if '-c' in args and 'importlib.metadata' in args[args.index('-c')+1]:call.stdout='11.3.0\n'
+                    if len(args)>2 and str(args[1]).endswith('probe_env.py') and args[2]=='pillow-version':call.stdout='11.3.0\n'
                     return call
             with self.assertRaisesRegex(bootstrap.BootstrapError,'secure Pillow 13.0.0 is required'):
                 bootstrap.bootstrap(root,python=sys.executable,runner=InsecureRunner(),emit=lambda line:None)

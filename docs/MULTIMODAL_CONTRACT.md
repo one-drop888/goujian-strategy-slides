@@ -88,6 +88,8 @@ Text over images samples the local region under the intended text box after crop
 
 ## Run and review
 
+The benchmark command below requires a Git checkout or the complete source ZIP. The build, inspection and Quality Gate commands also run from the runtime installer; its `npm test` is the installed-runtime smoke.
+
 ```bash
 npm run capabilities
 npm test

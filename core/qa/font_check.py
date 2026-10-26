@@ -4,6 +4,7 @@ from pathlib import Path
 import xml.etree.ElementTree as ET
 from collections import Counter
 A='http://schemas.openxmlformats.org/drawingml/2006/main'
+FONT_TIMEOUT_SECONDS=5
 
 def used_fonts(path):
     fonts=[]
@@ -22,7 +23,8 @@ def used_fonts(path):
     return Counter(fonts)
 
 def system_families():
-    try: out=subprocess.check_output(['fc-list',':','family'],text=True,stderr=subprocess.DEVNULL)
+    try: out=subprocess.check_output(['fc-list',':','family'],text=True,stderr=subprocess.DEVNULL,timeout=FONT_TIMEOUT_SECONDS,shell=False)
+    except subprocess.TimeoutExpired:return None
     except Exception:return None
     fam=set()
     for line in out.splitlines():

@@ -1,19 +1,17 @@
 """Conservative glyph-based text-height estimate, separate from exact PowerPoint layout."""
 from functools import lru_cache
-import importlib.util, re, subprocess
+import re, subprocess, sys
 from pathlib import Path
 
 ROOT=Path(__file__).resolve().parents[2]
-
-def _secure_deps():
-    spec=importlib.util.spec_from_file_location('goujian_secure_deps',ROOT/'core/qa/secure_deps.py')
-    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);return module
+if str(ROOT) not in sys.path:sys.path.insert(0,str(ROOT))
+from core.qa import secure_deps
 
 @lru_cache(maxsize=128)
 def font_for(family,size,bold):
-    _secure_deps().require_secure_image_stack('font measurements')
+    secure_deps.require_secure_image_stack('font measurements')
     from PIL import ImageFont
-    file=subprocess.check_output(['fc-match','-f','%{file}',family+(':style=Bold' if bold else '')],text=True,timeout=3).strip()
+    file=subprocess.check_output(['fc-match','-f','%{file}',family+(':style=Bold' if bold else '')],text=True,timeout=3,shell=False).strip()
     return ImageFont.truetype(file,round(size*4))
 
 def estimated_height(text,family,size,bold,width):

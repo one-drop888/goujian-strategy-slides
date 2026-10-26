@@ -1,18 +1,20 @@
 #!/usr/bin/env python3
 """Environment Doctor: report tool presence, not execution or visual approval."""
-import argparse, importlib.util, importlib.metadata, json, os, platform, re, shutil, subprocess, sys, tempfile
+import argparse, importlib.metadata, json, os, platform, re, shutil, subprocess, sys, tempfile
 from datetime import datetime
 from pathlib import Path
 
 ROOT=Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:sys.path.insert(0,str(ROOT))
+from core.qa import capabilities, secure_deps
+
+PROBE_ENV=ROOT/'scripts/probe_env.py'
 
 def load_capabilities():
-    spec=importlib.util.spec_from_file_location('goujian_capabilities',ROOT/'core/qa/capabilities.py')
-    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);return module
+    return capabilities
 
 def load_secure_deps():
-    spec=importlib.util.spec_from_file_location('goujian_secure_deps',ROOT/'core/qa/secure_deps.py')
-    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);return module
+    return secure_deps
 
 def parse_version(text):
     match=re.search(r'(\d+)\.(\d+)\.(\d+)',str(text or ''))
@@ -25,7 +27,7 @@ class SystemProbe:
     def which(self,name):return shutil.which(name)
     def is_executable(self,path):return bool(path) and os.path.isfile(path) and os.access(path,os.X_OK)
     def run(self,args,timeout=8):
-        return subprocess.run(args,text=True,capture_output=True,timeout=timeout)
+        return subprocess.run(args,text=True,capture_output=True,timeout=timeout,shell=False)
     def python_version(self):return tuple(sys.version_info[:3])
     def python_executable(self):return sys.executable
     def package_version(self,name):
@@ -44,14 +46,14 @@ class SystemProbe:
         python=self.venv_python(venv)
         if not python:return None
         try:
-            result=self.run([str(python),'-c','import importlib.metadata as m; print(m.version("Pillow"))'],timeout=10)
+            result=self.run([str(python),str(PROBE_ENV),'pillow-version'],timeout=10)
             return result.stdout.strip() if result.returncode==0 else None
         except (OSError,subprocess.TimeoutExpired):return None
     def venv_python_version(self,venv):
         python=self.venv_python(venv)
         if not python:return None
         try:
-            result=self.run([str(python),'-c','import sys; print(".".join(map(str,sys.version_info[:3])))'],timeout=10)
+            result=self.run([str(python),str(PROBE_ENV),'python-version'],timeout=10)
             return parse_version(result.stdout) if result.returncode==0 else None
         except (OSError,subprocess.TimeoutExpired):return None
     def can_write(self,path):

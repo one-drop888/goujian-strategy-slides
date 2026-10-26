@@ -17,6 +17,11 @@ class QualityTests(unittest.TestCase):
             self.assertEqual(r['status'],'FAIL');self.assertEqual(r['slides'][0]['objects'],1)
     def test_missing_font_inventory_never_passes(self):
         with patch.object(fonts,'used_fonts',return_value=Counter()),patch.object(fonts,'system_families',return_value=None):self.assertEqual(fonts.inspect('unused')['status'],'UNAVAILABLE')
+    def test_font_inventory_timeout_is_unavailable_not_hang(self):
+        with patch.object(fonts.subprocess,'check_output',side_effect=subprocess.TimeoutExpired(['fc-list',':','family'],fonts.FONT_TIMEOUT_SECONDS)):
+            self.assertIsNone(fonts.system_families())
+        with patch.object(fonts,'used_fonts',return_value=Counter()),patch.object(fonts.subprocess,'check_output',side_effect=subprocess.TimeoutExpired(['fc-list'],fonts.FONT_TIMEOUT_SECONDS)):
+            self.assertEqual(fonts.inspect('unused')['status'],'UNAVAILABLE')
     def test_missing_renderer_never_passes(self):
         with patch.object(render.shutil,'which',return_value=None):self.assertEqual(render.render('unused','unused')['status'],'UNAVAILABLE')
     def test_edit_refuses_source_overwrite(self):

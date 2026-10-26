@@ -3,14 +3,14 @@ import json, math, subprocess, zipfile, posixpath
 from pathlib import Path
 from xml.etree import ElementTree as ET
 ROOT=Path(__file__).resolve().parents[2]
+RECOMPUTE_CLI=ROOT/'core/qa/recompute_analytics.js'
 A='http://schemas.openxmlformats.org/drawingml/2006/main';C='http://schemas.openxmlformats.org/drawingml/2006/chart'
 def equal(x,y):
     if x is None or y is None:return x is None and y is None
     return math.isfinite(x) and math.isfinite(y) and (x==y or (x!=0 and y!=0 and math.isclose(x,y,rel_tol=16*2.220446049250313e-16,abs_tol=0)))
 def inspect(pptx,input_path,spec_path):
     source=json.loads(Path(input_path).read_text(encoding='utf-8'))
-    command="const fs=require('fs'),{analyze}=require('./core/analytics');process.stdout.write(JSON.stringify(analyze(JSON.parse(fs.readFileSync(0,'utf8')))));"
-    result=subprocess.run(['node','-e',command],input=json.dumps(source),capture_output=True,text=True,cwd=ROOT,timeout=30)
+    result=subprocess.run(['node',str(RECOMPUTE_CLI)],input=json.dumps(source),capture_output=True,text=True,cwd=ROOT,timeout=30,shell=False)
     if result.returncode:return {'status':'FAIL','reason':result.stderr.strip()}
     reference=json.loads(result.stdout);spec=json.loads(Path(spec_path).read_text(encoding='utf-8'))
     if spec!=reference['spec']:return {'status':'FAIL','reason':'Presentation spec differs from recomputed analytical input'}

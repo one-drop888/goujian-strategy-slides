@@ -6,6 +6,8 @@ All fixtures are clearly synthetic or project-authored. A–N below is a coverag
 
 ## Repeatable runs
 
+These development benchmark commands require a Git checkout or the complete `-source.zip`. The runtime installer retains production build/QA commands and uses the installed-runtime smoke for `npm test`; see [the distribution contract](INSTALLATION.md#release-archives-and-test-contract-v131).
+
 ```bash
 npm test
 npm run benchmark -- --render

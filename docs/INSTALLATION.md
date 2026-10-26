@@ -14,6 +14,23 @@ Use a maintained Node LTS release (24 recommended) and a supported Python releas
 
 No old Pillow fallback is installed on Python3.9/3.10. Presence of an affected Pillow version is not readiness. The runtime reports this limitation; it does not weaken security checks to obtain a PASS. No font file or Office runtime is bundled.
 
+## Release archives and test contract (V1.3.1)
+
+| Archive | Use | What its tests prove |
+|---|---|---|
+| `goujian-strategy-slides-v1.3.1.zip` | Primary installation (minimal runtime) | `npm test` / `npm run test:core` run the real installed-runtime smoke: schema, representative charts, analysis and plan flows. Core mode discloses Pillow-dependent image steps as NOT_RUN. It is not the full development suite. |
+| `goujian-strategy-slides-v1.3.1-source.zip` | Complete source/development | The original full source test and benchmark workflow, using the root `package.json`. |
+| `goujian-strategy-slides-v1.3.1-showcase.zip` | Review evidence only | Not an installation target; adds only `out/v1.3-showcase/` to the runtime payload. |
+
+The runtime ZIP's `package.json` is explicitly mapped from `distribution/runtime-package.json`; every other runtime member must match the approved commit. The 189 declared runtime files are the protected production set; the mapped `package.json` is development metadata, so the 190 archive members are not all byte-identical. Dependencies, version, name and overrides are identical across the runtime and source archives. Development-only benchmark, showcase and fixture commands are omitted from the runtime manifest and documented as such.
+
+### 发行包与测试契约（中文摘要）
+
+- 主安装包 `goujian-strategy-slides-v1.3.1.zip` 为精简运行时。它的 `npm test` / `test:core` 是真实的已安装运行时冒烟验证，不是完整开发测试套件；无 Pillow 的核心层会明确披露未执行的图片步骤。
+- `-source.zip` 为完整源码/开发包，保留原有全量测试与基准工作流；`-showcase.zip` 仅用于评审，新增 `out/v1.3-showcase/`，不是安装包。
+- 两个安装包使用同一版本、同一提交和同一锁定依赖。运行时包内 `package.json` 由 `distribution/runtime-package.json` 显式映射，其余成员须与批准提交逐字节一致。
+- 最终 ZIP 预检使用 runtime/source/legacy 三种画像，扫描全部文本成员并区分可执行代码与惰性字符串/注释。公司平台与 Agensi 的实际上传/审核仍未执行，`COMPANY_PLATFORM_SECURITY=NOT_VERIFIED`；公开静态预检 PASS 不等于企业平台批准。
+
 ## Install project dependencies
 
 From the skill root:
@@ -69,7 +86,7 @@ npm run render:example
 
 For the Pillow-free core tier, run `npm run test:core` instead of the full suite. `npm install` is supported; `npm ci` is preferred for a clean locked install. The build writes `out/executive-review.pptx` plus a scene sidecar. The QA report and render directory are separate; success generating a file is not visual approval.
 
-Unicode paths are supported by argument-array subprocess calls; the release acceptance records the actually tested case. Windows symlink-dependent adversarial tests may require OS support and must report a skip rather than a false pass.
+Unicode paths are supported by argument-array subprocess calls; the release workflow clean-installs the actual runtime ZIP in a Unicode-named directory before tag creation and publishes the receipt. Windows symlink-dependent adversarial tests may require OS support and must report a skip rather than a false pass.
 
 ## Agent and platform import
 
@@ -77,7 +94,9 @@ Let the agent discover the root `SKILL.md`; adapters in `adapters/` use the same
 
 ```bash
 npm run package
-npm run preflight -- dist/goujian-strategy-slides-v1.3.0.zip --json out/package-preflight.json
+npm run preflight -- dist/goujian-strategy-slides-v1.3.1.zip --json out/package-preflight.json
+# Or build the default runtime ZIP and let preflight find dist/goujian-strategy-slides-v1.3.1.zip
+npm run preflight
 ```
 
-Inspect the SHA256 checksum before extraction. Static preflight checks the actual archive, metadata, permissions, links, code patterns and declared dependencies. It is not enterprise or marketplace certification. Company-platform upload/security and Agensi are NOT_VERIFIED until a real upload and approval record exist. Do not publish internal platform logs or credentials.
+Inspect the SHA256 checksum before extraction. Static preflight checks the actual archive, metadata, permissions, links, code patterns, text inventory and declared dependencies under runtime, source or legacy profiles. The archived v1.3.0 baseline is accepted under the legacy structural profile with code findings reported, not silently erased. The preflight reports the company-reported `wxect` literal separately from `exec`; it does not hide or rename it. It is not enterprise or marketplace certification. Company-platform upload/security and Agensi are **NOT_VERIFIED** until a real upload and approval record exist: `COMPANY_PLATFORM_SECURITY=NOT_VERIFIED`. Do not publish internal platform logs or credentials. See [security and capability parity](SECURITY_PARITY_V1_3_1.md) and [release notes](V1_3_1_RELEASE_NOTES.md).

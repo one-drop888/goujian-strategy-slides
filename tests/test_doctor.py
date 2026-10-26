@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-import importlib.util, json, os, subprocess, sys, unittest
+import importlib.util, json, os, subprocess, sys, tempfile, unittest
 from datetime import datetime, timezone
 from pathlib import Path
 from types import SimpleNamespace
+from unittest.mock import patch
 ROOT=Path(__file__).resolve().parents[1]
 spec=importlib.util.spec_from_file_location('doctor',ROOT/'scripts/doctor.py')
 doctor=importlib.util.module_from_spec(spec);spec.loader.exec_module(doctor)
@@ -142,6 +143,37 @@ class DoctorTests(unittest.TestCase):
         platform=next(c for c in result['checks'] if c['id']=='platform')
         self.assertEqual(platform['status'],'UNSUPPORTED')
         self.assertIn('without normalization',platform['detail'])
+    def test_public_loaders_return_static_modules(self):
+        self.assertIs(doctor.load_capabilities(),doctor.capabilities)
+        self.assertIs(doctor.load_secure_deps(),doctor.secure_deps)
+    def test_venv_probes_use_static_probe_modes(self):
+        with tempfile.TemporaryDirectory() as directory:
+            venv=Path(directory)/'.venv';python=venv/'bin/python';python.parent.mkdir(parents=True);python.write_text('')
+            calls=[]
+            def fake_run(args,text=True,capture_output=True,timeout=None,shell=False):
+                calls.append((args,timeout,shell))
+                output='13.0.0\n' if args[-1]=='pillow-version' else '3.14.4\n'
+                return SimpleNamespace(returncode=0,stdout=output,stderr='')
+            probe=doctor.SystemProbe()
+            with patch.object(doctor.subprocess,'run',side_effect=fake_run):
+                self.assertEqual(probe.venv_pillow_version(venv),'13.0.0')
+                self.assertEqual(probe.venv_python_version(venv),(3,14,4))
+            self.assertEqual([args[-1] for args,_,_ in calls],['pillow-version','python-version'])
+            for args,timeout,shell in calls:
+                self.assertEqual(args[:2],[str(python),str(doctor.PROBE_ENV)])
+                self.assertEqual(timeout,10)
+                self.assertIs(shell,False)
+    def test_static_probe_cli_matches_selected_interpreter(self):
+        version=subprocess.run([sys.executable,str(doctor.PROBE_ENV),'python-version'],capture_output=True,text=True)
+        self.assertEqual(version.returncode,0,version.stderr)
+        self.assertEqual(version.stdout.strip(),'.'.join(map(str,sys.version_info[:3])))
+        prefix=subprocess.run([sys.executable,str(doctor.PROBE_ENV),'venv-prefix'],capture_output=True,text=True)
+        self.assertEqual(prefix.returncode,0,prefix.stderr)
+        info=json.loads(prefix.stdout)
+        self.assertEqual(info,{'prefix':sys.prefix,'base':sys.base_prefix})
+        pillow=subprocess.run([sys.executable,str(doctor.PROBE_ENV),'pillow-version'],capture_output=True,text=True)
+        self.assertIn(pillow.returncode,{0,1})
+        if pillow.returncode==0:self.assertRegex(pillow.stdout.strip(),r'^\d+\.\d+\.\d+')
     def test_standalone_capabilities_require_node(self):
         original=capabilities.shutil.which
         capabilities.shutil.which=lambda name:None if name=='node' else original(name)

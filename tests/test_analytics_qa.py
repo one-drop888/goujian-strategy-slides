@@ -1,9 +1,19 @@
-import importlib.util,json,tempfile,unittest,zipfile
+import importlib.util,json,subprocess,tempfile,unittest,zipfile
 from pathlib import Path
 from xml.etree import ElementTree as ET
 ROOT=Path(__file__).resolve().parents[1]
 s=importlib.util.spec_from_file_location('fidelity',ROOT/'core/qa/data_fidelity.py');qa=importlib.util.module_from_spec(s);s.loader.exec_module(qa)
 class FidelityTests(unittest.TestCase):
+    def test_static_node_cli_uses_analyze_and_rejects_bad_input(self):
+        source=json.loads((ROOT/'skill/analytics/business-performance.json').read_text(encoding='utf-8'))
+        result=subprocess.run(['node',str(qa.RECOMPUTE_CLI)],input=json.dumps(source),capture_output=True,text=True,cwd=ROOT,timeout=30)
+        self.assertEqual(result.returncode,0,result.stderr)
+        output=json.loads(result.stdout)
+        self.assertEqual(output['audit']['recipe'],source['recipe'])
+        self.assertEqual(output['spec']['slides'][0]['type'],'cover')
+        self.assertTrue(output['spec']['slides'])
+        bad=subprocess.run(['node',str(qa.RECOMPUTE_CLI)],input='{not json',capture_output=True,text=True,cwd=ROOT,timeout=30)
+        self.assertNotEqual(bad.returncode,0)
     def test_all_three_native_outputs_match_recomputed_source(self):
         for name,file in [('business-performance','executive-business-review'),('sales-conversion','sales-conversion-diagnostic'),('project-analytics','project-performance-review')]:
             r=qa.inspect(ROOT/f'out/analytics-regression/{name}.pptx',ROOT/f'skill/analytics/{name}.json',ROOT/f'skill/examples/{file}.json')

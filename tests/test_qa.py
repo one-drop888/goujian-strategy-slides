@@ -1,4 +1,4 @@
-import importlib.util, json, subprocess, sys, tempfile, unittest, zipfile
+import importlib.util, json, subprocess, sys, tempfile, unittest, zipfile, hashlib
 from pathlib import Path
 from collections import Counter
 from unittest.mock import patch
@@ -37,4 +37,64 @@ class QualityTests(unittest.TestCase):
             p=ROOT/'out/test-v1.pptx';r=Path(td)/'review.json';r.write_text(json.dumps({'status':'PASS','pptx_sha256':'wrong','reviewer':'test','notes':'test','slides_reviewed':list(range(1,9))}))
             out=Path(td)/'qa.json';proc=subprocess.run([sys.executable,str(ROOT/'skill/scripts/quality_gate.py'),str(p),'--out',str(out),'--visual-review',str(r)],capture_output=True)
             self.assertNotEqual(proc.returncode,0);self.assertEqual(json.loads(out.read_text())['checks']['visual_review']['status'],'FAIL')
+    def test_social_preview_public_copy_hides_status_internals(self):
+        import os
+        from PIL import Image
+        social=module('social_preview','scripts/social_preview.py')
+        public=(social.TITLE,social.SUBTITLE,social.EYEBROW,*social.FOOTER_LINES)
+        for line in public:
+            for marker in social.STATUS_MARKERS:
+                self.assertNotIn(marker.lower(),line.lower())
+        sources=[]
+        for index in range(3):
+            relative=f'out/test-social-{os.getpid()}-{index}.png'
+            Image.new('RGB',(400,225),(20+index*30,40,60)).save(ROOT/relative)
+            sources.append(f'Source {index}|{relative}|1')
+        try:
+            with tempfile.TemporaryDirectory() as td:
+                png=Path(td)/'social.png';meta_path=Path(td)/'social.json'
+                args=[sys.executable,str(ROOT/'scripts/social_preview.py'),'--out',str(png),'--meta',str(meta_path)]
+                for source in sources: args.extend(['--source',source])
+                proc=subprocess.run(args,cwd=ROOT,capture_output=True)
+                self.assertEqual(proc.returncode,0,proc.stderr.decode())
+                meta=json.loads(meta_path.read_text())
+                self.assertEqual(meta['review']['status'],'NOT_RUN')
+                self.assertEqual(meta['sha256'],hashlib.sha256(png.read_bytes()).hexdigest())
+                self.assertEqual(meta['size'],{'width':1280,'height':640})
+        finally:
+            for source in sources:
+                (ROOT/source.split('|')[1]).unlink(missing_ok=True)
+    def test_quality_gate_semantic_tamper_overrides_pass_sidecar(self):
+        with tempfile.TemporaryDirectory() as td:
+            td=Path(td);spec=td/'spec.json';pptx=td/'deck.pptx'
+            spec.write_text(json.dumps({'title':'Gate semantics','slides':[{'type':'chart','chartType':'column','title':'指标','labels':['本期','目标'],
+                'series':[{'name':'转化率','labels':['本期','目标'],'values':[8,10]}]}]},ensure_ascii=False))
+            script=("const {buildDeck}=require(%s);"
+                    "buildDeck(JSON.parse(require('fs').readFileSync(%s,'utf8')),%s)"
+                    ".catch(error=>{console.error(error);process.exit(1);});") % (
+                json.dumps(str(ROOT/'core/renderer')),json.dumps(str(spec)),json.dumps(str(pptx)))
+            subprocess.run(['node','-e',script],cwd=ROOT,check=True,capture_output=True)
+            out=td/'gate.json'
+            proc=subprocess.run([sys.executable,str(ROOT/'skill/scripts/quality_gate.py'),str(pptx),'--spec',str(spec),'--out',str(out)],capture_output=True)
+            self.assertEqual(proc.returncode,0,proc.stderr.decode())
+            baseline=json.loads(out.read_text())
+            self.assertIn(baseline['checks']['semantic_qa']['status'],{'PASS','PASS_WITH_NOTES'})
+            self.assertTrue((td/'gate.semantic-qa.json').exists())
+            tampered=td/'tampered.pptx'
+            with zipfile.ZipFile(pptx) as source,zipfile.ZipFile(tampered,'w') as target:
+                for name in source.namelist():
+                    data=source.read(name)
+                    if name=='ppt/charts/chart1.xml':data=data.replace(b'<c:v>8</c:v>',b'<c:v>7</c:v>',1)
+                    target.writestr(name,data)
+            scene=td/'scene.json'
+            scene.write_text(json.dumps({'status':'PASS','pptx_sha256':hashlib.sha256(tampered.read_bytes()).hexdigest(),
+                'visual_encoding':{'plans':[{'status':'PASS'}]},'theme_decision':{'selected_profile':'executive-clean'}}))
+            out2=td/'gate-tampered.json'
+            proc=subprocess.run([sys.executable,str(ROOT/'skill/scripts/quality_gate.py'),str(tampered),'--spec',str(spec),'--scene',str(scene),'--out',str(out2)],capture_output=True)
+            self.assertEqual(proc.returncode,2,proc.stderr.decode())
+            result=json.loads(out2.read_text())
+            self.assertEqual(result['checks']['semantic_qa']['status'],'FAIL')
+            self.assertEqual(result['checks']['semantic_qa']['checks']['NUMERIC_SEMANTIC_FIDELITY']['status'],'FAIL')
+            self.assertEqual(result['checks']['semantic_qa']['checks']['SIDECAR_BINDING']['status'],'PASS')
+            self.assertTrue((td/'gate-tampered.semantic-qa.json').exists())
 if __name__=='__main__':unittest.main()

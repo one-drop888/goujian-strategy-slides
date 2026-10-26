@@ -1,6 +1,6 @@
 {
   "name": "goujian-strategy-slides",
-  "version": "1.2.1",
+  "version": "1.3.0",
   "private": false,
   "description": "Goujian Strategy Slides — production-grade Presentation Intelligence for AI agents",
   "license": "Apache-2.0",
@@ -12,7 +12,9 @@
     "build:example": "node skill/scripts/build_deck.js skill/examples/executive-review.json out/executive-review.pptx",
     "qa:example": "python3 skill/scripts/quality_gate.py out/executive-review.pptx --spec skill/examples/executive-review.json --out out/quality-report.json --render-dir out/render",
     "library": "python3 skill/scripts/library_report.py",
-    "test": "python3 -m compileall -q core skill scripts tests && python3 tests/test_v1.py && python3 tests/validate_examples.py && node --check core/renderer/index.js && node --check core/renderer/charts.js && node --check core/renderer/slides/basic.js && node --check core/composition/resolver.js && node --check core/planner/index.js && node --check core/reasoning/calculations.js && node --check core/reasoning/validate-plan.js && node --check core/reasoning/theme-decision.js && node --check core/reasoning/compile.js && node --check core/reasoning/verify.js && node --check core/reasoning/embed.js && node --check skill/scripts/build_deck.js && node --check skill/scripts/validate_plan.js && node --check skill/scripts/compile_plan.js && node tests/test_contract.js && python3 tests/test_qa.py && python3 tests/test_package.py && node tests/test_v11.js && python3 tests/test_v11.py && node --test tests/test_analytics.js && python3 tests/test_analytics_qa.py && node tests/test_theme_charts.js && node tests/test_reasoning.js && python3 tests/test_doctor.py && python3 tests/test_bootstrap.py",
+    "test": "python3 -m compileall -q core skill scripts tests && python3 tests/test_v1.py && python3 tests/validate_examples.py && node --check core/renderer/index.js && node --check core/renderer/charts.js && node --check core/renderer/encoding.js && node --check core/renderer/slides/basic.js && node --check core/renderer/slides/data.js && node --check core/renderer/slides/multimodal.js && node --check core/composition/resolver.js && node --check core/planner/index.js && node --check core/reasoning/calculations.js && node --check core/reasoning/validate-plan.js && node --check core/reasoning/theme-decision.js && node --check core/reasoning/compile.js && node --check core/reasoning/verify.js && node --check core/reasoning/embed.js && node --check skill/scripts/build_deck.js && node --check skill/scripts/validate_plan.js && node --check skill/scripts/compile_plan.js && node tests/test_contract.js && python3 tests/test_secure_deps.py && python3 tests/test_qa.py && python3 tests/test_package.py && python3 tests/test_security_preflight.py && node tests/test_v11.js && python3 tests/test_v11.py && node --test tests/test_analytics.js && python3 tests/test_analytics_qa.py && node tests/test_theme_charts.js && node --test tests/test_v13_foundation.js && node tests/test_reasoning.js && python3 tests/test_doctor.py && python3 tests/test_bootstrap.py && node --test tests/test_path_safety.js && node --test tests/test_narrative.js tests/test_numeric_fidelity.js && node --test tests/test_relationships.js tests/test_semantic_qa.js tests/test_v13_benchmark.js",
+    "test:core": "python3 -m compileall -q core skill scripts tests && python3 tests/test_v1.py && python3 tests/validate_examples.py && node --check core/renderer/index.js && node --check core/renderer/charts.js && node --check core/renderer/encoding.js && node --check core/renderer/slides/basic.js && node --check core/renderer/slides/data.js && node --check core/renderer/slides/multimodal.js && node --check core/composition/resolver.js && node --check core/planner/index.js && node --check core/reasoning/calculations.js && node --check core/reasoning/validate-plan.js && node --check core/reasoning/theme-decision.js && node --check core/reasoning/compile.js && node --check core/reasoning/verify.js && node --check core/reasoning/embed.js && node --check skill/scripts/build_deck.js && node --check skill/scripts/validate_plan.js && node --check skill/scripts/compile_plan.js && node tests/test_contract.js && python3 tests/test_secure_deps.py && python3 tests/test_package.py && python3 tests/test_security_preflight.py && node --test tests/test_analytics.js && python3 tests/test_analytics_qa.py && node tests/test_theme_charts.js && node --test tests/test_v13_foundation.js && python3 tests/test_doctor.py && python3 tests/test_bootstrap.py && node --test tests/test_path_safety.js && node --test tests/test_narrative.js tests/test_numeric_fidelity.js && node --test tests/test_relationships.js tests/test_semantic_qa.js tests/test_v13_benchmark.js",
+    "preflight": "python3 scripts/security_preflight.py",
     "package": "python3 scripts/package_runtime.py",
     "package:showcase": "python3 scripts/package_runtime.py --showcase",
     "showcase": "node scripts/build_showcase.js",
@@ -25,7 +27,8 @@
     "fixtures:phase2": "node scripts/dogfood_phase2.js",
     "analyze:business": "node scripts/analyze.js skill/analytics/business-performance.json out/analytics/business.pptx",
     "analyze:sales": "node scripts/analyze.js skill/analytics/sales-conversion.json out/analytics/sales.pptx",
-    "analyze:project": "node scripts/analyze.js skill/analytics/project-analytics.json out/analytics/project.pptx"
+    "analyze:project": "node scripts/analyze.js skill/analytics/project-analytics.json out/analytics/project.pptx",
+    "benchmark:v13": "node scripts/v13_benchmark.js"
   },
   "dependencies": {
     "ajv": "8.20.0",

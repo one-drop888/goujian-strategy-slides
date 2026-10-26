@@ -35,7 +35,7 @@ function assertNotInput(target,label,inputs) {
 function assertDistinctOutputs(outputs) {
   const entries=outputs.filter(Boolean).map(({path:target,label})=>({label,target,canonical:canonicalPath(target)}));
   for(let i=0;i<entries.length;i++) for(let j=i+1;j<entries.length;j++) {
-    if(entries[i].canonical===entries[j].canonical) {
+    if(entries[i].canonical===entries[j].canonical||sameFile(entries[i].target,entries[j].target)) {
       throw new Error(`${entries[i].label} and ${entries[j].label} must be different paths`);
     }
   }

@@ -1,7 +1,13 @@
 #!/usr/bin/env python3
 """Isolated LibreOffice conversion; fresh output only, optional Pillow montage."""
-import argparse, json, os, re, shutil, subprocess, tempfile
+import argparse, importlib.util, json, os, re, shutil, subprocess, tempfile
 from pathlib import Path
+
+ROOT=Path(__file__).resolve().parents[2]
+
+def _secure_deps():
+    spec=importlib.util.spec_from_file_location('goujian_secure_deps',ROOT/'core/qa/secure_deps.py')
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);return module
 
 def run(cmd):
     return subprocess.run(cmd,text=True,capture_output=True,timeout=120,
@@ -13,9 +19,12 @@ def render(pptx,outdir,dpi=140):
     if not lo or not ppm:
         return {'status':'UNAVAILABLE','reason':'LibreOffice and pdftoppm are required','pages':[]}
     try:
+        _secure_deps().require_secure_image_stack('native render/montage')
         from PIL import Image, ImageDraw
     except ImportError:
-        return {'status':'UNAVAILABLE','reason':'Pillow is required: pip install -r requirements-render.txt','pages':[]}
+        return {'status':'UNAVAILABLE','reason':'Pillow is required: pip install -r requirements-render.txt in a Python >= 3.11 environment','pages':[]}
+    except Exception as error:
+        return {'status':'UNAVAILABLE','reason':str(error),'pages':[]}
     try:
         with tempfile.TemporaryDirectory(prefix='goujian-render-') as td:
             tmp=Path(td); profile=(tmp/'lo-profile').as_uri()

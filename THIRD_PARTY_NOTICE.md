@@ -9,7 +9,8 @@ Goujian source is licensed under Apache-2.0. Dependencies are installed through 
 - Other transitive dependencies retain the notices delivered in their packages.
 - The committed lockfile resolves 23 tarballs from `registry.npmjs.org`. An official `npm audit --omit=dev --registry=https://registry.npmjs.org` recorded 0 known advisories at the audit time; this is not a future security guarantee. A default mirror returning 404 is an access issue, not evidence of a dependency vulnerability.
 - No dependency versions were upgraded for v1.2.0.
-- **Pillow** — optional rendering/montage dependency, governed by its own license.
+- The current development lockfile raises only `fast-uri` from 3.1.8 to 3.1.9 as a minimal security patch; no other dependency version changed.
+- **Pillow 13.0.0** — `MIT-CMU` (installed metadata license expression); optional image preparation, font measurement and render-montage dependency. It is pinned only for Python >= 3.11 in `requirements-render.txt`. The core spec/geometry/inspection tier does not require Pillow. Python 3.9/3.10 remains a core-only tier; this repository intentionally declares no older, vulnerable Pillow fallback.
 - **LibreOffice / Poppler / Fontconfig** — optional external system tools, not vendored by this repository.
 - **Noto fonts** — referenced font families, not distributed or embedded. Install from an official font distribution under its supplied license.
 

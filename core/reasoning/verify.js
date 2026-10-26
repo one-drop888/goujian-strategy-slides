@@ -1,55 +1,11 @@
-const fs=require('fs');
-const path=require('path');
-const crypto=require('crypto');
-const JSZip=require('jszip');
 const {resolveSlide}=require('../composition/resolver');
 const {close}=require('./calculations');
+const {getPointer}=require('../semantics/numeric');
 const {REPORT_PART}=require('./embed');
+const {
+  normalizeText,chartNumbers,tableRows,slideTexts,notesForSlide,chartSeriesNames,chartCategoryLabels,loadNativeDeck,
+}=require('../qa/native_readback');
 
-function sha256(buffer) { return crypto.createHash('sha256').update(buffer).digest('hex'); }
-function normalizeText(value) { return String(value??'').replace(/\s+/g,' ').trim(); }
-function unescapeXml(value) {
-  return value.replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&apos;/g,"'").replace(/&amp;/g,'&');
-}
-function blocks(xml,tag) {
-  return [...xml.matchAll(new RegExp(`<c:${tag}[ >][\\s\\S]*?</c:${tag}>`,'g'))].map(match=>match[0]);
-}
-function aBlocks(xml,tag) {
-  return [...xml.matchAll(new RegExp(`<a:${tag}[ >][\\s\\S]*?</a:${tag}>`,'g'))].map(match=>match[0]);
-}
-function block(xml,tag) { return blocks(xml,tag)[0]||''; }
-function chartTextValues(fragment) {
-  return [...fragment.matchAll(/<c:v>([^<]*)<\/c:v>/g)].map(match=>unescapeXml(match[1]));
-}
-function chartSeriesNames(xml) {
-  return blocks(xml,'ser').map(series=>{
-    const tx=block(series,'tx');
-    return tx?chartTextValues(tx)[0]??null:null;
-  });
-}
-function chartCategoryLabels(xml) {
-  return blocks(xml,'ser').map(series=>{
-    const cat=block(series,'cat');
-    return cat?chartTextValues(cat):[];
-  });
-}
-function chartNumbers(xml) {
-  const values=[];
-  for(const valueBlock of blocks(xml,'val')) {
-    for(const match of valueBlock.matchAll(/<c:v>([^<]*)<\/c:v>/g)) {
-      const number=Number(match[1]);
-      if(Number.isFinite(number)) values.push(number);
-    }
-  }
-  return values;
-}
-function tableRows(xml) {
-  return aBlocks(xml,'tbl').map(table=>aBlocks(table,'tr').map(row=>aBlocks(row,'tc').map(cell=>
-    unescapeXml([...cell.matchAll(/<a:t>([\s\S]*?)<\/a:t>/g)].map(match=>match[1]).join('')))));
-}
-function slideTexts(xml) {
-  return [...xml.matchAll(/<a:t>([\s\S]*?)<\/a:t>/g)].map(match=>unescapeXml(match[1]));
-}
 
 function chartDescriptor(kind,container,series,labels) {
   return {
@@ -107,38 +63,29 @@ function expectedKpis(spec,repoRoot) {
   return kpis;
 }
 
-async function notesForSlide(zip,index) {
-  const relName=`ppt/slides/_rels/slide${index}.xml.rels`;
-  const relFile=zip.file(relName);
-  if(!relFile) return '';
-  const rels=await relFile.async('string');
-  const match=rels.match(/Target="([^"]*notesSlide[^"]*\.xml)"/);
-  if(!match) return '';
-  const target=path.posix.normalize(path.posix.join('ppt/slides',match[1]));
-  const notesFile=zip.file(target);
-  if(!notesFile) return '';
-  const xml=await notesFile.async('string');
-  return unescapeXml([...xml.matchAll(/<a:t>([\s\S]*?)<\/a:t>/g)].map(item=>item[1]).join('\n'));
-}
-
 async function verifyBuiltDeck(pptxPath,spec,reasoning,repoRoot) {
   if(!reasoning.expected_pptx_sha256) throw new Error('native verification requires expected_pptx_sha256 from a trusted sidecar or scene');
-  const actualPptxSha=sha256(fs.readFileSync(pptxPath));
+  const native=await loadNativeDeck(pptxPath);
+  const actualPptxSha=native.pptx_sha256;
   if(actualPptxSha!==reasoning.expected_pptx_sha256) {
     throw new Error(`final PPTX sha256 ${actualPptxSha} does not match expected ${reasoning.expected_pptx_sha256}`);
   }
-  const zip=await JSZip.loadAsync(fs.readFileSync(pptxPath));
-  const chartNames=Object.keys(zip.files).filter(name=>/^ppt\/charts\/chart\d+\.xml$/.test(name))
-    .sort((a,b)=>Number(a.match(/(\d+)/)[1])-Number(b.match(/(\d+)/)[1]));
+  const {zip,chartNames}=native;
   const expected=expectedCharts(spec,repoRoot);
   if(chartNames.length!==expected.length) throw new Error(`chart cache count ${chartNames.length} does not match spec ${expected.length}`);
   const charts=[];
   let chartSeries=0,chartLabels=0;
   for(const [index,name] of chartNames.entries()) {
-    const xml=await zip.file(name).async('string');
+    const xml=native.charts[index].xml;
     const actual=chartNumbers(xml),wanted=expected[index].series.flat();
     if(actual.length!==wanted.length) throw new Error(`chart ${index+1} value count ${actual.length} does not match spec ${wanted.length}`);
-    for(let i=0;i<wanted.length;i++) if(!close(actual[i],wanted[i])) throw new Error(`chart ${index+1} value ${actual[i]} does not match spec ${wanted[i]}`);
+    for(let i=0;i<wanted.length;i++) {
+      if(wanted[i]===null) {
+        if(actual[i]!==null) throw new Error(`chart ${index+1} value ${i+1} ${String(actual[i])} does not preserve the declared gap (null)`);
+      } else if(actual[i]===null||typeof actual[i]!=='number'||!close(actual[i],wanted[i])) {
+        throw new Error(`chart ${index+1} value ${String(actual[i])} does not match spec ${String(wanted[i])}`);
+      }
+    }
     const names=chartSeriesNames(xml),wantedNames=expected[index].names;
     if(names.length!==wantedNames.length) throw new Error(`chart ${index+1} series count ${names.length} does not match spec ${wantedNames.length}`);
     for(const [i,wantedName] of wantedNames.entries()) {
@@ -213,16 +160,34 @@ async function verifyBuiltDeck(pptxPath,spec,reasoning,repoRoot) {
   }
   const reportFile=zip.file(REPORT_PART);
   if(!reportFile) throw new Error(`embedded reasoning report ${REPORT_PART} is missing`);
-  const embeddedText=await reportFile.async('string');
-  const embedded=JSON.parse(embeddedText);
+  const embedded=native.embedded_report;
+  if(!embedded||embedded.malformed) throw new Error(`embedded reasoning report ${REPORT_PART} is malformed`);
   if(embedded.plan_sha256!==reasoning.plan_sha256) throw new Error('embedded report plan hash does not match');
   if(embedded.spec_sha256!==reasoning.spec_sha256) throw new Error('embedded report spec hash does not match');
-  if(reasoning.report_sha256) {
-    const actual=sha256(Buffer.from(embeddedText));
-    if(actual!==reasoning.report_sha256) throw new Error('embedded report bytes do not match report_sha256');
+  if(reasoning.report_sha256&&native.embedded_report_sha256!==reasoning.report_sha256) throw new Error('embedded report bytes do not match report_sha256');
+  let semanticBindings=0;
+  const semantics=reasoning.metric_semantics||embedded.metric_semantics;
+  if(semantics) {
+    if(!Array.isArray(semantics.transformations)||!Array.isArray(semantics.bindings)) throw new Error('metric semantics report is malformed');
+    for(const record of semantics.bindings) {
+      if(!record||record.ok!==true) throw new Error(`metric binding ${record?.pointer||'?'} was not reconciled`);
+      const slideIndex=Number(String(record.slide||'').match(/^slides\[(\d+)\]$/)?.[1]);
+      if(!Number.isInteger(slideIndex)||!spec.slides?.[slideIndex]) throw new Error(`metric binding ${record.pointer} references an unknown slide`);
+      const actual=getPointer(spec.slides[slideIndex],record.pointer);
+      if(record.mode==='numeric') {
+        const factor=record.render_factor??1;
+        if(typeof factor!=='number'||!Number.isFinite(factor)||factor<=0||typeof actual!=='number'||!close(actual*factor,record.effective_value))throw new Error(`metric binding ${record.pointer} native value ${actual} does not match effective ${record.effective_value}`);
+      }
+      else if(record.mode==='text') { if(actual!==record.formatted) throw new Error(`metric binding ${record.pointer} text ${JSON.stringify(actual)} does not match formatted ${JSON.stringify(record.formatted)}`); }
+      else if(record.mode==='missing') { if(actual!==null) throw new Error(`metric binding ${record.pointer} must remain null`); }
+      else throw new Error(`metric binding ${record.pointer} has unknown mode ${record.mode}`);
+      semanticBindings++;
+    }
+    if(embedded.metric_semantics&&JSON.stringify(embedded.metric_semantics)!==JSON.stringify(semantics)) throw new Error('embedded metric semantics do not match the build scene');
   }
   return {status:'PASS',pptx_sha256:actualPptxSha,charts:charts.length,chart_series:chartSeries,chart_labels:chartLabels,
-    tables:tableCount,table_cells:tableCellCount,kpis:kpiCount,notes:slideIds.length,embedded_report:REPORT_PART};
+    tables:tableCount,table_cells:tableCellCount,kpis:kpiCount,notes:slideIds.length,embedded_report:REPORT_PART,
+    metric_bindings:semanticBindings,metric_transformations:semantics?.transformations?.length||0};
 }
 
 module.exports={verifyBuiltDeck,expectedCharts,expectedTables,expectedKpis,chartNumbers,tableRows};

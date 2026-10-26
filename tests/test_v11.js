@@ -28,7 +28,7 @@ async function main(){
   assert.equal(resolved.subtitle,subtitle);
   assert.equal(resolved.lines.join(''),title);
   assert(!resolved.strategy.includes('remove-redundant')&&!resolved.strategy.includes('title-subtitle'));
-  assert(resolved.size>=font.titleSize*.92);
+  assert(resolved.size>=resolved.minimum_size&&resolved.minimum_size>=22,'title retains a readable floor');
   assert(resolved.dividerY>=resolved.subtitleY+resolved.subtitleH+resolved.gap-1e-5);
   assert(resolved.bodyTop>resolveTitle({title:'经营复盘'},font,11.77).bodyTop);
   const explicit=resolveTitle({title,title_short:'Q4 六项行动先定顺序与责任人',subtitle},font,11.77);

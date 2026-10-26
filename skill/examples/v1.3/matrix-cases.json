@@ -1,0 +1,5913 @@
+{
+  "schema_version": "1.3",
+  "description": "Explicit 6 native chart families x 2 themes x 8 cases matrix. ACCEPT cells build real native charts; REJECT cells assert the named deterministic contract.",
+  "native_chart_families": [
+    "bar",
+    "column",
+    "line",
+    "area",
+    "pie",
+    "doughnut"
+  ],
+  "themes": {
+    "light": "executive-dense",
+    "dark": "dark-executive"
+  },
+  "cases": [
+    "single",
+    "multi",
+    "long",
+    "percentage",
+    "negative",
+    "missing",
+    "large",
+    "dense"
+  ],
+  "counts": {
+    "cells": 96,
+    "accepted": 72,
+    "rejected": 24
+  },
+  "case_templates": {
+    "single": {
+      "labels": [
+        "本期"
+      ],
+      "unit": "单",
+      "numberFormat": "#,##0",
+      "series": [
+        {
+          "id": "value",
+          "name": "实际",
+          "role": "actual",
+          "values": [
+            120
+          ]
+        }
+      ],
+      "readback": {
+        "values": [
+          120
+        ],
+        "labels": [
+          "本期"
+        ],
+        "series_names": [
+          "实际"
+        ]
+      }
+    },
+    "multi": {
+      "labels": [
+        "华东",
+        "华北",
+        "华南",
+        "西南"
+      ],
+      "unit": "单",
+      "numberFormat": "#,##0",
+      "series": [
+        {
+          "id": "actual",
+          "name": "实际",
+          "role": "actual",
+          "values": [
+            120,
+            90,
+            60,
+            30
+          ]
+        },
+        {
+          "id": "target",
+          "name": "目标",
+          "role": "target",
+          "values": [
+            110,
+            100,
+            70,
+            35
+          ]
+        }
+      ],
+      "readback": {
+        "values": [
+          120,
+          90,
+          60,
+          30,
+          110,
+          100,
+          70,
+          35
+        ],
+        "labels": [
+          "华东",
+          "华北",
+          "华南",
+          "西南"
+        ],
+        "series_names": [
+          "实际",
+          "目标"
+        ]
+      }
+    },
+    "long": {
+      "labels": [
+        "华东区域重点客户续约收入",
+        "华北区域新客户首单收入",
+        "华南区域渠道合作收入"
+      ],
+      "unit": "万元",
+      "numberFormat": "#,##0",
+      "series": [
+        {
+          "id": "value",
+          "name": "收入",
+          "role": "actual",
+          "values": [
+            120,
+            90,
+            60
+          ]
+        }
+      ],
+      "readback": {
+        "values": [
+          120,
+          90,
+          60
+        ],
+        "labels": [
+          "华东区域重点客户续约收入",
+          "华北区域新客户首单收入",
+          "华南区域渠道合作收入"
+        ],
+        "series_names": [
+          "收入"
+        ]
+      }
+    },
+    "percentage": {
+      "labels": [
+        "线上",
+        "门店",
+        "渠道"
+      ],
+      "unit": "%",
+      "numberFormat": "0.0\"%\"",
+      "series": [
+        {
+          "id": "value",
+          "name": "占比",
+          "role": "actual",
+          "storage_scale": "fraction",
+          "values": [
+            0.42,
+            0.33,
+            0.25
+          ]
+        }
+      ],
+      "readback": {
+        "values": [
+          42,
+          33,
+          25
+        ],
+        "labels": [
+          "线上",
+          "门店",
+          "渠道"
+        ],
+        "series_names": [
+          "占比"
+        ],
+        "numberFormat": "0.0\"%\""
+      }
+    },
+    "negative": {
+      "labels": [
+        "一季度",
+        "二季度",
+        "三季度",
+        "四季度"
+      ],
+      "unit": "万元",
+      "numberFormat": "#,##0",
+      "series": [
+        {
+          "id": "value",
+          "name": "净变化",
+          "role": "actual",
+          "values": [
+            -20,
+            35,
+            10,
+            -5
+          ]
+        }
+      ],
+      "readback": {
+        "values": [
+          -20,
+          35,
+          10,
+          -5
+        ],
+        "labels": [
+          "一季度",
+          "二季度",
+          "三季度",
+          "四季度"
+        ],
+        "series_names": [
+          "净变化"
+        ]
+      }
+    },
+    "missing": {
+      "labels": [
+        "一月",
+        "二月",
+        "三月",
+        "四月"
+      ],
+      "unit": "单",
+      "numberFormat": "#,##0",
+      "missing_policy": "gap",
+      "series": [
+        {
+          "id": "value",
+          "name": "订单",
+          "role": "actual",
+          "values": [
+            10,
+            null,
+            0,
+            6
+          ]
+        }
+      ],
+      "readback": {
+        "values": [
+          10,
+          null,
+          0,
+          6
+        ],
+        "labels": [
+          "一月",
+          "二月",
+          "三月",
+          "四月"
+        ],
+        "series_names": [
+          "订单"
+        ],
+        "missing_policy": "gap"
+      }
+    },
+    "large": {
+      "labels": [
+        "本月",
+        "上月",
+        "去年同期"
+      ],
+      "unit": "元",
+      "numberFormat": "#,##0",
+      "series": [
+        {
+          "id": "value",
+          "name": "金额",
+          "role": "actual",
+          "values": [
+            1200000000,
+            980000000,
+            450000000
+          ]
+        }
+      ],
+      "readback": {
+        "values": [
+          1200000000,
+          980000000,
+          450000000
+        ],
+        "labels": [
+          "本月",
+          "上月",
+          "去年同期"
+        ],
+        "series_names": [
+          "金额"
+        ]
+      }
+    },
+    "dense": {
+      "labels": [
+        "1月",
+        "2月",
+        "3月",
+        "4月",
+        "5月",
+        "6月",
+        "7月",
+        "8月",
+        "9月",
+        "10月",
+        "11月",
+        "12月"
+      ],
+      "unit": "单",
+      "numberFormat": "#,##0",
+      "series": [
+        {
+          "id": "value",
+          "name": "月度值",
+          "role": "actual",
+          "values": [
+            12,
+            18,
+            15,
+            22,
+            19,
+            25,
+            28,
+            24,
+            30,
+            27,
+            33,
+            36
+          ]
+        }
+      ],
+      "readback": {
+        "values": [
+          12,
+          18,
+          15,
+          22,
+          19,
+          25,
+          28,
+          24,
+          30,
+          27,
+          33,
+          36
+        ],
+        "labels": [
+          "1月",
+          "2月",
+          "3月",
+          "4月",
+          "5月",
+          "6月",
+          "7月",
+          "8月",
+          "9月",
+          "10月",
+          "11月",
+          "12月"
+        ],
+        "series_names": [
+          "月度值"
+        ]
+      }
+    }
+  },
+  "cells": [
+    {
+      "id": "L-bar-single",
+      "family": "bar",
+      "theme": "light",
+      "case": "single",
+      "expected": "ACCEPT",
+      "chartType": "bar",
+      "title": "条形图 · 单系列",
+      "labels": [
+        "本期"
+      ],
+      "unit": "单",
+      "numberFormat": "#,##0",
+      "series": [
+        {
+          "id": "value",
+          "name": "实际",
+          "role": "actual",
+          "values": [
+            120
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "comparison",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ]
+      },
+      "readback": {
+        "values": [
+          120
+        ],
+        "labels": [
+          "本期"
+        ],
+        "series_names": [
+          "实际"
+        ]
+      },
+      "rejection": null
+    },
+    {
+      "id": "L-bar-multi",
+      "family": "bar",
+      "theme": "light",
+      "case": "multi",
+      "expected": "ACCEPT",
+      "chartType": "bar",
+      "title": "条形图 · 多系列",
+      "labels": [
+        "华东",
+        "华北",
+        "华南",
+        "西南"
+      ],
+      "unit": "单",
+      "numberFormat": "#,##0",
+      "series": [
+        {
+          "id": "actual",
+          "name": "实际",
+          "role": "actual",
+          "values": [
+            120,
+            90,
+            60,
+            30
+          ]
+        },
+        {
+          "id": "target",
+          "name": "目标",
+          "role": "target",
+          "values": [
+            110,
+            100,
+            70,
+            35
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "comparison",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "actual",
+            "role": "actual"
+          },
+          {
+            "id": "target",
+            "role": "target"
+          }
+        ]
+      },
+      "readback": {
+        "values": [
+          120,
+          90,
+          60,
+          30,
+          110,
+          100,
+          70,
+          35
+        ],
+        "labels": [
+          "华东",
+          "华北",
+          "华南",
+          "西南"
+        ],
+        "series_names": [
+          "实际",
+          "目标"
+        ]
+      },
+      "rejection": null
+    },
+    {
+      "id": "L-bar-long",
+      "family": "bar",
+      "theme": "light",
+      "case": "long",
+      "expected": "ACCEPT",
+      "chartType": "bar",
+      "title": "条形图 · 长标签",
+      "labels": [
+        "华东区域重点客户续约收入",
+        "华北区域新客户首单收入",
+        "华南区域渠道合作收入"
+      ],
+      "unit": "万元",
+      "numberFormat": "#,##0",
+      "series": [
+        {
+          "id": "value",
+          "name": "收入",
+          "role": "actual",
+          "values": [
+            120,
+            90,
+            60
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "comparison",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ]
+      },
+      "readback": {
+        "values": [
+          120,
+          90,
+          60
+        ],
+        "labels": [
+          "华东区域重点客户续约收入",
+          "华北区域新客户首单收入",
+          "华南区域渠道合作收入"
+        ],
+        "series_names": [
+          "收入"
+        ]
+      },
+      "rejection": null
+    },
+    {
+      "id": "L-bar-percentage",
+      "family": "bar",
+      "theme": "light",
+      "case": "percentage",
+      "expected": "ACCEPT",
+      "chartType": "bar",
+      "title": "条形图 · 百分比",
+      "labels": [
+        "线上",
+        "门店",
+        "渠道"
+      ],
+      "unit": "%",
+      "numberFormat": "0.0\"%\"",
+      "series": [
+        {
+          "id": "value",
+          "name": "占比",
+          "role": "actual",
+          "storage_scale": "fraction",
+          "values": [
+            0.42,
+            0.33,
+            0.25
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "comparison",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ]
+      },
+      "readback": {
+        "values": [
+          42,
+          33,
+          25
+        ],
+        "labels": [
+          "线上",
+          "门店",
+          "渠道"
+        ],
+        "series_names": [
+          "占比"
+        ],
+        "numberFormat": "0.0\"%\""
+      },
+      "rejection": null
+    },
+    {
+      "id": "L-bar-negative",
+      "family": "bar",
+      "theme": "light",
+      "case": "negative",
+      "expected": "ACCEPT",
+      "chartType": "bar",
+      "title": "条形图 · 负值",
+      "labels": [
+        "一季度",
+        "二季度",
+        "三季度",
+        "四季度"
+      ],
+      "unit": "万元",
+      "numberFormat": "#,##0",
+      "series": [
+        {
+          "id": "value",
+          "name": "净变化",
+          "role": "actual",
+          "values": [
+            -20,
+            35,
+            10,
+            -5
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "comparison",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ]
+      },
+      "readback": {
+        "values": [
+          -20,
+          35,
+          10,
+          -5
+        ],
+        "labels": [
+          "一季度",
+          "二季度",
+          "三季度",
+          "四季度"
+        ],
+        "series_names": [
+          "净变化"
+        ]
+      },
+      "rejection": null
+    },
+    {
+      "id": "L-bar-missing",
+      "family": "bar",
+      "theme": "light",
+      "case": "missing",
+      "expected": "ACCEPT",
+      "chartType": "bar",
+      "title": "条形图 · 缺失",
+      "labels": [
+        "一月",
+        "二月",
+        "三月",
+        "四月"
+      ],
+      "unit": "单",
+      "numberFormat": "#,##0",
+      "missing_policy": "gap",
+      "series": [
+        {
+          "id": "value",
+          "name": "订单",
+          "role": "actual",
+          "values": [
+            10,
+            null,
+            0,
+            6
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "comparison",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ]
+      },
+      "readback": {
+        "values": [
+          10,
+          null,
+          0,
+          6
+        ],
+        "labels": [
+          "一月",
+          "二月",
+          "三月",
+          "四月"
+        ],
+        "series_names": [
+          "订单"
+        ],
+        "missing_policy": "gap"
+      },
+      "rejection": null
+    },
+    {
+      "id": "L-bar-large",
+      "family": "bar",
+      "theme": "light",
+      "case": "large",
+      "expected": "ACCEPT",
+      "chartType": "bar",
+      "title": "条形图 · 大数",
+      "labels": [
+        "本月",
+        "上月",
+        "去年同期"
+      ],
+      "unit": "元",
+      "numberFormat": "#,##0",
+      "series": [
+        {
+          "id": "value",
+          "name": "金额",
+          "role": "actual",
+          "values": [
+            1200000000,
+            980000000,
+            450000000
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "comparison",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ]
+      },
+      "readback": {
+        "values": [
+          1200000000,
+          980000000,
+          450000000
+        ],
+        "labels": [
+          "本月",
+          "上月",
+          "去年同期"
+        ],
+        "series_names": [
+          "金额"
+        ]
+      },
+      "rejection": null
+    },
+    {
+      "id": "L-bar-dense",
+      "family": "bar",
+      "theme": "light",
+      "case": "dense",
+      "expected": "REJECT",
+      "chartType": "bar",
+      "title": "条形图 · 高密度",
+      "labels": [
+        "1月",
+        "2月",
+        "3月",
+        "4月",
+        "5月",
+        "6月",
+        "7月",
+        "8月",
+        "9月",
+        "10月",
+        "11月",
+        "12月"
+      ],
+      "unit": "单",
+      "numberFormat": "#,##0",
+      "series": [
+        {
+          "id": "value",
+          "name": "月度值",
+          "role": "actual",
+          "values": [
+            12,
+            18,
+            15,
+            22,
+            19,
+            25,
+            28,
+            24,
+            30,
+            27,
+            33,
+            36
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "comparison",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ]
+      },
+      "readback": null,
+      "rejection": {
+        "code": "CATEGORY_PALETTE_CAPACITY",
+        "reason": "Single-series bar/column category palette supports eight distinguishable colors; twelve categories must be split or faceted."
+      }
+    },
+    {
+      "id": "D-bar-single",
+      "family": "bar",
+      "theme": "dark",
+      "case": "single",
+      "expected": "ACCEPT",
+      "chartType": "bar",
+      "title": "条形图 · 单系列",
+      "labels": [
+        "本期"
+      ],
+      "unit": "单",
+      "numberFormat": "#,##0",
+      "series": [
+        {
+          "id": "value",
+          "name": "实际",
+          "role": "actual",
+          "values": [
+            120
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "comparison",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ]
+      },
+      "readback": {
+        "values": [
+          120
+        ],
+        "labels": [
+          "本期"
+        ],
+        "series_names": [
+          "实际"
+        ]
+      },
+      "rejection": null
+    },
+    {
+      "id": "D-bar-multi",
+      "family": "bar",
+      "theme": "dark",
+      "case": "multi",
+      "expected": "ACCEPT",
+      "chartType": "bar",
+      "title": "条形图 · 多系列",
+      "labels": [
+        "华东",
+        "华北",
+        "华南",
+        "西南"
+      ],
+      "unit": "单",
+      "numberFormat": "#,##0",
+      "series": [
+        {
+          "id": "actual",
+          "name": "实际",
+          "role": "actual",
+          "values": [
+            120,
+            90,
+            60,
+            30
+          ]
+        },
+        {
+          "id": "target",
+          "name": "目标",
+          "role": "target",
+          "values": [
+            110,
+            100,
+            70,
+            35
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "comparison",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "actual",
+            "role": "actual"
+          },
+          {
+            "id": "target",
+            "role": "target"
+          }
+        ]
+      },
+      "readback": {
+        "values": [
+          120,
+          90,
+          60,
+          30,
+          110,
+          100,
+          70,
+          35
+        ],
+        "labels": [
+          "华东",
+          "华北",
+          "华南",
+          "西南"
+        ],
+        "series_names": [
+          "实际",
+          "目标"
+        ]
+      },
+      "rejection": null
+    },
+    {
+      "id": "D-bar-long",
+      "family": "bar",
+      "theme": "dark",
+      "case": "long",
+      "expected": "ACCEPT",
+      "chartType": "bar",
+      "title": "条形图 · 长标签",
+      "labels": [
+        "华东区域重点客户续约收入",
+        "华北区域新客户首单收入",
+        "华南区域渠道合作收入"
+      ],
+      "unit": "万元",
+      "numberFormat": "#,##0",
+      "series": [
+        {
+          "id": "value",
+          "name": "收入",
+          "role": "actual",
+          "values": [
+            120,
+            90,
+            60
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "comparison",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ]
+      },
+      "readback": {
+        "values": [
+          120,
+          90,
+          60
+        ],
+        "labels": [
+          "华东区域重点客户续约收入",
+          "华北区域新客户首单收入",
+          "华南区域渠道合作收入"
+        ],
+        "series_names": [
+          "收入"
+        ]
+      },
+      "rejection": null
+    },
+    {
+      "id": "D-bar-percentage",
+      "family": "bar",
+      "theme": "dark",
+      "case": "percentage",
+      "expected": "ACCEPT",
+      "chartType": "bar",
+      "title": "条形图 · 百分比",
+      "labels": [
+        "线上",
+        "门店",
+        "渠道"
+      ],
+      "unit": "%",
+      "numberFormat": "0.0\"%\"",
+      "series": [
+        {
+          "id": "value",
+          "name": "占比",
+          "role": "actual",
+          "storage_scale": "fraction",
+          "values": [
+            0.42,
+            0.33,
+            0.25
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "comparison",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ]
+      },
+      "readback": {
+        "values": [
+          42,
+          33,
+          25
+        ],
+        "labels": [
+          "线上",
+          "门店",
+          "渠道"
+        ],
+        "series_names": [
+          "占比"
+        ],
+        "numberFormat": "0.0\"%\""
+      },
+      "rejection": null
+    },
+    {
+      "id": "D-bar-negative",
+      "family": "bar",
+      "theme": "dark",
+      "case": "negative",
+      "expected": "ACCEPT",
+      "chartType": "bar",
+      "title": "条形图 · 负值",
+      "labels": [
+        "一季度",
+        "二季度",
+        "三季度",
+        "四季度"
+      ],
+      "unit": "万元",
+      "numberFormat": "#,##0",
+      "series": [
+        {
+          "id": "value",
+          "name": "净变化",
+          "role": "actual",
+          "values": [
+            -20,
+            35,
+            10,
+            -5
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "comparison",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ]
+      },
+      "readback": {
+        "values": [
+          -20,
+          35,
+          10,
+          -5
+        ],
+        "labels": [
+          "一季度",
+          "二季度",
+          "三季度",
+          "四季度"
+        ],
+        "series_names": [
+          "净变化"
+        ]
+      },
+      "rejection": null
+    },
+    {
+      "id": "D-bar-missing",
+      "family": "bar",
+      "theme": "dark",
+      "case": "missing",
+      "expected": "ACCEPT",
+      "chartType": "bar",
+      "title": "条形图 · 缺失",
+      "labels": [
+        "一月",
+        "二月",
+        "三月",
+        "四月"
+      ],
+      "unit": "单",
+      "numberFormat": "#,##0",
+      "missing_policy": "gap",
+      "series": [
+        {
+          "id": "value",
+          "name": "订单",
+          "role": "actual",
+          "values": [
+            10,
+            null,
+            0,
+            6
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "comparison",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ]
+      },
+      "readback": {
+        "values": [
+          10,
+          null,
+          0,
+          6
+        ],
+        "labels": [
+          "一月",
+          "二月",
+          "三月",
+          "四月"
+        ],
+        "series_names": [
+          "订单"
+        ],
+        "missing_policy": "gap"
+      },
+      "rejection": null
+    },
+    {
+      "id": "D-bar-large",
+      "family": "bar",
+      "theme": "dark",
+      "case": "large",
+      "expected": "ACCEPT",
+      "chartType": "bar",
+      "title": "条形图 · 大数",
+      "labels": [
+        "本月",
+        "上月",
+        "去年同期"
+      ],
+      "unit": "元",
+      "numberFormat": "#,##0",
+      "series": [
+        {
+          "id": "value",
+          "name": "金额",
+          "role": "actual",
+          "values": [
+            1200000000,
+            980000000,
+            450000000
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "comparison",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ]
+      },
+      "readback": {
+        "values": [
+          1200000000,
+          980000000,
+          450000000
+        ],
+        "labels": [
+          "本月",
+          "上月",
+          "去年同期"
+        ],
+        "series_names": [
+          "金额"
+        ]
+      },
+      "rejection": null
+    },
+    {
+      "id": "D-bar-dense",
+      "family": "bar",
+      "theme": "dark",
+      "case": "dense",
+      "expected": "REJECT",
+      "chartType": "bar",
+      "title": "条形图 · 高密度",
+      "labels": [
+        "1月",
+        "2月",
+        "3月",
+        "4月",
+        "5月",
+        "6月",
+        "7月",
+        "8月",
+        "9月",
+        "10月",
+        "11月",
+        "12月"
+      ],
+      "unit": "单",
+      "numberFormat": "#,##0",
+      "series": [
+        {
+          "id": "value",
+          "name": "月度值",
+          "role": "actual",
+          "values": [
+            12,
+            18,
+            15,
+            22,
+            19,
+            25,
+            28,
+            24,
+            30,
+            27,
+            33,
+            36
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "comparison",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ]
+      },
+      "readback": null,
+      "rejection": {
+        "code": "CATEGORY_PALETTE_CAPACITY",
+        "reason": "Single-series bar/column category palette supports eight distinguishable colors; twelve categories must be split or faceted."
+      }
+    },
+    {
+      "id": "L-column-single",
+      "family": "column",
+      "theme": "light",
+      "case": "single",
+      "expected": "ACCEPT",
+      "chartType": "column",
+      "title": "柱状图 · 单系列",
+      "labels": [
+        "本期"
+      ],
+      "unit": "单",
+      "numberFormat": "#,##0",
+      "series": [
+        {
+          "id": "value",
+          "name": "实际",
+          "role": "actual",
+          "values": [
+            120
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "comparison",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ]
+      },
+      "readback": {
+        "values": [
+          120
+        ],
+        "labels": [
+          "本期"
+        ],
+        "series_names": [
+          "实际"
+        ]
+      },
+      "rejection": null
+    },
+    {
+      "id": "L-column-multi",
+      "family": "column",
+      "theme": "light",
+      "case": "multi",
+      "expected": "ACCEPT",
+      "chartType": "column",
+      "title": "柱状图 · 多系列",
+      "labels": [
+        "华东",
+        "华北",
+        "华南",
+        "西南"
+      ],
+      "unit": "单",
+      "numberFormat": "#,##0",
+      "series": [
+        {
+          "id": "actual",
+          "name": "实际",
+          "role": "actual",
+          "values": [
+            120,
+            90,
+            60,
+            30
+          ]
+        },
+        {
+          "id": "target",
+          "name": "目标",
+          "role": "target",
+          "values": [
+            110,
+            100,
+            70,
+            35
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "comparison",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "actual",
+            "role": "actual"
+          },
+          {
+            "id": "target",
+            "role": "target"
+          }
+        ]
+      },
+      "readback": {
+        "values": [
+          120,
+          90,
+          60,
+          30,
+          110,
+          100,
+          70,
+          35
+        ],
+        "labels": [
+          "华东",
+          "华北",
+          "华南",
+          "西南"
+        ],
+        "series_names": [
+          "实际",
+          "目标"
+        ]
+      },
+      "rejection": null
+    },
+    {
+      "id": "L-column-long",
+      "family": "column",
+      "theme": "light",
+      "case": "long",
+      "expected": "ACCEPT",
+      "chartType": "column",
+      "title": "柱状图 · 长标签",
+      "labels": [
+        "华东区域重点客户续约收入",
+        "华北区域新客户首单收入",
+        "华南区域渠道合作收入"
+      ],
+      "unit": "万元",
+      "numberFormat": "#,##0",
+      "series": [
+        {
+          "id": "value",
+          "name": "收入",
+          "role": "actual",
+          "values": [
+            120,
+            90,
+            60
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "comparison",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ]
+      },
+      "readback": {
+        "values": [
+          120,
+          90,
+          60
+        ],
+        "labels": [
+          "华东区域重点客户续约收入",
+          "华北区域新客户首单收入",
+          "华南区域渠道合作收入"
+        ],
+        "series_names": [
+          "收入"
+        ]
+      },
+      "rejection": null
+    },
+    {
+      "id": "L-column-percentage",
+      "family": "column",
+      "theme": "light",
+      "case": "percentage",
+      "expected": "ACCEPT",
+      "chartType": "column",
+      "title": "柱状图 · 百分比",
+      "labels": [
+        "线上",
+        "门店",
+        "渠道"
+      ],
+      "unit": "%",
+      "numberFormat": "0.0\"%\"",
+      "series": [
+        {
+          "id": "value",
+          "name": "占比",
+          "role": "actual",
+          "storage_scale": "fraction",
+          "values": [
+            0.42,
+            0.33,
+            0.25
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "comparison",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ]
+      },
+      "readback": {
+        "values": [
+          42,
+          33,
+          25
+        ],
+        "labels": [
+          "线上",
+          "门店",
+          "渠道"
+        ],
+        "series_names": [
+          "占比"
+        ],
+        "numberFormat": "0.0\"%\""
+      },
+      "rejection": null
+    },
+    {
+      "id": "L-column-negative",
+      "family": "column",
+      "theme": "light",
+      "case": "negative",
+      "expected": "ACCEPT",
+      "chartType": "column",
+      "title": "柱状图 · 负值",
+      "labels": [
+        "一季度",
+        "二季度",
+        "三季度",
+        "四季度"
+      ],
+      "unit": "万元",
+      "numberFormat": "#,##0",
+      "series": [
+        {
+          "id": "value",
+          "name": "净变化",
+          "role": "actual",
+          "values": [
+            -20,
+            35,
+            10,
+            -5
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "comparison",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ]
+      },
+      "readback": {
+        "values": [
+          -20,
+          35,
+          10,
+          -5
+        ],
+        "labels": [
+          "一季度",
+          "二季度",
+          "三季度",
+          "四季度"
+        ],
+        "series_names": [
+          "净变化"
+        ]
+      },
+      "rejection": null
+    },
+    {
+      "id": "L-column-missing",
+      "family": "column",
+      "theme": "light",
+      "case": "missing",
+      "expected": "ACCEPT",
+      "chartType": "column",
+      "title": "柱状图 · 缺失",
+      "labels": [
+        "一月",
+        "二月",
+        "三月",
+        "四月"
+      ],
+      "unit": "单",
+      "numberFormat": "#,##0",
+      "missing_policy": "gap",
+      "series": [
+        {
+          "id": "value",
+          "name": "订单",
+          "role": "actual",
+          "values": [
+            10,
+            null,
+            0,
+            6
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "comparison",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ]
+      },
+      "readback": {
+        "values": [
+          10,
+          null,
+          0,
+          6
+        ],
+        "labels": [
+          "一月",
+          "二月",
+          "三月",
+          "四月"
+        ],
+        "series_names": [
+          "订单"
+        ],
+        "missing_policy": "gap"
+      },
+      "rejection": null
+    },
+    {
+      "id": "L-column-large",
+      "family": "column",
+      "theme": "light",
+      "case": "large",
+      "expected": "ACCEPT",
+      "chartType": "column",
+      "title": "柱状图 · 大数",
+      "labels": [
+        "本月",
+        "上月",
+        "去年同期"
+      ],
+      "unit": "元",
+      "numberFormat": "#,##0",
+      "series": [
+        {
+          "id": "value",
+          "name": "金额",
+          "role": "actual",
+          "values": [
+            1200000000,
+            980000000,
+            450000000
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "comparison",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ]
+      },
+      "readback": {
+        "values": [
+          1200000000,
+          980000000,
+          450000000
+        ],
+        "labels": [
+          "本月",
+          "上月",
+          "去年同期"
+        ],
+        "series_names": [
+          "金额"
+        ]
+      },
+      "rejection": null
+    },
+    {
+      "id": "L-column-dense",
+      "family": "column",
+      "theme": "light",
+      "case": "dense",
+      "expected": "REJECT",
+      "chartType": "column",
+      "title": "柱状图 · 高密度",
+      "labels": [
+        "1月",
+        "2月",
+        "3月",
+        "4月",
+        "5月",
+        "6月",
+        "7月",
+        "8月",
+        "9月",
+        "10月",
+        "11月",
+        "12月"
+      ],
+      "unit": "单",
+      "numberFormat": "#,##0",
+      "series": [
+        {
+          "id": "value",
+          "name": "月度值",
+          "role": "actual",
+          "values": [
+            12,
+            18,
+            15,
+            22,
+            19,
+            25,
+            28,
+            24,
+            30,
+            27,
+            33,
+            36
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "comparison",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ]
+      },
+      "readback": null,
+      "rejection": {
+        "code": "CATEGORY_PALETTE_CAPACITY",
+        "reason": "Single-series bar/column category palette supports eight distinguishable colors; twelve categories must be split or faceted."
+      }
+    },
+    {
+      "id": "D-column-single",
+      "family": "column",
+      "theme": "dark",
+      "case": "single",
+      "expected": "ACCEPT",
+      "chartType": "column",
+      "title": "柱状图 · 单系列",
+      "labels": [
+        "本期"
+      ],
+      "unit": "单",
+      "numberFormat": "#,##0",
+      "series": [
+        {
+          "id": "value",
+          "name": "实际",
+          "role": "actual",
+          "values": [
+            120
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "comparison",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ]
+      },
+      "readback": {
+        "values": [
+          120
+        ],
+        "labels": [
+          "本期"
+        ],
+        "series_names": [
+          "实际"
+        ]
+      },
+      "rejection": null
+    },
+    {
+      "id": "D-column-multi",
+      "family": "column",
+      "theme": "dark",
+      "case": "multi",
+      "expected": "ACCEPT",
+      "chartType": "column",
+      "title": "柱状图 · 多系列",
+      "labels": [
+        "华东",
+        "华北",
+        "华南",
+        "西南"
+      ],
+      "unit": "单",
+      "numberFormat": "#,##0",
+      "series": [
+        {
+          "id": "actual",
+          "name": "实际",
+          "role": "actual",
+          "values": [
+            120,
+            90,
+            60,
+            30
+          ]
+        },
+        {
+          "id": "target",
+          "name": "目标",
+          "role": "target",
+          "values": [
+            110,
+            100,
+            70,
+            35
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "comparison",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "actual",
+            "role": "actual"
+          },
+          {
+            "id": "target",
+            "role": "target"
+          }
+        ]
+      },
+      "readback": {
+        "values": [
+          120,
+          90,
+          60,
+          30,
+          110,
+          100,
+          70,
+          35
+        ],
+        "labels": [
+          "华东",
+          "华北",
+          "华南",
+          "西南"
+        ],
+        "series_names": [
+          "实际",
+          "目标"
+        ]
+      },
+      "rejection": null
+    },
+    {
+      "id": "D-column-long",
+      "family": "column",
+      "theme": "dark",
+      "case": "long",
+      "expected": "ACCEPT",
+      "chartType": "column",
+      "title": "柱状图 · 长标签",
+      "labels": [
+        "华东区域重点客户续约收入",
+        "华北区域新客户首单收入",
+        "华南区域渠道合作收入"
+      ],
+      "unit": "万元",
+      "numberFormat": "#,##0",
+      "series": [
+        {
+          "id": "value",
+          "name": "收入",
+          "role": "actual",
+          "values": [
+            120,
+            90,
+            60
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "comparison",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ]
+      },
+      "readback": {
+        "values": [
+          120,
+          90,
+          60
+        ],
+        "labels": [
+          "华东区域重点客户续约收入",
+          "华北区域新客户首单收入",
+          "华南区域渠道合作收入"
+        ],
+        "series_names": [
+          "收入"
+        ]
+      },
+      "rejection": null
+    },
+    {
+      "id": "D-column-percentage",
+      "family": "column",
+      "theme": "dark",
+      "case": "percentage",
+      "expected": "ACCEPT",
+      "chartType": "column",
+      "title": "柱状图 · 百分比",
+      "labels": [
+        "线上",
+        "门店",
+        "渠道"
+      ],
+      "unit": "%",
+      "numberFormat": "0.0\"%\"",
+      "series": [
+        {
+          "id": "value",
+          "name": "占比",
+          "role": "actual",
+          "storage_scale": "fraction",
+          "values": [
+            0.42,
+            0.33,
+            0.25
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "comparison",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ]
+      },
+      "readback": {
+        "values": [
+          42,
+          33,
+          25
+        ],
+        "labels": [
+          "线上",
+          "门店",
+          "渠道"
+        ],
+        "series_names": [
+          "占比"
+        ],
+        "numberFormat": "0.0\"%\""
+      },
+      "rejection": null
+    },
+    {
+      "id": "D-column-negative",
+      "family": "column",
+      "theme": "dark",
+      "case": "negative",
+      "expected": "ACCEPT",
+      "chartType": "column",
+      "title": "柱状图 · 负值",
+      "labels": [
+        "一季度",
+        "二季度",
+        "三季度",
+        "四季度"
+      ],
+      "unit": "万元",
+      "numberFormat": "#,##0",
+      "series": [
+        {
+          "id": "value",
+          "name": "净变化",
+          "role": "actual",
+          "values": [
+            -20,
+            35,
+            10,
+            -5
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "comparison",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ]
+      },
+      "readback": {
+        "values": [
+          -20,
+          35,
+          10,
+          -5
+        ],
+        "labels": [
+          "一季度",
+          "二季度",
+          "三季度",
+          "四季度"
+        ],
+        "series_names": [
+          "净变化"
+        ]
+      },
+      "rejection": null
+    },
+    {
+      "id": "D-column-missing",
+      "family": "column",
+      "theme": "dark",
+      "case": "missing",
+      "expected": "ACCEPT",
+      "chartType": "column",
+      "title": "柱状图 · 缺失",
+      "labels": [
+        "一月",
+        "二月",
+        "三月",
+        "四月"
+      ],
+      "unit": "单",
+      "numberFormat": "#,##0",
+      "missing_policy": "gap",
+      "series": [
+        {
+          "id": "value",
+          "name": "订单",
+          "role": "actual",
+          "values": [
+            10,
+            null,
+            0,
+            6
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "comparison",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ]
+      },
+      "readback": {
+        "values": [
+          10,
+          null,
+          0,
+          6
+        ],
+        "labels": [
+          "一月",
+          "二月",
+          "三月",
+          "四月"
+        ],
+        "series_names": [
+          "订单"
+        ],
+        "missing_policy": "gap"
+      },
+      "rejection": null
+    },
+    {
+      "id": "D-column-large",
+      "family": "column",
+      "theme": "dark",
+      "case": "large",
+      "expected": "ACCEPT",
+      "chartType": "column",
+      "title": "柱状图 · 大数",
+      "labels": [
+        "本月",
+        "上月",
+        "去年同期"
+      ],
+      "unit": "元",
+      "numberFormat": "#,##0",
+      "series": [
+        {
+          "id": "value",
+          "name": "金额",
+          "role": "actual",
+          "values": [
+            1200000000,
+            980000000,
+            450000000
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "comparison",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ]
+      },
+      "readback": {
+        "values": [
+          1200000000,
+          980000000,
+          450000000
+        ],
+        "labels": [
+          "本月",
+          "上月",
+          "去年同期"
+        ],
+        "series_names": [
+          "金额"
+        ]
+      },
+      "rejection": null
+    },
+    {
+      "id": "D-column-dense",
+      "family": "column",
+      "theme": "dark",
+      "case": "dense",
+      "expected": "REJECT",
+      "chartType": "column",
+      "title": "柱状图 · 高密度",
+      "labels": [
+        "1月",
+        "2月",
+        "3月",
+        "4月",
+        "5月",
+        "6月",
+        "7月",
+        "8月",
+        "9月",
+        "10月",
+        "11月",
+        "12月"
+      ],
+      "unit": "单",
+      "numberFormat": "#,##0",
+      "series": [
+        {
+          "id": "value",
+          "name": "月度值",
+          "role": "actual",
+          "values": [
+            12,
+            18,
+            15,
+            22,
+            19,
+            25,
+            28,
+            24,
+            30,
+            27,
+            33,
+            36
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "comparison",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ]
+      },
+      "readback": null,
+      "rejection": {
+        "code": "CATEGORY_PALETTE_CAPACITY",
+        "reason": "Single-series bar/column category palette supports eight distinguishable colors; twelve categories must be split or faceted."
+      }
+    },
+    {
+      "id": "L-line-single",
+      "family": "line",
+      "theme": "light",
+      "case": "single",
+      "expected": "ACCEPT",
+      "chartType": "line",
+      "title": "折线图 · 单系列",
+      "labels": [
+        "本期"
+      ],
+      "unit": "单",
+      "numberFormat": "#,##0",
+      "series": [
+        {
+          "id": "value",
+          "name": "实际",
+          "role": "actual",
+          "values": [
+            120
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "trend",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ]
+      },
+      "readback": {
+        "values": [
+          120
+        ],
+        "labels": [
+          "本期"
+        ],
+        "series_names": [
+          "实际"
+        ]
+      },
+      "rejection": null
+    },
+    {
+      "id": "L-line-multi",
+      "family": "line",
+      "theme": "light",
+      "case": "multi",
+      "expected": "ACCEPT",
+      "chartType": "line",
+      "title": "折线图 · 多系列",
+      "labels": [
+        "华东",
+        "华北",
+        "华南",
+        "西南"
+      ],
+      "unit": "单",
+      "numberFormat": "#,##0",
+      "series": [
+        {
+          "id": "actual",
+          "name": "实际",
+          "role": "actual",
+          "values": [
+            120,
+            90,
+            60,
+            30
+          ]
+        },
+        {
+          "id": "target",
+          "name": "目标",
+          "role": "target",
+          "values": [
+            110,
+            100,
+            70,
+            35
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "trend",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "actual",
+            "role": "actual"
+          },
+          {
+            "id": "target",
+            "role": "target"
+          }
+        ]
+      },
+      "readback": {
+        "values": [
+          120,
+          90,
+          60,
+          30,
+          110,
+          100,
+          70,
+          35
+        ],
+        "labels": [
+          "华东",
+          "华北",
+          "华南",
+          "西南"
+        ],
+        "series_names": [
+          "实际",
+          "目标"
+        ]
+      },
+      "rejection": null
+    },
+    {
+      "id": "L-line-long",
+      "family": "line",
+      "theme": "light",
+      "case": "long",
+      "expected": "ACCEPT",
+      "chartType": "line",
+      "title": "折线图 · 长标签",
+      "labels": [
+        "华东区域重点客户续约收入",
+        "华北区域新客户首单收入",
+        "华南区域渠道合作收入"
+      ],
+      "unit": "万元",
+      "numberFormat": "#,##0",
+      "series": [
+        {
+          "id": "value",
+          "name": "收入",
+          "role": "actual",
+          "values": [
+            120,
+            90,
+            60
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "trend",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ]
+      },
+      "readback": {
+        "values": [
+          120,
+          90,
+          60
+        ],
+        "labels": [
+          "华东区域重点客户续约收入",
+          "华北区域新客户首单收入",
+          "华南区域渠道合作收入"
+        ],
+        "series_names": [
+          "收入"
+        ]
+      },
+      "rejection": null
+    },
+    {
+      "id": "L-line-percentage",
+      "family": "line",
+      "theme": "light",
+      "case": "percentage",
+      "expected": "ACCEPT",
+      "chartType": "line",
+      "title": "折线图 · 百分比",
+      "labels": [
+        "线上",
+        "门店",
+        "渠道"
+      ],
+      "unit": "%",
+      "numberFormat": "0.0\"%\"",
+      "series": [
+        {
+          "id": "value",
+          "name": "占比",
+          "role": "actual",
+          "storage_scale": "fraction",
+          "values": [
+            0.42,
+            0.33,
+            0.25
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "trend",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ]
+      },
+      "readback": {
+        "values": [
+          42,
+          33,
+          25
+        ],
+        "labels": [
+          "线上",
+          "门店",
+          "渠道"
+        ],
+        "series_names": [
+          "占比"
+        ],
+        "numberFormat": "0.0\"%\""
+      },
+      "rejection": null
+    },
+    {
+      "id": "L-line-negative",
+      "family": "line",
+      "theme": "light",
+      "case": "negative",
+      "expected": "ACCEPT",
+      "chartType": "line",
+      "title": "折线图 · 负值",
+      "labels": [
+        "一季度",
+        "二季度",
+        "三季度",
+        "四季度"
+      ],
+      "unit": "万元",
+      "numberFormat": "#,##0",
+      "series": [
+        {
+          "id": "value",
+          "name": "净变化",
+          "role": "actual",
+          "values": [
+            -20,
+            35,
+            10,
+            -5
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "trend",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ]
+      },
+      "readback": {
+        "values": [
+          -20,
+          35,
+          10,
+          -5
+        ],
+        "labels": [
+          "一季度",
+          "二季度",
+          "三季度",
+          "四季度"
+        ],
+        "series_names": [
+          "净变化"
+        ]
+      },
+      "rejection": null
+    },
+    {
+      "id": "L-line-missing",
+      "family": "line",
+      "theme": "light",
+      "case": "missing",
+      "expected": "ACCEPT",
+      "chartType": "line",
+      "title": "折线图 · 缺失",
+      "labels": [
+        "一月",
+        "二月",
+        "三月",
+        "四月"
+      ],
+      "unit": "单",
+      "numberFormat": "#,##0",
+      "missing_policy": "gap",
+      "series": [
+        {
+          "id": "value",
+          "name": "订单",
+          "role": "actual",
+          "values": [
+            10,
+            null,
+            0,
+            6
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "trend",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ]
+      },
+      "readback": {
+        "values": [
+          10,
+          null,
+          0,
+          6
+        ],
+        "labels": [
+          "一月",
+          "二月",
+          "三月",
+          "四月"
+        ],
+        "series_names": [
+          "订单"
+        ],
+        "missing_policy": "gap"
+      },
+      "rejection": null
+    },
+    {
+      "id": "L-line-large",
+      "family": "line",
+      "theme": "light",
+      "case": "large",
+      "expected": "ACCEPT",
+      "chartType": "line",
+      "title": "折线图 · 大数",
+      "labels": [
+        "本月",
+        "上月",
+        "去年同期"
+      ],
+      "unit": "元",
+      "numberFormat": "#,##0",
+      "series": [
+        {
+          "id": "value",
+          "name": "金额",
+          "role": "actual",
+          "values": [
+            1200000000,
+            980000000,
+            450000000
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "trend",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ]
+      },
+      "readback": {
+        "values": [
+          1200000000,
+          980000000,
+          450000000
+        ],
+        "labels": [
+          "本月",
+          "上月",
+          "去年同期"
+        ],
+        "series_names": [
+          "金额"
+        ]
+      },
+      "rejection": null
+    },
+    {
+      "id": "L-line-dense",
+      "family": "line",
+      "theme": "light",
+      "case": "dense",
+      "expected": "ACCEPT",
+      "chartType": "line",
+      "title": "折线图 · 高密度",
+      "labels": [
+        "1月",
+        "2月",
+        "3月",
+        "4月",
+        "5月",
+        "6月",
+        "7月",
+        "8月",
+        "9月",
+        "10月",
+        "11月",
+        "12月"
+      ],
+      "unit": "单",
+      "numberFormat": "#,##0",
+      "series": [
+        {
+          "id": "value",
+          "name": "月度值",
+          "role": "actual",
+          "values": [
+            12,
+            18,
+            15,
+            22,
+            19,
+            25,
+            28,
+            24,
+            30,
+            27,
+            33,
+            36
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "trend",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ]
+      },
+      "readback": {
+        "values": [
+          12,
+          18,
+          15,
+          22,
+          19,
+          25,
+          28,
+          24,
+          30,
+          27,
+          33,
+          36
+        ],
+        "labels": [
+          "1月",
+          "2月",
+          "3月",
+          "4月",
+          "5月",
+          "6月",
+          "7月",
+          "8月",
+          "9月",
+          "10月",
+          "11月",
+          "12月"
+        ],
+        "series_names": [
+          "月度值"
+        ]
+      },
+      "rejection": null
+    },
+    {
+      "id": "D-line-single",
+      "family": "line",
+      "theme": "dark",
+      "case": "single",
+      "expected": "ACCEPT",
+      "chartType": "line",
+      "title": "折线图 · 单系列",
+      "labels": [
+        "本期"
+      ],
+      "unit": "单",
+      "numberFormat": "#,##0",
+      "series": [
+        {
+          "id": "value",
+          "name": "实际",
+          "role": "actual",
+          "values": [
+            120
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "trend",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ]
+      },
+      "readback": {
+        "values": [
+          120
+        ],
+        "labels": [
+          "本期"
+        ],
+        "series_names": [
+          "实际"
+        ]
+      },
+      "rejection": null
+    },
+    {
+      "id": "D-line-multi",
+      "family": "line",
+      "theme": "dark",
+      "case": "multi",
+      "expected": "ACCEPT",
+      "chartType": "line",
+      "title": "折线图 · 多系列",
+      "labels": [
+        "华东",
+        "华北",
+        "华南",
+        "西南"
+      ],
+      "unit": "单",
+      "numberFormat": "#,##0",
+      "series": [
+        {
+          "id": "actual",
+          "name": "实际",
+          "role": "actual",
+          "values": [
+            120,
+            90,
+            60,
+            30
+          ]
+        },
+        {
+          "id": "target",
+          "name": "目标",
+          "role": "target",
+          "values": [
+            110,
+            100,
+            70,
+            35
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "trend",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "actual",
+            "role": "actual"
+          },
+          {
+            "id": "target",
+            "role": "target"
+          }
+        ]
+      },
+      "readback": {
+        "values": [
+          120,
+          90,
+          60,
+          30,
+          110,
+          100,
+          70,
+          35
+        ],
+        "labels": [
+          "华东",
+          "华北",
+          "华南",
+          "西南"
+        ],
+        "series_names": [
+          "实际",
+          "目标"
+        ]
+      },
+      "rejection": null
+    },
+    {
+      "id": "D-line-long",
+      "family": "line",
+      "theme": "dark",
+      "case": "long",
+      "expected": "ACCEPT",
+      "chartType": "line",
+      "title": "折线图 · 长标签",
+      "labels": [
+        "华东区域重点客户续约收入",
+        "华北区域新客户首单收入",
+        "华南区域渠道合作收入"
+      ],
+      "unit": "万元",
+      "numberFormat": "#,##0",
+      "series": [
+        {
+          "id": "value",
+          "name": "收入",
+          "role": "actual",
+          "values": [
+            120,
+            90,
+            60
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "trend",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ]
+      },
+      "readback": {
+        "values": [
+          120,
+          90,
+          60
+        ],
+        "labels": [
+          "华东区域重点客户续约收入",
+          "华北区域新客户首单收入",
+          "华南区域渠道合作收入"
+        ],
+        "series_names": [
+          "收入"
+        ]
+      },
+      "rejection": null
+    },
+    {
+      "id": "D-line-percentage",
+      "family": "line",
+      "theme": "dark",
+      "case": "percentage",
+      "expected": "ACCEPT",
+      "chartType": "line",
+      "title": "折线图 · 百分比",
+      "labels": [
+        "线上",
+        "门店",
+        "渠道"
+      ],
+      "unit": "%",
+      "numberFormat": "0.0\"%\"",
+      "series": [
+        {
+          "id": "value",
+          "name": "占比",
+          "role": "actual",
+          "storage_scale": "fraction",
+          "values": [
+            0.42,
+            0.33,
+            0.25
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "trend",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ]
+      },
+      "readback": {
+        "values": [
+          42,
+          33,
+          25
+        ],
+        "labels": [
+          "线上",
+          "门店",
+          "渠道"
+        ],
+        "series_names": [
+          "占比"
+        ],
+        "numberFormat": "0.0\"%\""
+      },
+      "rejection": null
+    },
+    {
+      "id": "D-line-negative",
+      "family": "line",
+      "theme": "dark",
+      "case": "negative",
+      "expected": "ACCEPT",
+      "chartType": "line",
+      "title": "折线图 · 负值",
+      "labels": [
+        "一季度",
+        "二季度",
+        "三季度",
+        "四季度"
+      ],
+      "unit": "万元",
+      "numberFormat": "#,##0",
+      "series": [
+        {
+          "id": "value",
+          "name": "净变化",
+          "role": "actual",
+          "values": [
+            -20,
+            35,
+            10,
+            -5
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "trend",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ]
+      },
+      "readback": {
+        "values": [
+          -20,
+          35,
+          10,
+          -5
+        ],
+        "labels": [
+          "一季度",
+          "二季度",
+          "三季度",
+          "四季度"
+        ],
+        "series_names": [
+          "净变化"
+        ]
+      },
+      "rejection": null
+    },
+    {
+      "id": "D-line-missing",
+      "family": "line",
+      "theme": "dark",
+      "case": "missing",
+      "expected": "ACCEPT",
+      "chartType": "line",
+      "title": "折线图 · 缺失",
+      "labels": [
+        "一月",
+        "二月",
+        "三月",
+        "四月"
+      ],
+      "unit": "单",
+      "numberFormat": "#,##0",
+      "missing_policy": "gap",
+      "series": [
+        {
+          "id": "value",
+          "name": "订单",
+          "role": "actual",
+          "values": [
+            10,
+            null,
+            0,
+            6
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "trend",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ]
+      },
+      "readback": {
+        "values": [
+          10,
+          null,
+          0,
+          6
+        ],
+        "labels": [
+          "一月",
+          "二月",
+          "三月",
+          "四月"
+        ],
+        "series_names": [
+          "订单"
+        ],
+        "missing_policy": "gap"
+      },
+      "rejection": null
+    },
+    {
+      "id": "D-line-large",
+      "family": "line",
+      "theme": "dark",
+      "case": "large",
+      "expected": "ACCEPT",
+      "chartType": "line",
+      "title": "折线图 · 大数",
+      "labels": [
+        "本月",
+        "上月",
+        "去年同期"
+      ],
+      "unit": "元",
+      "numberFormat": "#,##0",
+      "series": [
+        {
+          "id": "value",
+          "name": "金额",
+          "role": "actual",
+          "values": [
+            1200000000,
+            980000000,
+            450000000
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "trend",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ]
+      },
+      "readback": {
+        "values": [
+          1200000000,
+          980000000,
+          450000000
+        ],
+        "labels": [
+          "本月",
+          "上月",
+          "去年同期"
+        ],
+        "series_names": [
+          "金额"
+        ]
+      },
+      "rejection": null
+    },
+    {
+      "id": "D-line-dense",
+      "family": "line",
+      "theme": "dark",
+      "case": "dense",
+      "expected": "ACCEPT",
+      "chartType": "line",
+      "title": "折线图 · 高密度",
+      "labels": [
+        "1月",
+        "2月",
+        "3月",
+        "4月",
+        "5月",
+        "6月",
+        "7月",
+        "8月",
+        "9月",
+        "10月",
+        "11月",
+        "12月"
+      ],
+      "unit": "单",
+      "numberFormat": "#,##0",
+      "series": [
+        {
+          "id": "value",
+          "name": "月度值",
+          "role": "actual",
+          "values": [
+            12,
+            18,
+            15,
+            22,
+            19,
+            25,
+            28,
+            24,
+            30,
+            27,
+            33,
+            36
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "trend",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ]
+      },
+      "readback": {
+        "values": [
+          12,
+          18,
+          15,
+          22,
+          19,
+          25,
+          28,
+          24,
+          30,
+          27,
+          33,
+          36
+        ],
+        "labels": [
+          "1月",
+          "2月",
+          "3月",
+          "4月",
+          "5月",
+          "6月",
+          "7月",
+          "8月",
+          "9月",
+          "10月",
+          "11月",
+          "12月"
+        ],
+        "series_names": [
+          "月度值"
+        ]
+      },
+      "rejection": null
+    },
+    {
+      "id": "L-area-single",
+      "family": "area",
+      "theme": "light",
+      "case": "single",
+      "expected": "REJECT",
+      "chartType": "area",
+      "title": "面积图 · 单系列",
+      "labels": [
+        "本期"
+      ],
+      "unit": "单",
+      "numberFormat": "#,##0",
+      "series": [
+        {
+          "id": "value",
+          "name": "实际",
+          "role": "actual",
+          "values": [
+            120
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "trend",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ]
+      },
+      "readback": null,
+      "rejection": {
+        "code": "AREA_SINGLE_POINT",
+        "reason": "Area charts require at least two points per series because a single point is visually empty; use a line chart for one point, a KPI value for one number, or a table for one row."
+      }
+    },
+    {
+      "id": "L-area-multi",
+      "family": "area",
+      "theme": "light",
+      "case": "multi",
+      "expected": "ACCEPT",
+      "chartType": "area",
+      "title": "面积图 · 多系列",
+      "labels": [
+        "华东",
+        "华北",
+        "华南",
+        "西南"
+      ],
+      "unit": "单",
+      "numberFormat": "#,##0",
+      "series": [
+        {
+          "id": "actual",
+          "name": "实际",
+          "role": "actual",
+          "values": [
+            120,
+            90,
+            60,
+            30
+          ]
+        },
+        {
+          "id": "target",
+          "name": "目标",
+          "role": "target",
+          "values": [
+            110,
+            100,
+            70,
+            35
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "trend",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "actual",
+            "role": "actual"
+          },
+          {
+            "id": "target",
+            "role": "target"
+          }
+        ]
+      },
+      "readback": {
+        "values": [
+          120,
+          90,
+          60,
+          30,
+          110,
+          100,
+          70,
+          35
+        ],
+        "labels": [
+          "华东",
+          "华北",
+          "华南",
+          "西南"
+        ],
+        "series_names": [
+          "实际",
+          "目标"
+        ]
+      },
+      "rejection": null
+    },
+    {
+      "id": "L-area-long",
+      "family": "area",
+      "theme": "light",
+      "case": "long",
+      "expected": "ACCEPT",
+      "chartType": "area",
+      "title": "面积图 · 长标签",
+      "labels": [
+        "华东区域重点客户续约收入",
+        "华北区域新客户首单收入",
+        "华南区域渠道合作收入"
+      ],
+      "unit": "万元",
+      "numberFormat": "#,##0",
+      "series": [
+        {
+          "id": "value",
+          "name": "收入",
+          "role": "actual",
+          "values": [
+            120,
+            90,
+            60
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "trend",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ]
+      },
+      "readback": {
+        "values": [
+          120,
+          90,
+          60
+        ],
+        "labels": [
+          "华东区域重点客户续约收入",
+          "华北区域新客户首单收入",
+          "华南区域渠道合作收入"
+        ],
+        "series_names": [
+          "收入"
+        ]
+      },
+      "rejection": null
+    },
+    {
+      "id": "L-area-percentage",
+      "family": "area",
+      "theme": "light",
+      "case": "percentage",
+      "expected": "ACCEPT",
+      "chartType": "area",
+      "title": "面积图 · 百分比",
+      "labels": [
+        "线上",
+        "门店",
+        "渠道"
+      ],
+      "unit": "%",
+      "numberFormat": "0.0\"%\"",
+      "series": [
+        {
+          "id": "value",
+          "name": "占比",
+          "role": "actual",
+          "storage_scale": "fraction",
+          "values": [
+            0.42,
+            0.33,
+            0.25
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "trend",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ]
+      },
+      "readback": {
+        "values": [
+          42,
+          33,
+          25
+        ],
+        "labels": [
+          "线上",
+          "门店",
+          "渠道"
+        ],
+        "series_names": [
+          "占比"
+        ],
+        "numberFormat": "0.0\"%\""
+      },
+      "rejection": null
+    },
+    {
+      "id": "L-area-negative",
+      "family": "area",
+      "theme": "light",
+      "case": "negative",
+      "expected": "ACCEPT",
+      "chartType": "area",
+      "title": "面积图 · 负值",
+      "labels": [
+        "一季度",
+        "二季度",
+        "三季度",
+        "四季度"
+      ],
+      "unit": "万元",
+      "numberFormat": "#,##0",
+      "series": [
+        {
+          "id": "value",
+          "name": "净变化",
+          "role": "actual",
+          "values": [
+            -20,
+            35,
+            10,
+            -5
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "trend",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ]
+      },
+      "readback": {
+        "values": [
+          -20,
+          35,
+          10,
+          -5
+        ],
+        "labels": [
+          "一季度",
+          "二季度",
+          "三季度",
+          "四季度"
+        ],
+        "series_names": [
+          "净变化"
+        ]
+      },
+      "rejection": null
+    },
+    {
+      "id": "L-area-missing",
+      "family": "area",
+      "theme": "light",
+      "case": "missing",
+      "expected": "REJECT",
+      "chartType": "area",
+      "title": "面积图 · 缺失",
+      "labels": [
+        "一月",
+        "二月",
+        "三月",
+        "四月"
+      ],
+      "unit": "单",
+      "numberFormat": "#,##0",
+      "missing_policy": "gap",
+      "series": [
+        {
+          "id": "value",
+          "name": "订单",
+          "role": "actual",
+          "values": [
+            10,
+            null,
+            0,
+            6
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "trend",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ]
+      },
+      "readback": null,
+      "rejection": {
+        "code": "AREA_MISSING",
+        "reason": "Area charts cannot render missing values honestly because the filled band visually bridges the gap in office renderers; choose a line chart for an explicit gap or a table that states the missing value."
+      }
+    },
+    {
+      "id": "L-area-large",
+      "family": "area",
+      "theme": "light",
+      "case": "large",
+      "expected": "ACCEPT",
+      "chartType": "area",
+      "title": "面积图 · 大数",
+      "labels": [
+        "本月",
+        "上月",
+        "去年同期"
+      ],
+      "unit": "元",
+      "numberFormat": "#,##0",
+      "series": [
+        {
+          "id": "value",
+          "name": "金额",
+          "role": "actual",
+          "values": [
+            1200000000,
+            980000000,
+            450000000
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "trend",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ]
+      },
+      "readback": {
+        "values": [
+          1200000000,
+          980000000,
+          450000000
+        ],
+        "labels": [
+          "本月",
+          "上月",
+          "去年同期"
+        ],
+        "series_names": [
+          "金额"
+        ]
+      },
+      "rejection": null
+    },
+    {
+      "id": "L-area-dense",
+      "family": "area",
+      "theme": "light",
+      "case": "dense",
+      "expected": "ACCEPT",
+      "chartType": "area",
+      "title": "面积图 · 高密度",
+      "labels": [
+        "1月",
+        "2月",
+        "3月",
+        "4月",
+        "5月",
+        "6月",
+        "7月",
+        "8月",
+        "9月",
+        "10月",
+        "11月",
+        "12月"
+      ],
+      "unit": "单",
+      "numberFormat": "#,##0",
+      "series": [
+        {
+          "id": "value",
+          "name": "月度值",
+          "role": "actual",
+          "values": [
+            12,
+            18,
+            15,
+            22,
+            19,
+            25,
+            28,
+            24,
+            30,
+            27,
+            33,
+            36
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "trend",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ]
+      },
+      "readback": {
+        "values": [
+          12,
+          18,
+          15,
+          22,
+          19,
+          25,
+          28,
+          24,
+          30,
+          27,
+          33,
+          36
+        ],
+        "labels": [
+          "1月",
+          "2月",
+          "3月",
+          "4月",
+          "5月",
+          "6月",
+          "7月",
+          "8月",
+          "9月",
+          "10月",
+          "11月",
+          "12月"
+        ],
+        "series_names": [
+          "月度值"
+        ]
+      },
+      "rejection": null
+    },
+    {
+      "id": "D-area-single",
+      "family": "area",
+      "theme": "dark",
+      "case": "single",
+      "expected": "REJECT",
+      "chartType": "area",
+      "title": "面积图 · 单系列",
+      "labels": [
+        "本期"
+      ],
+      "unit": "单",
+      "numberFormat": "#,##0",
+      "series": [
+        {
+          "id": "value",
+          "name": "实际",
+          "role": "actual",
+          "values": [
+            120
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "trend",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ]
+      },
+      "readback": null,
+      "rejection": {
+        "code": "AREA_SINGLE_POINT",
+        "reason": "Area charts require at least two points per series because a single point is visually empty; use a line chart for one point, a KPI value for one number, or a table for one row."
+      }
+    },
+    {
+      "id": "D-area-multi",
+      "family": "area",
+      "theme": "dark",
+      "case": "multi",
+      "expected": "ACCEPT",
+      "chartType": "area",
+      "title": "面积图 · 多系列",
+      "labels": [
+        "华东",
+        "华北",
+        "华南",
+        "西南"
+      ],
+      "unit": "单",
+      "numberFormat": "#,##0",
+      "series": [
+        {
+          "id": "actual",
+          "name": "实际",
+          "role": "actual",
+          "values": [
+            120,
+            90,
+            60,
+            30
+          ]
+        },
+        {
+          "id": "target",
+          "name": "目标",
+          "role": "target",
+          "values": [
+            110,
+            100,
+            70,
+            35
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "trend",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "actual",
+            "role": "actual"
+          },
+          {
+            "id": "target",
+            "role": "target"
+          }
+        ]
+      },
+      "readback": {
+        "values": [
+          120,
+          90,
+          60,
+          30,
+          110,
+          100,
+          70,
+          35
+        ],
+        "labels": [
+          "华东",
+          "华北",
+          "华南",
+          "西南"
+        ],
+        "series_names": [
+          "实际",
+          "目标"
+        ]
+      },
+      "rejection": null
+    },
+    {
+      "id": "D-area-long",
+      "family": "area",
+      "theme": "dark",
+      "case": "long",
+      "expected": "ACCEPT",
+      "chartType": "area",
+      "title": "面积图 · 长标签",
+      "labels": [
+        "华东区域重点客户续约收入",
+        "华北区域新客户首单收入",
+        "华南区域渠道合作收入"
+      ],
+      "unit": "万元",
+      "numberFormat": "#,##0",
+      "series": [
+        {
+          "id": "value",
+          "name": "收入",
+          "role": "actual",
+          "values": [
+            120,
+            90,
+            60
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "trend",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ]
+      },
+      "readback": {
+        "values": [
+          120,
+          90,
+          60
+        ],
+        "labels": [
+          "华东区域重点客户续约收入",
+          "华北区域新客户首单收入",
+          "华南区域渠道合作收入"
+        ],
+        "series_names": [
+          "收入"
+        ]
+      },
+      "rejection": null
+    },
+    {
+      "id": "D-area-percentage",
+      "family": "area",
+      "theme": "dark",
+      "case": "percentage",
+      "expected": "ACCEPT",
+      "chartType": "area",
+      "title": "面积图 · 百分比",
+      "labels": [
+        "线上",
+        "门店",
+        "渠道"
+      ],
+      "unit": "%",
+      "numberFormat": "0.0\"%\"",
+      "series": [
+        {
+          "id": "value",
+          "name": "占比",
+          "role": "actual",
+          "storage_scale": "fraction",
+          "values": [
+            0.42,
+            0.33,
+            0.25
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "trend",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ]
+      },
+      "readback": {
+        "values": [
+          42,
+          33,
+          25
+        ],
+        "labels": [
+          "线上",
+          "门店",
+          "渠道"
+        ],
+        "series_names": [
+          "占比"
+        ],
+        "numberFormat": "0.0\"%\""
+      },
+      "rejection": null
+    },
+    {
+      "id": "D-area-negative",
+      "family": "area",
+      "theme": "dark",
+      "case": "negative",
+      "expected": "ACCEPT",
+      "chartType": "area",
+      "title": "面积图 · 负值",
+      "labels": [
+        "一季度",
+        "二季度",
+        "三季度",
+        "四季度"
+      ],
+      "unit": "万元",
+      "numberFormat": "#,##0",
+      "series": [
+        {
+          "id": "value",
+          "name": "净变化",
+          "role": "actual",
+          "values": [
+            -20,
+            35,
+            10,
+            -5
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "trend",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ]
+      },
+      "readback": {
+        "values": [
+          -20,
+          35,
+          10,
+          -5
+        ],
+        "labels": [
+          "一季度",
+          "二季度",
+          "三季度",
+          "四季度"
+        ],
+        "series_names": [
+          "净变化"
+        ]
+      },
+      "rejection": null
+    },
+    {
+      "id": "D-area-missing",
+      "family": "area",
+      "theme": "dark",
+      "case": "missing",
+      "expected": "REJECT",
+      "chartType": "area",
+      "title": "面积图 · 缺失",
+      "labels": [
+        "一月",
+        "二月",
+        "三月",
+        "四月"
+      ],
+      "unit": "单",
+      "numberFormat": "#,##0",
+      "missing_policy": "gap",
+      "series": [
+        {
+          "id": "value",
+          "name": "订单",
+          "role": "actual",
+          "values": [
+            10,
+            null,
+            0,
+            6
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "trend",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ]
+      },
+      "readback": null,
+      "rejection": {
+        "code": "AREA_MISSING",
+        "reason": "Area charts cannot render missing values honestly because the filled band visually bridges the gap in office renderers; choose a line chart for an explicit gap or a table that states the missing value."
+      }
+    },
+    {
+      "id": "D-area-large",
+      "family": "area",
+      "theme": "dark",
+      "case": "large",
+      "expected": "ACCEPT",
+      "chartType": "area",
+      "title": "面积图 · 大数",
+      "labels": [
+        "本月",
+        "上月",
+        "去年同期"
+      ],
+      "unit": "元",
+      "numberFormat": "#,##0",
+      "series": [
+        {
+          "id": "value",
+          "name": "金额",
+          "role": "actual",
+          "values": [
+            1200000000,
+            980000000,
+            450000000
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "trend",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ]
+      },
+      "readback": {
+        "values": [
+          1200000000,
+          980000000,
+          450000000
+        ],
+        "labels": [
+          "本月",
+          "上月",
+          "去年同期"
+        ],
+        "series_names": [
+          "金额"
+        ]
+      },
+      "rejection": null
+    },
+    {
+      "id": "D-area-dense",
+      "family": "area",
+      "theme": "dark",
+      "case": "dense",
+      "expected": "ACCEPT",
+      "chartType": "area",
+      "title": "面积图 · 高密度",
+      "labels": [
+        "1月",
+        "2月",
+        "3月",
+        "4月",
+        "5月",
+        "6月",
+        "7月",
+        "8月",
+        "9月",
+        "10月",
+        "11月",
+        "12月"
+      ],
+      "unit": "单",
+      "numberFormat": "#,##0",
+      "series": [
+        {
+          "id": "value",
+          "name": "月度值",
+          "role": "actual",
+          "values": [
+            12,
+            18,
+            15,
+            22,
+            19,
+            25,
+            28,
+            24,
+            30,
+            27,
+            33,
+            36
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "trend",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ]
+      },
+      "readback": {
+        "values": [
+          12,
+          18,
+          15,
+          22,
+          19,
+          25,
+          28,
+          24,
+          30,
+          27,
+          33,
+          36
+        ],
+        "labels": [
+          "1月",
+          "2月",
+          "3月",
+          "4月",
+          "5月",
+          "6月",
+          "7月",
+          "8月",
+          "9月",
+          "10月",
+          "11月",
+          "12月"
+        ],
+        "series_names": [
+          "月度值"
+        ]
+      },
+      "rejection": null
+    },
+    {
+      "id": "L-pie-single",
+      "family": "pie",
+      "theme": "light",
+      "case": "single",
+      "expected": "ACCEPT",
+      "chartType": "pie",
+      "title": "饼图 · 单系列",
+      "labels": [
+        "本期"
+      ],
+      "unit": "单",
+      "numberFormat": "#,##0",
+      "series": [
+        {
+          "id": "value",
+          "name": "实际",
+          "role": "actual",
+          "values": [
+            120
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "comparison",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ],
+        "label_strategy": "percent"
+      },
+      "readback": {
+        "values": [
+          120
+        ],
+        "labels": [
+          "本期"
+        ],
+        "series_names": [
+          "实际"
+        ]
+      },
+      "rejection": null
+    },
+    {
+      "id": "L-pie-multi",
+      "family": "pie",
+      "theme": "light",
+      "case": "multi",
+      "expected": "REJECT",
+      "chartType": "pie",
+      "title": "饼图 · 多系列",
+      "labels": [
+        "华东",
+        "华北",
+        "华南",
+        "西南"
+      ],
+      "unit": "单",
+      "numberFormat": "#,##0",
+      "series": [
+        {
+          "id": "actual",
+          "name": "实际",
+          "role": "actual",
+          "values": [
+            120,
+            90,
+            60,
+            30
+          ]
+        },
+        {
+          "id": "target",
+          "name": "目标",
+          "role": "target",
+          "values": [
+            110,
+            100,
+            70,
+            35
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "comparison",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "actual",
+            "role": "actual"
+          },
+          {
+            "id": "target",
+            "role": "target"
+          }
+        ],
+        "label_strategy": "percent"
+      },
+      "readback": null,
+      "rejection": {
+        "code": "PIE_SINGLE_SERIES",
+        "reason": "pie/doughnut accepts exactly one series; a multi-series pie is not a faithful type substitution."
+      }
+    },
+    {
+      "id": "L-pie-long",
+      "family": "pie",
+      "theme": "light",
+      "case": "long",
+      "expected": "ACCEPT",
+      "chartType": "pie",
+      "title": "饼图 · 长标签",
+      "labels": [
+        "华东区域重点客户续约收入",
+        "华北区域新客户首单收入",
+        "华南区域渠道合作收入"
+      ],
+      "unit": "万元",
+      "numberFormat": "#,##0",
+      "series": [
+        {
+          "id": "value",
+          "name": "收入",
+          "role": "actual",
+          "values": [
+            120,
+            90,
+            60
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "comparison",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ],
+        "label_strategy": "percent"
+      },
+      "readback": {
+        "values": [
+          120,
+          90,
+          60
+        ],
+        "labels": [
+          "华东区域重点客户续约收入",
+          "华北区域新客户首单收入",
+          "华南区域渠道合作收入"
+        ],
+        "series_names": [
+          "收入"
+        ]
+      },
+      "rejection": null
+    },
+    {
+      "id": "L-pie-percentage",
+      "family": "pie",
+      "theme": "light",
+      "case": "percentage",
+      "expected": "ACCEPT",
+      "chartType": "pie",
+      "title": "饼图 · 百分比",
+      "labels": [
+        "线上",
+        "门店",
+        "渠道"
+      ],
+      "unit": "%",
+      "numberFormat": "0.0\"%\"",
+      "series": [
+        {
+          "id": "value",
+          "name": "占比",
+          "role": "actual",
+          "storage_scale": "fraction",
+          "values": [
+            0.42,
+            0.33,
+            0.25
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "comparison",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ],
+        "label_strategy": "percent"
+      },
+      "readback": {
+        "values": [
+          42,
+          33,
+          25
+        ],
+        "labels": [
+          "线上",
+          "门店",
+          "渠道"
+        ],
+        "series_names": [
+          "占比"
+        ],
+        "numberFormat": "0.0\"%\""
+      },
+      "rejection": null
+    },
+    {
+      "id": "L-pie-negative",
+      "family": "pie",
+      "theme": "light",
+      "case": "negative",
+      "expected": "REJECT",
+      "chartType": "pie",
+      "title": "饼图 · 负值",
+      "labels": [
+        "一季度",
+        "二季度",
+        "三季度",
+        "四季度"
+      ],
+      "unit": "万元",
+      "numberFormat": "#,##0",
+      "series": [
+        {
+          "id": "value",
+          "name": "净变化",
+          "role": "actual",
+          "values": [
+            -20,
+            35,
+            10,
+            -5
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "comparison",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ],
+        "label_strategy": "percent"
+      },
+      "readback": null,
+      "rejection": {
+        "code": "PIE_NONNEGATIVE",
+        "reason": "pie/doughnut requires nonnegative values; negative values are rejected rather than clipped."
+      }
+    },
+    {
+      "id": "L-pie-missing",
+      "family": "pie",
+      "theme": "light",
+      "case": "missing",
+      "expected": "REJECT",
+      "chartType": "pie",
+      "title": "饼图 · 缺失",
+      "labels": [
+        "一月",
+        "二月",
+        "三月",
+        "四月"
+      ],
+      "unit": "单",
+      "numberFormat": "#,##0",
+      "missing_policy": "gap",
+      "series": [
+        {
+          "id": "value",
+          "name": "订单",
+          "role": "actual",
+          "values": [
+            10,
+            null,
+            0,
+            6
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "comparison",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ],
+        "label_strategy": "percent"
+      },
+      "readback": null,
+      "rejection": {
+        "code": "PIE_MISSING",
+        "reason": "pie/doughnut rejects missing values; an explicit other bucket must be supplied by the author."
+      }
+    },
+    {
+      "id": "L-pie-large",
+      "family": "pie",
+      "theme": "light",
+      "case": "large",
+      "expected": "ACCEPT",
+      "chartType": "pie",
+      "title": "饼图 · 大数",
+      "labels": [
+        "本月",
+        "上月",
+        "去年同期"
+      ],
+      "unit": "元",
+      "numberFormat": "#,##0",
+      "series": [
+        {
+          "id": "value",
+          "name": "金额",
+          "role": "actual",
+          "values": [
+            1200000000,
+            980000000,
+            450000000
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "comparison",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ],
+        "label_strategy": "percent"
+      },
+      "readback": {
+        "values": [
+          1200000000,
+          980000000,
+          450000000
+        ],
+        "labels": [
+          "本月",
+          "上月",
+          "去年同期"
+        ],
+        "series_names": [
+          "金额"
+        ]
+      },
+      "rejection": null
+    },
+    {
+      "id": "L-pie-dense",
+      "family": "pie",
+      "theme": "light",
+      "case": "dense",
+      "expected": "REJECT",
+      "chartType": "pie",
+      "title": "饼图 · 高密度",
+      "labels": [
+        "1月",
+        "2月",
+        "3月",
+        "4月",
+        "5月",
+        "6月",
+        "7月",
+        "8月",
+        "9月",
+        "10月",
+        "11月",
+        "12月"
+      ],
+      "unit": "单",
+      "numberFormat": "#,##0",
+      "series": [
+        {
+          "id": "value",
+          "name": "月度值",
+          "role": "actual",
+          "values": [
+            12,
+            18,
+            15,
+            22,
+            19,
+            25,
+            28,
+            24,
+            30,
+            27,
+            33,
+            36
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "comparison",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ],
+        "label_strategy": "percent"
+      },
+      "readback": null,
+      "rejection": {
+        "code": "CATEGORY_PALETTE_CAPACITY",
+        "reason": "pie/doughnut category palette supports eight distinguishable colors; twelve slices must be split or faceted."
+      }
+    },
+    {
+      "id": "D-pie-single",
+      "family": "pie",
+      "theme": "dark",
+      "case": "single",
+      "expected": "ACCEPT",
+      "chartType": "pie",
+      "title": "饼图 · 单系列",
+      "labels": [
+        "本期"
+      ],
+      "unit": "单",
+      "numberFormat": "#,##0",
+      "series": [
+        {
+          "id": "value",
+          "name": "实际",
+          "role": "actual",
+          "values": [
+            120
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "comparison",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ],
+        "label_strategy": "percent"
+      },
+      "readback": {
+        "values": [
+          120
+        ],
+        "labels": [
+          "本期"
+        ],
+        "series_names": [
+          "实际"
+        ]
+      },
+      "rejection": null
+    },
+    {
+      "id": "D-pie-multi",
+      "family": "pie",
+      "theme": "dark",
+      "case": "multi",
+      "expected": "REJECT",
+      "chartType": "pie",
+      "title": "饼图 · 多系列",
+      "labels": [
+        "华东",
+        "华北",
+        "华南",
+        "西南"
+      ],
+      "unit": "单",
+      "numberFormat": "#,##0",
+      "series": [
+        {
+          "id": "actual",
+          "name": "实际",
+          "role": "actual",
+          "values": [
+            120,
+            90,
+            60,
+            30
+          ]
+        },
+        {
+          "id": "target",
+          "name": "目标",
+          "role": "target",
+          "values": [
+            110,
+            100,
+            70,
+            35
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "comparison",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "actual",
+            "role": "actual"
+          },
+          {
+            "id": "target",
+            "role": "target"
+          }
+        ],
+        "label_strategy": "percent"
+      },
+      "readback": null,
+      "rejection": {
+        "code": "PIE_SINGLE_SERIES",
+        "reason": "pie/doughnut accepts exactly one series; a multi-series pie is not a faithful type substitution."
+      }
+    },
+    {
+      "id": "D-pie-long",
+      "family": "pie",
+      "theme": "dark",
+      "case": "long",
+      "expected": "ACCEPT",
+      "chartType": "pie",
+      "title": "饼图 · 长标签",
+      "labels": [
+        "华东区域重点客户续约收入",
+        "华北区域新客户首单收入",
+        "华南区域渠道合作收入"
+      ],
+      "unit": "万元",
+      "numberFormat": "#,##0",
+      "series": [
+        {
+          "id": "value",
+          "name": "收入",
+          "role": "actual",
+          "values": [
+            120,
+            90,
+            60
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "comparison",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ],
+        "label_strategy": "percent"
+      },
+      "readback": {
+        "values": [
+          120,
+          90,
+          60
+        ],
+        "labels": [
+          "华东区域重点客户续约收入",
+          "华北区域新客户首单收入",
+          "华南区域渠道合作收入"
+        ],
+        "series_names": [
+          "收入"
+        ]
+      },
+      "rejection": null
+    },
+    {
+      "id": "D-pie-percentage",
+      "family": "pie",
+      "theme": "dark",
+      "case": "percentage",
+      "expected": "ACCEPT",
+      "chartType": "pie",
+      "title": "饼图 · 百分比",
+      "labels": [
+        "线上",
+        "门店",
+        "渠道"
+      ],
+      "unit": "%",
+      "numberFormat": "0.0\"%\"",
+      "series": [
+        {
+          "id": "value",
+          "name": "占比",
+          "role": "actual",
+          "storage_scale": "fraction",
+          "values": [
+            0.42,
+            0.33,
+            0.25
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "comparison",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ],
+        "label_strategy": "percent"
+      },
+      "readback": {
+        "values": [
+          42,
+          33,
+          25
+        ],
+        "labels": [
+          "线上",
+          "门店",
+          "渠道"
+        ],
+        "series_names": [
+          "占比"
+        ],
+        "numberFormat": "0.0\"%\""
+      },
+      "rejection": null
+    },
+    {
+      "id": "D-pie-negative",
+      "family": "pie",
+      "theme": "dark",
+      "case": "negative",
+      "expected": "REJECT",
+      "chartType": "pie",
+      "title": "饼图 · 负值",
+      "labels": [
+        "一季度",
+        "二季度",
+        "三季度",
+        "四季度"
+      ],
+      "unit": "万元",
+      "numberFormat": "#,##0",
+      "series": [
+        {
+          "id": "value",
+          "name": "净变化",
+          "role": "actual",
+          "values": [
+            -20,
+            35,
+            10,
+            -5
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "comparison",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ],
+        "label_strategy": "percent"
+      },
+      "readback": null,
+      "rejection": {
+        "code": "PIE_NONNEGATIVE",
+        "reason": "pie/doughnut requires nonnegative values; negative values are rejected rather than clipped."
+      }
+    },
+    {
+      "id": "D-pie-missing",
+      "family": "pie",
+      "theme": "dark",
+      "case": "missing",
+      "expected": "REJECT",
+      "chartType": "pie",
+      "title": "饼图 · 缺失",
+      "labels": [
+        "一月",
+        "二月",
+        "三月",
+        "四月"
+      ],
+      "unit": "单",
+      "numberFormat": "#,##0",
+      "missing_policy": "gap",
+      "series": [
+        {
+          "id": "value",
+          "name": "订单",
+          "role": "actual",
+          "values": [
+            10,
+            null,
+            0,
+            6
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "comparison",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ],
+        "label_strategy": "percent"
+      },
+      "readback": null,
+      "rejection": {
+        "code": "PIE_MISSING",
+        "reason": "pie/doughnut rejects missing values; an explicit other bucket must be supplied by the author."
+      }
+    },
+    {
+      "id": "D-pie-large",
+      "family": "pie",
+      "theme": "dark",
+      "case": "large",
+      "expected": "ACCEPT",
+      "chartType": "pie",
+      "title": "饼图 · 大数",
+      "labels": [
+        "本月",
+        "上月",
+        "去年同期"
+      ],
+      "unit": "元",
+      "numberFormat": "#,##0",
+      "series": [
+        {
+          "id": "value",
+          "name": "金额",
+          "role": "actual",
+          "values": [
+            1200000000,
+            980000000,
+            450000000
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "comparison",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ],
+        "label_strategy": "percent"
+      },
+      "readback": {
+        "values": [
+          1200000000,
+          980000000,
+          450000000
+        ],
+        "labels": [
+          "本月",
+          "上月",
+          "去年同期"
+        ],
+        "series_names": [
+          "金额"
+        ]
+      },
+      "rejection": null
+    },
+    {
+      "id": "D-pie-dense",
+      "family": "pie",
+      "theme": "dark",
+      "case": "dense",
+      "expected": "REJECT",
+      "chartType": "pie",
+      "title": "饼图 · 高密度",
+      "labels": [
+        "1月",
+        "2月",
+        "3月",
+        "4月",
+        "5月",
+        "6月",
+        "7月",
+        "8月",
+        "9月",
+        "10月",
+        "11月",
+        "12月"
+      ],
+      "unit": "单",
+      "numberFormat": "#,##0",
+      "series": [
+        {
+          "id": "value",
+          "name": "月度值",
+          "role": "actual",
+          "values": [
+            12,
+            18,
+            15,
+            22,
+            19,
+            25,
+            28,
+            24,
+            30,
+            27,
+            33,
+            36
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "comparison",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ],
+        "label_strategy": "percent"
+      },
+      "readback": null,
+      "rejection": {
+        "code": "CATEGORY_PALETTE_CAPACITY",
+        "reason": "pie/doughnut category palette supports eight distinguishable colors; twelve slices must be split or faceted."
+      }
+    },
+    {
+      "id": "L-doughnut-single",
+      "family": "doughnut",
+      "theme": "light",
+      "case": "single",
+      "expected": "ACCEPT",
+      "chartType": "doughnut",
+      "title": "环形图 · 单系列",
+      "labels": [
+        "本期"
+      ],
+      "unit": "单",
+      "numberFormat": "#,##0",
+      "series": [
+        {
+          "id": "value",
+          "name": "实际",
+          "role": "actual",
+          "values": [
+            120
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "comparison",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ],
+        "label_strategy": "percent"
+      },
+      "readback": {
+        "values": [
+          120
+        ],
+        "labels": [
+          "本期"
+        ],
+        "series_names": [
+          "实际"
+        ]
+      },
+      "rejection": null
+    },
+    {
+      "id": "L-doughnut-multi",
+      "family": "doughnut",
+      "theme": "light",
+      "case": "multi",
+      "expected": "REJECT",
+      "chartType": "doughnut",
+      "title": "环形图 · 多系列",
+      "labels": [
+        "华东",
+        "华北",
+        "华南",
+        "西南"
+      ],
+      "unit": "单",
+      "numberFormat": "#,##0",
+      "series": [
+        {
+          "id": "actual",
+          "name": "实际",
+          "role": "actual",
+          "values": [
+            120,
+            90,
+            60,
+            30
+          ]
+        },
+        {
+          "id": "target",
+          "name": "目标",
+          "role": "target",
+          "values": [
+            110,
+            100,
+            70,
+            35
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "comparison",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "actual",
+            "role": "actual"
+          },
+          {
+            "id": "target",
+            "role": "target"
+          }
+        ],
+        "label_strategy": "percent"
+      },
+      "readback": null,
+      "rejection": {
+        "code": "PIE_SINGLE_SERIES",
+        "reason": "pie/doughnut accepts exactly one series; a multi-series doughnut is not a faithful type substitution."
+      }
+    },
+    {
+      "id": "L-doughnut-long",
+      "family": "doughnut",
+      "theme": "light",
+      "case": "long",
+      "expected": "ACCEPT",
+      "chartType": "doughnut",
+      "title": "环形图 · 长标签",
+      "labels": [
+        "华东区域重点客户续约收入",
+        "华北区域新客户首单收入",
+        "华南区域渠道合作收入"
+      ],
+      "unit": "万元",
+      "numberFormat": "#,##0",
+      "series": [
+        {
+          "id": "value",
+          "name": "收入",
+          "role": "actual",
+          "values": [
+            120,
+            90,
+            60
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "comparison",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ],
+        "label_strategy": "percent"
+      },
+      "readback": {
+        "values": [
+          120,
+          90,
+          60
+        ],
+        "labels": [
+          "华东区域重点客户续约收入",
+          "华北区域新客户首单收入",
+          "华南区域渠道合作收入"
+        ],
+        "series_names": [
+          "收入"
+        ]
+      },
+      "rejection": null
+    },
+    {
+      "id": "L-doughnut-percentage",
+      "family": "doughnut",
+      "theme": "light",
+      "case": "percentage",
+      "expected": "ACCEPT",
+      "chartType": "doughnut",
+      "title": "环形图 · 百分比",
+      "labels": [
+        "线上",
+        "门店",
+        "渠道"
+      ],
+      "unit": "%",
+      "numberFormat": "0.0\"%\"",
+      "series": [
+        {
+          "id": "value",
+          "name": "占比",
+          "role": "actual",
+          "storage_scale": "fraction",
+          "values": [
+            0.42,
+            0.33,
+            0.25
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "comparison",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ],
+        "label_strategy": "percent"
+      },
+      "readback": {
+        "values": [
+          42,
+          33,
+          25
+        ],
+        "labels": [
+          "线上",
+          "门店",
+          "渠道"
+        ],
+        "series_names": [
+          "占比"
+        ],
+        "numberFormat": "0.0\"%\""
+      },
+      "rejection": null
+    },
+    {
+      "id": "L-doughnut-negative",
+      "family": "doughnut",
+      "theme": "light",
+      "case": "negative",
+      "expected": "REJECT",
+      "chartType": "doughnut",
+      "title": "环形图 · 负值",
+      "labels": [
+        "一季度",
+        "二季度",
+        "三季度",
+        "四季度"
+      ],
+      "unit": "万元",
+      "numberFormat": "#,##0",
+      "series": [
+        {
+          "id": "value",
+          "name": "净变化",
+          "role": "actual",
+          "values": [
+            -20,
+            35,
+            10,
+            -5
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "comparison",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ],
+        "label_strategy": "percent"
+      },
+      "readback": null,
+      "rejection": {
+        "code": "PIE_NONNEGATIVE",
+        "reason": "pie/doughnut requires nonnegative values; negative values are rejected rather than clipped."
+      }
+    },
+    {
+      "id": "L-doughnut-missing",
+      "family": "doughnut",
+      "theme": "light",
+      "case": "missing",
+      "expected": "REJECT",
+      "chartType": "doughnut",
+      "title": "环形图 · 缺失",
+      "labels": [
+        "一月",
+        "二月",
+        "三月",
+        "四月"
+      ],
+      "unit": "单",
+      "numberFormat": "#,##0",
+      "missing_policy": "gap",
+      "series": [
+        {
+          "id": "value",
+          "name": "订单",
+          "role": "actual",
+          "values": [
+            10,
+            null,
+            0,
+            6
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "comparison",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ],
+        "label_strategy": "percent"
+      },
+      "readback": null,
+      "rejection": {
+        "code": "PIE_MISSING",
+        "reason": "pie/doughnut rejects missing values; an explicit other bucket must be supplied by the author."
+      }
+    },
+    {
+      "id": "L-doughnut-large",
+      "family": "doughnut",
+      "theme": "light",
+      "case": "large",
+      "expected": "ACCEPT",
+      "chartType": "doughnut",
+      "title": "环形图 · 大数",
+      "labels": [
+        "本月",
+        "上月",
+        "去年同期"
+      ],
+      "unit": "元",
+      "numberFormat": "#,##0",
+      "series": [
+        {
+          "id": "value",
+          "name": "金额",
+          "role": "actual",
+          "values": [
+            1200000000,
+            980000000,
+            450000000
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "comparison",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ],
+        "label_strategy": "percent"
+      },
+      "readback": {
+        "values": [
+          1200000000,
+          980000000,
+          450000000
+        ],
+        "labels": [
+          "本月",
+          "上月",
+          "去年同期"
+        ],
+        "series_names": [
+          "金额"
+        ]
+      },
+      "rejection": null
+    },
+    {
+      "id": "L-doughnut-dense",
+      "family": "doughnut",
+      "theme": "light",
+      "case": "dense",
+      "expected": "REJECT",
+      "chartType": "doughnut",
+      "title": "环形图 · 高密度",
+      "labels": [
+        "1月",
+        "2月",
+        "3月",
+        "4月",
+        "5月",
+        "6月",
+        "7月",
+        "8月",
+        "9月",
+        "10月",
+        "11月",
+        "12月"
+      ],
+      "unit": "单",
+      "numberFormat": "#,##0",
+      "series": [
+        {
+          "id": "value",
+          "name": "月度值",
+          "role": "actual",
+          "values": [
+            12,
+            18,
+            15,
+            22,
+            19,
+            25,
+            28,
+            24,
+            30,
+            27,
+            33,
+            36
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "comparison",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ],
+        "label_strategy": "percent"
+      },
+      "readback": null,
+      "rejection": {
+        "code": "CATEGORY_PALETTE_CAPACITY",
+        "reason": "pie/doughnut category palette supports eight distinguishable colors; twelve slices must be split or faceted."
+      }
+    },
+    {
+      "id": "D-doughnut-single",
+      "family": "doughnut",
+      "theme": "dark",
+      "case": "single",
+      "expected": "ACCEPT",
+      "chartType": "doughnut",
+      "title": "环形图 · 单系列",
+      "labels": [
+        "本期"
+      ],
+      "unit": "单",
+      "numberFormat": "#,##0",
+      "series": [
+        {
+          "id": "value",
+          "name": "实际",
+          "role": "actual",
+          "values": [
+            120
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "comparison",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ],
+        "label_strategy": "percent"
+      },
+      "readback": {
+        "values": [
+          120
+        ],
+        "labels": [
+          "本期"
+        ],
+        "series_names": [
+          "实际"
+        ]
+      },
+      "rejection": null
+    },
+    {
+      "id": "D-doughnut-multi",
+      "family": "doughnut",
+      "theme": "dark",
+      "case": "multi",
+      "expected": "REJECT",
+      "chartType": "doughnut",
+      "title": "环形图 · 多系列",
+      "labels": [
+        "华东",
+        "华北",
+        "华南",
+        "西南"
+      ],
+      "unit": "单",
+      "numberFormat": "#,##0",
+      "series": [
+        {
+          "id": "actual",
+          "name": "实际",
+          "role": "actual",
+          "values": [
+            120,
+            90,
+            60,
+            30
+          ]
+        },
+        {
+          "id": "target",
+          "name": "目标",
+          "role": "target",
+          "values": [
+            110,
+            100,
+            70,
+            35
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "comparison",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "actual",
+            "role": "actual"
+          },
+          {
+            "id": "target",
+            "role": "target"
+          }
+        ],
+        "label_strategy": "percent"
+      },
+      "readback": null,
+      "rejection": {
+        "code": "PIE_SINGLE_SERIES",
+        "reason": "pie/doughnut accepts exactly one series; a multi-series doughnut is not a faithful type substitution."
+      }
+    },
+    {
+      "id": "D-doughnut-long",
+      "family": "doughnut",
+      "theme": "dark",
+      "case": "long",
+      "expected": "ACCEPT",
+      "chartType": "doughnut",
+      "title": "环形图 · 长标签",
+      "labels": [
+        "华东区域重点客户续约收入",
+        "华北区域新客户首单收入",
+        "华南区域渠道合作收入"
+      ],
+      "unit": "万元",
+      "numberFormat": "#,##0",
+      "series": [
+        {
+          "id": "value",
+          "name": "收入",
+          "role": "actual",
+          "values": [
+            120,
+            90,
+            60
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "comparison",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ],
+        "label_strategy": "percent"
+      },
+      "readback": {
+        "values": [
+          120,
+          90,
+          60
+        ],
+        "labels": [
+          "华东区域重点客户续约收入",
+          "华北区域新客户首单收入",
+          "华南区域渠道合作收入"
+        ],
+        "series_names": [
+          "收入"
+        ]
+      },
+      "rejection": null
+    },
+    {
+      "id": "D-doughnut-percentage",
+      "family": "doughnut",
+      "theme": "dark",
+      "case": "percentage",
+      "expected": "ACCEPT",
+      "chartType": "doughnut",
+      "title": "环形图 · 百分比",
+      "labels": [
+        "线上",
+        "门店",
+        "渠道"
+      ],
+      "unit": "%",
+      "numberFormat": "0.0\"%\"",
+      "series": [
+        {
+          "id": "value",
+          "name": "占比",
+          "role": "actual",
+          "storage_scale": "fraction",
+          "values": [
+            0.42,
+            0.33,
+            0.25
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "comparison",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ],
+        "label_strategy": "percent"
+      },
+      "readback": {
+        "values": [
+          42,
+          33,
+          25
+        ],
+        "labels": [
+          "线上",
+          "门店",
+          "渠道"
+        ],
+        "series_names": [
+          "占比"
+        ],
+        "numberFormat": "0.0\"%\""
+      },
+      "rejection": null
+    },
+    {
+      "id": "D-doughnut-negative",
+      "family": "doughnut",
+      "theme": "dark",
+      "case": "negative",
+      "expected": "REJECT",
+      "chartType": "doughnut",
+      "title": "环形图 · 负值",
+      "labels": [
+        "一季度",
+        "二季度",
+        "三季度",
+        "四季度"
+      ],
+      "unit": "万元",
+      "numberFormat": "#,##0",
+      "series": [
+        {
+          "id": "value",
+          "name": "净变化",
+          "role": "actual",
+          "values": [
+            -20,
+            35,
+            10,
+            -5
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "comparison",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ],
+        "label_strategy": "percent"
+      },
+      "readback": null,
+      "rejection": {
+        "code": "PIE_NONNEGATIVE",
+        "reason": "pie/doughnut requires nonnegative values; negative values are rejected rather than clipped."
+      }
+    },
+    {
+      "id": "D-doughnut-missing",
+      "family": "doughnut",
+      "theme": "dark",
+      "case": "missing",
+      "expected": "REJECT",
+      "chartType": "doughnut",
+      "title": "环形图 · 缺失",
+      "labels": [
+        "一月",
+        "二月",
+        "三月",
+        "四月"
+      ],
+      "unit": "单",
+      "numberFormat": "#,##0",
+      "missing_policy": "gap",
+      "series": [
+        {
+          "id": "value",
+          "name": "订单",
+          "role": "actual",
+          "values": [
+            10,
+            null,
+            0,
+            6
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "comparison",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ],
+        "label_strategy": "percent"
+      },
+      "readback": null,
+      "rejection": {
+        "code": "PIE_MISSING",
+        "reason": "pie/doughnut rejects missing values; an explicit other bucket must be supplied by the author."
+      }
+    },
+    {
+      "id": "D-doughnut-large",
+      "family": "doughnut",
+      "theme": "dark",
+      "case": "large",
+      "expected": "ACCEPT",
+      "chartType": "doughnut",
+      "title": "环形图 · 大数",
+      "labels": [
+        "本月",
+        "上月",
+        "去年同期"
+      ],
+      "unit": "元",
+      "numberFormat": "#,##0",
+      "series": [
+        {
+          "id": "value",
+          "name": "金额",
+          "role": "actual",
+          "values": [
+            1200000000,
+            980000000,
+            450000000
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "comparison",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ],
+        "label_strategy": "percent"
+      },
+      "readback": {
+        "values": [
+          1200000000,
+          980000000,
+          450000000
+        ],
+        "labels": [
+          "本月",
+          "上月",
+          "去年同期"
+        ],
+        "series_names": [
+          "金额"
+        ]
+      },
+      "rejection": null
+    },
+    {
+      "id": "D-doughnut-dense",
+      "family": "doughnut",
+      "theme": "dark",
+      "case": "dense",
+      "expected": "REJECT",
+      "chartType": "doughnut",
+      "title": "环形图 · 高密度",
+      "labels": [
+        "1月",
+        "2月",
+        "3月",
+        "4月",
+        "5月",
+        "6月",
+        "7月",
+        "8月",
+        "9月",
+        "10月",
+        "11月",
+        "12月"
+      ],
+      "unit": "单",
+      "numberFormat": "#,##0",
+      "series": [
+        {
+          "id": "value",
+          "name": "月度值",
+          "role": "actual",
+          "values": [
+            12,
+            18,
+            15,
+            22,
+            19,
+            25,
+            28,
+            24,
+            30,
+            27,
+            33,
+            36
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "comparison",
+        "palette_type": "categorical",
+        "series": [
+          {
+            "id": "value",
+            "role": "actual"
+          }
+        ],
+        "label_strategy": "percent"
+      },
+      "readback": null,
+      "rejection": {
+        "code": "CATEGORY_PALETTE_CAPACITY",
+        "reason": "pie/doughnut category palette supports eight distinguishable colors; twelve slices must be split or faceted."
+      }
+    }
+  ]
+}

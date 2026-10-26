@@ -39,7 +39,7 @@
         },
         {
           "label": "观察窗",
-          "value": "30 天"
+          "value": "30天"
         }
       ]
     },
@@ -82,7 +82,8 @@
       "unit": "客户",
       "period": "2026-08-01 至 2026-09-30",
       "insight": "阶段覆盖允许分支；不强制画成逐级收窄漏斗",
-      "chartType": "bar"
+      "chartType": "bar",
+      "numberFormat": "#,##0"
     },
     {
       "type": "table",
@@ -177,7 +178,8 @@
       "unit": "客户",
       "period": "2026-08-01 至 2026-09-30",
       "insight": "区域属于首次获客归属；不按最新门店重新分配",
-      "chartType": "bar"
+      "chartType": "bar",
+      "numberFormat": "#,##0"
     },
     {
       "type": "table",

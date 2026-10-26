@@ -80,7 +80,7 @@ async function compilePlan(planPath,options={}) {
   for(const target of [outPath,scenePath,reasoningPath,specOut].filter(Boolean)) {
     if(fs.existsSync(target)&&!options.force) throw new Error(`${target} already exists; pass --force to overwrite that output (inputs are never overwritten)`);
   }
-  const reportFactory=({content_sha256,theme_decision})=>{
+  const reportFactory=({content_sha256,theme_decision,metric_semantics})=>{
     const coverage=coverageReport(plan,validation);
     return {
       schema_version:'1.0',
@@ -93,6 +93,8 @@ async function compilePlan(planPath,options={}) {
       pptx_content_sha256:content_sha256,
       intent:plan.intent,
       theme_decision,
+      metrics:plan.deck.metrics||[],
+      metric_semantics:metric_semantics||null,
       sources:(plan.sources||[]).map(source=>({
         ...source,
         verification:validation.hashes.get(source.id),
@@ -128,8 +130,9 @@ async function compilePlan(planPath,options={}) {
   });
   const sceneFile=JSON.parse(fs.readFileSync(built.scene,'utf8'));
   if(sceneFile.pptx_sha256!==built.pptx_sha256) throw new Error('Scene pptx_sha256 does not match the built deck');
-  const verification=await verifyBuiltDeck(outPath,spec,{plan_sha256:validation.plan_sha256,spec_sha256,slides:ordered,
-    report_sha256:built.reasoning.report_sha256,expected_pptx_sha256:sceneFile.pptx_sha256},repoRoot);
+  const verification=await verifyBuiltDeck(outPath,built.effective_spec,{plan_sha256:validation.plan_sha256,spec_sha256,slides:ordered,
+    report_sha256:built.reasoning.report_sha256,expected_pptx_sha256:sceneFile.pptx_sha256,
+    metric_semantics:sceneFile.metric_semantics},repoRoot);
   const sidecar={
     ...built.reasoning_report,
     pptx_sha256:built.pptx_sha256,

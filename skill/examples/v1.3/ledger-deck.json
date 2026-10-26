@@ -1,0 +1,286 @@
+{
+  "schema_version": "1.3",
+  "title": "多文档源台账与冗余复核",
+  "subtitle": "三份合成业务源的哈希、权利与复核状态",
+  "lang": "zh-CN",
+  "profile": "executive-dense",
+  "period": "2026-08-01 至 2026-09-30",
+  "footer": "合成演示数据 · 源复核状态 NOT_RUN",
+  "slides": [
+    {
+      "type": "cover",
+      "title": "多文档源台账与冗余复核",
+      "subtitle": "三份合成业务源：哈希可核，权利与访问仍待复核",
+      "body": "本页只登记源文件事实；不把哈希当作真实性证明。"
+    },
+    {
+      "type": "executive-summary",
+      "title": "三份合成源已建档：哈希可核，权利与访问仍待复核",
+      "items": [
+        {
+          "title": "经营月报：9 月收入与趋势",
+          "note": "960 万元、目标 1,000 万元；2026-04 至 2026-09 趋势，2026-09 为当前快照。"
+        },
+        {
+          "title": "转化漏斗：成熟队列 30 人",
+          "note": "8 月 20 人、9 月 10 人；仅作描述性对照，不推断因果。"
+        },
+        {
+          "title": "项目台账：3 个项目累计成本",
+          "note": "27.02 万元；P3 已实现价值缺失，按缺失保留。"
+        }
+      ]
+    },
+    {
+      "type": "table",
+      "title": "源文件清单：三份文档、六个可核字段",
+      "source": "项目自建 source-ledger（合成）",
+      "headers": [
+        "源 ID",
+        "文件",
+        "字节",
+        "SHA-256 前 12 位",
+        "贡献事实",
+        "复核"
+      ],
+      "columnWidths": [
+        0.22,
+        0.2,
+        0.08,
+        0.16,
+        0.24,
+        0.1
+      ],
+      "rows": [
+        [
+          "synthetic-business-performance",
+          "inputs/business-performance.json",
+          "1,475",
+          "ffa1b524b103",
+          "收入、订单、毛利率、月度趋势",
+          "NOT_RUN"
+        ],
+        [
+          "synthetic-sales-conversion",
+          "inputs/sales-conversion.json",
+          "11,592",
+          "74c57f5f6cda",
+          "成熟队列、阶段、分支、线索日期",
+          "NOT_RUN"
+        ],
+        [
+          "synthetic-project-analytics",
+          "inputs/project-analytics.json",
+          "1,711",
+          "e277f08e887e",
+          "预算、成本、已实现价值、里程碑",
+          "NOT_RUN"
+        ]
+      ]
+    },
+    {
+      "type": "table",
+      "title": "字段与口径明细：缺失、分母和期间逐项登记",
+      "source": "项目自建 source-ledger（合成）",
+      "headers": [
+        "源文件",
+        "关键字段",
+        "期间 / 基准",
+        "缺失与去重",
+        "使用页面"
+      ],
+      "columnWidths": [
+        0.21,
+        0.23,
+        0.2,
+        0.2,
+        0.16
+      ],
+      "rows": [
+        [
+          "business-performance.json",
+          "收入、目标、订单、毛利率",
+          "趋势 2026-04 至 2026-09；快照 2026-09",
+          "无缺失值",
+          "经营结论、收入对比、KPI 趋势"
+        ],
+        [
+          "sales-conversion.json",
+          "成熟队列、阶段、分支、线索日期",
+          "2026-08-01 至 2026-09-30",
+          "重复线索 0；额外线索 1；重复阶段事件 1",
+          "队列转化、试驾分支、线索直方图"
+        ],
+        [
+          "project-analytics.json",
+          "预算、实际成本、已实现价值、里程碑",
+          "累计截至 2026-09-30",
+          "P3 已实现价值缺失，保留 null",
+          "项目成本对比、项目明细、决策"
+        ]
+      ]
+    },
+    {
+      "type": "decision",
+      "title": "发布前先完成源权利与访问复核",
+      "statement": "哈希与字段可核，但源真实性、访问权限与再分发权利尚未完成人工复核。",
+      "decision_points": [
+        {
+          "title": "登记哈希与字节数",
+          "note": "三份源文件均已在台账中登记 SHA-256；这只是完整性校验，不是真实性证明。"
+        },
+        {
+          "title": "复核访问与再分发权利",
+          "note": "合成素材不包含公司或个人信息；公开发布前仍由发布负责人确认。"
+        },
+        {
+          "title": "保留摘要、明细与决策页",
+          "note": "冗余候选只提示复核，不自动删除页面或数值证据。"
+        }
+      ]
+    }
+  ],
+  "narrative": {
+    "objective": "确认三份合成源的登记范围、权利复核缺口与冗余候选处置方式",
+    "claims": [
+      {
+        "id": "ledger_inventory",
+        "text": "三份合成源已登记字节数与 SHA-256",
+        "kind": "FACT",
+        "evidence_ids": [
+          "ledger_docs"
+        ]
+      },
+      {
+        "id": "ledger_rights",
+        "text": "访问、真实性与再分发权利仍待人工复核",
+        "kind": "INTERPRETATION",
+        "evidence_ids": [
+          "ledger_docs"
+        ]
+      },
+      {
+        "id": "retention",
+        "text": "冗余候选页保留，待复核后再决定合并或删除",
+        "kind": "RECOMMENDATION"
+      }
+    ],
+    "evidence": [
+      {
+        "id": "ledger_docs",
+        "source_id": "source-ledger",
+        "bindings": [
+          {
+            "slide": 2,
+            "pointer": "/items/0/title"
+          },
+          {
+            "slide": 3,
+            "pointer": "/rows/0/0"
+          },
+          {
+            "slide": 4,
+            "pointer": "/rows/0/0"
+          }
+        ]
+      }
+    ],
+    "decisions": [
+      {
+        "id": "review_rights",
+        "question": "是否在公开发布前完成三份源文件的访问与再分发权利复核？",
+        "claim_ids": [
+          "ledger_rights"
+        ]
+      }
+    ],
+    "nodes": [
+      {
+        "slide": 1,
+        "role": "cover",
+        "question": "这份台账解决什么问题？",
+        "claim_ids": [],
+        "evidence_ids": []
+      },
+      {
+        "slide": 2,
+        "role": "summary",
+        "question": "三份源分别支撑哪些业务事实？",
+        "claim_ids": [
+          "ledger_inventory"
+        ],
+        "evidence_ids": [
+          "ledger_docs"
+        ],
+        "transition": "先给出源清单，再展开字段与口径。"
+      },
+      {
+        "slide": 3,
+        "role": "detail",
+        "question": "每份源的哈希、字节和用途是否可核？",
+        "claim_ids": [
+          "ledger_inventory"
+        ],
+        "evidence_ids": [
+          "ledger_docs"
+        ],
+        "expansion_note": "明细增加文件路径、字节数、哈希前缀与使用事实，摘要不承担逐项核对。",
+        "transition": "清单之后继续核对字段与缺失口径。"
+      },
+      {
+        "slide": 4,
+        "role": "detail",
+        "question": "字段、期间与缺失处理是否逐项登记？",
+        "claim_ids": [
+          "ledger_inventory"
+        ],
+        "evidence_ids": [
+          "ledger_docs"
+        ],
+        "transition": "证据保留后，再决定发布前的复核动作。"
+      },
+      {
+        "slide": 5,
+        "role": "decision",
+        "question": "发布前还缺哪一步复核？",
+        "claim_ids": [
+          "ledger_rights",
+          "retention"
+        ],
+        "evidence_ids": [
+          "ledger_docs"
+        ],
+        "decision_ids": [
+          "review_rights"
+        ],
+        "transition": "字段与缺失登记完成后，落到发布前的权利复核。"
+      }
+    ],
+    "edges": [
+      {
+        "from": 1,
+        "to": 2,
+        "relation": "introduces",
+        "explanation": "封面引出源清单。"
+      },
+      {
+        "from": 2,
+        "to": 3,
+        "relation": "expands",
+        "explanation": "摘要展开为逐文件哈希与用途。"
+      },
+      {
+        "from": 3,
+        "to": 4,
+        "relation": "expands",
+        "explanation": "文件清单继续展开为字段与缺失口径。"
+      },
+      {
+        "from": 4,
+        "to": 5,
+        "relation": "leads_to",
+        "explanation": "字段登记完成后落到权利复核决策。"
+      }
+    ]
+  }
+}

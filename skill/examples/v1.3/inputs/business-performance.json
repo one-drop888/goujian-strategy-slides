@@ -1,0 +1,83 @@
+{
+  "source": "Project-authored synthetic dataset / Apache-2.0",
+  "synthetic": true,
+  "period": {
+    "start": "2026-09-01",
+    "end": "2026-09-30"
+  },
+  "recipe": "business-performance",
+  "title": "经营总览：目标、增长与贡献",
+  "primary_metric": "revenue",
+  "metrics": [
+    {
+      "id": "revenue",
+      "label": "收入",
+      "unit": "万元",
+      "actual": 960,
+      "target": 1000,
+      "previous_month": 900,
+      "previous_year": 800
+    },
+    {
+      "id": "orders",
+      "label": "订单",
+      "unit": "单",
+      "actual": 240,
+      "target": 250,
+      "previous_month": 225,
+      "previous_year": 200
+    },
+    {
+      "id": "margin",
+      "label": "毛利率",
+      "unit": "%",
+      "actual": 22,
+      "target": 24,
+      "previous_month": 21,
+      "previous_year": 20
+    }
+  ],
+  "trend": [
+    {
+      "month": "2026-04",
+      "actual": 780
+    },
+    {
+      "month": "2026-05",
+      "actual": 820
+    },
+    {
+      "month": "2026-06",
+      "actual": 850
+    },
+    {
+      "month": "2026-07",
+      "actual": 870
+    },
+    {
+      "month": "2026-08",
+      "actual": 900
+    },
+    {
+      "month": "2026-09",
+      "actual": 960
+    }
+  ],
+  "contributions": [
+    {
+      "label": "直营",
+      "actual": 480,
+      "previous": 450
+    },
+    {
+      "label": "渠道",
+      "actual": 320,
+      "previous": 300
+    },
+    {
+      "label": "线上",
+      "actual": 160,
+      "previous": 150
+    }
+  ]
+}

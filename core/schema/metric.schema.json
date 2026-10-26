@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "metric.schema.json",
+  "title": "Typed Numeric Metric",
+  "type": "object",
+  "required": ["id", "type", "storage_scale", "raw_value"],
+  "additionalProperties": false,
+  "properties": {
+    "id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,80}$"},
+    "name": {"type": "string"},
+    "raw_value": {"type": ["number", "null"]},
+    "type": {"enum": ["absolute", "count", "currency", "ratio", "percent", "pp", "yoy", "mom", "growth", "achievement", "mean", "median", "rank", "index", "duration", "difference"]},
+    "storage_scale": {"enum": ["fraction", "percent", "unit", "thousand", "million", "billion"]},
+    "display_unit": {"type": "string"},
+    "precision": {"type": "integer", "minimum": 0, "maximum": 6},
+    "currency": {"type": "string", "pattern": "^[A-Z]{3}$"},
+    "time_window": {"type": "string"},
+    "denominator": {"type": "number"},
+    "aggregation": {"enum": ["sum", "mean", "median", "min", "max", "count", "last", "none"]},
+    "comparison_basis": {"type": "string"},
+    "missing_policy": {"enum": ["gap", "null", "reject"]},
+    "provenance": {},
+    "display_scale": {
+      "type": "object",
+      "required": ["unit", "factor"],
+      "additionalProperties": false,
+      "properties": {
+        "unit": {"type": "string", "minLength": 1},
+        "factor": {"type": "number", "exclusiveMinimum": 0}
+      }
+    },
+    "display_notation": {"enum": ["auto", "plain", "scientific"]},
+    "notes": {"type": "string"},
+    "description": {}
+  }
+}

@@ -1,0 +1,89 @@
+{
+  "schema_version": "1.3",
+  "base_path": "skill/examples/v1.3",
+  "generated_by": "scripts/v13_benchmark.js",
+  "review_status": "NOT_RUN",
+  "review_note": "Inventory and hash registry only. Source authenticity, access rights and redistribution rights still require human review.",
+  "documents": [
+    {
+      "id": "synthetic-business-performance",
+      "name": "经营总览：目标、增长与贡献（合成）",
+      "path": "inputs/business-performance.json",
+      "format": "json",
+      "bytes": 1475,
+      "sha256": "ffa1b524b10320fdc417dcefe4e0d79466c04154ee512fee0f6d6d0fc220f7e4",
+      "period": {
+        "start": "2026-09-01",
+        "end": "2026-09-30"
+      },
+      "period_basis": "business-performance",
+      "trend_period": {
+        "start": "2026-04",
+        "end": "2026-09",
+        "basis": "trend"
+      },
+      "period_note": "period mirrors the raw declared reporting window; earlier history appears only in explicitly dated trend or previous_month/previous_year fields.",
+      "measurement_basis": "business-performance",
+      "synthetic": true,
+      "rights": "Project-authored synthetic dataset / Apache-2.0",
+      "review_status": "NOT_RUN"
+    },
+    {
+      "id": "synthetic-sales-conversion",
+      "name": "销售转化诊断：队列与可选行为（合成）",
+      "path": "inputs/sales-conversion.json",
+      "format": "json",
+      "bytes": 11592,
+      "sha256": "74c57f5f6cda0d9dc924eb0de024cc432045ef255917017f64de598865a7f660",
+      "period": {
+        "start": "2026-08-01",
+        "end": "2026-09-30"
+      },
+      "period_basis": "sales-conversion",
+      "trend_period": null,
+      "period_note": "period mirrors the raw declared reporting window; earlier history appears only in explicitly dated trend or previous_month/previous_year fields.",
+      "measurement_basis": "sales-conversion",
+      "synthetic": true,
+      "rights": "Project-authored synthetic dataset / Apache-2.0",
+      "review_status": "NOT_RUN"
+    },
+    {
+      "id": "synthetic-project-analytics",
+      "name": "项目绩效复盘：交付、投入与预算（合成）",
+      "path": "inputs/project-analytics.json",
+      "format": "json",
+      "bytes": 1711,
+      "sha256": "e277f08e887e11892f88b974994657347a79c0b165060f406487c8624dcebc19",
+      "period": {
+        "start": "2026-09-01",
+        "end": "2026-09-30"
+      },
+      "period_basis": "cumulative_as_of",
+      "trend_period": null,
+      "period_note": "period mirrors the raw declared reporting window; earlier history appears only in explicitly dated trend or previous_month/previous_year fields.",
+      "measurement_basis": "cumulative_as_of",
+      "synthetic": true,
+      "rights": "Project-authored synthetic dataset / Apache-2.0",
+      "review_status": "NOT_RUN"
+    }
+  ],
+  "derivatives": [
+    {
+      "id": "v13-matrix-cases",
+      "name": "V1.3 图表矩阵用例（生成）",
+      "path": "matrix-cases.json",
+      "format": "json",
+      "bytes": 120536,
+      "sha256": "c30d0fbd7a488e5a30676b7538a2c23fd47475de81d6fb45640d40b434e55740",
+      "derived_from": "scripts/v13_benchmark.js matrix generator",
+      "synthetic": true,
+      "review_status": "NOT_RUN"
+    }
+  ],
+  "controls": {
+    "duplicate_documents": "Document IDs and SHA-256 values must be unique; the benchmark rebuilds this ledger from actual input bytes.",
+    "period": "Declared period mirrors the raw reporting window; trend and previous-period comparisons stay explicitly dated.",
+    "rights": "No company, customer, personal or third-party asset is included.",
+    "baseline_reuse": "The V1.2.1 baseline consumes the same raw bytes; the benchmark records both input hashes."
+  }
+}

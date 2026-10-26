@@ -1,5 +1,5 @@
 const { createPrimitives } = require('../primitives/base');
-const { createChartHelper } = require('../charts');
+const { createChartHelper, labelOptions } = require('../charts');
 function createDataRenderers(pptx, style, spec) {
   const {base, finish, text, line, C, F, left, width} = createPrimitives(pptx, style);
   const charts = createChartHelper(style), tableTokens = style.tokens.table;
@@ -53,25 +53,39 @@ function createDataRenderers(pptx, style, spec) {
       pie:pptx.ChartType.pie,doughnut:pptx.ChartType.doughnut};
     const series=s.series.map(x=>({name:x.name||'',labels:x.labels||s.labels,values:x.values}));
     const pieLike=['pie','doughnut'].includes(kind);
-    const colors=series.length===1 && ['bar','column'].includes(kind)
-      ? charts.categoryColors(series[0].values,s.highlightIndex)
-      : charts.tokens.chart.palette;
+    const colors=style.encoding
+      ? style.encoding.colorsFor(kind,s.series,s)
+      : (series.length===1 && ['bar','column'].includes(kind)
+        ? charts.categoryColors(series[0].values,s.highlightIndex)
+        : charts.tokens.chart.palette);
+    const stacked=s.series.some(x=>x.stack===true);
+    const hasMissing=series.some(x=>(x.values||[]).some(value=>value==null));
+    const numberFormat=s.numberFormat||(pieLike?'0%':'0.##');
+    const labelStrategy=style.encoding?style.encoding.encodingPlan(s).label_strategy:null;
+    const labelDefaults={showValue:['bar','column'].includes(kind)||pieLike,showLabel:pieLike,showPercent:pieLike,showCatName:false,showSerName:false};
     const options=charts.options({
       x:left,y:2.12,w:s.insight?8.25:width,h:4.32,
-      showLegend:pieLike||series.length>1,showValue:['bar','column'].includes(kind)||pieLike,
-      showLabel:pieLike,showPercent:pieLike,showLeaderLines:pieLike,
-      dataLabelPosition:'outEnd',dataLabelFormatCode:pieLike?'0%':(s.numberFormat||'0.##'),
+      showLegend:pieLike||series.length>1,
+      ...labelOptions(kind,labelStrategy,labelDefaults),
+      showLeaderLines:pieLike,
+      ...(hasMissing?{displayBlanksAs:'gap'}:{}),
+      dataLabelPosition:'outEnd',dataLabelFormatCode:require('../charts').dataLabelNumberFormat(kind,labelStrategy,numberFormat),
+      valAxisLabelFormatCode:numberFormat,
       chartColors:colors,
       chartColorsOpacity:kind==='area'?55:undefined,
       valGridLine:{color:charts.tokens.chart.grid,size:.5,style:style.style.chart_grid==='none'?'none':'solid'},
       showMarker:true,lineSize:2.5,lineDataSymbol:'circle',lineDataSymbolSize:5,
-      showCatName:false,showShadow:false,showSerName:false,
-      barGapWidthPct:s.semanticType==='histogram'?0:(series[0].labels.length<3?220:65),barDir:kind==='bar'?'bar':'col',
+      showShadow:false,
+      barGapWidthPct:s.histogram?0:(series[0].labels.length<3?220:65),
+      barDir:kind==='bar'?'bar':'col',
+      barGrouping:stacked?'stacked':'clustered',
     });
-    if (['bar','column','area'].includes(kind)) options.valAxisMinVal=Math.min(0,...series.flatMap(x=>x.values));
-    if (s.axisMin != null) options.valAxisMinVal=s.axisMin;
+    const finite=series.flatMap(x=>x.values).filter(value=>value!=null);
+    if(['bar','column','area'].includes(kind)) options.valAxisMinVal=charts.valueAxisMin(finite,s.axisMin);
+    else if(s.axisMin!=null) options.valAxisMinVal=s.axisMin;
     slide.addChart(map[kind],series,options);
-    text(slide,[s.unit,s.period].filter(Boolean).join(' · '),left,1.73,8,.27,{fontSize:11,color:C.muted});
+    const axisText=[s.unit,s.period,s.axis_note].filter(Boolean).join(' · ');
+    text(slide,axisText,left,1.73,8,.27,{fontSize:11,color:C.muted});
     if(s.insight) {
       const x=left+8.65,w=width-8.65;
       line(slide,x,2.32,.55,C.accent,3);

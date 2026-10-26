@@ -34,3 +34,22 @@ with zipfile.ZipFile(sys.argv[1]) as z:
 test('analysis CLI cannot overwrite input with a sidecar',()=>{const os=require('os'),cp=require('child_process');const dir=fs.mkdtempSync(path.join(os.tmpdir(),'gj-analytics-'));try{const out=path.join(dir,'deck.pptx'),source=out+'.spec.json',bytes=JSON.stringify(business());fs.writeFileSync(source,bytes);const r=cp.spawnSync(process.execPath,[path.join(__dirname,'../scripts/analyze.js'),source,out],{encoding:'utf8'});assert.notEqual(r.status,0);assert.equal(fs.readFileSync(source,'utf8'),bytes);assert(!fs.existsSync(out));}finally{fs.rmSync(dir,{recursive:true,force:true});}});
 
 test('trend and supplied comparison baselines cannot contradict',()=>{const d=business();d.trend.at(-2).actual=700;assert.throws(()=>analyze(d),/previous_month baseline/);const e=business();e.metrics[0].previous_year=999;e.trend=Array.from({length:13},(_,i)=>({month:new Date(Date.UTC(2025,8+i,1)).toISOString().slice(0,7),actual:i===0?800:i===11?900:i===12?960:850}));assert.throws(()=>analyze(e),/previous_year baseline/);});
+
+test('analytics formatter keeps tiny nonzero facts, pp and negative zero explicit',()=>{
+ const {fmt}=require('../core/analytics');assert.equal(fmt(2.675),'2.68');assert.equal(fmt(-0),'0');assert.equal(fmt(1e-12),'1.00e-12');assert.equal(fmt(2,'pp'),'2pp');assert.equal(fmt(9.2,'%'),'9.20%');
+});
+test('missing observations keep the original temporal positions in chart output',()=>{
+ const d=business();d.trend[1].actual=null;const {spec}=analyze(d);const trend=spec.slides.find(s=>s.chartType==='line');assert.equal(trend.labels.length,d.trend.length);assert.equal(trend.series[0].values[1],null);assert.equal(trend.missing_policy,'gap');
+});
+test('contribution reconciliation cannot hide a one-unit error in a large total',()=>{
+ const d=business();d.metrics[0].actual=1e9;d.trend.at(-1).actual=1e9;d.contributions=[{label:'全部',actual:1e9+1,previous:900}];assert.throws(()=>analyze(d),/reconcile/);
+});
+test('one thousand decimal contributions reconcile to their exact total',()=>{
+ const d=business(),primary=d.metrics[0];
+ d.metrics=[{...primary,actual:100,target:100,previous_month:100,previous_year:null}];
+ d.trend.at(-1).actual=100;d.trend.at(-2).actual=100;
+ d.contributions=Array.from({length:1000},(_,index)=>({label:`分项${index+1}`,actual:0.1,previous:0.1}));
+ const r=analyze(d);
+ assert.equal(r.audit.metrics.reconciliation.actual,100);
+ assert.equal(r.audit.metrics.reconciliation.previous,100);
+});

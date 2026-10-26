@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Idempotent local bootstrap: npm ci from the lockfile plus an isolated .venv."""
-import argparse, hashlib, json, os, platform, re, shutil, subprocess, sys, datetime
+import argparse, hashlib, importlib.util, json, os, platform, re, shutil, subprocess, sys, datetime
 from pathlib import Path
 
 ROOT=Path(__file__).resolve().parents[1]
@@ -19,14 +19,36 @@ def version_tuple(text):
     match=re.search(r'(\d+)\.(\d+)\.(\d+)',str(text or ''))
     return tuple(int(x) for x in match.groups()) if match else None
 
-def choose_python(explicit=None):
-    if explicit:return explicit,'--python'
-    if os.environ.get('GOUJIAN_PYTHON'):return os.environ['GOUJIAN_PYTHON'],'GOUJIAN_PYTHON'
-    if sys.version_info>=(3,9):return sys.executable,'current interpreter (Python >= 3.9)'
-    for name in ('python3','python'):
+def load_secure_deps():
+    spec=importlib.util.spec_from_file_location('goujian_secure_deps',ROOT/'core/qa/secure_deps.py')
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);return module
+
+def python_candidates():
+    seen=set()
+    for name in ('python3.14','python3.13','python3.12','python3.11','python3','python'):
         path=shutil.which(name)
-        if path:return path,'PATH fallback (current interpreter is older than 3.9)'
-    raise BootstrapError('Python >= 3.9 not found; install it or pass --python')
+        if path and path not in seen:
+            seen.add(path);yield path
+
+def choose_python(explicit=None,runner=None):
+    secure_deps=load_secure_deps()
+    if explicit:return explicit,'--python (explicit selection)'
+    if os.environ.get('GOUJIAN_PYTHON'):return os.environ['GOUJIAN_PYTHON'],'GOUJIAN_PYTHON (explicit selection)'
+    if tuple(sys.version_info[:3])>=secure_deps.MIN_PYTHON_SECURE:
+        return sys.executable,f"current interpreter (Python >= {secure_deps.version_text(secure_deps.MIN_PYTHON_SECURE)})"
+    for path in python_candidates():
+        try:version=version_tuple(verify_python(path,runner))
+        except BootstrapError:continue
+        if version>=secure_deps.MIN_PYTHON_SECURE:
+            return path,f"PATH fallback (Python >= {secure_deps.version_text(secure_deps.MIN_PYTHON_SECURE)} found; current interpreter is older)"
+    if tuple(sys.version_info[:3])>=(3,9):
+        current=version_tuple('.'.join(map(str,tuple(sys.version_info[:3]))))
+        raise BootstrapError(
+            f'Secure bootstrap requires Python >= {secure_deps.version_text(secure_deps.MIN_PYTHON_SECURE)}; '
+            f'the current interpreter is {secure_deps.version_text(current)} and no newer interpreter was found. '
+            f'Install Python {secure_deps.version_text(secure_deps.MIN_PYTHON_SECURE)}+, or pass --python to opt into the core-only tier '
+            f'(Pillow is never installed for Python < {secure_deps.version_text(secure_deps.MIN_PYTHON_SECURE)}).')
+    raise BootstrapError(f'Python >= 3.9 not found; install Python 3.9+ (3.11+ for the secure image/render tier) or pass --python')
 
 def verify_python(path,runner=None):
     result=run_command([path,'-c','import sys; print(".".join(map(str,sys.version_info[:3])))'],Path.cwd(),runner=runner)
@@ -76,6 +98,13 @@ def verify_venv_python(python,venv,runner=None):
         raise BootstrapError(f'Refusing pip outside the isolated .venv: {python}')
     return info
 
+def verify_venv_version(python,runner=None):
+    result=run_command([str(python),'-c','import sys; print(".".join(map(str,sys.version_info[:3])))'],Path.cwd(),runner=runner)
+    version=version_tuple(result.stdout if result.returncode==0 else '')
+    if result.returncode!=0 or not version:
+        raise BootstrapError(f'Cannot read the isolated Python version at {python}: {(result.stderr or result.stdout).strip()}')
+    return version
+
 def venv_pillow(python,runner=None):
     result=run_command([str(python),'-c','import importlib.metadata as m; print(m.version("Pillow"))'],Path.cwd(),runner=runner)
     return result.stdout.strip() if result.returncode==0 else None
@@ -94,9 +123,16 @@ def write_state(venv,state):
 
 def bootstrap(root=ROOT,python=None,dry_run=False,force=False,runner=None,emit=print):
     root=Path(root).resolve();runner=runner or subprocess.run
-    selected,reason=choose_python(python)
+    secure_deps=load_secure_deps()
+    explicit=bool(python or os.environ.get('GOUJIAN_PYTHON'))
+    selected,reason=choose_python(python,runner)
     python_version=verify_python(selected,runner)
+    selected_version=version_tuple(python_version)
     actions=[]
+    requirements=root/'requirements-render.txt'
+    if not requirements.is_file():raise BootstrapError('requirements-render.txt is required for the isolated environment')
+    requirement_errors=secure_deps.validate_requirements_text(requirements.read_text(encoding='utf-8'))
+    if requirement_errors:raise BootstrapError('; '.join(requirement_errors))
     venv=root/'.venv'
     state=read_state(venv) if venv.is_dir() else {}
     lockfile=root/'package-lock.json'
@@ -127,7 +163,15 @@ def bootstrap(root=ROOT,python=None,dry_run=False,force=False,runner=None,emit=p
     # 2. Isolated virtual environment (repairing an interrupted partial venv is safe).
     python_path=venv_python(venv)
     if python_path:
-        if not dry_run:verify_venv_python(python_path,venv,runner)
+        if not dry_run:
+            verify_venv_python(python_path,venv,runner)
+            venv_version=verify_venv_version(python_path,runner)
+            if explicit and venv_version[:2]!=selected_version[:2]:
+                raise BootstrapError(
+                    f'Explicit Python selection {python_version} does not match the existing .venv interpreter '
+                    f'{secure_deps.version_text(venv_version)}. Use a matching --python or move the existing .venv aside, then rerun bootstrap.')
+            python_version=secure_deps.version_text(venv_version)
+            selected_version=venv_version
         actions.append({'step':'venv','status':'SKIPPED','path':str(venv),'reason':'virtual environment already present'})
     else:
         command=[selected,'-m','venv',str(venv)]
@@ -138,42 +182,59 @@ def bootstrap(root=ROOT,python=None,dry_run=False,force=False,runner=None,emit=p
             python_path=venv_python(venv)
             if not python_path:raise BootstrapError('venv created without a Python interpreter; rerun bootstrap')
             verify_venv_python(python_path,venv,runner)
+            python_version=secure_deps.version_text(verify_venv_version(python_path,runner))
+            selected_version=version_tuple(python_version)
             actions.append({'step':'venv','status':'OK','path':str(python_path)})
-    requirements=root/'requirements-render.txt'
-    if not requirements.is_file():raise BootstrapError('requirements-render.txt is required for the isolated environment')
+    tier='secure' if selected_version>=secure_deps.MIN_PYTHON_SECURE else 'core'
+    if tier!='secure' and not explicit:
+        raise BootstrapError(
+            f'Existing .venv uses Python {python_version}, but the secure image/render tier requires '
+            f'{secure_deps.version_text(secure_deps.MIN_PYTHON_SECURE)}+. Move .venv aside and rerun bootstrap, or pass --python '
+            f'to explicitly choose the core-only tier (Pillow is not installed then).')
     requirement_hash=file_hash(requirements)
-    state_matches=(state.get('requirements_sha256')==requirement_hash and state.get('lock_sha256')==lock_hash
-                   and state.get('python_version')==python_version and state.get('npm_ready') is True and js_ready)
     pillow=venv_pillow(python_path,runner) if python_path else None
-    # 3. Isolated Python dependencies, never global pip.
-    if state_matches and pillow and not force:
-        actions.append({'step':'pip-install','status':'SKIPPED','reason':'bootstrap state is complete and requirements are unchanged','pillow':pillow})
+    if tier=='core':
+        actions.append({'step':'pip-install','status':'SKIPPED','reason':
+                        f'explicit Python {python_version} (< {secure_deps.version_text(secure_deps.MIN_PYTHON_SECURE)}): core-only tier; no Pillow install and no vulnerable fallback'})
     else:
-        planned_python=python_path or venv_python(venv)
-        if planned_python is None and dry_run:
-            suffix='Scripts/python.exe' if platform.system()=='Windows' else 'bin/python'
-            planned_python=venv/suffix
-        if planned_python is None:raise BootstrapError('virtual environment Python is unavailable')
-        if not python_inside_venv(venv,planned_python):
-            raise BootstrapError('Refusing pip outside the isolated .venv')
-        if not dry_run:verify_venv_python(planned_python,venv,runner)
-        command=[str(planned_python),'-m','pip','install','--disable-pip-version-check','--no-input','-r',str(requirements)]
-        env={**os.environ,'PYTHONNOUSERSITE':'1','PIP_NO_INPUT':'1','PIP_DISABLE_PIP_VERSION_CHECK':'1','PIP_USER':'0'}
-        if dry_run:actions.append({'step':'pip-install','status':'PLANNED','command':command,'env':{'PYTHONNOUSERSITE':'1'}})
+        state_matches=(state.get('requirements_sha256')==requirement_hash and state.get('lock_sha256')==lock_hash
+                       and state.get('python_version')==python_version and state.get('npm_ready') is True and js_ready
+                       and state.get('tier')=='secure' and secure_deps.pillow_is_secure(pillow))
+        # 3. Isolated Python dependencies, never global pip.
+        if state_matches and not force:
+            actions.append({'step':'pip-install','status':'SKIPPED','reason':'bootstrap state is complete and requirements are unchanged','pillow':pillow})
         else:
-            result=run_command(command,root,env=env,runner=runner)
-            if result.returncode!=0:raise BootstrapError(f'pip install failed: {(result.stderr or result.stdout).strip()}')
-            pillow=venv_pillow(planned_python,runner)
-            if not pillow:raise BootstrapError('pip install completed but Pillow is not importable in the isolated .venv')
-            actions.append({'step':'pip-install','status':'OK','command':command,'pillow':pillow})
+            planned_python=python_path or venv_python(venv)
+            if planned_python is None and dry_run:
+                suffix='Scripts/python.exe' if platform.system()=='Windows' else 'bin/python'
+                planned_python=venv/suffix
+            if planned_python is None:raise BootstrapError('virtual environment Python is unavailable')
+            if not python_inside_venv(venv,planned_python):
+                raise BootstrapError('Refusing pip outside the isolated .venv')
+            if not dry_run:verify_venv_python(planned_python,venv,runner)
+            command=[str(planned_python),'-m','pip','install','--disable-pip-version-check','--no-input','-r',str(requirements)]
+            env={**os.environ,'PYTHONNOUSERSITE':'1','PIP_NO_INPUT':'1','PIP_DISABLE_PIP_VERSION_CHECK':'1','PIP_USER':'0'}
+            if dry_run:actions.append({'step':'pip-install','status':'PLANNED','command':command,'env':{'PYTHONNOUSERSITE':'1'}})
+            else:
+                result=run_command(command,root,env=env,runner=runner)
+                if result.returncode!=0:raise BootstrapError(f'pip install failed: {(result.stderr or result.stdout).strip()}')
+                pillow=venv_pillow(planned_python,runner)
+                if not secure_deps.pillow_is_secure(pillow):
+                    raise BootstrapError(
+                        f'pip install completed but the isolated .venv has Pillow {pillow or "missing"}; '
+                        f'secure Pillow {secure_deps.version_text(secure_deps.MIN_PILLOW)} is required for Python {python_version}. '
+                        f'Check that pip resolves the python_version marker in requirements-render.txt.')
+                actions.append({'step':'pip-install','status':'OK','command':command,'pillow':pillow})
     if not dry_run:
-        state={'schema_version':1,'completed_at':datetime.datetime.now().astimezone().isoformat(timespec='seconds'),
+        state={'schema_version':2,'tier':tier,'secure_image':'AVAILABLE' if tier=='secure' else 'UNAVAILABLE',
+               'completed_at':datetime.datetime.now().astimezone().isoformat(timespec='seconds'),
                'python':str(selected),'python_version':python_version,'venv_python':str(python_path or venv_python(venv)),
                'requirements_sha256':requirement_hash,'lock_sha256':lock_hash,'npm_ready':js_ready,'pillow':pillow}
         write_state(venv,state)
         actions.append({'step':'state','status':'OK','path':str(state_path(venv))})
     result={'status':'DRY_RUN' if dry_run else 'READY','root':str(root),'python':str(selected),
-            'python_choice':reason,'python_version':python_version,'venv':str(venv),'pillow':pillow,'actions':actions}
+            'python_choice':reason,'python_version':python_version,'tier':tier,
+            'secure_image':'AVAILABLE' if tier=='secure' else 'UNAVAILABLE','venv':str(venv),'pillow':pillow,'actions':actions}
     emit_human(result,emit)
     return result
 
@@ -181,6 +242,7 @@ def emit_human(result,emit):
     emit(f"Bootstrap: {result['status']}")
     emit(f"Root: {result['root']}")
     emit(f"Python: {result['python']} ({result['python_choice']}, {result['python_version']})")
+    emit(f"Tier: {result['tier']} (secure image/render: {result['secure_image']})")
     for action in result['actions']:
         detail=action.get('reason') or action.get('path') or ' '.join(action.get('command',[]))
         emit(f"- {action['step']}: {action['status']} {detail}")

@@ -10,12 +10,12 @@ cap_spec=importlib.util.spec_from_file_location('capabilities',ROOT/'core/qa/cap
 capabilities=importlib.util.module_from_spec(cap_spec);cap_spec.loader.exec_module(capabilities)
 
 class FakeProbe:
-    def __init__(self,commands=None,pillow=('12.1.1',None),specs=None,venv=False,cjk=True,writable=True):
+    def __init__(self,commands=None,pillow=('13.0.0',None),specs=None,venv=False,cjk=True,writable=True,python=(3,14,4)):
         self.commands={'node':'/usr/bin/node','npm':'/usr/bin/npm','libreoffice':'/usr/bin/libreoffice',
                        'pdftoppm':'/usr/bin/pdftoppm','fc-list':'/usr/bin/fc-list','fc-match':'/usr/bin/fc-match'}
         if commands is not None:self.commands=commands
         self.pillow=pillow;self.specs={'PIL':pillow[1] is None} if specs is None else specs
-        self.venv=venv;self.cjk=cjk;self.writable=writable
+        self.venv=venv;self.cjk=cjk;self.writable=writable;self.python=python
         self.versions={'ajv':'8.20.0','jszip':'3.10.2','pptxgenjs':'4.0.0','image-size':'2.0.4'}
     def which(self,name):return self.commands.get(name)
     def find_spec(self,name):return object() if self.specs.get(name) else None
@@ -27,13 +27,14 @@ class FakeProbe:
             if not self.cjk:return SimpleNamespace(returncode=0,stdout='DejaVu Sans|Book\n',stderr='')
             return SimpleNamespace(returncode=0,stdout=('Noto Sans CJK SC|Bold\n' if ':bold' in args[-1] else 'Noto Sans CJK SC|Regular\n'),stderr='')
         return SimpleNamespace(returncode=0,stdout='',stderr='')
-    def python_version(self):return (3,14,4)
+    def python_version(self):return self.python
     def python_executable(self):return '/usr/bin/python3'
     def package_version(self,name):return self.versions.get(name)
     def pillow_version(self):return self.pillow
     def exists(self,path):return self.venv
     def venv_python(self,venv):return (Path(venv)/'bin/python') if self.venv else None
-    def venv_pillow_version(self,venv):return '12.1.1' if self.venv else None
+    def venv_pillow_version(self,venv):return '13.0.0' if self.venv else None
+    def venv_python_version(self,venv):return (3,14,4) if self.venv else None
     def can_write(self,path):return (True,None) if self.writable else (False,'denied')
     def platform_info(self):return {'system':'Linux','release':'test','machine':'x86_64','platform':'linux',
                                     'current':'linux','wsl':False,'wsl_distro':None}
@@ -87,6 +88,44 @@ class DoctorTests(unittest.TestCase):
         result=doctor.inspect(probe)
         pillow=next(c for c in result['checks'] if c['id']=='pillow')
         self.assertEqual(pillow['status'],'MISSING')
+        secure=next(c for c in result['checks'] if c['id']=='secure-image')
+        self.assertEqual(secure['status'],'MISSING')
+        self.assertEqual(result['capabilities']['ladder']['SECURE_IMAGE_RENDER']['status'],'UNAVAILABLE')
+        self.assertEqual(result['capabilities']['ladder']['STRUCTURAL_QA']['status'],'AVAILABLE')
+    def test_insecure_pillow_disables_native_render_but_keeps_core(self):
+        probe=FakeProbe(pillow=('12.1.1',None))
+        result=doctor.inspect(probe)
+        pillow=next(c for c in result['checks'] if c['id']=='pillow')
+        self.assertEqual(pillow['status'],'BROKEN')
+        self.assertIn('advisories',pillow['detail'])
+        secure=next(c for c in result['checks'] if c['id']=='secure-image')
+        self.assertEqual(secure['status'],'BROKEN')
+        self.assertEqual(secure['detected']['status'],'INSECURE')
+        self.assertEqual(result['capabilities']['ladder']['SECURE_IMAGE_RENDER']['status'],'INSECURE')
+        self.assertEqual(result['capabilities']['ladder']['NATIVE_RENDER']['status'],'UNAVAILABLE')
+        self.assertIn('Pillow 12.1.1',result['capabilities']['ladder']['NATIVE_RENDER']['note'])
+        self.assertEqual(result['capabilities']['levels']['0_spec'],'AVAILABLE')
+        self.assertEqual(result['capabilities']['levels']['3_native_render'],'UNAVAILABLE')
+        self.assertNotEqual(result['visual_qa'],'PASS')
+    def test_python_39_reports_core_only_tier(self):
+        probe=FakeProbe(python=(3,9,18),pillow=('13.0.0',None))
+        result=doctor.inspect(probe)
+        python=next(c for c in result['checks'] if c['id']=='python')
+        self.assertEqual(python['status'],'PRESENT')
+        self.assertIn('Core tier only',python['detail'])
+        secure=next(c for c in result['checks'] if c['id']=='secure-image')
+        self.assertEqual(secure['status'],'MISSING')
+        self.assertEqual(secure['detected']['status'],'UNAVAILABLE')
+        self.assertEqual(result['capabilities']['ladder']['STRUCTURAL_QA']['status'],'AVAILABLE')
+        self.assertEqual(result['capabilities']['ladder']['NATIVE_RENDER']['status'],'UNAVAILABLE')
+    def test_secure_venv_is_preferred_over_active_insecure_interpreter(self):
+        probe=FakeProbe(pillow=('12.1.1',None),venv=True)
+        result=doctor.inspect(probe)
+        secure=next(c for c in result['checks'] if c['id']=='secure-image')
+        self.assertEqual(secure['status'],'PRESENT')
+        self.assertEqual(secure['detected']['runtime'],'venv')
+        self.assertEqual(secure['detected']['pillow'],'13.0.0')
+        self.assertEqual(result['capabilities']['ladder']['NATIVE_RENDER']['status'],'AVAILABLE')
     def test_platform_and_wsl_reporting(self):
         probe=FakeProbe();probe.platform_info=lambda:{'system':'Linux','release':'test','machine':'x86_64','platform':'linux',
                                                        'current':'linux','wsl':True,'wsl_distro':'Ubuntu'}

@@ -1,0 +1,78 @@
+{
+  "source": "Project-authored synthetic dataset / Apache-2.0",
+  "synthetic": true,
+  "period": {
+    "start": "2026-09-01",
+    "end": "2026-09-30"
+  },
+  "recipe": "project-analytics",
+  "title": "项目绩效复盘：交付、投入与预算",
+  "as_of": "2026-09-30",
+  "unit": "项",
+  "projects": [
+    {
+      "id": "P1",
+      "name": "平台升级",
+      "planned_units": 12,
+      "actual_units": 10,
+      "planned_days": 80,
+      "actual_days": 90,
+      "day_rate": 1200,
+      "budget": 120000,
+      "external_cost": 10000,
+      "realized_value": 170000,
+      "risk": "high"
+    },
+    {
+      "id": "P2",
+      "name": "渠道接入",
+      "planned_units": 8,
+      "actual_units": 8,
+      "planned_days": 50,
+      "actual_days": 48,
+      "day_rate": 1200,
+      "budget": 80000,
+      "external_cost": 5000,
+      "realized_value": 120000,
+      "risk": "low"
+    },
+    {
+      "id": "P3",
+      "name": "数据治理",
+      "planned_units": 10,
+      "actual_units": 7,
+      "planned_days": 60,
+      "actual_days": 68,
+      "day_rate": 1200,
+      "budget": 90000,
+      "external_cost": 8000,
+      "realized_value": null,
+      "risk": "medium"
+    }
+  ],
+  "milestones": [
+    {
+      "id": "M1",
+      "project_id": "P1",
+      "name": "阶段验收",
+      "planned": "2026-09-15",
+      "actual": null
+    },
+    {
+      "id": "M2",
+      "project_id": "P2",
+      "name": "阶段验收",
+      "planned": "2026-09-20",
+      "actual": "2026-09-19"
+    },
+    {
+      "id": "M3",
+      "project_id": "P3",
+      "name": "阶段验收",
+      "planned": "2026-09-25",
+      "actual": "2026-09-28"
+    }
+  ],
+  "currency": "CNY",
+  "measurement_basis": "cumulative_as_of"
+}

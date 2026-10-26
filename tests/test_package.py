@@ -49,6 +49,7 @@ def assert_archive(archive, required):
 def main():
     assert not (ROOT / 'skill/SKILL.md').exists()
     packager = load_packager()
+    assert packager.SHOWCASE_REL == Path('out/v1.3-showcase')
     with tempfile.TemporaryDirectory(prefix='goujian-package-test-') as temp:
         temp = Path(temp)
         first, second = temp / 'first.zip', temp / 'second.zip'
@@ -62,7 +63,7 @@ def main():
             frontmatter = package.read(PREFIX + 'SKILL.md').decode('utf-8').split('---', 2)[1]
             assert 'name: goujian-strategy-slides' in frontmatter
             version = json.loads(package.read(PREFIX + 'package.json'))['version']
-            assert version == '1.2.1'
+            assert version == '1.3.0'
             assert f'version: "{version}"' in frontmatter
             line = next(line for line in frontmatter.splitlines() if line.startswith('description: '))
             description = json.loads(line.removeprefix('description: '))
@@ -84,6 +85,11 @@ def main():
                 assert PREFIX + 'out/.package-test-showcase/decks/example.pptx' in names
                 assert PREFIX + 'out/.package-test-showcase/readme.txt' in names
                 assert [name for name in names if name.endswith('/SKILL.md')] == [PREFIX + 'SKILL.md']
+                assert json.loads(package.read(PREFIX + 'package.json'))['version'] == '1.3.0'
+                frontmatter = package.read(PREFIX + 'SKILL.md').decode('utf-8').split('---', 2)[1]
+                assert 'version: "1.3.0"' in frontmatter
+                assert not any(name.startswith(PREFIX + 'out/') and not name.startswith(PREFIX + 'out/.package-test-showcase/')
+                               for name in names)
         finally:
             shutil.rmtree(fake, ignore_errors=True)
     print('PASS: deterministic installer, one Skill entry, required assets, safe paths and optional showcase')

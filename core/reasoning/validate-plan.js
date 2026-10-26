@@ -4,6 +4,7 @@ const path=require('path');
 const {schemaErrors}=require('../schema/validate');
 const {resolveSlide}=require('../composition/resolver');
 const {evaluateCalculation,formatNumber,resolvePointer,normalizeUnit,close}=require('./calculations');
+const {validateMetricCatalogue,formatMetric}=require('../semantics/numeric');
 
 const QUALIFIED=/可能|假设|待验证|尚需|不确定|未知|待核实|不能证明|hypothes|may|might|possibly|potential|unknown|not\s+proven|requires?\s+validation/i;
 const NUMERIC_CELL=/^(?:[¥$€£]\s*)?[-+−]?\d[\d,]*(?:\.\d+)?\s*(?:%|pp|万元|万|元|单|天|人|个|次)?$/u;
@@ -155,7 +156,7 @@ function numericPointerSet(slide) {
   return pointers;
 }
 
-function validateBindings(planSlide,sources,calculations,errors,closure) {
+function validateBindings(planSlide,sources,calculations,metrics,errors,closure) {
   const required=numericPointerSet(planSlide);
   const bound=new Set();
   for(const [index,binding] of (planSlide.bindings||[]).entries()) {
@@ -166,6 +167,21 @@ function validateBindings(planSlide,sources,calculations,errors,closure) {
     try { actual=resolvePointer(planSlide.spec,binding.pointer); }
     catch(error) { errors.push(`${label}: ${error.message}`); continue; }
     try {
+      if(binding.target.kind==='metric') {
+        const metric=metrics.get(binding.target.metric_id);
+        if(!metric) throw new Error(`unknown metric ${binding.target.metric_id}`);
+        if(typeof actual==='number') {
+          if(metric.effective_value===null) throw new Error(`metric ${metric.id} is missing and cannot bind a numeric value`);
+          if(binding.format.kind!=='number') throw new Error(`numeric JSON pointer ${binding.pointer} cannot use formatted binding ${binding.format.kind}`);
+          if(!close(actual,metric.effective_value)) throw new Error(`bound value ${actual} does not match metric ${metric.id} effective value ${metric.effective_value}`);
+        } else if(typeof actual==='string') {
+          const formatted=formatMetric(metric).text;
+          if(actual!==formatted) throw new Error(`bound text "${actual}" does not match metric ${metric.id} formatted as "${formatted}"`);
+        } else if(actual===null) {
+          if(metric.effective_value!==null) throw new Error(`null pointer ${binding.pointer} conflicts with metric ${metric.id} value ${metric.effective_value}`);
+        } else throw new Error(`JSON pointer ${binding.pointer} must resolve to a number, string or null`);
+        continue;
+      }
       if(binding.target.kind==='source') {
         if(!closure.sourceIds.has(closure.canonical(binding.target.source_id))) {
           throw new Error(`binding source ${binding.target.source_id} is outside the slide source closure`);
@@ -207,6 +223,9 @@ function validatePlan(plan,options={}) {
   const repoRoot=options.repoRoot||path.resolve(__dirname,'../..');
   let schema=[];try{schema=schemaErrors('reasoning-plan',plan);}catch(error){errors.push(error.message);return {errors,valid:false};}
   if(schema.length)return {errors:schema.map(message=>`schema ${message}`),valid:false};
+  let metrics=new Map();
+  try { metrics=validateMetricCatalogue(plan.deck?.metrics,{label:'plan.deck.metrics'}); }
+  catch(error) { errors.push(error.message); }
   const sources=new Map();
   for(const source of plan.sources) {
     if(sources.has(source.id)) errors.push(`duplicate source id ${source.id}`);
@@ -406,7 +425,7 @@ function validatePlan(plan,options={}) {
     if(planSlide.title_mode==='conclusion'&&!refs.some(claim=>['FACT','CALCULATION'].includes(claim.type))) {
       errors.push(`slide ${planSlide.id}: conclusion title requires a FACT or CALCULATION claim`);
     }
-    validateBindings(planSlide,sources,calculations,errors,{sourceIds:requiredCanonical,claimIds:claimClosure,canonical});
+    validateBindings(planSlide,sources,calculations,metrics,errors,{sourceIds:requiredCanonical,claimIds:claimClosure,canonical});
     for(const binding of planSlide.bindings||[]) {
       if(binding.target.kind==='source'&&sources.has(binding.target.source_id)) {
         markValue(boundValues,binding.target.source_id,binding.target.value_id);
@@ -464,7 +483,7 @@ function validatePlan(plan,options={}) {
     warnings.push(`claims not referenced by any slide: ${unreferenced.join(', ')}`);
   }
   return {valid:errors.length===0,errors,warnings,sources,claims,calculations,dispositions,hashes,
-    canonical,coveredSources,referencedClaims,valueCoverage,dedupValueMaps,
+    canonical,coveredSources,referencedClaims,valueCoverage,dedupValueMaps,metrics,
     plan_sha256:sha256(stableStringify(plan))};
 }
 

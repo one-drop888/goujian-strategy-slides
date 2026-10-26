@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import importlib.util, json, os, shutil, subprocess, sys, tempfile, time, unittest
+import importlib.util, json, os, shutil, subprocess, sys, tempfile, time, unittest, unittest.mock
 from pathlib import Path
 from types import SimpleNamespace
 ROOT=Path(__file__).resolve().parents[1]
@@ -17,7 +17,7 @@ class Runner:
         if '-c' in args:
             code=args[args.index('-c')+1]
             if 'sys.version_info' in code:output='3.14.4\n'
-            elif 'importlib.metadata' in code:output='12.1.1\n'
+            elif 'importlib.metadata' in code:output='13.0.0\n'
             elif 'sys.prefix' in code:
                 prefix=str(Path(args[0]).resolve().parent.parent)
                 output=json.dumps({'prefix':prefix,'base':'/usr'})+'\n'
@@ -29,7 +29,7 @@ def make_root(directory,with_node_modules=True):
     root=Path(directory)
     (root/'package.json').write_text(json.dumps({'name':'fixture','version':'0.0.0','dependencies':{'ajv':'8.20.0','jszip':'3.10.2','pptxgenjs':'4.0.0'},'overrides':{'image-size':'2.0.4'}}),encoding='utf-8')
     (root/'package-lock.json').write_text('{"lockfileVersion":3}\n',encoding='utf-8')
-    (root/'requirements-render.txt').write_text('Pillow==12.1.1\n',encoding='utf-8')
+    (root/'requirements-render.txt').write_text('Pillow==13.0.0; python_version >= "3.11"\n',encoding='utf-8')
     if with_node_modules:
         for name,version in {'ajv':'8.20.0','jszip':'3.10.2','pptxgenjs':'4.0.0','image-size':'2.0.4'}.items():
             package=root/'node_modules'/name/'package.json';package.parent.mkdir(parents=True,exist_ok=True)
@@ -67,7 +67,8 @@ class BootstrapTests(unittest.TestCase):
             self.assertEqual(pip_calls[0]['env']['PYTHONNOUSERSITE'],'1')
             state=json.loads((root/'.venv/.goujian-bootstrap.json').read_text())
             self.assertEqual(state['requirements_sha256'],bootstrap.file_hash(root/'requirements-render.txt'))
-            self.assertTrue(state['npm_ready']);self.assertEqual(state['pillow'],'12.1.1')
+            self.assertTrue(state['npm_ready']);self.assertEqual(state['pillow'],'13.0.0')
+            self.assertEqual((state['tier'],state['secure_image']),('secure','AVAILABLE'))
             second=bootstrap.bootstrap(root,python=sys.executable,runner=runner,emit=lambda line:None)
             self.assertEqual(second['status'],'READY')
             self.assertEqual(len(runner.pip_calls()),1)
@@ -125,7 +126,7 @@ class BootstrapTests(unittest.TestCase):
                     if len(args)>2 and args[1:3]==['-m','pip']:
                         return SimpleNamespace(returncode=0,stdout='',stderr='')
                     if '-c' in args and 'importlib.metadata' in args[args.index('-c')+1]:
-                        return SimpleNamespace(returncode=0,stdout='12.1.1\n',stderr='')
+                        return SimpleNamespace(returncode=0,stdout='13.0.0\n',stderr='')
                     return subprocess.run(args,cwd=cwd,env=env,capture_output=True,text=True,**kwargs)
             runner=OfflineRunner()
             first=bootstrap.bootstrap(root,python=sys.executable,runner=runner,emit=lambda line:None)
@@ -145,6 +146,57 @@ class BootstrapTests(unittest.TestCase):
             self.assertEqual(third['status'],'READY')
             self.assertTrue(Path(python_path).exists())
 
+    def test_explicit_python_below_311_is_core_only_without_pillow(self):
+        with tempfile.TemporaryDirectory(prefix='构见 Q4 bootstrap core ') as directory:
+            root=make_root(directory);venv_python=root/'.venv/bin/python';venv_python.parent.mkdir(parents=True);venv_python.write_text('')
+            class CoreRunner(Runner):
+                def __call__(self,args,cwd=None,env=None,capture_output=False,text=False,**kwargs):
+                    call=super().__call__(args,cwd,env,capture_output,text,**kwargs)
+                    if '-c' in args and 'sys.version_info' in args[args.index('-c')+1]:call.stdout='3.10.4\n'
+                    if '-c' in args and 'importlib.metadata' in args[args.index('-c')+1]:call.returncode=1;call.stdout=''
+                    return call
+            runner=CoreRunner()
+            result=bootstrap.bootstrap(root,python=sys.executable,runner=runner,emit=lambda line:None)
+            self.assertEqual((result['tier'],result['secure_image'],result['pillow']),('core','UNAVAILABLE',None))
+            self.assertFalse(runner.pip_calls())
+            state=json.loads((root/'.venv/.goujian-bootstrap.json').read_text())
+            self.assertEqual((state['tier'],state['secure_image'],state['pillow']),('core','UNAVAILABLE',None))
+            second=bootstrap.bootstrap(root,python=sys.executable,runner=runner,emit=lambda line:None)
+            step=next(action for action in second['actions'] if action['step']=='pip-install')
+            self.assertEqual(step['status'],'SKIPPED')
+            self.assertIn('core-only',step['reason'])
+    def test_non_explicit_old_runtime_requires_python_311(self):
+        fake=SimpleNamespace(version_info=(3,10,4),executable='/usr/bin/python3.10')
+        with unittest.mock.patch.object(bootstrap,'sys',fake),unittest.mock.patch.object(bootstrap.shutil,'which',return_value=None):
+            with self.assertRaisesRegex(bootstrap.BootstrapError,r'requires Python >= 3\.11'):
+                bootstrap.choose_python()
+    def test_explicit_old_selection_does_not_match_existing_new_venv(self):
+        with tempfile.TemporaryDirectory(prefix='构见 Q4 bootstrap mismatch ') as directory:
+            root=make_root(directory);venv_python=root/'.venv/bin/python';venv_python.parent.mkdir(parents=True);venv_python.write_text('')
+            class OldRunner(Runner):
+                def __call__(self,args,cwd=None,env=None,capture_output=False,text=False,**kwargs):
+                    call=super().__call__(args,cwd,env,capture_output,text,**kwargs)
+                    if '-c' in args and 'sys.version_info' in args[args.index('-c')+1]:
+                        call.stdout='3.14.4\n' if str(root/'.venv') in str(args[0]) else '3.10.4\n'
+                    return call
+            with self.assertRaisesRegex(bootstrap.BootstrapError,'does not match the existing .venv'):
+                bootstrap.bootstrap(root,python=sys.executable,runner=OldRunner(),emit=lambda line:None)
+    def test_insecure_pillow_install_is_rejected(self):
+        with tempfile.TemporaryDirectory(prefix='构见 Q4 bootstrap insecure ') as directory:
+            root=make_root(directory);venv_python=root/'.venv/bin/python';venv_python.parent.mkdir(parents=True);venv_python.write_text('')
+            class InsecureRunner(Runner):
+                def __call__(self,args,cwd=None,env=None,capture_output=False,text=False,**kwargs):
+                    call=super().__call__(args,cwd,env,capture_output,text,**kwargs)
+                    if '-c' in args and 'importlib.metadata' in args[args.index('-c')+1]:call.stdout='11.3.0\n'
+                    return call
+            with self.assertRaisesRegex(bootstrap.BootstrapError,'secure Pillow 13.0.0 is required'):
+                bootstrap.bootstrap(root,python=sys.executable,runner=InsecureRunner(),emit=lambda line:None)
+            self.assertFalse((root/'.venv/.goujian-bootstrap.json').exists())
+    def test_vulnerable_pillow_fallback_in_requirements_is_rejected(self):
+        with tempfile.TemporaryDirectory(prefix='构见 Q4 bootstrap fallback ') as directory:
+            root=make_root(directory);(root/'requirements-render.txt').write_text('Pillow==12.1.1\n',encoding='utf-8')
+            with self.assertRaisesRegex(bootstrap.BootstrapError,'unsupported Pillow declaration'):
+                bootstrap.bootstrap(root,dry_run=True,runner=Runner(),emit=lambda line:None)
     @unittest.skipUnless(os.environ.get('GOUJIAN_CLEAN_INSTALL')=='1',
                          'set GOUJIAN_CLEAN_INSTALL=1 to run the real npm ci/pip clean-install integration exactly once')
     def test_opt_in_real_clean_install_rerun_and_partial_recovery(self):

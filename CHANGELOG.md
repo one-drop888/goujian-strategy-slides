@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.3.0] — 2026-10-26
+
+### Analytical and visual intelligence
+
+- Added optional typed numeric contracts, shared formatting and explicit fraction/percent/pp/currency scale handling across native charts and text. Preserved raw facts and recorded display normalization.
+- Added role/category/value encoding, stable series identity, dash/marker distinctions and native legend/format/workbook readback checks. Histogram bins are explicit; unsupported families are rejected.
+- Added a declared narrative graph with evidence bindings, coverage and cross-slide redundancy candidates; useful summaries and detail are retained for review.
+- Expanded measured title candidates within a readable floor, preserved authored category labels and missing temporal positions, and separated pie shares from stored-percent value formats.
+- Added date-scaled native timelines and bounded acyclic branch/swimlane graphs, reusing the PPTX engine.
+- Tightened numerical reconciliation and output-path protection; updated full-ZIP static preflight and kept the V1.2.1 static Doctor import fix.
+- Updated fast-uri to3.1.9 and the secure optional image tier to Pillow13/Python3.11+. Python3.9/3.10 retain a core-only tier; no vulnerable fallback is installed.
+- Added a96-cell light/dark chart matrix, three same-input V1.2.1 comparisons, synthetic business/narrative fixtures and actual render previews. Independent review scope is documented separately from automated QA.
+- Updated bilingual product/installation/migration documentation. Community stays Apache-2.0; Pro is separate design work, not a paid product launch. Company/Agensi approval and native Windows/macOS PowerPoint are not claimed.
+
+
 ## 1.2.1 — 2026-10-21
 
 - Replace the Doctor's dynamic datetime import with an ordinary static import while preserving the timezone-aware ISO 8601 timestamp with seconds precision. Add a regression test for timezone awareness, second precision and freshness.

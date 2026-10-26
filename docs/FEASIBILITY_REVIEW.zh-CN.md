@@ -1,56 +1,46 @@
-# 构见·战略演示 V1.2 可行性复核
+# 可行性与验收范围 · V1.3
 
-2026-10-21 · 战略推理、确定性校验与发布打包。
+[English](FEASIBILITY_REVIEW.md) | [简体中文](FEASIBILITY_REVIEW.zh-CN.md)
 
-[English](FEASIBILITY_REVIEW.md) · [产品介绍](PRODUCT_OVERVIEW.zh-CN.md) · [Benchmark A–J](BENCHMARKS_V1_2.md) · [质量与验证](QUALITY_AND_VALIDATION.md)
+2026-10-26。**V1.3 RELEASE READY WITH KNOWN LIMITATIONS。** 这是有边界的工程与产品结论。正式发布仍须通过 CI、其实际 Ubuntu 渲染复核、批准提交打包与远端复验；本文件本身不代表 Release 已发布。
 
-状态词：**PROVEN** 表示在声明的证据与范围内已执行；**PARTIAL** 表示覆盖有限或不完整；**DESIGNED** 表示契约存在但无忠实实现；**BLOCKED** 表示必需能力无法运行；**NOT_VERIFIED** 表示未实际执行。状态由证据范围限定，不是产品级保证。
-
-| 维度 | 状态 | 证据与边界 |
+| 维度 | 状态 | 已证明的范围与边界 |
 |---|---|---|
-| 架构 | PROVEN | 共享 Schema → Composition → 原生 PPTX → 哈希绑定 Scene → QA；推理层为增量，Renderer 核心保留。 |
-| Reasoning Plan 契约 | PROVEN，契约内 | Agent 编写来源、主张、取舍、计算、绑定与主题，编译前校验。Codex 在 `2c622db` 独立重跑 15/15 引擎检查。未宣称独立推理模型。 |
-| 确定性算术 | PROVEN，四种算子 | `sum`、`difference`、`ratio`、`percent_change`，检查单位/指标/窗口/分母/零值并给出容差。无任意公式、统计显著性检验或因果推断。 |
-| 来源核对 | PARTIAL | 结构化 JSON 可用 JSON Pointer 对照源字节并校验 SHA256。PDF/图片/文本/原生 PPTX 台账为 `REVIEWER_REQUIRED`；定位或引用不等于来源为真。 |
-| 最终产物校验 | PROVEN，信任范围受限 | 给定可信期望哈希后，读取精确 PPTX 字节，检查图表缓存、表格、KPI 文本、备注、内嵌报告及计划/Spec 哈希。不证明来源真实性或视觉质量。 |
-| 主题决策 | PROVEN，选择层面 | reference > brand > 显式用户 > automatic > default；显式 dark 与 printable 冲突会记录。light/brand-blue/dark 三变体已构建渲染。配置差异不等于 15 套视觉批准设计。 |
-| 多模态/原生图片 | PROVEN，契约内 | 原生 PNG/JPEG/WEBP、保护性裁剪/焦点/透明度/遮罩、图注与像素文字来源。无 PPTX 图像后处理。 |
-| 资产理解 | PARTIAL | 分类与来源由 Agent 提供，代码执行策略。无分类器、OCR 或通用视觉理解。 |
-| 原生来源检查 | PROVEN，限定样例 | 两份合成原生来源 PPTX 保留 9 列表格（含负责人/复核日）、4 个图表值及内嵌图片，并给出文件/页/形状定位。任意复杂来源重建仍为 Partial。 |
-| 标题/布局 | PROVEN，契约内 | 字形测量/等价估算、短标题/副标题、动态分割线与正文流、显式标题容量错误。长标题回归已渲染；估算不等于 PowerPoint 精确排字。 |
-| 来源与场景 | PROVEN | 原生、像素、标注、数据与判断来源类型，以及实际原生对象关系。 |
-| 空间 QA | PROVEN，显式场景内 | 原生坐标/顺序读回、遮挡、安全区、文字/横线间距、密度与保守文字容量警告。不推断任意导入稿意图。 |
-| 视觉质量 | PARTIAL | 最终独立实际 VQA 覆盖 Linux LibreOffice 上 8 个案例/58 页合成素材，绑定精确 PPTX 与页面哈希，状态 `PASS_WITH_KNOWN_LIMITATIONS`。这不覆盖全部 15 个 Profile、15 个历史 Benchmark 场景或原生 PowerPoint；八个渲染不等于八个通用视觉批准。 |
-| 打包 | PROVEN（本地） | 确定性安装包测试可生成相同字节，检查单一根 SKILL、固定时间戳/权限、必需资产、无 PPTX/PDF/缓存。最终干净解压安装证据单独记录。 |
-| 安装 | PROVEN，Linux x86_64 | 从安装 ZIP 在 Unicode/空格、无符号链接路径执行隔离 `.venv`、`npm ci`/bootstrap、doctor、测试、示例构建与渲染。macOS/Windows/ARM64 未验证。 |
-| 可维护性 | PROVEN，结构层面 | 推理、资产、标题、场景由小型共享模块实现；未整体重写引擎或增加重量级运行时依赖。 |
-| Profile/字体 | PARTIAL | 15 个真实 token 配置（不止配色）；Linux 字体解析已验证。未嵌入字体，不证明完整字形覆盖与接收端效果。 |
-| PPT 接入/保真 | PARTIAL | 文字、图片、图表、表格、组、母版/布局候选可映射；复杂重建与歧义语义仍不完整。 |
-| 可扩展性 | PROVEN，边界层面 | 资产、来源、关系与推理 JSON 不导入 PptxGenJS；原生适配位于渲染边界。 |
-| 多输出 | DESIGNED | HTML/Web Renderer 未实现。 |
-| QA 可靠性 | PARTIAL | 有负向回归、哈希绑定与实际复核；无精确 PowerPoint 排字、通用美学标准或自主修复。 |
-| 发布流程 | NOT_VERIFIED | 手动 `workflow_dispatch` 流程已更新并静态检查，但本阶段未派发，未创建标签或公开 Release。 |
-| 开源就绪 | PARTIAL | 单一 Skill 入口、合成声明、安装包与展示包已本地构建检查；GitHub 发布设置与匿名资产下载仍是待执行手工步骤。 |
-| 商业就绪 | PARTIAL | 仅文档。Community 保持 Apache-2.0；Supporter/Pro 为未来候选，无收款、账户或上架。Agensi 托管运行未验证。 |
-| 文档准确性 | PROVEN，审计声明内 | Create、推理、原生图片与有限 QA 路径可执行；Edit/Rebuild/Reference/Vision/Repair 边界已声明。历史发布文档不改写。 |
+| 架构可行性 | PROVEN | 扩展现有 Schema、推理、Composition/Profile 和同一原生 PPTX 引擎，保留旧示例 |
+| 产品可行性 | PROVEN | 三类可替换数据的分析 Recipe，显式数值与叙事契约；业务解释和设计仍由 Agent 负责 |
+| 视觉与美学 | PROVEN | 实际 Montage 与代表页面放大检查，验收范围和文件哈希单独记录 |
+| 安装可行性 | PROVEN | Unicode/空格路径解压、项目 npm/venv、Bootstrap、Doctor 与示例构建/QA/渲染；发布时再次核对正式包 |
+| 可维护性 | PARTIAL | 共享计算、格式化与回读；原生 XML 补丁及较大的 Benchmark/QA 脚本需重点回归 |
+| 可扩展性 | PARTIAL | 数据语义可复用；布局和原生回读仍针对 PPTX |
+| 多 Renderer 准备 | PARTIAL | 未实现 HTML Renderer 或中立布局 IR |
+| 开源准备 | PROVEN | Apache-2.0、唯一 Skill、完整 ZIP 预检、源码一致性和不可覆盖历史的发布链路 |
+| 文档准确性 | PROVEN | 双语介绍、安装、迁移与质量文档区分代码能力、Agent 判断和未验收平台 |
+| QA 可靠性 | PROVEN | 数值/工作簿/单位/系列、源文件别名、图形/轴/配色篡改和元数据负面测试可执行；不认证任意内容的审美与语义正确性 |
 
-28 Storylines · 86 semantic entries（74 IMPLEMENTED / 6 PARTIAL / 6 DESIGNED）· 27 Compositions · 15 Profiles · 15 Template Recipes · 15 Benchmark scenarios。
+## 实际证据
 
-## 证据锚点
+冻结引擎 SHA256：`e183c3c162801781a1c69cc480dd53b49f805c2e571be5a9a0245cff5b45d854`。完整回归发现188项，187通过、1项可选集成测试跳过、0失败（Node122、Python66）。核心层172项，171通过、1跳过、0失败。真实干净安装/Bootstrap 另行执行，不把跳过项算作通过。原有15场景共104页全部实际渲染，结果 PASS_WITH_NOTES。
 
-- 引擎验收：[Codex final acceptance](evidence/v1.2/reviews/codex-final-acceptance.json) — `2c622db` 处 15/15，仅代表引擎验收。
-- 最终实际视觉验收：[Codex final visual acceptance](evidence/v1.2/reviews/codex-final-visual-acceptance.json) — 8 案例/58 页，`PASS_WITH_KNOWN_LIMITATIONS`，仅 Linux LibreOffice。
-- 已验收渲染的来源字节等价性：[final source provenance](evidence/v1.2/reviews/final-source-provenance.json) — 91 个文件、0 不一致；历史 dirty 构建元数据单独保留。
-- 部分全尺寸复核与剩余文案问题：[round-2 preview review](evidence/v1.2/reviews/codex-round2-preview-review.md)；修复后文案已进入展示构建。
-- 来源 PPTX 范围：[source acceptance](evidence/v1.2/reviews/codex-source-pptx-acceptance.md)；实际检查记录在可选展示包的 `source-inspection.json`。
-- 依赖审计：[official npm audit record](evidence/v1.2/reviews/codex-dependency-audit-official.json) — 官方 registry 下 0 已知漏洞。
-- 展示与预览：[展示说明](SHOWCASE_V1_2.md)、`docs/visual/v1.2/`。
-- A–J 证据矩阵：[Benchmark A–J](BENCHMARKS_V1_2.md)。
+V1.3 图表矩阵96项：72项实际构建/渲染、24项按明确契约拒绝，覆盖六类原生图表、浅深色及八类边界输入，另有堆叠和直方图补充。三组 V1.2.1 对照使用相同原始 JSON；三套12页主题案例、5页来源台账、8个原生关系图均生成。[Benchmark 与真实对照](BENCHMARKS_V1_3.md) · [独立视觉记录](evidence/v1.3/visual-review.json)。
 
-## 结论
+基线为 v1.2.1 提交 `fb55b1cc92e52923027c2a5ad405d3ee92b42f25`，两版共用当前锁定依赖与主机环境，属于受控源码对照，不是历史 Office 环境回放。原 Recipe 多数版式保留；综合案例是另外编写的 Agent 组合，不能用配色变化宣称自动完成整套叙事重构。
 
-**V1.2 为文档化 Agent 辅助工作流的 READY WITH KNOWN LIMITATIONS。**
+## 审计、修复与视觉迭代
 
-推理契约、有限算术、原生构建、主题选择、来源检查与打包在各自声明范围内已证明。语义忠实度、来源真实性、因果结论、视觉质量与跨平台渲染不由代码认证。最终独立视觉验收已在 8 案例/58 页的 Linux LibreOffice 范围内完成；15 个历史 Benchmark 场景的视觉验收仍为 `NOT_RUN`，15 个 Profile 也未全部完成视觉测试。公开发布仍是独立门禁，尚未执行。
+独立审查复现并修复了输出别名覆盖源文件、极小/大数比较、连续小数求和、金额和份额标签、缺失折线桥接、类别标签被时间窗覆盖、长标题及关系图事实文案等问题。原生图形类型、轴范围和配色缺失曾逃过通用 QA；原始三种篡改探针现均正确 FAIL。来源期间与派生文件哈希也按原始字节核对。
 
-三类可运行分析在声明 Schema 内仍为 PROVEN：完整月份经营数据、成熟非线性销售队列及 CNY 项目累计快照。来源真实性与因果推断不在代码认证范围内。参阅[分析边界](ANALYTICAL_LIBRARY.md)。
+实际放大检查进一步发现：面积图缺失值被画向零、单点面积为空、负值标签与类别重叠。现在不可靠的面积输入明确报错并给出折线/KPI/表格替代建议；负值轴留白按数量级处理，保留极小真实负数，类别文字置于柱体外。已查看真实重渲染，没有为了视觉通过而静默补零、删数据或改值。
+
+最终本地视觉结论 PASS_WITH_NOTES：全套 Montage/Contact Sheet 加明确列出的放大页面，不声称每页均全尺寸检查。密集表格适合会前阅读/附录；临近真实日期的圆点可能接触，但标签错层可读；精确比较宜优先折线而非重叠面积。自动报告仍保留 VISUAL_QA=NOT_RUN，由单独 Codex 记录提供实际复核判断。
+
+## 已知边界
+
+数值契约校验声明的语义与格式，显式绑定复用事实；不是通用资料抽取、因果推断或统计显著性引擎。叙事图检查声明的覆盖与精确重复候选；摘要/展开的价值和决策相关性仍需 Agent 判断。JSON/IEEE754 不等于任意精度会计计算。
+
+六类原生图表、堆叠及显式等宽分箱均有限制。缺失/单点面积、散点/气泡/瀑布/组合图等不可靠或未实现组合会被拒绝。日期时间轴、有限容量的无环分支/泳道/DAG 使用可编辑对象；循环流程与通用排程未实现。已有 PPTX 替换范围有限，无任意无损编辑、HTML 输出或自主视觉修复。
+
+安全图片层需 Python3.11+/Pillow13；Python3.9+ 可运行无 Pillow 核心层。依赖公告是[带日期的快照](evidence/v1.3/dependency-security.json)，不保证没有未知漏洞。完整 ZIP 预检保留 V1.2.1 Doctor 静态导入修复，检查代码、说明、元数据、路径、权限及依赖声明，不等同企业平台认证。
+
+本地实测为 Linux x86_64、Node24.18、Python3.14.4/Pillow13、LibreOfficeDev26.8 alpha、Poppler26.05。CI 另有 Ubuntu 渲染，发布前独立复核。Windows/macOS/ARM64 原生 PowerPoint 为 NOT_RUN；公司/Agensi 实际上传和安全审核为 NOT_VERIFIED。Social Preview 素材已生成；CLI 管理权限已确认，但浏览器会话不可用，仓库设置仍需按文档手动应用。
+
+Pro 在公共 Core 外独立交付产品设计，收费交付、差异化实测及市场旅程尚未建立，$29 只是价格假设。正式提交、ZIP 校验值和公开复验以 Release 外部证据为准，避免将压缩包自身哈希写入其内部造成循环。

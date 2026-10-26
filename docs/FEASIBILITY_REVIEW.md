@@ -1,56 +1,46 @@
-# Goujian Strategy Slides V1.2 feasibility review
+# Feasibility review · V1.3
 
-2026-10-21 · Strategic intelligence, deterministic validation and release packaging.
+[English](FEASIBILITY_REVIEW.md) | [简体中文](FEASIBILITY_REVIEW.zh-CN.md)
 
-[简体中文](FEASIBILITY_REVIEW.zh-CN.md) · [Product overview](PRODUCT_OVERVIEW.md) · [Benchmarks A–J](BENCHMARKS_V1_2.md) · [Quality and validation](QUALITY_AND_VALIDATION.md)
-
-Status vocabulary: **PROVEN** within the stated evidence and scope; **PARTIAL** for bounded or incomplete coverage; **DESIGNED** for a contract without a faithful implementation; **BLOCKED** when a required capability cannot run; **NOT_VERIFIED** when the claim or platform was not executed. These labels are scoped by evidence, not product-wide guarantees.
+2026-10-26. **V1.3 RELEASE READY WITH KNOWN LIMITATIONS.** This is the bounded engineering/product verdict. Publication additionally requires green CI, review of its actual Ubuntu renders, approved-commit packaging and remote verification; this document does not itself claim a published Release.
 
 | Dimension | Status | Evidence and boundary |
 |---|---|---|
-| Architecture | PROVEN | Shared schema → composition → native PPTX → hash-bound scene → QA pipeline. Reasoning layer is additive; renderer core retained. |
-| Reasoning plan contract | PROVEN within contract | Agent-authored sources, claims, dispositions, calculations, bindings and theme are validated before compile. 15/15 independent engine checks were rerun by Codex at `2c622db`. No independent reasoning model is claimed. |
-| Deterministic arithmetic | PROVEN for four operators | `sum`, `difference`, `ratio`, `percent_change`, with unit/metric/window/denominator/zero checks and explicit tolerance. No arbitrary formulas, statistical significance or causal inference. |
-| Source verification | PARTIAL | Structured JSON values can be checked with JSON Pointers and source SHA256. PDF/image/text/native-PPTX ledgers remain `REVIEWER_REQUIRED`; a locator or citation is not source truth. |
-| Final artifact verification | PROVEN within trust scope | With a trusted expected hash, verification reads the exact PPTX bytes and checks chart caches, tables, KPI text, notes, embedded report and plan/spec hashes. It does not prove source truth or visual quality. |
-| Theme decision | PROVEN for selection | Reference > brand > explicit user > automatic > default precedence; explicit dark and printable conflicts are recorded. light/brand-blue/dark variants were built and rendered. Configuration diversity is not 15 visually approved designs. |
-| Multimodal / native images | PROVEN within contract | Native PNG/JPEG/WEBP, protected crop/focal/opacity/masks, captions and pixel-text provenance. No PPTX image postprocessing. |
-| Asset reasoning | PARTIAL | The agent supplies categories and provenance; code enforces policy. No classifier, OCR or universal visual understanding. |
-| Native source inspection | PROVEN for supplied fixtures | Two synthetic native source decks preserved a nine-column table with owner/review date, four chart values and embedded images with file/slide/shape locators. Arbitrary complex source reconstruction remains partial. |
-| Title/layout | PROVEN within contract | Measured/equivalent estimates, short-title/subtitle, dynamic divider/body flow, explicit header-capacity errors. Long-title regression rendered; measurement is not exact PowerPoint shaping. |
-| Provenance / scene | PROVEN | Native, pixel, annotation, data and insight provenance plus actual native object relationships. |
-| Spatial QA | PROVEN within explicit scenes | Native geometry/order readback, occlusion, safe area, text/rule gap, density and conservative text-fit warnings. No arbitrary imported-intent inference. |
-| Visual quality | PARTIAL | Final independent actual VQA covers 8 cases / 58 pages on Linux LibreOffice with synthetic fixtures, bound to exact PPTX and page hashes, status `PASS_WITH_KNOWN_LIMITATIONS`. This is not all 15 profiles, not the 15 legacy benchmark scenarios and not native PowerPoint. Eight renders are not eight universal visual approvals. |
-| Packaging | PROVEN locally | Deterministic installer test builds identical bytes and checks one root SKILL, fixed timestamps/permissions, required assets, no PPTX/PDF or caches. Final clean-unzip installation evidence is recorded separately. |
-| Installation | PROVEN on Linux x86_64 | isolate `.venv`, `npm ci`/bootstrap, doctor, tests, example build and render were executed from the installer ZIP in a Unicode/space path without symlinks. macOS/Windows/ARM64 are not verified. |
-| Maintainability | PROVEN structurally | Small shared modules for reasoning, assets, titles and scene capture. No wholesale engine rewrite or heavyweight runtime dependency. |
-| Profiles / fonts | PARTIAL | Fifteen real token configurations beyond color; Linux font resolution is proven. Fonts are not embedded; complete glyph coverage and recipient rendering are not proven. |
-| PPT ingestion / fidelity | PARTIAL | Text, pictures, charts, tables, groups and master/layout candidates are mapped; complex reconstruction and ambiguous semantics remain partial. |
-| Extensibility | PROVEN at boundary | Asset, provenance, relationship and reasoning JSON do not import PptxGenJS; the native adapter stays at the renderer boundary. |
-| Multi-renderer | DESIGNED | HTML/Web renderer is not implemented. |
-| QA reliability | PARTIAL | Negative regressions, hash-binding and actual review exist. No exact PowerPoint shaping, universal aesthetic oracle or autonomous repair. |
-| Release workflow | NOT_VERIFIED | The manual `workflow_dispatch` workflow is updated and statically checked, but was not dispatched in this phase. No tag or public Release was created. |
-| Open-source readiness | PARTIAL | Single Skill entry, synthetic notices, installer and showcase are locally built and checked. GitHub publication settings and anonymous asset download are outstanding manual steps. |
-| Commercial readiness | PARTIAL | Documentation only. Community remains Apache-2.0. Supporter/Pro are future candidates with no checkout, account or listing. Agensi hosted runtime is NOT_VERIFIED. |
-| Documentation accuracy | PROVEN for audited claims | Create, reasoning, native image and bounded QA paths execute. Edit/rebuild/reference/vision/repair boundaries are stated. Historical release documents are unchanged. |
+| Architecture feasibility | PROVEN | Existing schemas, reasoning, compositions/profiles and one native PPTX engine extended; legacy examples retained |
+| Product feasibility | PROVEN | Three recomputable analytical recipes and explicit semantic/narrative contracts; the agent supplies interpretation/design |
+| Visual/aesthetic quality | PROVEN | Actual montage and representative full-size inspection; see hash-bound review and its limited scope |
+| Installation feasibility | PROVEN | Unicode/spaced ZIP extraction, project npm/venv bootstrap, Doctor and example build/QA/render; final archive rechecked at release |
+| Maintainability | PARTIAL | Shared calculations/formatting/readback; pinned native XML patches and the large benchmark/QA scripts need focused regression |
+| Extensibility | PARTIAL | Semantic contracts are reusable; layout and native readback remain PPTX-specific |
+| Multi-renderer readiness | PARTIAL | HTML renderer and renderer-neutral layout IR are not implemented |
+| Open-source readiness | PROVEN | Apache-2.0, one Skill, complete-ZIP preflight, source-parity and immutable release workflow |
+| Documentation accuracy | PROVEN | Bilingual product/installation/migration/quality docs distinguish implemented checks from Agent judgment and unsupported platforms |
+| QA reliability | PROVEN | Native values/workbooks/units/series, source aliases, family/axis/paint corruption and metadata negatives are exercised; universal aesthetic/semantic correctness is not certified |
 
-28 Storylines · 86 semantic entries (74 IMPLEMENTED / 6 PARTIAL / 6 DESIGNED) · 27 Compositions · 15 Profiles · 15 Template Recipes · 15 Benchmark scenarios.
+## Executed evidence
 
-## Evidence anchors
+Frozen engine SHA256: `e183c3c162801781a1c69cc480dd53b49f805c2e571be5a9a0245cff5b45d854`. Full regression: 188 discovered, 187 passed, 1 opt-in integration skip, 0 failures (122 Node + 66 Python). Core tier: 172 discovered, 171 passed, 1 skip, 0 failures. The real clean-install/bootstrap journey is executed separately, rather than counting the skipped test as a pass. Legacy benchmark: 15 scenarios / 104 slides, all rendered, PASS_WITH_NOTES.
 
-- Engine acceptance: [Codex final acceptance](evidence/v1.2/reviews/codex-final-acceptance.json) — 15/15 at `2c622db`, engine acceptance only.
-- Final actual visual acceptance: [Codex final visual acceptance](evidence/v1.2/reviews/codex-final-visual-acceptance.json) — 8 cases / 58 pages, `PASS_WITH_KNOWN_LIMITATIONS`, Linux LibreOffice only.
-- Source-byte equivalence for the accepted renders: [final source provenance](evidence/v1.2/reviews/final-source-provenance.json) — 91 files, 0 mismatches; historical dirty-build metadata preserved separately.
-- Partial full-size review and remaining copy defects: [round-2 preview review](evidence/v1.2/reviews/codex-round2-preview-review.md); fixed copy is reflected in the showcase build.
-- Source PPTX scope: [source acceptance](evidence/v1.2/reviews/codex-source-pptx-acceptance.md); actual inspection records are in the optional showcase (`source-inspection.json`).
-- Dependency audit: [official npm audit record](evidence/v1.2/reviews/codex-dependency-audit-official.json) — 0 known advisories with the official registry.
-- Showcase and previews: [showcase documentation](SHOWCASE_V1_2.md), `docs/visual/v1.2/`.
-- A–J evidence matrix: [Benchmarks A–J](BENCHMARKS_V1_2.md).
+V1.3 chart matrix: 96 cases, 72 actual accepted renders and 24 expected rejections. Six native families, light/dark and eight edge-case categories are covered, with stacked/histogram supplements. Three same-input v1.2.1 comparisons use identical raw JSON; three 12-page theme galleries, a 5-page source ledger and 8 native relationship examples are generated. [Benchmark and actual comparison](BENCHMARKS_V1_3.md) · [independent visual record](evidence/v1.3/visual-review.json).
 
-## Verdict
+The source baseline is v1.2.1 commit `fb55b1cc92e52923027c2a5ad405d3ee92b42f25`; both versions use the same current locked host runtime. This is controlled source comparison, not historical Office replay. Original recipe layouts largely remain; curated gallery compositions are separate Agent-authored examples. A changed color is not evidence of automatic narrative reconstruction.
 
-**V1.2 READY WITH KNOWN LIMITATIONS for the documented Agent-assisted workflow.**
+## Audit, repair and visual iteration
 
-The reasoning contract, bounded arithmetic, native build, theme selection, source inspection and packaging are proven within their declared scopes. Semantic faithfulness, source truth, causal claims, visual quality and cross-platform rendering are not certified by code. Final independent visual acceptance is complete within the 8-case/58-page Linux LibreOffice scope; the 15 legacy benchmark scenarios remain visual `NOT_RUN`, and all 15 profiles were not fully visually tested. Public publication remains a separate gate and has not occurred.
+Independent review found and repaired output aliases that could overwrite a source; tiny/large numeric comparison and long-sum roundoff errors; currency/share-label mistakes; missing-line bridges; overwritten category labels; long-title context and relationship-copy errors. Native family/axis/paint corruption originally escaped generic QA; all three original mutation probes now correctly FAIL. Source-ledger periods and derivative hashes are reconciled against original bytes.
 
-Three runnable analytical families remain PROVEN for their declared schemas: business monthly data, mature nonlinear sales cohorts and CNY project snapshots. Source truth and causal inference are outside code certification. See [analytical boundaries](ANALYTICAL_LIBRARY.md).
+Full-size render inspection also found false zero-area gaps, empty single-point areas and negative labels overlapping categories. Unsupported area inputs now fail with explicit line/KPI/table alternatives. Magnitude-aware negative-axis padding preserves tiny real values; category labels stay outside negative bars. Actual rerenders were inspected. No source value was silently imputed, removed or changed to make a picture pass.
+
+The final local visual verdict is PASS_WITH_NOTES: complete montages/contact sheets plus named full-size pages, not every page at full size. Dense tables suit read-ahead/appendix; close true-date markers can touch while alternating labels remain readable; overlapping areas are less useful than lines for exact comparison. The automated manifests retain VISUAL_QA=NOT_RUN; the separate Codex record supplies the actual reviewer judgment.
+
+## Boundaries
+
+Typed metrics validate declared meaning and formatting; explicit bindings share facts across text/KPI/table/chart. They are not a general source-extraction, causal-inference or statistical-significance engine. Narrative graphs flag declared coverage/exact redundancy; Agent review retains useful summary/detail and assesses decision relevance. JSON/IEEE754 is not arbitrary-precision accounting.
+
+Six native chart families, stacking and explicit equal-bin histograms have bounded implementations. Missing/single-point areas and unsupported scatter/bubble/waterfall/combination charts are rejected. Dated timeline and bounded acyclic branch/swimlane/DAG use editable objects; cyclic flows and generic scheduling remain unsupported. Existing PPTX replacement is limited; lossless editing, HTML output and autonomous visual repair are not implemented.
+
+The secure optional tier requires Python 3.11+ / Pillow 13; Python 3.9+ retains a Pillow-free core tier. Dependency advisories are a [dated snapshot](evidence/v1.3/dependency-security.json), not a promise of no unknown vulnerabilities. Complete ZIP preflight preserves the V1.2.1 static Doctor fix and checks code, instructions, metadata, paths, permissions and dependency declarations. It is not private-platform approval.
+
+Local execution used Node 24.18, Python 3.14.4 / Pillow 13, LibreOfficeDev 26.8 alpha and Poppler 26.05 on Linux x86_64. CI supplies a separate Ubuntu render that is reviewed before release. Native Windows/macOS/ARM64 PowerPoint is NOT_RUN; company/Agensi upload/security is NOT_VERIFIED. GitHub Social Preview material is generated; applying the repository setting remains manual because the browser session was unavailable, despite verified CLI admin access.
+
+Pro is a separate design deliverable outside public Core. Paid delivery, measured differentiation and marketplace execution are not established; $29 remains a pricing hypothesis. Final release commit, archive checksums and public verification are recorded in external Release evidence, avoiding circular self-hashes inside the installer.

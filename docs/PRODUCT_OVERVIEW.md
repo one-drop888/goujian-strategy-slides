@@ -1,52 +1,38 @@
 # Goujian Strategy Slides
 
-[English](PRODUCT_OVERVIEW.md) | [简体中文](PRODUCT_OVERVIEW.zh-CN.md) | [Repository root](../README.en.md) · [Installation](../README.en.md#installation) · [Benchmarks A–J](BENCHMARKS_V1_2.md) · [Feasibility review](FEASIBILITY_REVIEW.md)
+[English](PRODUCT_OVERVIEW.md) | [简体中文](PRODUCT_OVERVIEW.zh-CN.md) · [README](../README.en.md)
 
-## Presentation Intelligence for AI Agents
+**Presentation Intelligence for AI Agents**
 
-Goujian Strategy Slides is an open-source presentation skill designed to help AI agents turn complex information into clear, structured and decision-useful presentations.
+Goujian is an open-source, production-oriented presentation skill. It helps an agent turn complex information into a structured argument and native editable PowerPoint, with explicit data contracts and reviewable output.
 
-**Think clearly. Structure strategically. Present decisively.**
-
-It models the reasoning behind a strong professional presentation:
+Think clearly. Structure strategically. Present decisively.
 
 **Think → Structure → Visualize → Build → Validate**
 
-It combines management storytelling, storylines, action titles, semantic archetypes, composition grammar, data visualization, profile-driven design, native editable PPTX generation and quality gates into one workflow. The agent supplies judgment; deterministic code validates, builds and exposes boundaries.
+A useful management presentation answers a question, presents evidence, makes a supported judgment and identifies an action. Goujian uses **Question → Evidence → Judgment → Action** to organize that work. High information density does not mean high text density: a precise comparison may communicate more than several paragraphs, while a table may be better than a chart for exact lookup.
 
-> Great presentations are not collections of beautiful slides. They are structured arguments designed to help people understand complex information and act.
+## What you get
 
-Its management reasoning model is **Question → Evidence → Judgment → Action**. High information density ≠ high text density: charts, comparisons, frameworks and tables should carry the argument, with text reserved for interpretation and action.
+- A reusable presentation library: storylines, semantic archetypes, compositions, profiles and recipes, backed by one native PPTX engine. These are expression choices, not hundreds of unrelated slide templates.
+- Three executable analytical workflows: business performance, nonlinear sales conversion and project performance. Inputs, calculations, periods, denominators and missing facts stay inspectable.
+- Optional typed metrics for fractions, percentages, percentage points, currency, scaling and display precision. A fact can drive a title, KPI, table and native chart without repeated manual conversion.
+- An agent-authored Reasoning Plan for sources, claims, arithmetic and content dispositions. A declared Narrative Graph tracks questions, evidence, pages and decisions without automatically deleting similar content.
+- Visual encoding for categorical comparisons, declared value scales and business roles; native text, charts, tables and shapes; measured titles and image/evidence compositions.
+- Executable QA on serialized PPTX and chart workbooks, plus geometry, fonts, spatial checks, actual render and a separate visual-review record.
 
-## Who it serves
+The working boundary is deliberate: the agent explains and chooses; code computes, constrains and records. The project does not contain an independent general business reasoning model, arbitrary statistical significance engine or causal inference system.
 
-- Management teams reviewing results, diagnosing gaps and assigning owned actions.
-- Research teams connecting sample design, quantitative signals, quotations and qualified interpretation.
-- Product and technology teams explaining choices, risks, operating models and staged implementation.
-- AI agents that need a reusable presentation workflow instead of ad hoc slide-generation scripts.
+## One product, different agent environments
 
-## How V1.2 works
+The Community runtime is Apache-2.0 and retains one root `SKILL.md`. Agent adapters reuse the same core; a platform display name does not create a new skill ID or a company-specific branch. Install the complete source/runtime ZIP, not only the `skill/` directory.
 
-The agent establishes the decision, evidence, constraints and content dispositions, then authors a Reasoning Plan. Deterministic validation checks structure, arithmetic, referential closure, coverage, numeric bindings and theme selection. Compilation produces an exported spec and a native editable PPTX. A hash-bound scene and reasoning sidecar support structural QA and actual rendering for semantic/visual review.
+Node18+/Python3.9+ remain compatibility floors; use maintained security-patched runtimes. Secure image/full-render functionality needs Python3.11+/Pillow13 plus external render tools/fonts. See [installation](INSTALLATION.md).
 
-The Reasoning Plan is an **agent-authored** input; this project has no independent general reasoning model. Validation supports `sum`, `difference`, `ratio` and `percent_change`, including unit, time-window, metric and denominator checks. There is no arbitrary formula engine, significance test or causal inference. Structured JSON sources can be compared with source bytes through JSON Pointers. Numeric ledgers extracted from images, PDFs, text or native PPTX remain reviewer-required. A citation is not proof of source truth.
+## Output and limitations
 
-The library contains 28 storylines, 86 semantic entries, 27 composition recipes, 15 profiles and 15 starting recipes. **74 semantic entries are implemented, 6 are partial, and 6 are designed only.** The last group cannot be built. Counts describe vocabulary, not a promise of 86 independently designed layouts.
+Native text, shapes, tables and supported charts can be edited in PowerPoint. Pixel text in screenshots cannot. Existing PPTX text replacement is bounded to a single DrawingML text node; lossless round-trip editing, imported master cloning, automatic OCR and autonomous visual repair are not implemented.
 
-## Theme and visual system
+Six native chart families are supported. Explicit equal-width histogram bins and stacked bar/column have bounded implementations; unsupported statistical or combination charts are rejected instead of relabeled. Source truth, business relevance and aesthetics still require review. The executed Linux environment does not prove native Windows/macOS/ARM64 PowerPoint parity or company/Agensi approval.
 
-Theme precedence is reference profile > brand profile > explicit user profile > automatic intent matching > default. An explicit dark request can override automatic light selection, but dark versus printable and related conflicts are recorded rather than hidden. The selected profile drives typography, spacing, tables, metrics, chart grids and colors.
-
-V1.2 showcases three theme variants and eight dark native chart types. Titles use glyph measurement and conservative estimation, with short-title/subtitle support, a dynamic divider and body flow. Measurement is not proof of exact PowerPoint shaping; structural QA cannot prove the absence of rendered text collisions. The final frame requires inspection.
-
-Images, native charts, tables and interpretation share one pipeline with source, pixel-text, crop and scene relationships. Asset classification, semantic rewriting and visual repair remain agent-assisted. There is no automatic OCR, arbitrary lossless PPTX editor, autonomous visual repair or cross-renderer layout engine.
-
-## V1.2 delivery and review
-
-Eight showcase cases cover an executive review, Q4 actions, multisource consolidation, three theme variants, eight dark charts and a long-title regression. Each case preserves reference inputs, exported spec, PPTX, reasoning sidecar, QA, actual LibreOffice render, montage and hash manifest. The install ZIP is a separate lightweight runtime; the showcase ZIP is an optional review artifact.
-
-Independent final visual acceptance was completed after writing stopped: Codex reviewed all 58 pages across the 8 showcase cases on Linux LibreOffice with synthetic fixtures, with `PASS_WITH_KNOWN_LIMITATIONS` bound to exact PPTX and page hashes. This is not publication approval. The 15 legacy benchmark scenarios remain visual `NOT_RUN`, and all 15 profiles were not fully visually tested. Native PowerPoint on macOS/Windows/ARM64 was not executed; Agensi/company-hosted runtime is not verified.
-
-The Community core, including doctor, QA and defect fixes, remains free under Apache-2.0. Supporter and Pro are future candidates only: no account, payment or listing exists in this repository. Pro adds business workflow packs, not a second rendering engine. See [Commercial readiness](COMMERCIAL_READINESS.md).
-
-For exact limits, read the [feasibility review](FEASIBILITY_REVIEW.md), [quality and validation](QUALITY_AND_VALIDATION.md), [Benchmarks A–J](BENCHMARKS_V1_2.md) and [root README](../README.en.md). V1.1 and earlier release documents remain historical records and are not retroactively rewritten.
+V1.3 focuses on **Semantic Accuracy → Visual Encoding → Perceptual Clarity → Management Insight**. The [benchmark](BENCHMARKS_V1_3.md) and [feasibility review](FEASIBILITY_REVIEW.md) state what was actually tested. Pro is a separate product design; it does not remove correctness or readability fixes from Community and is not a launched paid product.

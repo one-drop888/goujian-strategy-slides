@@ -1,5 +1,5 @@
 const {createPrimitives}=require('../primitives/base');
-const {createChartHelper}=require('../charts');
+const {createChartHelper,labelOptions}=require('../charts');
 const {resolveTitle,balancedWrap}=require('../../planner/title');
 function createMultimodalRenderers(pptx,style,spec,assets) {
   const {base,finish,text,C,F,left,width,W,H}=createPrimitives(pptx,style);
@@ -13,7 +13,7 @@ function createMultimodalRenderers(pptx,style,spec,assets) {
     slide._scene.relationships.push({from:nodeId+'-caption',to:nodeId,type:'caption_of'});
     return result;
   }
-  function panel(slide,p,b) {
+  function panel(slide,p,b,s) {
     const scene=native({id:p.id,role:p.role||'evidence',provenance:p.provenance});
     if(!scene.provenance)delete scene.provenance;
     if(p.kind==='image')return imagePanel(slide,p.asset_id,b,p.id);
@@ -25,8 +25,20 @@ function createMultimodalRenderers(pptx,style,spec,assets) {
       const rows=p.rows.map((row,i)=>row.map(value=>({text:String(value),options:{color:table.bodyText,fill:i%2===1?table.bandFill:table.bodyFill}})));
       slide.addTable([p.headers.map(t=>({text:String(t),options:header})),...rows],{x:b.x,y:b.y,w:b.w,rowH:Math.min(.65,b.h/(p.rows.length+1)),fontFace:F.cjk,fontSize:Math.max(12,F.tableSize-1),color:table.bodyText,margin:[4,4,4,4],border:{pt:.5,color:table.border},autoPage:false,scene});return;
     }
-    const colors=charts.tokens.chart.palette;
-    slide.addChart(p.chartType==='line'?pptx.ChartType.line:pptx.ChartType.bar,p.series.map(s=>({name:s.name||'',labels:s.labels||p.labels,values:s.values})),charts.options({...b,barDir:p.chartType==='column'?'col':'bar',showLegend:p.series.length>1,showValue:true,showCatName:false,catAxisLabelFontSize:12,valAxisLabelFontSize:11,dataLabelFontSize:12,dataLabelFormatCode:p.numberFormat||'0.0',chartColors:colors,valAxisMinVal:0,valGridLine:{color:charts.tokens.chart.grid,size:.5,style:style.style.chart_grid==='none'?'none':'solid'},showShadow:false,scene}));
+    const kind=p.chartType||'bar';
+    const caption=[p.unit,p.period].filter(value=>value!=null&&String(value).trim()!=='').map(value=>String(value).trim()).join(' · ');
+    const captionHeight=caption?0.32:0;
+    const chartBox={...b,h:b.h-captionHeight};
+    const colors=style.encoding?style.encoding.colorsFor(kind,p.series||[],s):charts.tokens.chart.palette;
+    const numberFormat=p.numberFormat||'0.0';
+    const labelStrategy=style.encoding?style.encoding.encodingPlan(s).label_strategy:null;
+    const panelSeries=p.series.map(item=>({name:item.name||'',labels:item.labels||p.labels,values:item.values}));
+    const panelMissing=p.series.some(item=>(item.values||[]).some(value=>value==null));
+    const panelFinite=(p.series||[]).flatMap(item=>item.values||[]).filter(value=>value!=null);
+    const panelAxisMin=['bar','column','area'].includes(kind)?charts.valueAxisMin(panelFinite):kind==='line'?0:undefined;
+    slide.addChart(kind==='line'?pptx.ChartType.line:pptx.ChartType.bar,panelSeries,charts.options({...chartBox,barDir:kind==='column'?'col':'bar',showLegend:p.series.length>1,...(panelMissing?{displayBlanksAs:'gap'}:{}),...labelOptions(kind,labelStrategy,{showValue:true,showCatName:false,showSerName:false,showPercent:false,showLabel:false}),showMarker:kind==='line',lineDataSymbol:'circle',lineDataSymbolSize:5,lineSize:2.5,catAxisLabelFontSize:12,valAxisLabelFontSize:11,dataLabelFontSize:12,dataLabelFormatCode:numberFormat,valAxisLabelFormatCode:numberFormat,chartColors:colors,...(panelAxisMin!=null?{valAxisMinVal:panelAxisMin}:{}),valGridLine:{color:charts.tokens.chart.grid,size:.5,style:style.style.chart_grid==='none'?'none':'solid'},showShadow:false,scene}));
+    if(caption)text(slide,caption,b.x,b.y+b.h-captionHeight+.02,b.w,captionHeight-.04,
+      {fontSize:Math.min(11,F.bodySize-4),color:C.muted,valign:'bottom',scene:native({id:`${p.id}-unit`,role:'unit'})});
   }
   function hero(slide,s) {
     const box={x:0,y:0,w:W,h:H};
@@ -68,7 +80,7 @@ function createMultimodalRenderers(pptx,style,spec,assets) {
         if(s.composition==='multimodal-split')panels.push({id:'interpretation',kind:'text',text:s.insight||s.body,provenance:{kind:'derived_insight',render_mode:'editable'}});
       }
       const cols=panels.length===1?1:2,rows=Math.ceil(panels.length/cols),cw=(b.w-gap*(cols-1))/cols,ch=(b.h-gap*(rows-1))/rows;
-      panels.forEach((p,i)=>panel(slide,p,{x:b.x+(i%cols)*(cw+gap),y:b.y+Math.floor(i/cols)*(ch+gap),w:cw,h:ch}));
+      panels.forEach((p,i)=>panel(slide,p,{x:b.x+(i%cols)*(cw+gap),y:b.y+Math.floor(i/cols)*(ch+gap),w:cw,h:ch},s));
     }
     finish(slide,s);
   }

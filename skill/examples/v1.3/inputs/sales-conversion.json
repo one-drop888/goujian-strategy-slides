@@ -1,0 +1,582 @@
+{
+  "source": "Project-authored synthetic dataset / Apache-2.0",
+  "synthetic": true,
+  "period": {
+    "start": "2026-08-01",
+    "end": "2026-09-30"
+  },
+  "recipe": "sales-conversion",
+  "title": "销售转化诊断：队列与可选行为",
+  "as_of": "2026-10-10",
+  "horizon_days": 30,
+  "stages": [
+    {
+      "id": "visit",
+      "label": "到店"
+    },
+    {
+      "id": "trial",
+      "label": "试驾（可选）"
+    },
+    {
+      "id": "order",
+      "label": "成交"
+    }
+  ],
+  "outcome_stage": "order",
+  "edges": [
+    {
+      "from": "lead",
+      "to": "visit"
+    },
+    {
+      "from": "visit",
+      "to": "order"
+    },
+    {
+      "from": "trial",
+      "to": "order"
+    }
+  ],
+  "leads": [
+    {
+      "lead_id": "L001",
+      "customer_id": "C001",
+      "acquired": "2026-08-01",
+      "channel": "广告",
+      "region": "华南"
+    },
+    {
+      "lead_id": "L002",
+      "customer_id": "C002",
+      "acquired": "2026-08-02",
+      "channel": "转介",
+      "region": "华北"
+    },
+    {
+      "lead_id": "L003",
+      "customer_id": "C003",
+      "acquired": "2026-08-03",
+      "channel": "自然",
+      "region": "西南"
+    },
+    {
+      "lead_id": "L004",
+      "customer_id": "C004",
+      "acquired": "2026-08-04",
+      "channel": "广告",
+      "region": "华东"
+    },
+    {
+      "lead_id": "L005",
+      "customer_id": "C005",
+      "acquired": "2026-08-05",
+      "channel": "转介",
+      "region": "华南"
+    },
+    {
+      "lead_id": "L006",
+      "customer_id": "C006",
+      "acquired": "2026-08-06",
+      "channel": "自然",
+      "region": "华北"
+    },
+    {
+      "lead_id": "L007",
+      "customer_id": "C007",
+      "acquired": "2026-08-07",
+      "channel": "广告",
+      "region": "西南"
+    },
+    {
+      "lead_id": "L008",
+      "customer_id": "C008",
+      "acquired": "2026-08-08",
+      "channel": "转介",
+      "region": "华东"
+    },
+    {
+      "lead_id": "L009",
+      "customer_id": "C009",
+      "acquired": "2026-08-09",
+      "channel": "自然",
+      "region": "华南"
+    },
+    {
+      "lead_id": "L010",
+      "customer_id": "C010",
+      "acquired": "2026-08-10",
+      "channel": "广告",
+      "region": "华北"
+    },
+    {
+      "lead_id": "L011",
+      "customer_id": "C011",
+      "acquired": "2026-08-11",
+      "channel": "转介",
+      "region": "西南"
+    },
+    {
+      "lead_id": "L012",
+      "customer_id": "C012",
+      "acquired": "2026-08-12",
+      "channel": "自然",
+      "region": "华东"
+    },
+    {
+      "lead_id": "L013",
+      "customer_id": "C013",
+      "acquired": "2026-08-13",
+      "channel": "广告",
+      "region": "华南"
+    },
+    {
+      "lead_id": "L014",
+      "customer_id": "C014",
+      "acquired": "2026-08-14",
+      "channel": "转介",
+      "region": "华北"
+    },
+    {
+      "lead_id": "L015",
+      "customer_id": "C015",
+      "acquired": "2026-08-15",
+      "channel": "自然",
+      "region": "西南"
+    },
+    {
+      "lead_id": "L016",
+      "customer_id": "C016",
+      "acquired": "2026-08-16",
+      "channel": "广告",
+      "region": "华东"
+    },
+    {
+      "lead_id": "L017",
+      "customer_id": "C017",
+      "acquired": "2026-08-17",
+      "channel": "转介",
+      "region": "华南"
+    },
+    {
+      "lead_id": "L018",
+      "customer_id": "C018",
+      "acquired": "2026-08-18",
+      "channel": "自然",
+      "region": "华北"
+    },
+    {
+      "lead_id": "L019",
+      "customer_id": "C019",
+      "acquired": "2026-08-19",
+      "channel": "广告",
+      "region": "西南"
+    },
+    {
+      "lead_id": "L020",
+      "customer_id": "C020",
+      "acquired": "2026-08-20",
+      "channel": "转介",
+      "region": "华东"
+    },
+    {
+      "lead_id": "L021",
+      "customer_id": "C021",
+      "acquired": "2026-09-01",
+      "channel": "自然",
+      "region": "华南"
+    },
+    {
+      "lead_id": "L022",
+      "customer_id": "C022",
+      "acquired": "2026-09-02",
+      "channel": "广告",
+      "region": "华北"
+    },
+    {
+      "lead_id": "L023",
+      "customer_id": "C023",
+      "acquired": "2026-09-03",
+      "channel": "转介",
+      "region": "西南"
+    },
+    {
+      "lead_id": "L024",
+      "customer_id": "C024",
+      "acquired": "2026-09-04",
+      "channel": "自然",
+      "region": "华东"
+    },
+    {
+      "lead_id": "L025",
+      "customer_id": "C025",
+      "acquired": "2026-09-05",
+      "channel": "广告",
+      "region": "华南"
+    },
+    {
+      "lead_id": "L026",
+      "customer_id": "C026",
+      "acquired": "2026-09-06",
+      "channel": "转介",
+      "region": "华北"
+    },
+    {
+      "lead_id": "L027",
+      "customer_id": "C027",
+      "acquired": "2026-09-07",
+      "channel": "自然",
+      "region": "西南"
+    },
+    {
+      "lead_id": "L028",
+      "customer_id": "C028",
+      "acquired": "2026-09-08",
+      "channel": "广告",
+      "region": "华东"
+    },
+    {
+      "lead_id": "L029",
+      "customer_id": "C029",
+      "acquired": "2026-09-09",
+      "channel": "转介",
+      "region": "华南"
+    },
+    {
+      "lead_id": "L030",
+      "customer_id": "C030",
+      "acquired": "2026-09-10",
+      "channel": "自然",
+      "region": "华北"
+    },
+    {
+      "lead_id": "L031",
+      "customer_id": "C031",
+      "acquired": "2026-09-11",
+      "channel": "广告",
+      "region": "西南"
+    },
+    {
+      "lead_id": "L032",
+      "customer_id": "C032",
+      "acquired": "2026-09-12",
+      "channel": "转介",
+      "region": "华东"
+    },
+    {
+      "lead_id": "L033",
+      "customer_id": "C033",
+      "acquired": "2026-09-13",
+      "channel": "自然",
+      "region": "华南"
+    },
+    {
+      "lead_id": "L034",
+      "customer_id": "C034",
+      "acquired": "2026-09-14",
+      "channel": "广告",
+      "region": "华北"
+    },
+    {
+      "lead_id": "L035",
+      "customer_id": "C035",
+      "acquired": "2026-09-15",
+      "channel": "转介",
+      "region": "西南"
+    },
+    {
+      "lead_id": "L036",
+      "customer_id": "C036",
+      "acquired": "2026-09-16",
+      "channel": "自然",
+      "region": "华东"
+    },
+    {
+      "lead_id": "L037",
+      "customer_id": "C037",
+      "acquired": "2026-09-17",
+      "channel": "广告",
+      "region": "华南"
+    },
+    {
+      "lead_id": "L038",
+      "customer_id": "C038",
+      "acquired": "2026-09-18",
+      "channel": "转介",
+      "region": "华北"
+    },
+    {
+      "lead_id": "L039",
+      "customer_id": "C039",
+      "acquired": "2026-09-19",
+      "channel": "自然",
+      "region": "西南"
+    },
+    {
+      "lead_id": "L040",
+      "customer_id": "C040",
+      "acquired": "2026-09-20",
+      "channel": "广告",
+      "region": "华东"
+    },
+    {
+      "lead_id": "L-duplicate",
+      "customer_id": "C001",
+      "acquired": "2026-08-05",
+      "channel": "广告",
+      "region": "华南"
+    }
+  ],
+  "events": [
+    {
+      "customer_id": "C001",
+      "stage": "visit",
+      "date": "2026-08-02"
+    },
+    {
+      "customer_id": "C002",
+      "stage": "visit",
+      "date": "2026-08-03"
+    },
+    {
+      "customer_id": "C004",
+      "stage": "visit",
+      "date": "2026-08-05"
+    },
+    {
+      "customer_id": "C004",
+      "stage": "trial",
+      "date": "2026-08-07"
+    },
+    {
+      "customer_id": "C005",
+      "stage": "visit",
+      "date": "2026-08-06"
+    },
+    {
+      "customer_id": "C005",
+      "stage": "order",
+      "date": "2026-08-12"
+    },
+    {
+      "customer_id": "C007",
+      "stage": "visit",
+      "date": "2026-08-08"
+    },
+    {
+      "customer_id": "C007",
+      "stage": "order",
+      "date": "2026-08-14"
+    },
+    {
+      "customer_id": "C008",
+      "stage": "visit",
+      "date": "2026-08-09"
+    },
+    {
+      "customer_id": "C008",
+      "stage": "trial",
+      "date": "2026-08-11"
+    },
+    {
+      "customer_id": "C010",
+      "stage": "visit",
+      "date": "2026-08-11"
+    },
+    {
+      "customer_id": "C010",
+      "stage": "order",
+      "date": "2026-08-17"
+    },
+    {
+      "customer_id": "C011",
+      "stage": "visit",
+      "date": "2026-08-12"
+    },
+    {
+      "customer_id": "C012",
+      "stage": "trial",
+      "date": "2026-08-15"
+    },
+    {
+      "customer_id": "C013",
+      "stage": "visit",
+      "date": "2026-08-14"
+    },
+    {
+      "customer_id": "C014",
+      "stage": "visit",
+      "date": "2026-08-15"
+    },
+    {
+      "customer_id": "C014",
+      "stage": "order",
+      "date": "2026-08-21"
+    },
+    {
+      "customer_id": "C015",
+      "stage": "order",
+      "date": "2026-08-22"
+    },
+    {
+      "customer_id": "C016",
+      "stage": "visit",
+      "date": "2026-08-17"
+    },
+    {
+      "customer_id": "C016",
+      "stage": "trial",
+      "date": "2026-08-19"
+    },
+    {
+      "customer_id": "C017",
+      "stage": "visit",
+      "date": "2026-08-18"
+    },
+    {
+      "customer_id": "C019",
+      "stage": "visit",
+      "date": "2026-08-20"
+    },
+    {
+      "customer_id": "C020",
+      "stage": "visit",
+      "date": "2026-08-21"
+    },
+    {
+      "customer_id": "C020",
+      "stage": "trial",
+      "date": "2026-08-23"
+    },
+    {
+      "customer_id": "C020",
+      "stage": "order",
+      "date": "2026-08-27"
+    },
+    {
+      "customer_id": "C021",
+      "stage": "order",
+      "date": "2026-09-08"
+    },
+    {
+      "customer_id": "C022",
+      "stage": "visit",
+      "date": "2026-09-03"
+    },
+    {
+      "customer_id": "C023",
+      "stage": "visit",
+      "date": "2026-09-04"
+    },
+    {
+      "customer_id": "C024",
+      "stage": "trial",
+      "date": "2026-09-07"
+    },
+    {
+      "customer_id": "C025",
+      "stage": "visit",
+      "date": "2026-09-06"
+    },
+    {
+      "customer_id": "C025",
+      "stage": "order",
+      "date": "2026-09-12"
+    },
+    {
+      "customer_id": "C026",
+      "stage": "visit",
+      "date": "2026-09-07"
+    },
+    {
+      "customer_id": "C028",
+      "stage": "visit",
+      "date": "2026-09-09"
+    },
+    {
+      "customer_id": "C028",
+      "stage": "trial",
+      "date": "2026-09-11"
+    },
+    {
+      "customer_id": "C028",
+      "stage": "order",
+      "date": "2026-09-15"
+    },
+    {
+      "customer_id": "C029",
+      "stage": "visit",
+      "date": "2026-09-10"
+    },
+    {
+      "customer_id": "C030",
+      "stage": "order",
+      "date": "2026-09-17"
+    },
+    {
+      "customer_id": "C031",
+      "stage": "visit",
+      "date": "2026-09-12"
+    },
+    {
+      "customer_id": "C032",
+      "stage": "visit",
+      "date": "2026-09-13"
+    },
+    {
+      "customer_id": "C032",
+      "stage": "trial",
+      "date": "2026-09-15"
+    },
+    {
+      "customer_id": "C034",
+      "stage": "visit",
+      "date": "2026-09-15"
+    },
+    {
+      "customer_id": "C035",
+      "stage": "visit",
+      "date": "2026-09-16"
+    },
+    {
+      "customer_id": "C035",
+      "stage": "order",
+      "date": "2026-09-22"
+    },
+    {
+      "customer_id": "C036",
+      "stage": "trial",
+      "date": "2026-09-19"
+    },
+    {
+      "customer_id": "C037",
+      "stage": "visit",
+      "date": "2026-09-18"
+    },
+    {
+      "customer_id": "C038",
+      "stage": "visit",
+      "date": "2026-09-19"
+    },
+    {
+      "customer_id": "C040",
+      "stage": "visit",
+      "date": "2026-09-21"
+    },
+    {
+      "customer_id": "C040",
+      "stage": "trial",
+      "date": "2026-09-23"
+    },
+    {
+      "customer_id": "C040",
+      "stage": "order",
+      "date": "2026-09-27"
+    },
+    {
+      "customer_id": "C001",
+      "stage": "visit",
+      "date": "2026-08-02"
+    }
+  ]
+}

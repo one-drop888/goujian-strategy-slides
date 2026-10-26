@@ -5,15 +5,14 @@ on:
 permissions:
   contents: read
 jobs:
-  test:
+  core:
+    name: Core-only (Node ${{ matrix.node }}, Python ${{ matrix.python }})
     runs-on: ubuntu-latest
     strategy:
       matrix:
         include:
           - node: 18
             python: '3.9'
-          - node: 24
-            python: '3.11'
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -26,7 +25,135 @@ jobs:
       - name: Install declared Linux font prerequisites
         run: sudo apt-get update -qq && sudo apt-get install -y fontconfig fonts-noto-core fonts-noto-cjk
       - run: npm ci
+      - name: Core tier without Pillow or render dependencies
+        run: npm run test:core
+      - name: Package and preflight the actual installer
+        run: |
+          set -euo pipefail
+          mkdir -p out dist
+          python3 scripts/package_runtime.py dist/installer.zip --json > out/package.json
+          python3 - <<'PY'
+          import subprocess, zipfile
+          from pathlib import Path
+          prefix = 'goujian-strategy-slides/'
+          with zipfile.ZipFile(Path('dist/installer.zip')) as archive:
+              for name in archive.namelist():
+                  relative = name[len(prefix):] if name.startswith(prefix) else None
+                  assert relative, f'archive member outside the declared prefix: {name}'
+                  expected = subprocess.run(['git', 'show', f'HEAD:{relative}'], check=True, capture_output=True).stdout
+                  assert archive.read(name) == expected, f'{relative} differs from HEAD'
+          print('PASS: installer members match HEAD')
+          PY
+          python3 scripts/security_preflight.py dist/installer.zip --json out/preflight.json
+
+  secure:
+    name: Secure image tier (Node ${{ matrix.node }}, Python ${{ matrix.python }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - node: 18
+            python: '3.11'
+          - node: 24
+            python: '3.14'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Install declared Linux font prerequisites
+        run: sudo apt-get update -qq && sudo apt-get install -y fontconfig fonts-noto-core fonts-noto-cjk
+      - name: Install V1.3 render prerequisites on the full-runtime leg
+        if: matrix.node == 24
+        run: sudo apt-get install -y libreoffice-impress poppler-utils imagemagick
+      - run: npm ci
       - run: python3 -m pip install -r requirements-render.txt
       - run: npm test
       - run: npm run benchmark
-      - run: npm run package
+      - name: V1.3 matrix, dogfood and public showcase without a baseline
+        if: matrix.node == 24
+        run: |
+          set -euo pipefail
+          mkdir -p out dist
+          node scripts/build_showcase.js --no-previews | tee out/v13-public-showcase-summary.json
+          node - <<'JS'
+          const fs = require('fs');
+          const manifest = JSON.parse(fs.readFileSync('out/v1.3-showcase/showcase.manifest.json', 'utf8'));
+          if (manifest.baseline !== null) throw new Error('Public showcase must not use a baseline path');
+          if (!manifest.scenarios.length || !manifest.scenarios.every(item => item.comparison.status === 'NOT_RUN')) throw new Error('Public showcase comparison must be NOT_RUN');
+          if (!(manifest.matrix.status === 'PASS' && manifest.gallery.status === 'PASS' && manifest.ledger.status === 'PASS')) throw new Error('A public V1.3 suite is not PASS');
+          const relationships = JSON.parse(fs.readFileSync('out/v1.3-showcase/relationships/manifest.json', 'utf8'));
+          if (relationships.status !== 'PASS' || relationships.outputs.length !== 8) throw new Error('Relationship evidence is incomplete');
+          if (relationships.visual_qa !== 'NOT_RUN') throw new Error('Relationship evidence must not claim a visual pass');
+          const preview = JSON.parse(fs.readFileSync('docs/visual/v1.3/preview-manifest.json', 'utf8'));
+          if (preview.review.status !== 'NOT_RUN') throw new Error('Preview review must remain NOT_RUN');
+          const fingerprint = JSON.parse(fs.readFileSync('out/v1.3-showcase/engine-source-fingerprint.json', 'utf8'));
+          if (preview.engine_source_fingerprint?.aggregate_sha256 !== fingerprint.aggregate_sha256) throw new Error('Checked-in previews are stale for this engine source');
+          JS
+      - name: Keep tracked source clean before packaging
+        if: matrix.node == 24
+        run: |
+          set -euo pipefail
+          git diff --exit-code
+          test -z "$(git status --porcelain)"
+          echo 'PASS: showcase generation changed no tracked file'
+      - name: Package and preflight the actual installer
+        run: |
+          set -euo pipefail
+          mkdir -p out dist
+          python3 scripts/package_runtime.py dist/installer.zip --json > out/package.json
+          python3 - <<'PY'
+          import subprocess, zipfile
+          from pathlib import Path
+          prefix = 'goujian-strategy-slides/'
+          with zipfile.ZipFile(Path('dist/installer.zip')) as archive:
+              for name in archive.namelist():
+                  relative = name[len(prefix):] if name.startswith(prefix) else None
+                  assert relative, f'archive member outside the declared prefix: {name}'
+                  expected = subprocess.run(['git', 'show', f'HEAD:{relative}'], check=True, capture_output=True).stdout
+                  assert archive.read(name) == expected, f'{relative} differs from HEAD'
+          print('PASS: installer members match HEAD')
+          PY
+          python3 scripts/security_preflight.py dist/installer.zip --json out/preflight.json
+      - name: Package and preflight the optional V1.3 showcase
+        if: matrix.node == 24
+        run: |
+          set -euo pipefail
+          python3 scripts/package_runtime.py dist/showcase.zip --showcase --json > out/showcase-package.json
+          python3 - <<'PY'
+          import subprocess, zipfile
+          from pathlib import Path
+          prefix = 'goujian-strategy-slides/'
+          with zipfile.ZipFile(Path('dist/showcase.zip')) as archive:
+              names = archive.namelist()
+              assert [name for name in names if name.endswith('/SKILL.md')] == [prefix + 'SKILL.md']
+              unexpected = [name for name in names
+                            if name.startswith(prefix + 'out/') and not name.startswith(prefix + 'out/v1.3-showcase/')]
+              assert not unexpected, f'unexpected generated output: {unexpected[:3]}'
+              for name in names:
+                  relative = name[len(prefix):] if name.startswith(prefix) else None
+                  assert relative, f'archive member outside the declared prefix: {name}'
+                  if relative.startswith('out/v1.3-showcase/'):
+                      continue
+                  expected = subprocess.run(['git', 'show', f'HEAD:{relative}'], check=True, capture_output=True).stdout
+                  assert archive.read(name) == expected, f'{relative} differs from HEAD'
+          print('PASS: showcase source matches HEAD and only adds out/v1.3-showcase')
+          PY
+          python3 scripts/security_preflight.py dist/showcase.zip --allow-showcase --json out/showcase-preflight.json
+      - name: Upload the real CI showcase for independent review
+        if: matrix.node == 24
+        uses: actions/upload-artifact@v4
+        with:
+          name: v1.3-ci-showcase-node24-python314
+          path: |
+            out/v1.3-showcase
+            out/package.json
+            out/preflight.json
+            out/showcase-package.json
+            out/showcase-preflight.json
+          if-no-files-found: error
+          retention-days: 14

@@ -1,0 +1,1677 @@
+{
+  "schema_version": "1.3",
+  "title": "经营复盘：目标差距、转化口径与项目交付",
+  "subtitle": "合成演示数据 · 2026-08-01 至 2026-09-30",
+  "lang": "zh-CN",
+  "profile": "executive-dense",
+  "period": "2026-08-01 至 2026-09-30",
+  "metrics": [
+    {
+      "id": "revenue_actual",
+      "name": "2026-09 收入",
+      "type": "currency",
+      "storage_scale": "unit",
+      "raw_value": 9600000,
+      "currency": "CNY",
+      "precision": 0,
+      "display_scale": {
+        "unit": "万",
+        "factor": 10000
+      },
+      "time_window": "2026-09",
+      "provenance": {
+        "source_id": "synthetic-business-performance",
+        "pointer": "/metrics/0/actual",
+        "source_factor": 10000,
+        "source_unit": "万元"
+      },
+      "notes": "源数据以 960 万元呈现；指标以 CNY 基础值 9,600,000 存储，图表按 10,000 显式归一为 960 万。"
+    },
+    {
+      "id": "revenue_target",
+      "name": "2026-09 收入目标",
+      "type": "currency",
+      "storage_scale": "unit",
+      "raw_value": 10000000,
+      "currency": "CNY",
+      "precision": 0,
+      "display_scale": {
+        "unit": "万",
+        "factor": 10000
+      },
+      "time_window": "2026-09",
+      "provenance": {
+        "source_id": "synthetic-business-performance",
+        "pointer": "/metrics/0/target",
+        "source_factor": 10000,
+        "source_unit": "万元"
+      },
+      "notes": "源数据以 1,000 万元呈现；指标以 CNY 基础值存储。"
+    },
+    {
+      "id": "revenue_prev_month",
+      "name": "2026-08 收入",
+      "type": "currency",
+      "storage_scale": "unit",
+      "raw_value": 9000000,
+      "currency": "CNY",
+      "precision": 0,
+      "display_scale": {
+        "unit": "万",
+        "factor": 10000
+      },
+      "time_window": "2026-08",
+      "provenance": {
+        "source_id": "synthetic-business-performance",
+        "pointer": "/metrics/0/previous_month",
+        "source_factor": 10000,
+        "source_unit": "万元"
+      }
+    },
+    {
+      "id": "revenue_prev_year",
+      "name": "2025-09 收入",
+      "type": "currency",
+      "storage_scale": "unit",
+      "raw_value": 8000000,
+      "currency": "CNY",
+      "precision": 0,
+      "display_scale": {
+        "unit": "万",
+        "factor": 10000
+      },
+      "time_window": "2025-09",
+      "provenance": {
+        "source_id": "synthetic-business-performance",
+        "pointer": "/metrics/0/previous_year",
+        "source_factor": 10000,
+        "source_unit": "万元"
+      }
+    },
+    {
+      "id": "revenue_gap",
+      "name": "收入目标缺口",
+      "type": "currency",
+      "storage_scale": "unit",
+      "raw_value": -400000,
+      "currency": "CNY",
+      "precision": 0,
+      "display_scale": {
+        "unit": "万",
+        "factor": 10000
+      },
+      "time_window": "2026-09",
+      "comparison_basis": "actual_vs_target",
+      "provenance": {
+        "source_id": "synthetic-business-performance",
+        "pointer": "/metrics/0",
+        "calculation": "(actual - target) × 10000"
+      },
+      "notes": "960 万 - 1,000 万 = -40 万；负号只表示低于目标，不代表原因。"
+    },
+    {
+      "id": "revenue_attainment",
+      "name": "收入达成率",
+      "type": "achievement",
+      "storage_scale": "fraction",
+      "raw_value": 0.96,
+      "display_unit": "%",
+      "precision": 1,
+      "denominator": 10000000,
+      "time_window": "2026-09",
+      "comparison_basis": "actual_vs_target",
+      "provenance": {
+        "source_id": "synthetic-business-performance",
+        "pointer": "/metrics/0",
+        "calculation": "actual / target"
+      }
+    },
+    {
+      "id": "revenue_mom",
+      "name": "收入环比",
+      "type": "growth",
+      "storage_scale": "fraction",
+      "raw_value": 0.06666666666666667,
+      "display_unit": "%",
+      "precision": 1,
+      "comparison_basis": "period_over_period",
+      "time_window": "2026-09 vs 2026-08",
+      "provenance": {
+        "source_id": "synthetic-business-performance",
+        "pointer": "/metrics/0",
+        "calculation": "(actual - previous_month) / previous_month"
+      }
+    },
+    {
+      "id": "revenue_yoy",
+      "name": "收入同比",
+      "type": "growth",
+      "storage_scale": "fraction",
+      "raw_value": 0.2,
+      "display_unit": "%",
+      "precision": 1,
+      "comparison_basis": "year_over_year",
+      "time_window": "2026-09 vs 2025-09",
+      "provenance": {
+        "source_id": "synthetic-business-performance",
+        "pointer": "/metrics/0",
+        "calculation": "(actual - previous_year) / previous_year"
+      }
+    },
+    {
+      "id": "orders_actual",
+      "name": "2026-09 订单",
+      "type": "count",
+      "storage_scale": "unit",
+      "raw_value": 240,
+      "display_unit": "单",
+      "precision": 0,
+      "time_window": "2026-09",
+      "provenance": {
+        "source_id": "synthetic-business-performance",
+        "pointer": "/metrics/1/actual"
+      }
+    },
+    {
+      "id": "orders_target",
+      "name": "2026-09 订单目标",
+      "type": "count",
+      "storage_scale": "unit",
+      "raw_value": 250,
+      "display_unit": "单",
+      "precision": 0,
+      "time_window": "2026-09",
+      "provenance": {
+        "source_id": "synthetic-business-performance",
+        "pointer": "/metrics/1/target"
+      }
+    },
+    {
+      "id": "margin_actual",
+      "name": "2026-09 毛利率",
+      "type": "percent",
+      "storage_scale": "percent",
+      "raw_value": 22,
+      "display_unit": "%",
+      "precision": 1,
+      "time_window": "2026-09",
+      "comparison_basis": "period_observed",
+      "provenance": {
+        "source_id": "synthetic-business-performance",
+        "pointer": "/metrics/2/actual"
+      }
+    },
+    {
+      "id": "margin_target",
+      "name": "2026-09 毛利率目标",
+      "type": "percent",
+      "storage_scale": "percent",
+      "raw_value": 24,
+      "display_unit": "%",
+      "precision": 1,
+      "time_window": "2026-09",
+      "comparison_basis": "target",
+      "provenance": {
+        "source_id": "synthetic-business-performance",
+        "pointer": "/metrics/2/target"
+      }
+    },
+    {
+      "id": "margin_gap",
+      "name": "毛利率目标差",
+      "type": "pp",
+      "storage_scale": "percent",
+      "raw_value": -2,
+      "display_unit": "pp",
+      "precision": 1,
+      "time_window": "2026-09",
+      "comparison_basis": "actual_vs_target",
+      "provenance": {
+        "source_id": "synthetic-business-performance",
+        "pointer": "/metrics/2",
+        "calculation": "actual - target"
+      }
+    },
+    {
+      "id": "revenue_apr",
+      "name": "2026-04 收入",
+      "type": "currency",
+      "storage_scale": "unit",
+      "raw_value": 7800000,
+      "currency": "CNY",
+      "precision": 0,
+      "display_scale": {
+        "unit": "万",
+        "factor": 10000
+      },
+      "time_window": "2026-04",
+      "provenance": {
+        "source_id": "synthetic-business-performance",
+        "pointer": "/trend/0/actual",
+        "source_factor": 10000,
+        "source_unit": "万元"
+      }
+    },
+    {
+      "id": "revenue_may",
+      "name": "2026-05 收入",
+      "type": "currency",
+      "storage_scale": "unit",
+      "raw_value": 8200000,
+      "currency": "CNY",
+      "precision": 0,
+      "display_scale": {
+        "unit": "万",
+        "factor": 10000
+      },
+      "time_window": "2026-05",
+      "provenance": {
+        "source_id": "synthetic-business-performance",
+        "pointer": "/trend/1/actual",
+        "source_factor": 10000,
+        "source_unit": "万元"
+      }
+    },
+    {
+      "id": "revenue_jun",
+      "name": "2026-06 收入",
+      "type": "currency",
+      "storage_scale": "unit",
+      "raw_value": 8500000,
+      "currency": "CNY",
+      "precision": 0,
+      "display_scale": {
+        "unit": "万",
+        "factor": 10000
+      },
+      "time_window": "2026-06",
+      "provenance": {
+        "source_id": "synthetic-business-performance",
+        "pointer": "/trend/2/actual",
+        "source_factor": 10000,
+        "source_unit": "万元"
+      }
+    },
+    {
+      "id": "revenue_jul",
+      "name": "2026-07 收入",
+      "type": "currency",
+      "storage_scale": "unit",
+      "raw_value": 8700000,
+      "currency": "CNY",
+      "precision": 0,
+      "display_scale": {
+        "unit": "万",
+        "factor": 10000
+      },
+      "time_window": "2026-07",
+      "provenance": {
+        "source_id": "synthetic-business-performance",
+        "pointer": "/trend/3/actual",
+        "source_factor": 10000,
+        "source_unit": "万元"
+      }
+    },
+    {
+      "id": "revenue_aug",
+      "name": "2026-08 收入",
+      "type": "currency",
+      "storage_scale": "unit",
+      "raw_value": 9000000,
+      "currency": "CNY",
+      "precision": 0,
+      "display_scale": {
+        "unit": "万",
+        "factor": 10000
+      },
+      "time_window": "2026-08",
+      "provenance": {
+        "source_id": "synthetic-business-performance",
+        "pointer": "/trend/4/actual",
+        "source_factor": 10000,
+        "source_unit": "万元"
+      }
+    },
+    {
+      "id": "revenue_sep",
+      "name": "2026-09 收入",
+      "type": "currency",
+      "storage_scale": "unit",
+      "raw_value": 9600000,
+      "currency": "CNY",
+      "precision": 0,
+      "display_scale": {
+        "unit": "万",
+        "factor": 10000
+      },
+      "time_window": "2026-09",
+      "provenance": {
+        "source_id": "synthetic-business-performance",
+        "pointer": "/trend/5/actual",
+        "source_factor": 10000,
+        "source_unit": "万元"
+      }
+    },
+    {
+      "id": "conv_aug",
+      "name": "2026-08 成熟队列成交率",
+      "type": "percent",
+      "storage_scale": "fraction",
+      "raw_value": 0.3,
+      "display_unit": "%",
+      "precision": 1,
+      "denominator": 20,
+      "aggregation": "none",
+      "time_window": "2026-08 获客队列 · 30 天成熟期 · 截至 2026-10-10",
+      "comparison_basis": "mature_cohort",
+      "provenance": {
+        "source_id": "synthetic-sales-conversion",
+        "pointer": "/leads",
+        "calculation": "2026-08 mature cohort wins / 20; derived from leads and events"
+      }
+    },
+    {
+      "id": "conv_sep",
+      "name": "2026-09 成熟队列成交率",
+      "type": "percent",
+      "storage_scale": "fraction",
+      "raw_value": 0.4,
+      "display_unit": "%",
+      "precision": 1,
+      "denominator": 10,
+      "aggregation": "none",
+      "time_window": "2026-09 获客队列 · 30 天成熟期 · 截至 2026-10-10",
+      "comparison_basis": "mature_cohort",
+      "provenance": {
+        "source_id": "synthetic-sales-conversion",
+        "pointer": "/leads",
+        "calculation": "2026-09 mature cohort wins / 10; derived from leads and events"
+      }
+    },
+    {
+      "id": "conv_delta",
+      "name": "9 月较 8 月成交率差",
+      "type": "pp",
+      "storage_scale": "percent",
+      "raw_value": 10,
+      "display_unit": "pp",
+      "precision": 1,
+      "time_window": "2026-09 vs 2026-08 成熟队列",
+      "comparison_basis": "2026-09 vs 2026-08 mature cohort",
+      "provenance": {
+        "source_id": "synthetic-sales-conversion",
+        "pointer": "/leads",
+        "calculation": "2026-09 cohort rate - 2026-08 cohort rate"
+      }
+    },
+    {
+      "id": "mature_rate",
+      "name": "成熟队列整体成交率",
+      "type": "percent",
+      "storage_scale": "fraction",
+      "raw_value": 0.3333333333333333,
+      "display_unit": "%",
+      "precision": 1,
+      "denominator": 30,
+      "aggregation": "none",
+      "time_window": "2026-08 至 2026-09 获客队列 · 截至 2026-10-10",
+      "comparison_basis": "mature_cohort",
+      "provenance": {
+        "source_id": "synthetic-sales-conversion",
+        "pointer": "/leads",
+        "calculation": "mature cohort wins / 30; derived from leads and events"
+      }
+    },
+    {
+      "id": "trial_yes_rate",
+      "name": "有试驾者成交率",
+      "type": "percent",
+      "storage_scale": "fraction",
+      "raw_value": 0.2857142857142857,
+      "display_unit": "%",
+      "precision": 1,
+      "denominator": 7,
+      "aggregation": "none",
+      "time_window": "成熟队列 · 首次观察分支 · 截至 2026-10-10",
+      "comparison_basis": "descriptive_branch_not_causal",
+      "provenance": {
+        "source_id": "synthetic-sales-conversion",
+        "pointer": "/events",
+        "calculation": "trial branch wins / 7; derived from stage events"
+      },
+      "notes": "试驾为可选行为；本指标只描述样本内关联，不支持因果解释。"
+    },
+    {
+      "id": "trial_no_rate",
+      "name": "未试驾者成交率",
+      "type": "percent",
+      "storage_scale": "fraction",
+      "raw_value": 0.34782608695652173,
+      "display_unit": "%",
+      "precision": 1,
+      "denominator": 23,
+      "aggregation": "none",
+      "time_window": "成熟队列 · 首次观察分支 · 截至 2026-10-10",
+      "comparison_basis": "descriptive_branch_not_causal",
+      "provenance": {
+        "source_id": "synthetic-sales-conversion",
+        "pointer": "/events",
+        "calculation": "no-trial branch wins / 23; derived from stage events"
+      }
+    },
+    {
+      "id": "cost_p1",
+      "name": "平台升级实际成本",
+      "type": "currency",
+      "storage_scale": "unit",
+      "raw_value": 118000,
+      "currency": "CNY",
+      "precision": 2,
+      "display_scale": {
+        "unit": "万",
+        "factor": 10000
+      },
+      "time_window": "截至 2026-09-30",
+      "provenance": {
+        "source_id": "synthetic-project-analytics",
+        "pointer": "/projects/0",
+        "calculation": "actual_days × day_rate + external_cost"
+      }
+    },
+    {
+      "id": "cost_p2",
+      "name": "渠道接入实际成本",
+      "type": "currency",
+      "storage_scale": "unit",
+      "raw_value": 62600,
+      "currency": "CNY",
+      "precision": 2,
+      "display_scale": {
+        "unit": "万",
+        "factor": 10000
+      },
+      "time_window": "截至 2026-09-30",
+      "provenance": {
+        "source_id": "synthetic-project-analytics",
+        "pointer": "/projects/1",
+        "calculation": "actual_days × day_rate + external_cost"
+      }
+    },
+    {
+      "id": "cost_p3",
+      "name": "数据治理实际成本",
+      "type": "currency",
+      "storage_scale": "unit",
+      "raw_value": 89600,
+      "currency": "CNY",
+      "precision": 2,
+      "display_scale": {
+        "unit": "万",
+        "factor": 10000
+      },
+      "time_window": "截至 2026-09-30",
+      "provenance": {
+        "source_id": "synthetic-project-analytics",
+        "pointer": "/projects/2",
+        "calculation": "actual_days × day_rate + external_cost"
+      }
+    },
+    {
+      "id": "budget_p1",
+      "name": "平台升级预算",
+      "type": "currency",
+      "storage_scale": "unit",
+      "raw_value": 120000,
+      "currency": "CNY",
+      "precision": 2,
+      "display_scale": {
+        "unit": "万",
+        "factor": 10000
+      },
+      "time_window": "截至 2026-09-30",
+      "provenance": {
+        "source_id": "synthetic-project-analytics",
+        "pointer": "/projects/0/budget"
+      }
+    },
+    {
+      "id": "budget_p2",
+      "name": "渠道接入预算",
+      "type": "currency",
+      "storage_scale": "unit",
+      "raw_value": 80000,
+      "currency": "CNY",
+      "precision": 2,
+      "display_scale": {
+        "unit": "万",
+        "factor": 10000
+      },
+      "time_window": "截至 2026-09-30",
+      "provenance": {
+        "source_id": "synthetic-project-analytics",
+        "pointer": "/projects/1/budget"
+      }
+    },
+    {
+      "id": "budget_p3",
+      "name": "数据治理预算",
+      "type": "currency",
+      "storage_scale": "unit",
+      "raw_value": 90000,
+      "currency": "CNY",
+      "precision": 2,
+      "display_scale": {
+        "unit": "万",
+        "factor": 10000
+      },
+      "time_window": "截至 2026-09-30",
+      "provenance": {
+        "source_id": "synthetic-project-analytics",
+        "pointer": "/projects/2/budget"
+      }
+    },
+    {
+      "id": "cost_variance_p1",
+      "name": "平台升级成本偏差",
+      "type": "currency",
+      "storage_scale": "unit",
+      "raw_value": -2000,
+      "currency": "CNY",
+      "precision": 2,
+      "display_scale": {
+        "unit": "万",
+        "factor": 10000
+      },
+      "time_window": "截至 2026-09-30",
+      "comparison_basis": "cost_vs_budget",
+      "provenance": {
+        "source_id": "synthetic-project-analytics",
+        "pointer": "/projects/0",
+        "calculation": "cost - budget"
+      }
+    },
+    {
+      "id": "cost_variance_p2",
+      "name": "渠道接入成本偏差",
+      "type": "currency",
+      "storage_scale": "unit",
+      "raw_value": -17400,
+      "currency": "CNY",
+      "precision": 2,
+      "display_scale": {
+        "unit": "万",
+        "factor": 10000
+      },
+      "time_window": "截至 2026-09-30",
+      "comparison_basis": "cost_vs_budget",
+      "provenance": {
+        "source_id": "synthetic-project-analytics",
+        "pointer": "/projects/1",
+        "calculation": "cost - budget"
+      }
+    },
+    {
+      "id": "cost_variance_p3",
+      "name": "数据治理成本偏差",
+      "type": "currency",
+      "storage_scale": "unit",
+      "raw_value": -400,
+      "currency": "CNY",
+      "precision": 2,
+      "display_scale": {
+        "unit": "万",
+        "factor": 10000
+      },
+      "time_window": "截至 2026-09-30",
+      "comparison_basis": "cost_vs_budget",
+      "provenance": {
+        "source_id": "synthetic-project-analytics",
+        "pointer": "/projects/2",
+        "calculation": "cost - budget"
+      }
+    },
+    {
+      "id": "cost_total",
+      "name": "项目累计成本",
+      "type": "currency",
+      "storage_scale": "unit",
+      "raw_value": 270200,
+      "currency": "CNY",
+      "precision": 2,
+      "display_scale": {
+        "unit": "万",
+        "factor": 10000
+      },
+      "time_window": "截至 2026-09-30",
+      "provenance": {
+        "source_id": "synthetic-project-analytics",
+        "pointer": "/projects",
+        "calculation": "sum(actual_days × day_rate + external_cost)"
+      }
+    },
+    {
+      "id": "budget_total",
+      "name": "项目累计预算",
+      "type": "currency",
+      "storage_scale": "unit",
+      "raw_value": 290000,
+      "currency": "CNY",
+      "precision": 2,
+      "display_scale": {
+        "unit": "万",
+        "factor": 10000
+      },
+      "time_window": "截至 2026-09-30",
+      "provenance": {
+        "source_id": "synthetic-project-analytics",
+        "pointer": "/projects",
+        "calculation": "sum(budget)"
+      }
+    },
+    {
+      "id": "cost_variance_total",
+      "name": "项目累计成本偏差",
+      "type": "currency",
+      "storage_scale": "unit",
+      "raw_value": -19800,
+      "currency": "CNY",
+      "precision": 2,
+      "display_scale": {
+        "unit": "万",
+        "factor": 10000
+      },
+      "time_window": "截至 2026-09-30",
+      "comparison_basis": "cost_vs_budget",
+      "provenance": {
+        "source_id": "synthetic-project-analytics",
+        "pointer": "/projects",
+        "calculation": "sum(cost) - sum(budget)"
+      }
+    },
+    {
+      "id": "realized_p1",
+      "name": "平台升级已实现价值",
+      "type": "currency",
+      "storage_scale": "unit",
+      "raw_value": 170000,
+      "currency": "CNY",
+      "precision": 2,
+      "display_scale": {
+        "unit": "万",
+        "factor": 10000
+      },
+      "time_window": "截至 2026-09-30",
+      "provenance": {
+        "source_id": "synthetic-project-analytics",
+        "pointer": "/projects/0/realized_value"
+      }
+    },
+    {
+      "id": "realized_p2",
+      "name": "渠道接入已实现价值",
+      "type": "currency",
+      "storage_scale": "unit",
+      "raw_value": 120000,
+      "currency": "CNY",
+      "precision": 2,
+      "display_scale": {
+        "unit": "万",
+        "factor": 10000
+      },
+      "time_window": "截至 2026-09-30",
+      "provenance": {
+        "source_id": "synthetic-project-analytics",
+        "pointer": "/projects/1/realized_value"
+      }
+    },
+    {
+      "id": "realized_p3",
+      "name": "数据治理已实现价值",
+      "type": "currency",
+      "storage_scale": "unit",
+      "raw_value": null,
+      "currency": "CNY",
+      "precision": 2,
+      "display_scale": {
+        "unit": "万",
+        "factor": 10000
+      },
+      "time_window": "截至 2026-09-30",
+      "missing_policy": "gap",
+      "provenance": {
+        "source_id": "synthetic-project-analytics",
+        "pointer": "/projects/2/realized_value"
+      },
+      "notes": "源数据为 null；按缺失保留，不按 0 处理。"
+    }
+  ],
+  "slides": [
+    {
+      "type": "cover",
+      "title": "经营复盘：目标差距、转化口径与项目交付",
+      "subtitle": "2026-08-01 至 2026-09-30 · 合成演示数据 · 所有金额与人数均可回溯到输入",
+      "kicker": "构见 · 经营复盘",
+      "source": "项目自造合成数据（Apache-2.0）"
+    },
+    {
+      "type": "executive-summary",
+      "title": "三条结论：缺口可量化，转化需看口径，项目价值仍缺一项",
+      "items": [
+        {
+          "title": "收入 960 万元，达成 96.0%",
+          "note": "较 1,000 万元目标少 40 万元，订单少 10 单；毛利率 22.0%，低于 24.0% 目标 2.0pp。"
+        },
+        {
+          "title": "9 月成熟队列成交率 40.0%",
+          "note": "高于 8 月 30.0% 共 10.0pp；两个队列合计 30 人，样本小，需后续队列复核。"
+        },
+        {
+          "title": "项目成本低于预算 1.98 万元",
+          "note": "累计成本 27.02 万元；P3 已实现价值缺失，按缺失保留，不计算整体价值成本比。"
+        }
+      ]
+    },
+    {
+      "type": "chart",
+      "chartType": "bar",
+      "title": "9 月收入 960 万元，低于 1,000 万元目标，但高于上月与去年同期",
+      "labels": [
+        "收入对比"
+      ],
+      "series": [
+        {
+          "id": "revenue_actual",
+          "name": "实际（2026-09）",
+          "role": "actual",
+          "metric_ids": [
+            "revenue_actual"
+          ],
+          "labels": [
+            "收入对比"
+          ]
+        },
+        {
+          "id": "revenue_target",
+          "name": "目标（2026-09）",
+          "role": "target",
+          "metric_ids": [
+            "revenue_target"
+          ],
+          "labels": [
+            "收入对比"
+          ]
+        },
+        {
+          "id": "revenue_prev_month",
+          "name": "上月（2026-08）",
+          "role": "history",
+          "metric_ids": [
+            "revenue_prev_month"
+          ],
+          "labels": [
+            "收入对比"
+          ]
+        },
+        {
+          "id": "revenue_prev_year",
+          "name": "去年同期（2025-09）",
+          "role": "comparison",
+          "metric_ids": [
+            "revenue_prev_year"
+          ],
+          "labels": [
+            "收入对比"
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "comparison",
+        "series": [
+          {
+            "id": "revenue_actual",
+            "role": "actual"
+          },
+          {
+            "id": "revenue_target",
+            "role": "target"
+          },
+          {
+            "id": "revenue_prev_month",
+            "role": "history"
+          },
+          {
+            "id": "revenue_prev_year",
+            "role": "comparison"
+          }
+        ]
+      },
+      "unit": "CNY (万)",
+      "period": "2026-09",
+      "source": "合成经营月报"
+    },
+    {
+      "type": "kpi",
+      "title": "收入环比 +6.7%，但订单与毛利率仍低于目标",
+      "items": [
+        {
+          "label": "收入 · 达成 {{metric:revenue_attainment}}",
+          "value": "{{metric:revenue_actual}}",
+          "delta": "{{metric:revenue_target}}"
+        },
+        {
+          "label": "订单（差 10 单）",
+          "value": "{{metric:orders_actual}}",
+          "delta": "{{metric:orders_target}}"
+        },
+        {
+          "label": "毛利率（目标差 {{metric:margin_gap}}）",
+          "value": "{{metric:margin_actual}}",
+          "delta": "{{metric:margin_target}}"
+        }
+      ],
+      "dashboard": {
+        "unit": "CNY (万)",
+        "labels": [
+          "2026-04",
+          "2026-05",
+          "2026-06",
+          "2026-07",
+          "2026-08",
+          "2026-09"
+        ],
+        "series": [
+          {
+            "id": "revenue_trend",
+            "name": "收入",
+            "role": "actual",
+            "metric_ids": [
+              "revenue_apr",
+              "revenue_may",
+              "revenue_jun",
+              "revenue_jul",
+              "revenue_aug",
+              "revenue_sep"
+            ]
+          }
+        ]
+      },
+      "unit": "CNY (万)",
+      "period": "2026-04 至 2026-09",
+      "source": "合成经营月报"
+    },
+    {
+      "type": "chart",
+      "chartType": "column",
+      "title": "9 月成熟队列成交率 40.0%，较 8 月高 10.0pp；两个队列合计仅 30 人",
+      "title_short": "9 月成熟队列成交率 40.0%，较 8 月高 10.0pp",
+      "subtitle": "两个队列合计仅 30 人（8 月 20 人、9 月 10 人）；仅描述性对照",
+      "labels": [
+        "2026-08 队列（n=20）",
+        "2026-09 队列（n=10）"
+      ],
+      "series": [
+        {
+          "id": "cohort_rate",
+          "name": "成熟队列成交率",
+          "role": "actual",
+          "metric_ids": [
+            "conv_aug",
+            "conv_sep"
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "comparison",
+        "label_strategy": "value"
+      },
+      "unit": "%",
+      "period": "2026-08 至 2026-09",
+      "source": "合成转化漏斗"
+    },
+    {
+      "type": "chart",
+      "chartType": "column",
+      "title": "有试驾者 28.6%（2/7），未试驾者 34.8%（8/23）——仅描述性对照，不推断因果",
+      "title_short": "有试驾者 vs 未试驾者：成交率仅描述性对照",
+      "subtitle": "有试驾者 28.6%（2/7），未试驾者 34.8%（8/23）；试驾为可选行为，样本仅 30 人，不能据此推断因果",
+      "labels": [
+        "未试驾（n=23）",
+        "有试驾（n=7）"
+      ],
+      "series": [
+        {
+          "id": "trial_branch",
+          "name": "成交率",
+          "role": "actual",
+          "metric_ids": [
+            "trial_no_rate",
+            "trial_yes_rate"
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "comparison",
+        "label_strategy": "value"
+      },
+      "insight": "试驾是可选行为，样本仅 30 人；差异可能来自选择、阶段或其他未观测因素，不能据此判断试驾提升或降低成交。",
+      "unit": "%",
+      "period": "2026-08-01 至 2026-09-30",
+      "source": "合成转化漏斗"
+    },
+    {
+      "type": "chart",
+      "chartType": "column",
+      "title": "项目累计成本 27.02 万元，低于预算 1.98 万元；P3 预算使用率 99.6%",
+      "title_short": "项目累计成本 27.02 万元，低于预算 1.98 万元",
+      "subtitle": "P3 实际成本 8.96 万元 / 预算 9.00 万元，预算使用率 99.6%",
+      "labels": [
+        "平台升级",
+        "渠道接入",
+        "数据治理"
+      ],
+      "series": [
+        {
+          "id": "project_cost",
+          "name": "实际成本",
+          "role": "actual",
+          "metric_ids": [
+            "cost_p1",
+            "cost_p2",
+            "cost_p3"
+          ]
+        },
+        {
+          "id": "project_budget",
+          "name": "预算",
+          "role": "target",
+          "metric_ids": [
+            "budget_p1",
+            "budget_p2",
+            "budget_p3"
+          ]
+        }
+      ],
+      "visual_encoding": {
+        "relation": "comparison",
+        "series": [
+          {
+            "id": "project_cost",
+            "role": "actual"
+          },
+          {
+            "id": "project_budget",
+            "role": "target"
+          }
+        ]
+      },
+      "unit": "CNY (万)",
+      "period": "截至 2026-09-30",
+      "source": "合成项目台账"
+    },
+    {
+      "type": "table",
+      "title": "项目交付、成本与价值：P1 逾期未验收，P3 价值口径缺失",
+      "headers": [
+        "项目",
+        "项（计划/实际）",
+        "天（计划/实际）",
+        "预算",
+        "实际成本",
+        "成本偏差",
+        "已实现价值",
+        "关键状态"
+      ],
+      "columnWidths": [
+        0.13,
+        0.1,
+        0.1,
+        0.115,
+        0.115,
+        0.115,
+        0.12,
+        0.205
+      ],
+      "rows": [
+        [
+          "平台升级",
+          "12 / 10",
+          "80 / 90",
+          "{{metric:budget_p1}}",
+          "{{metric:cost_p1}}",
+          "{{metric:cost_variance_p1}}",
+          "{{metric:realized_p1}}",
+          "少交付 2 项；M1 逾期未验收"
+        ],
+        [
+          "渠道接入",
+          "8 / 8",
+          "50 / 48",
+          "{{metric:budget_p2}}",
+          "{{metric:cost_p2}}",
+          "{{metric:cost_variance_p2}}",
+          "{{metric:realized_p2}}",
+          "按期交付；M2 提前 1 天完成"
+        ],
+        [
+          "数据治理",
+          "10 / 7",
+          "60 / 68",
+          "{{metric:budget_p3}}",
+          "{{metric:cost_p3}}",
+          "{{metric:cost_variance_p3}}",
+          "{{metric:realized_p3}}（缺失）",
+          "少交付 3 项；M3 延期 3 天"
+        ]
+      ]
+    },
+    {
+      "type": "histogram",
+      "chartType": "column",
+      "title": "线索获取按 7 天分箱：8 月下旬有 1 周空档，9 月恢复",
+      "unit": "条",
+      "period": "2026-08-01 至 2026-09-30 · 获客日期 7 天等宽分箱",
+      "bins": [
+        {
+          "start": 0,
+          "end": 7,
+          "count": 7
+        },
+        {
+          "start": 7,
+          "end": 14,
+          "count": 7
+        },
+        {
+          "start": 14,
+          "end": 21,
+          "count": 6
+        },
+        {
+          "start": 21,
+          "end": 28,
+          "count": 0
+        },
+        {
+          "start": 28,
+          "end": 35,
+          "count": 4
+        },
+        {
+          "start": 35,
+          "end": 42,
+          "count": 7
+        },
+        {
+          "start": 42,
+          "end": 49,
+          "count": 7
+        },
+        {
+          "start": 49,
+          "end": 56,
+          "count": 2
+        },
+        {
+          "start": 56,
+          "end": 63,
+          "count": 0
+        }
+      ],
+      "visual_encoding": {
+        "relation": "distribution",
+        "label_strategy": "value"
+      },
+      "insight": "去重后 40 个线索；从 2026-08-01 起按 7 天等宽分箱，共 9 箱至 63 天。末箱 09-26 至 10-02 仅观察到 09-30，窗口内计 0 条；10 月 1 日至 2 日未观察，不按 0 推断。",
+      "series": [
+        {
+          "id": "lead_count",
+          "name": "线索数",
+          "labels": [
+            "0–7",
+            "7–14",
+            "14–21",
+            "21–28",
+            "28–35",
+            "35–42",
+            "42–49",
+            "49–56",
+            "56–63"
+          ],
+          "values": [
+            7,
+            7,
+            6,
+            0,
+            4,
+            7,
+            7,
+            2,
+            0
+          ]
+        }
+      ],
+      "source": "合成转化漏斗"
+    },
+    {
+      "type": "table",
+      "title": "试驾是可选分支，不是必经阶段：到店 20 人，成交 10 人",
+      "headers": [
+        "阶段",
+        "人数",
+        "占成熟队列",
+        "口径说明"
+      ],
+      "rows": [
+        [
+          "获客",
+          "30",
+          "100.0%",
+          "2026-08 至 2026-09 获客、截至 2026-10-10 已成熟"
+        ],
+        [
+          "到店",
+          "20",
+          "66.7%",
+          "首次观察到店"
+        ],
+        [
+          "试驾（可选）",
+          "7",
+          "23.3%",
+          "可选分支，不是漏斗的必经阶段"
+        ],
+        [
+          "成交",
+          "10",
+          "33.3%",
+          "成熟队列成交率；到店→成交 7/20"
+        ]
+      ]
+    },
+    {
+      "type": "decision",
+      "title": "下一步先补三个口径缺口，再决定增长动作",
+      "statement": "现有证据支持“差距在哪里”，还不足以支持“为什么”与“做了就一定改善”。",
+      "decision_points": [
+        {
+          "title": "先验证收入缺口构成",
+          "note": "按产品、价格与渠道补充分解，再讨论增长动作；本页没有分解数据，不预设原因。"
+        },
+        {
+          "title": "把转化结论限定在成熟队列",
+          "note": "9 月队列仅 10 人；用后续队列复核 40.0% 是否稳定，并保留 8 月 30.0% 作为对照。"
+        },
+        {
+          "title": "补齐 P3 价值与 M1 验收",
+          "note": "两项数据缺失；在口径确认前，不计算整体价值成本比，也不推断项目成功或失败。"
+        }
+      ]
+    },
+    {
+      "type": "executive-summary",
+      "title": "口径与限制：结论必须与样本、缺失和时间窗一起阅读",
+      "items": [
+        {
+          "title": "数据性质",
+          "note": "三份输入均为项目自造合成数据，标注 Apache-2.0；来源真实性与发布授权仍需人工复核。"
+        },
+        {
+          "title": "样本与时间窗",
+          "note": "成交率只使用 30 天成熟队列：8 月 20 人、9 月 10 人；未成熟 10 人不计入。数据截至 2026-10-10。"
+        },
+        {
+          "title": "关联不是因果",
+          "note": "试驾为可选行为；试驾与成交只做描述性对照，不推断因果，也不外推到全量客户。"
+        },
+        {
+          "title": "缺失值",
+          "note": "P3 已实现价值与 M1 实际验收日期缺失；按缺失保留，不按 0 处理。"
+        },
+        {
+          "title": "金额与分箱",
+          "note": "收入与成本指标以 CNY 基础值存储，按 10,000 显式归一为万元；线索直方图按获客日期 7 天等宽分箱。"
+        }
+      ]
+    }
+  ],
+  "narrative": {
+    "objective": "用 2026-08 至 2026-09 的合成经营数据，确认收入与利润差距、成交率口径和项目交付证据，并形成可验证的下一步决策。",
+    "claims": [
+      {
+        "id": "c_rev_gap",
+        "kind": "FACT",
+        "text": "2026-09 收入 960 万元，目标 1,000 万元，差 40 万元；达成 96.0%。",
+        "evidence_ids": [
+          "e_revenue"
+        ]
+      },
+      {
+        "id": "c_growth",
+        "kind": "CALCULATION",
+        "text": "收入环比 +6.7%、同比 +20.0%；订单 240 单、毛利率 22.0%，均低于目标。",
+        "evidence_ids": [
+          "e_growth"
+        ]
+      },
+      {
+        "id": "c_conv",
+        "kind": "CALCULATION",
+        "text": "2026-09 成熟队列成交率 40.0%（4/10），较 2026-08 的 30.0%（6/20）高 10.0pp；两个队列合计仅 30 人。",
+        "evidence_ids": [
+          "e_conversion"
+        ]
+      },
+      {
+        "id": "c_branch",
+        "kind": "INTERPRETATION",
+        "text": "有试驾者成交率 28.6%（2/7），未试驾者 34.8%（8/23）；该描述性差异不能推断试驾因果。",
+        "evidence_ids": [
+          "e_branch"
+        ]
+      },
+      {
+        "id": "c_project",
+        "kind": "FACT",
+        "text": "三项目累计成本 27.02 万元，预算 29.00 万元，低于预算 1.98 万元；P3 已实现价值缺失。",
+        "evidence_ids": [
+          "e_project"
+        ]
+      },
+      {
+        "id": "c_project_detail",
+        "kind": "FACT",
+        "text": "P1 逾期未验收且少交付 2 项；P3 少交付 3 项并延期 3 天；P2 按期完成。",
+        "evidence_ids": [
+          "e_project"
+        ]
+      },
+      {
+        "id": "c_leads",
+        "kind": "FACT",
+        "text": "去重后 40 个线索；按获客日期 7 天分箱，2026-08-22 至 08-28 为 0；观察截至 2026-09-30，末箱仅覆盖 09-26 至 09-30 的窗口内部分。",
+        "evidence_ids": [
+          "e_leads"
+        ]
+      },
+      {
+        "id": "c_stage",
+        "kind": "FACT",
+        "text": "成熟队列 30 人：到店 20 人、试驾 7 人（可选）、成交 10 人；到店→成交 35.0%。",
+        "evidence_ids": [
+          "e_conversion"
+        ]
+      },
+      {
+        "id": "c_decision",
+        "kind": "RECOMMENDATION",
+        "text": "先补充分解与口径验证，再承诺增长动作；不把试驾差异表述为因果。",
+        "evidence_ids": []
+      },
+      {
+        "id": "c_limits",
+        "kind": "FACT",
+        "text": "合成数据、样本小、P3 价值与 M1 验收缺失；收入按 CNY 基础值存储并按 10,000 显式归一为万元。",
+        "evidence_ids": [
+          "e_limits"
+        ]
+      }
+    ],
+    "evidence": [
+      {
+        "id": "e_revenue",
+        "source_id": "synthetic-business-performance",
+        "bindings": [
+          {
+            "slide": 2,
+            "pointer": "/items/0/title"
+          },
+          {
+            "slide": 3,
+            "pointer": "/title"
+          }
+        ]
+      },
+      {
+        "id": "e_growth",
+        "source_id": "synthetic-business-performance",
+        "bindings": [
+          {
+            "slide": 4,
+            "pointer": "/items/0/value"
+          },
+          {
+            "slide": 4,
+            "pointer": "/items/1/value"
+          },
+          {
+            "slide": 4,
+            "pointer": "/items/2/value"
+          }
+        ]
+      },
+      {
+        "id": "e_conversion",
+        "source_id": "synthetic-sales-conversion",
+        "bindings": [
+          {
+            "slide": 5,
+            "pointer": "/title"
+          },
+          {
+            "slide": 10,
+            "pointer": "/rows/3/1"
+          },
+          {
+            "slide": 10,
+            "pointer": "/rows/0/1"
+          }
+        ]
+      },
+      {
+        "id": "e_branch",
+        "source_id": "synthetic-sales-conversion",
+        "bindings": [
+          {
+            "slide": 6,
+            "pointer": "/title"
+          },
+          {
+            "slide": 6,
+            "pointer": "/insight"
+          }
+        ]
+      },
+      {
+        "id": "e_project",
+        "source_id": "synthetic-project-analytics",
+        "bindings": [
+          {
+            "slide": 7,
+            "pointer": "/title"
+          },
+          {
+            "slide": 8,
+            "pointer": "/rows/0/3"
+          },
+          {
+            "slide": 8,
+            "pointer": "/rows/0/4"
+          },
+          {
+            "slide": 8,
+            "pointer": "/rows/2/6"
+          }
+        ]
+      },
+      {
+        "id": "e_leads",
+        "source_id": "synthetic-sales-conversion",
+        "bindings": [
+          {
+            "slide": 9,
+            "pointer": "/title"
+          },
+          {
+            "slide": 9,
+            "pointer": "/insight"
+          }
+        ]
+      },
+      {
+        "id": "e_limits",
+        "source_id": "method-note",
+        "bindings": [
+          {
+            "slide": 12,
+            "pointer": "/items/0/note"
+          },
+          {
+            "slide": 12,
+            "pointer": "/items/4/note"
+          }
+        ]
+      }
+    ],
+    "nodes": [
+      {
+        "slide": 1,
+        "role": "cover",
+        "question": "这份复盘回答什么问题？",
+        "claim_ids": [],
+        "evidence_ids": []
+      },
+      {
+        "slide": 2,
+        "role": "summary",
+        "question": "最重要的三条结论是什么？",
+        "claim_ids": [
+          "c_rev_gap",
+          "c_conv",
+          "c_project"
+        ],
+        "evidence_ids": [
+          "e_revenue",
+          "e_conversion",
+          "e_project"
+        ],
+        "transition": "先给出结论，再逐页展开证据与口径。"
+      },
+      {
+        "slide": 3,
+        "role": "detail",
+        "question": "收入与目标、上月和去年同期相比如何？",
+        "claim_ids": [
+          "c_rev_gap"
+        ],
+        "evidence_ids": [
+          "e_revenue"
+        ],
+        "transition": "收入是月度结果，需要同时看趋势与达成。"
+      },
+      {
+        "slide": 4,
+        "role": "detail",
+        "question": "趋势、订单与毛利率说明了什么？",
+        "claim_ids": [
+          "c_growth"
+        ],
+        "evidence_ids": [
+          "e_growth"
+        ],
+        "transition": "经营结果之外，销售转化需要先统一队列口径。"
+      },
+      {
+        "slide": 5,
+        "role": "detail",
+        "question": "成熟队列成交率如何变化？",
+        "claim_ids": [
+          "c_conv"
+        ],
+        "evidence_ids": [
+          "e_conversion"
+        ],
+        "transition": "队列差异之外，还要检查可选行为带来的描述性差异。"
+      },
+      {
+        "slide": 6,
+        "role": "comparison",
+        "question": "试驾与成交之间能观察到什么？",
+        "claim_ids": [
+          "c_branch"
+        ],
+        "evidence_ids": [
+          "e_branch"
+        ],
+        "transition": "销售侧只能描述关联，项目侧回到成本与交付证据。"
+      },
+      {
+        "slide": 7,
+        "role": "detail",
+        "question": "项目成本相对预算如何？",
+        "claim_ids": [
+          "c_project"
+        ],
+        "evidence_ids": [
+          "e_project"
+        ],
+        "transition": "总量之外，逐项目看交付与价值缺口。"
+      },
+      {
+        "slide": 8,
+        "role": "detail",
+        "question": "各项目交付与价值缺口在哪里？",
+        "claim_ids": [
+          "c_project_detail"
+        ],
+        "evidence_ids": [
+          "e_project"
+        ],
+        "transition": "项目数据之后，回到销售线索的获取节奏。"
+      },
+      {
+        "slide": 9,
+        "role": "detail",
+        "question": "线索获取节奏是否连续？",
+        "claim_ids": [
+          "c_leads"
+        ],
+        "evidence_ids": [
+          "e_leads"
+        ],
+        "transition": "节奏之外，阶段人数需要与可选分支口径对齐。"
+      },
+      {
+        "slide": 10,
+        "role": "comparison",
+        "question": "各阶段人数与口径如何对齐？",
+        "claim_ids": [
+          "c_stage"
+        ],
+        "evidence_ids": [
+          "e_conversion"
+        ],
+        "transition": "证据展示完毕，进入决策与限制。"
+      },
+      {
+        "slide": 11,
+        "role": "decision",
+        "question": "下一步先做什么？",
+        "claim_ids": [
+          "c_decision"
+        ],
+        "evidence_ids": [],
+        "decision_ids": [
+          "d_gap",
+          "d_cohort",
+          "d_p3"
+        ],
+        "transition": "所有结论都要与限制一起阅读。"
+      },
+      {
+        "slide": 12,
+        "role": "appendix",
+        "question": "哪些限制必须随结论一起阅读？",
+        "claim_ids": [
+          "c_limits"
+        ],
+        "evidence_ids": [
+          "e_limits"
+        ],
+        "transition": "回到封面与主结论时，保留这些限制。"
+      }
+    ],
+    "edges": [
+      {
+        "from": 1,
+        "to": 2,
+        "relation": "introduces",
+        "explanation": "封面提出复盘范围，摘要给出三条结论。"
+      },
+      {
+        "from": 2,
+        "to": 3,
+        "relation": "expands",
+        "explanation": "摘要中的收入结论由第 3 页的角色对比展开。"
+      },
+      {
+        "from": 3,
+        "to": 4,
+        "relation": "expands",
+        "explanation": "单月对比扩展到六个月趋势与订单、毛利率。"
+      },
+      {
+        "from": 4,
+        "to": 5,
+        "relation": "supports",
+        "explanation": "经营结果之后给出销售转化的队列证据。"
+      },
+      {
+        "from": 5,
+        "to": 6,
+        "relation": "contrasts",
+        "explanation": "队列差异与试驾分支的描述性差异形成对照。"
+      },
+      {
+        "from": 6,
+        "to": 7,
+        "relation": "leads_to",
+        "explanation": "从销售关联转向项目成本证据。"
+      },
+      {
+        "from": 7,
+        "to": 8,
+        "relation": "expands",
+        "explanation": "成本总量展开为逐项目交付、成本与价值。"
+      },
+      {
+        "from": 8,
+        "to": 9,
+        "relation": "leads_to",
+        "explanation": "项目证据之后补充线索获取节奏。"
+      },
+      {
+        "from": 9,
+        "to": 10,
+        "relation": "supports",
+        "explanation": "线索节奏与阶段人数共同约束转化解释。"
+      },
+      {
+        "from": 10,
+        "to": 11,
+        "relation": "leads_to",
+        "explanation": "证据汇总后提出三项待决事项。"
+      },
+      {
+        "from": 11,
+        "to": 12,
+        "relation": "recaps",
+        "explanation": "决策与限制一起收束，避免过度解读。"
+      }
+    ],
+    "decisions": [
+      {
+        "id": "d_gap",
+        "question": "收入缺口的构成与可行动作是否需要先补充分解？",
+        "claim_ids": [
+          "c_rev_gap",
+          "c_growth"
+        ]
+      },
+      {
+        "id": "d_cohort",
+        "question": "是否用后续成熟队列复核转化率，而不是对 9 月单队列下结论？",
+        "claim_ids": [
+          "c_conv",
+          "c_branch"
+        ]
+      },
+      {
+        "id": "d_p3",
+        "question": "P3 价值与 M1 验收缺失是否先补齐口径再评估？",
+        "claim_ids": [
+          "c_project"
+        ]
+      }
+    ]
+  }
+}

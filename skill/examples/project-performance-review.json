@@ -28,13 +28,13 @@
         },
         {
           "label": "实际成本",
-          "value": "270,200 元",
-          "delta": "预算 290,000 元",
+          "value": "270,200元",
+          "delta": "预算 290,000元",
           "highlight": true
         },
         {
           "label": "成本差异",
-          "value": "-19,800 元"
+          "value": "-19,800元"
         },
         {
           "label": "已实现价值",
@@ -58,6 +58,7 @@
       "series": [
         {
           "name": "计划",
+          "role": "target",
           "values": [
             12,
             8,
@@ -66,6 +67,7 @@
         },
         {
           "name": "实际",
+          "role": "actual",
           "values": [
             10,
             8,
@@ -76,7 +78,8 @@
       "unit": "项",
       "period": "2026-09-01 至 2026-09-30",
       "insight": "交付量不代表质量或业务价值；须结合验收状态",
-      "chartType": "bar"
+      "chartType": "bar",
+      "numberFormat": "#,##0"
     },
     {
       "type": "table",
@@ -147,7 +150,8 @@
       "unit": "人天",
       "period": "2026-09-01 至 2026-09-30",
       "insight": "成本 = 实际人天 × 日费率 + 外部费用",
-      "chartType": "bar"
+      "chartType": "bar",
+      "numberFormat": "#,##0"
     },
     {
       "type": "table",
@@ -238,7 +242,7 @@
         },
         {
           "title": "预算",
-          "note": "实际成本 270,200 元，预算差异 -19,800 元。"
+          "note": "实际成本 270,200元，预算差异 -19,800元。"
         },
         {
           "title": "投入产出",

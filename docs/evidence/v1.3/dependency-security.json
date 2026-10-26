@@ -1,0 +1,35 @@
+{
+  "checked_at": "2026-10-26T01:23:09.667986+00:00",
+  "results": [
+    {
+      "source": "pypi-pillow13",
+      "status": "PASS",
+      "known_advisory_records": 0,
+      "requires_python": ">=3.11"
+    },
+    {
+      "source": "osv-pillow13",
+      "status": "PASS",
+      "known_advisory_records": 0,
+      "requires_python": null
+    }
+  ],
+  "boundary": "Official API snapshot; no TLS bypass, no promise of unknown-vulnerability absence.",
+  "npm_registry": "https://registry.npmjs.org",
+  "npm_audit_report_version": 2,
+  "npm_vulnerabilities": {
+    "info": 0,
+    "low": 0,
+    "moderate": 0,
+    "high": 0,
+    "critical": 0,
+    "total": 0
+  },
+  "python_declared_dependency": {
+    "name": "Pillow",
+    "version": "13.0.0",
+    "requires_python": ">=3.11",
+    "license": "MIT-CMU"
+  },
+  "scope": "Declared project dependencies only. Not a host OS/runtime security certification or company/Agensi acceptance."
+}

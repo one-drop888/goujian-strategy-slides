@@ -1,72 +1,47 @@
-# V1.2 architecture
+# Architecture · V1.3
 
-Goujian is one product and one distributable Presentation Library. V1.2 adds an auditable reasoning layer and release packaging without replacing the renderer core.
+Goujian is one product with one shared native PPTX engine. Platform adapters do not fork the analytical or rendering core.
+
+```text
+Agent + sources + user intent
+  → Data semantics (optional typed metric catalogue)
+  → Analytical Reasoning Plan + declared narrative graph
+  → Visual encoding + composition/profile selection
+  → Adaptive title/layout + PPTX renderer
+  → Native readback + geometry/fonts/spatial + render + reviewer
+```
+
+## Responsibilities and actual implementation
 
 | Layer | Implementation | Boundary |
 |---|---|---|
-| Reasoning Plan | `core/schema/reasoning-plan.schema.json`, `core/reasoning/validate-plan.js` | Agent-authored sources, claims, dispositions, calculations, bindings and theme; not independent reasoning |
-| Arithmetic | `core/reasoning/calculations.js` | `sum`, `difference`, `ratio`, `percent_change` with units/windows/denominators; no arbitrary formulas or statistics |
-| Source ledger | Source path/hash and optional JSON-Pointer values in plan validation | JSON sources can be byte-checked; PDF/image/text/native-PPTX values are reviewer-required |
-| Theme | `core/reasoning/theme-decision.js`, profile resolver | Reference > brand > explicit user > automatic > default; conflict record; no font embedding |
-| Compile / verify | `core/reasoning/compile.js`, `verify.js`, `embed.js` | Exported spec, native PPTX, scene/reasoning sidecars, embedded report, exact-byte verification |
-| Schema | `core/schema/validate.js`: Ajv Draft 2020-12 + composition payload guards | Shape/capacity validation, not factual correctness or exact text fitting |
-| Planner | Keyword storyline/archetype routing and measured title resolution | Partial semantic reasoning; rewriting remains agent/author-assisted |
-| Storyline | 28 registry entries with questions, triggers and sequences | Agent chooses/adapts; sequence is guidance, not enforced page order |
-| Archetype | 86 semantic entries with explicit status and limitations | 74 implemented, 6 partial, 6 rejected as designed-only |
-| Composition | Portable JSON normalization, role-aware deduplication and registry mapping | 27 recipes → 22 rendering functions; four reusable multimodal grammars |
-| Asset / provenance | Local raster contract, source region/confidence/render mode and protected evidence | Agent supplies classification; no OCR or universal visual understanding |
-| Profile | Inheritance, spec-local lookup, schema/style/font resolution | Typography, spacing, table/chart/title/image tokens; no font embedding |
-| Renderer | `core/renderer/`: PPTX orchestration, primitives, structural slides, data slides | Native PPTX objects; wide canvas; backend-specific geometry |
-| QA | `core/qa/`, `quality_gate.py`, `render_deck.py` | Executable bounded checks plus explicit reviewer attestation |
-| Scene | Hash-bound native object record with semantic relationships | Spatial QA reads actual serialized native geometry and order; no arbitrary imported intent inference |
-| Packaging | `scripts/package_runtime.py`, `tests/test_package.py` | Deterministic single-SKILL installer and separate showcase artifact; no build caches or PPTX in installer |
-| Release | `.github/workflows/release.yml` | Manual approved-SHA dispatch; no push trigger; annotated immutable tag; not dispatched in this phase |
+| Data semantic contract | `core/semantics/numeric.js`, `deck.js`, metric/deck schemas | Validates supplied meaning, not source authenticity; original spec immutable |
+| Analytical reasoning | Existing `core/reasoning/` source hashes, bounded arithmetic, claim/content ledger; three `core/analytics/` recipes | Business interpretation is agent-authored; no general model or arbitrary formula engine |
+| Narrative graph | `core/semantics/narrative.js`, optional deck field | Declared links/coverage/fingerprints and redundancy candidates; no automatic semantic deletion |
+| Visual grammar | `core/renderer/encoding.js`, style tokens | Stable series identities, roles, categorical/value encoding and bounded perceptual heuristics |
+| Adaptive presentation | Existing composition resolver, profiles, measured title candidates, native slide primitives | Wide16:9, bounded capacities; no generic global layout optimizer |
+| Relationship layouts | Date/ordinal timeline; native DAG branch/swimlane/roadmap | True date distances; bounded graph capacities; cycles not implemented as DAG |
+| QA | Shared `native_readback.js`, `semantic.js`, existing Python gate/renderers | Serialized PPTX and XLSX checked; visual/source-truth judgments remain separate |
+| Distribution | One root Skill, deterministic runtime package, complete-ZIP preflight, existing CI/release workflow | Public checks cannot certify company/marketplace import |
 
-```text
-Agent reasoning / source interpretation
-           ↓
-Reasoning Plan (JSON): sources · claims · dispositions · calculations · bindings · theme
-           ↓
-Deterministic validation: structure · arithmetic · closure · coverage · bindings · theme
-           ↓
-Exported Presentation Spec (JSON)
-           ↓
-Storyline + semantic archetype → composition resolver
-                                      + profile resolver
-                                             ↓
-                                        PPTX backend
-                                             ↓
-                   Scene + reasoning sidecar + embedded report
-                                             ↓
-                                Geometry / Fonts / Render
-                                             ↓
-                                     Visual review → repair
-```
+## Original facts and transformed output
 
-## Reasoning and verification trust
+A build validates the original deck, derives an effective copy and records substitutions/storage conversions/display normalization. Raw fractions .092 become canonical percent-point values9.2. Excel-native thousands/millions formats retain base chart values; explicit 万/亿 scales normalize chart/workbook values and record the factor, while the original metric remains unchanged. Placeholders bind formatted text to the same catalogue.
 
-`validate_plan.js` performs deterministic structural and semantic checks before build. When a structured JSON source declares `path`, `sha256` and numeric `values[].json_pointer`, validation hashes the source, resolves each pointer and compares the declared number with the source bytes. Other source formats or absent structured values receive `REVIEWER_REQUIRED`; an agent summary or locator is never promoted to machine-verified truth.
+The original spec is the portable rebuild input. `effective_spec` is internal and must not be passed back as raw input. Reasoning Plan source/spec hashes remain enforced; final native verification requires the trusted final PPTX hash and authenticates the embedded report. Generic QA re-derives expected values from the original spec and reads the actual output without trusting a sidecar PASS flag.
 
-`compile_plan.js` writes the PPTX and sidecars. Final verification requires an `expected_pptx_sha256` supplied by a trusted sidecar or scene. It checks the exact PPTX bytes, chart caches against the exported spec, native tables, KPI text, speaker-note claim references, and the embedded plan/spec/report hashes. This detects a mismatch between the expected artifact and the declared contract. It does not establish that the plan's interpretation is fair, the source is authentic or the rendered page is visually acceptable.
+## Reuse rather than independent slide templates
 
-Theme selection is deterministic and recorded in the reasoning sidecar: reference profile > brand profile > explicit user profile (`--profile`, plan user profile, deck profile) > automatic intent matching > default. An explicit dark request may override automatic/default light selection; conflicts such as dark versus printable remain visible. The chosen profile drives the build, but theme configuration diversity is not a claim that every profile has received equal visual review.
+Storylines express management logic. Semantic archetypes resolve into a limited set of compositions and native primitives. Profiles supply typography, spacing, chart/table language and colors. A catalogue count is not a count of independently implemented renderers. Unsupported semantic types stay explicitly unsupported instead of silently becoming a misleading chart.
 
-## Dependency direction
+The legacy keyword planner remains a helper. Agent-authored reasoning, not fixed keyword rules, makes business and chart-selection decisions. Deterministic code rejects contradictions and unsupported capacity.
 
-Only `core/renderer/index.js` imports PptxGenJS. Planning, schemas, semantic metadata, reasoning validation and normalization use ordinary JSON/JavaScript. A future HTML renderer can reuse the contract without importing PowerPoint code.
+## Extension boundary
 
-The composition registry describes routing and purpose. It is **not** a backend-neutral box/constraint graph. Coordinates, native chart options and table behavior remain in renderer modules. An HTML backend would implement equivalent compositions and its own font measurement; a shared geometry model should follow concrete second-backend needs.
+Numeric semantics, declared narrative and most source/claim contracts have no PptxGenJS imports. These can be reused by a future renderer. Composition realization, native chart format/style patches, scenes and QA are still PPTX-specific. HTML/multi-renderer readiness is PARTIAL at the contract level; there is no HTML renderer or complete renderer-independent layout IR in V1.3. A future implementation needs its own layout adapter and output/readback/visual acceptance, not a rewrite of business reasoning.
 
-## Maintenance decisions
+The native chart XML postprocessor targets pinned PptxGenJS4.0.0 behavior. Upgrades must repeat the native/workbook/format/legend and actual-render tests. Large QA/benchmark modules are a maintenance boundary: extend focused helpers when new families justify it, not a second rendering engine.
 
-The original builder's chart/table code was separated into `slides/data.js`; shared typography/rules/footers live in `primitives/base.js`. `slides/basic.js` remains the largest module and includes some legacy diagram sizing. Further decomposition belongs with tests for new behavior, not a speculative plugin framework.
+## Community and Pro
 
-Unknown compositions, unsupported special charts, missing matrix coordinates, nonfinite/mismatched chart values and over-capacity content fail before writing. `renderer` is not an accepted override. Profile inheritance detects cycles and resolves relative parent files from the child directory.
-
-Evidence metadata is preserved in speaker notes. It is an author-provided record, not verified source truth. Visual records bind to the exact PPTX SHA256 and reviewed slide numbers; they attest that inspection happened, not that a machine proved visual quality.
-
-V1.1 records actual native draw calls at `scene-adapter.js`; the body coordinate frame adapts to measured header height. Raster preparation occurs before native serialization in an isolated temporary directory; source files are never overwritten. Asset schema, provenance, relationship and reasoning JSON do not import PptxGenJS. See the [multimodal contract](../MULTIMODAL_CONTRACT.md) and [Reasoning Plan reference](../../skill/references/reasoning-plan.md).
-
-## Packaging and release direction
-
-The installer is built from an explicit include whitelist with stable ordering, fixed timestamps/permissions, one root `SKILL.md`, and rejection of symlinks, caches, private paths and duplicate entries. The optional showcase is packaged separately and is not required at runtime. The release workflow runs only by manual dispatch of an approved main-branch SHA, verifies remote state, rebuilds and tests, and stops on an existing tag/release. This phase does not execute that workflow.
+Apache-2.0 Community contains semantic correctness, native generation, readability and QA. Any future Pro extension consumes the same public contracts/engine from separately versioned, licensed and delivered code. No proprietary Pro module is included in this public repository. Paid delivery, marketplace runtime and commercial differentiation are separate unverified gates.

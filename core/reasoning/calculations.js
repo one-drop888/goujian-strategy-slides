@@ -1,4 +1,4 @@
-const TOLERANCE=1e-9;
+const TOLERANCE=16*Number.EPSILON;
 
 function normalizeUnit(unit) {
   const value=String(unit||'').trim();
@@ -14,7 +14,22 @@ function finite(value,label) {
 }
 
 function close(actual,expected) {
-  return Math.abs(actual-expected)<=TOLERANCE*Math.max(1,Math.abs(expected));
+  if(typeof actual!=='number'||typeof expected!=='number'||!Number.isFinite(actual)||!Number.isFinite(expected))return false;
+  if(actual===expected)return true;
+  if(actual===0||expected===0)return false;
+  return Math.abs(actual-expected)<=TOLERANCE*Math.max(Math.abs(actual),Math.abs(expected));
+}
+// Neumaier summation keeps long decimal runs (for example 1000 contributions of
+// 0.1) from drifting outside the strict reconciliation tolerance.
+function compensatedSum(values) {
+  let sum=0,compensation=0;
+  for(const value of values) {
+    const next=sum+value;
+    if(Math.abs(sum)>=Math.abs(value)) compensation+=(sum-next)+value;
+    else compensation+=(value-next)+sum;
+    sum=next;
+  }
+  return sum+compensation;
 }
 
 function lookupSourceValue(sources,sourceId,valueId) {
@@ -68,7 +83,7 @@ function evaluateCalculation(claim,sources) {
   if(operator==='sum') {
     if(['%','pp'].includes(unit)) throw new Error(`${claim.id}: sum of ${unit} values is not a valid aggregate; use raw counts or weighted totals`);
     if(resultUnit!==unit) throw new Error(`${claim.id}: sum result unit ${resultUnit} must equal input unit ${unit}`);
-    expected=operands.reduce((total,op)=>total+op.value,0);
+    expected=compensatedSum(operands.map(op=>op.value));
   }
   if(operator==='difference') {
     const required=unit==='%'?'pp':unit;
@@ -163,4 +178,4 @@ function resolvePointer(document,pointer) {
   return current;
 }
 
-module.exports={evaluateCalculation,formatNumber,resolvePointer,normalizeUnit,close,TOLERANCE};
+module.exports={evaluateCalculation,formatNumber,resolvePointer,normalizeUnit,close,compensatedSum,TOLERANCE};

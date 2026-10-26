@@ -1,0 +1,219 @@
+{
+  "schema_version": "1.3",
+  "title": "关系图演示：真实日期、分支与阶段",
+  "profile": "executive-clean",
+  "slides": [
+    {
+      "type": "timeline",
+      "title": "3 家门店试点按真实日期推进，复盘与扩面尚未完成",
+      "takeaway": "试点已结束，中期复盘仍在进行；扩面与季度复盘未开始，节点位置只反映真实日期。",
+      "items": [
+        {
+          "id": "kickoff",
+          "title": "试点启动",
+          "date": "2026-01-05",
+          "owner": "增长组",
+          "status": "已完成",
+          "note": "3 家门店，合成数据"
+        },
+        {
+          "id": "pilot",
+          "title": "18 天试点观察",
+          "date": "2026-02-02",
+          "end_date": "2026-02-20",
+          "owner": "运营组",
+          "status": "已完成",
+          "note": "保留原始访谈记录"
+        },
+        {
+          "id": "review",
+          "title": "中期复盘",
+          "date": "2026-03-02",
+          "owner": "数据组",
+          "status": "进行中",
+          "note": "只陈述样本内差异"
+        },
+        {
+          "id": "rollout",
+          "title": "分店扩面",
+          "date": "2026-03-30",
+          "end_date": "2026-04-17",
+          "owner": "区域团队",
+          "status": "未开始",
+          "note": "以复核结果为准"
+        },
+        {
+          "id": "readout",
+          "title": "季度复盘",
+          "date": "2026-04-27",
+          "owner": "管理层",
+          "status": "未开始",
+          "note": "不把相关误写成因果"
+        }
+      ],
+      "source": "Synthetic relationship dogfood · Apache-2.0"
+    },
+    {
+      "type": "timeline",
+      "title": "九月连续两次访谈，十月复盘仍在进行",
+      "takeaway": "两次访谈相隔一天；十月复盘尚未结束，时间轴不压缩真实日期。",
+      "items": [
+        {
+          "id": "sep1",
+          "title": "九月启动",
+          "date": "2026-09-01",
+          "owner": "增长组",
+          "status": "已完成",
+          "note": "合成试点记录"
+        },
+        {
+          "id": "sep2",
+          "title": "次日补访",
+          "date": "2026-09-02",
+          "owner": "研究组",
+          "status": "已完成",
+          "note": "保留原始访谈"
+        },
+        {
+          "id": "oct31",
+          "title": "十月复盘",
+          "date": "2026-10-31",
+          "owner": "数据组",
+          "status": "进行中",
+          "note": "只陈述样本内差异"
+        }
+      ],
+      "source": "Synthetic relationship dogfood · Apache-2.0"
+    },
+    {
+      "type": "roadmap",
+      "title": "达到门槛再扩面，未达门槛先补证据",
+      "takeaway": "门槛未判定前不扩面；达到门槛走向扩面，未达门槛先补充访谈。",
+      "tasks": [
+        {
+          "id": "A",
+          "title": "小范围试点",
+          "lane": 0,
+          "owner": "增长组",
+          "date": "2026 Q1",
+          "status": "已完成"
+        },
+        {
+          "id": "B",
+          "title": "门槛评估",
+          "kind": "decision",
+          "lane": 1,
+          "owner": "数据组",
+          "date": "2026 Q2",
+          "status": "待判定"
+        },
+        {
+          "id": "C",
+          "title": "补充访谈",
+          "lane": 2,
+          "owner": "研究组",
+          "date": "2026 Q2",
+          "status": "进行中"
+        },
+        {
+          "id": "D",
+          "title": "分店扩面",
+          "lane": 0,
+          "owner": "运营组",
+          "date": "2026 Q3",
+          "status": "未开始"
+        },
+        {
+          "id": "E",
+          "title": "暂缓投入",
+          "lane": 1,
+          "owner": "管理层",
+          "date": "2026 Q3",
+          "status": "未开始"
+        }
+      ],
+      "dependencies": [
+        {
+          "from": "A",
+          "to": "B",
+          "label": "完成后评估"
+        },
+        {
+          "from": "B",
+          "to": "D",
+          "label": "达到门槛"
+        },
+        {
+          "from": "B",
+          "to": "C",
+          "label": "未达门槛"
+        },
+        {
+          "from": "B",
+          "to": "E",
+          "label": "暂停投入"
+        }
+      ],
+      "stage_labels": [
+        "试点",
+        "判定",
+        "动作"
+      ],
+      "lane_labels": [
+        "业务",
+        "决策",
+        "研究"
+      ],
+      "source": "Synthetic relationship dogfood · Apache-2.0"
+    },
+    {
+      "type": "roadmap",
+      "title": "三段推进，先验证再扩面",
+      "lanes": [
+        {
+          "title": "产品",
+          "phases": [
+            {
+              "title": "试点版本"
+            },
+            {
+              "title": "扩面能力"
+            },
+            {
+              "title": "稳定运营"
+            }
+          ]
+        },
+        {
+          "title": "运营",
+          "phases": [
+            {
+              "title": "门店试点"
+            },
+            {
+              "title": "区域复制"
+            },
+            {
+              "title": "例行复盘"
+            }
+          ]
+        },
+        {
+          "title": "研究",
+          "phases": [
+            {
+              "title": "小样本访谈"
+            },
+            {
+              "title": "复访验证"
+            },
+            {
+              "title": "边界说明"
+            }
+          ]
+        }
+      ],
+      "source": "Synthetic relationship dogfood · Apache-2.0"
+    }
+  ]
+}

@@ -1,0 +1,646 @@
+{
+  "schema_version": "goujian.independent-visual-review/1",
+  "reviewer": "Codex",
+  "date": "2026-10-26",
+  "status": "PASS_WITH_NOTES",
+  "engine_source_sha256": "e183c3c162801781a1c69cc480dd53b49f805c2e571be5a9a0245cff5b45d854",
+  "environment": "Linux x86_64; LibreOfficeDev26.8 alpha; Poppler26.05; Python3.14/Pillow13; Noto fonts",
+  "scope": "Local synthetic fixtures. Complete montage/contact sheets with representative full-size review, not every page full size. Unchanged gallery/relationship renders were hash-compared with earlier inspected artifacts; final changed negative charts and ledger window were rechecked. CI Ubuntu renders require a separate pre-release differential review.",
+  "decks": [
+    {
+      "path": "matrix/light.pptx",
+      "pptx_sha256": "93958f00f16bf565ee1b3cdff06f80f1b3a1ad7ac48818f9a15824e79d681c20",
+      "slides_reviewed": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36
+      ],
+      "method": "complete montage/contact-sheet review plus the listed full-size pages",
+      "full_size_pages": [
+        16,
+        23
+      ],
+      "notes": "Six-family coverage; missing line remains a gap; zero is retained; percentages/legend visible. Missing/single-point area combinations are rejected, not rendered. Final negative bar checked independently at full size; all36 cells reviewed in3 contact sheets. Other detailed examples inspected in prior rounds and unchanged layouts rechecked by contact sheets."
+    },
+    {
+      "path": "matrix/dark.pptx",
+      "pptx_sha256": "bd60d25d45a6e4a29f516db3942e202b6af2d8603347c51a99ce6e28dfb92ecc",
+      "slides_reviewed": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36
+      ],
+      "method": "complete montage/contact-sheet review plus the listed full-size pages",
+      "full_size_pages": [
+        12
+      ],
+      "notes": "Six-family coverage; missing line remains a gap; zero is retained; percentages/legend visible. Missing/single-point area combinations are rejected, not rendered. Final negative bar checked independently at full size; all36 cells reviewed in3 contact sheets. Other detailed examples inspected in prior rounds and unchanged layouts rechecked by contact sheets."
+    },
+    {
+      "path": "matrix/supplemental/supplemental.pptx",
+      "pptx_sha256": "526472f26571747900ef26491c0131c387aa9015d550769667bbe28571fb5642",
+      "slides_reviewed": [
+        1,
+        2,
+        3
+      ],
+      "method": "complete montage/contact-sheet review plus the listed full-size pages",
+      "full_size_pages": [],
+      "notes": "Stacked components and explicit equal-width histogram inspected in contact sheet. Exact quantitative comparison still benefits from line/grouped charts where area overlaps."
+    },
+    {
+      "path": "gallery/corporate/gallery-corporate.pptx",
+      "pptx_sha256": "2ebaa6b97ac7f352e45884f6f2a134396903c395eabc8d0017c6533cc76835f6",
+      "slides_reviewed": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "method": "complete montage/contact-sheet review plus the listed full-size pages",
+      "full_size_pages": [],
+      "notes": "Complete12-page montage inspected. Readable hierarchy/units and bounded causal statements; dense table is for read-ahead/appendix rather than every cell at distance. Same36-page gallery across profiles; no claim of full-size inspection of every profile/page."
+    },
+    {
+      "path": "gallery/dark-executive/gallery-dark-executive.pptx",
+      "pptx_sha256": "1fa6bb84c598efc6ebe347dcf4ab092bf68c0d50a4ab4f8f495b00164f42dd2e",
+      "slides_reviewed": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "method": "complete montage/contact-sheet review plus the listed full-size pages",
+      "full_size_pages": [
+        4
+      ],
+      "notes": "Complete12-page montage inspected. Readable hierarchy/units and bounded causal statements; dense table is for read-ahead/appendix rather than every cell at distance. Same36-page gallery across profiles; no claim of full-size inspection of every profile/page."
+    },
+    {
+      "path": "gallery/executive-dense/gallery-executive-dense.pptx",
+      "pptx_sha256": "01fa7d0341a1282be18209e8e3b45ac1bc9851eb42996024f2461939a18c98f2",
+      "slides_reviewed": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "method": "complete montage/contact-sheet review plus the listed full-size pages",
+      "full_size_pages": [
+        2,
+        3,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "notes": "Complete12-page montage inspected. Readable hierarchy/units and bounded causal statements; dense table is for read-ahead/appendix rather than every cell at distance. Same36-page gallery across profiles; no claim of full-size inspection of every profile/page."
+    },
+    {
+      "path": "ledger/ledger-executive-dense.pptx",
+      "pptx_sha256": "b35e25817227c500b0a9fc0450056582303c7251bcced73c8e24bcc3b8fce0c1",
+      "slides_reviewed": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "method": "complete montage/contact-sheet review plus the listed full-size pages",
+      "full_size_pages": [
+        4
+      ],
+      "notes": "Full montage and field/window detail reviewed. Sep snapshot and Apr–Sep trend now distinguished. Summary/detail pair retained; hashes do not establish external source truth."
+    },
+    {
+      "path": "relationships/branch-swimlane-dark.pptx",
+      "pptx_sha256": "b643888f9373ddade46eee76677ba32d74db7cad6711f3559942c0b5af901cc6",
+      "slides_reviewed": [
+        1
+      ],
+      "method": "complete montage/contact-sheet review plus the listed full-size pages",
+      "full_size_pages": [
+        1
+      ],
+      "notes": "Actual full-size native timeline/branch/roadmap inspected; dates, duration/status and branch labels agree. Close elapsed-date markers can touch while labels alternate lanes. Ordinal roadmap is distinct from a dated timeline; no cyclic-flow/scheduler claim."
+    },
+    {
+      "path": "relationships/branch-swimlane-light.pptx",
+      "pptx_sha256": "48f98099e935ef52a1f9327cb56ff537ee32dca38c5234172784fb7024e917ad",
+      "slides_reviewed": [
+        1
+      ],
+      "method": "complete montage/contact-sheet review plus the listed full-size pages",
+      "full_size_pages": [
+        1
+      ],
+      "notes": "Actual full-size native timeline/branch/roadmap inspected; dates, duration/status and branch labels agree. Close elapsed-date markers can touch while labels alternate lanes. Ordinal roadmap is distinct from a dated timeline; no cyclic-flow/scheduler claim."
+    },
+    {
+      "path": "relationships/dated-timeline-close-dark.pptx",
+      "pptx_sha256": "7f69a786679815b3aeb586b26451bce3c67b1bbd4f6f2b16520ae42ae8e7179c",
+      "slides_reviewed": [
+        1
+      ],
+      "method": "complete montage/contact-sheet review plus the listed full-size pages",
+      "full_size_pages": [
+        1
+      ],
+      "notes": "Actual full-size native timeline/branch/roadmap inspected; dates, duration/status and branch labels agree. Close elapsed-date markers can touch while labels alternate lanes. Ordinal roadmap is distinct from a dated timeline; no cyclic-flow/scheduler claim."
+    },
+    {
+      "path": "relationships/dated-timeline-close-light.pptx",
+      "pptx_sha256": "2de2a7da18caca1ff4de776dff0e6d6e9da5334a559d3d4f75ef927d2f5a49d4",
+      "slides_reviewed": [
+        1
+      ],
+      "method": "complete montage/contact-sheet review plus the listed full-size pages",
+      "full_size_pages": [
+        1
+      ],
+      "notes": "Actual full-size native timeline/branch/roadmap inspected; dates, duration/status and branch labels agree. Close elapsed-date markers can touch while labels alternate lanes. Ordinal roadmap is distinct from a dated timeline; no cyclic-flow/scheduler claim."
+    },
+    {
+      "path": "relationships/dated-timeline-dark.pptx",
+      "pptx_sha256": "9dad6b4fdee19f943ff7d3a9fe0d2df2c80dabb8014c0139ef2bc7cdd24d2684",
+      "slides_reviewed": [
+        1
+      ],
+      "method": "complete montage/contact-sheet review plus the listed full-size pages",
+      "full_size_pages": [
+        1
+      ],
+      "notes": "Actual full-size native timeline/branch/roadmap inspected; dates, duration/status and branch labels agree. Close elapsed-date markers can touch while labels alternate lanes. Ordinal roadmap is distinct from a dated timeline; no cyclic-flow/scheduler claim."
+    },
+    {
+      "path": "relationships/dated-timeline-light.pptx",
+      "pptx_sha256": "33b8a480771dc68f887cf73e358dd543b9ea797d3d6b9b87e6a92f8f79f42bdc",
+      "slides_reviewed": [
+        1
+      ],
+      "method": "complete montage/contact-sheet review plus the listed full-size pages",
+      "full_size_pages": [
+        1
+      ],
+      "notes": "Actual full-size native timeline/branch/roadmap inspected; dates, duration/status and branch labels agree. Close elapsed-date markers can touch while labels alternate lanes. Ordinal roadmap is distinct from a dated timeline; no cyclic-flow/scheduler claim."
+    },
+    {
+      "path": "relationships/roadmap-dark.pptx",
+      "pptx_sha256": "3fce6d995253be172840466d8cc390222526ea618002f7795d0ad9c4b17d6db0",
+      "slides_reviewed": [
+        1
+      ],
+      "method": "complete montage/contact-sheet review plus the listed full-size pages",
+      "full_size_pages": [
+        1
+      ],
+      "notes": "Actual full-size native timeline/branch/roadmap inspected; dates, duration/status and branch labels agree. Close elapsed-date markers can touch while labels alternate lanes. Ordinal roadmap is distinct from a dated timeline; no cyclic-flow/scheduler claim."
+    },
+    {
+      "path": "relationships/roadmap-light.pptx",
+      "pptx_sha256": "e282c1bf785f46261335fe8e8d9c23a90108f3e87193c8df2e7a12316ad886fc",
+      "slides_reviewed": [
+        1
+      ],
+      "method": "complete montage/contact-sheet review plus the listed full-size pages",
+      "full_size_pages": [
+        1
+      ],
+      "notes": "Actual full-size native timeline/branch/roadmap inspected; dates, duration/status and branch labels agree. Close elapsed-date markers can touch while labels alternate lanes. Ordinal roadmap is distinct from a dated timeline; no cyclic-flow/scheduler claim."
+    },
+    {
+      "path": "scenarios/business-performance/after/deck.pptx",
+      "pptx_sha256": "4fd1aa4e14bc233987804052e11b368d9246fb7ad4e8b6fb755b3494d5fa6bdb",
+      "slides_reviewed": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "method": "complete montage/contact-sheet review plus the listed full-size pages",
+      "full_size_pages": [
+        2
+      ],
+      "notes": "Both before/after complete montages inspected using identical raw inputs. Most original recipe layouts are retained; formatting/role distinction improves. No claim of automatic narrative redesign from the same-input pair."
+    },
+    {
+      "path": "scenarios/sales-conversion/after/deck.pptx",
+      "pptx_sha256": "595089d499e441c92d7cba3c6dc1794395cc57c91101bfb14a61053155e42451",
+      "slides_reviewed": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "method": "complete montage/contact-sheet review plus the listed full-size pages",
+      "full_size_pages": [],
+      "notes": "Both before/after complete montages inspected using identical raw inputs. Most original recipe layouts are retained; formatting/role distinction improves. No claim of automatic narrative redesign from the same-input pair."
+    },
+    {
+      "path": "scenarios/project-analytics/after/deck.pptx",
+      "pptx_sha256": "4c641b2f37a3abf5c21a3af1fa293eac5eeabc765043b8d7833cc67b149e3930",
+      "slides_reviewed": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "method": "complete montage/contact-sheet review plus the listed full-size pages",
+      "full_size_pages": [],
+      "notes": "Both before/after complete montages inspected using identical raw inputs. Most original recipe layouts are retained; formatting/role distinction improves. No claim of automatic narrative redesign from the same-input pair."
+    }
+  ],
+  "public_preview_hashes": [
+    {
+      "path": "docs/visual/v1.3/before-after/business-performance-after.png",
+      "sha256": "8b23302fb0641cd1e16adccc81c18df8bd05b668c1d8c1cfa783cde5f5a5d634"
+    },
+    {
+      "path": "docs/visual/v1.3/before-after/business-performance-before.png",
+      "sha256": "7906d499f5bf400fa38cdcb019b040fb0ee8c727f81e2a4e1e67d6060ebf70df"
+    },
+    {
+      "path": "docs/visual/v1.3/gallery-corporate/slide-01.png",
+      "sha256": "ff6c90e51141270ecbb1121cb1b30707cceddff766c4709feb2150fc8f138bd7"
+    },
+    {
+      "path": "docs/visual/v1.3/gallery-corporate/slide-02.png",
+      "sha256": "248e43acd2906169c27b940d4785bdd6d5bf98a92e5d9bbae240fce19494ef2a"
+    },
+    {
+      "path": "docs/visual/v1.3/gallery-corporate/slide-03.png",
+      "sha256": "ce6d4ab93f01afd86609a53efef80698ead12f83f947a5346b82d918c8cec845"
+    },
+    {
+      "path": "docs/visual/v1.3/gallery-corporate/slide-04.png",
+      "sha256": "997618b22516a141a207bc605e32297e992a766540157801c06939e7e956fbb6"
+    },
+    {
+      "path": "docs/visual/v1.3/gallery-corporate/slide-05.png",
+      "sha256": "0e1363e884c0883e6a978cfaa2bc84179cfb3d56640ce396f4098e0b1af14da4"
+    },
+    {
+      "path": "docs/visual/v1.3/gallery-corporate/slide-06.png",
+      "sha256": "22c9571d0674d8bde5c03bb87632fc7afef2737eca20d1fcf7f1fe79fc748d00"
+    },
+    {
+      "path": "docs/visual/v1.3/gallery-corporate/slide-07.png",
+      "sha256": "87c08d5dee40cb0a8cb18fd3340c630f362e4dfa8e7fa782f3de914371ed750e"
+    },
+    {
+      "path": "docs/visual/v1.3/gallery-corporate/slide-08.png",
+      "sha256": "6cfca3ce88af469c3a33c6e2461ba87bd39fd86e44f6d407b25d708a4e540709"
+    },
+    {
+      "path": "docs/visual/v1.3/gallery-corporate/slide-09.png",
+      "sha256": "efe86fb8900fe3d0b0c48ca65f50cb393d6ea59db285af3f7642216c5cf7a962"
+    },
+    {
+      "path": "docs/visual/v1.3/gallery-corporate/slide-10.png",
+      "sha256": "9996ccac137eff43fd8d186c94d00ac99dd8bfc93899b691e132c43a7c6003c5"
+    },
+    {
+      "path": "docs/visual/v1.3/gallery-corporate/slide-11.png",
+      "sha256": "0fae8fdefc0fdcac290eacdb807773cdbea9a4fd900f3403ce88841ab2d00f16"
+    },
+    {
+      "path": "docs/visual/v1.3/gallery-corporate/slide-12.png",
+      "sha256": "a7dda7c2a944f987e49070aaaf6fc56f2b63ec26b6d7cfd7bc2db4c165d13a15"
+    },
+    {
+      "path": "docs/visual/v1.3/gallery-dark-executive/slide-01.png",
+      "sha256": "a214ecd7eba8fcbd7b6cab6e8fc3ddd948837519ed9d2139518b736c8e40a33e"
+    },
+    {
+      "path": "docs/visual/v1.3/gallery-dark-executive/slide-02.png",
+      "sha256": "6a5183f66d2f6ff33f35061544ed053c02c0794ae90c95a44e8035579f143379"
+    },
+    {
+      "path": "docs/visual/v1.3/gallery-dark-executive/slide-03.png",
+      "sha256": "477a80bbacc07463bafaad476a9bfe0c0dd9c2955a628c8ab30235be47d32e02"
+    },
+    {
+      "path": "docs/visual/v1.3/gallery-dark-executive/slide-04.png",
+      "sha256": "63edd3ae3db321a1f8d2d029d2d9896115eadfad8dc05e136648cf50c3d4ad0a"
+    },
+    {
+      "path": "docs/visual/v1.3/gallery-dark-executive/slide-05.png",
+      "sha256": "31f877c68d7520dd54dc11062857ee538e111155e1d1523a935f5d3b2792c4c6"
+    },
+    {
+      "path": "docs/visual/v1.3/gallery-dark-executive/slide-06.png",
+      "sha256": "70d332b5a28a1596e89409c55ca5fc4c5499f5469d14dc78aac15b29d50ca603"
+    },
+    {
+      "path": "docs/visual/v1.3/gallery-dark-executive/slide-07.png",
+      "sha256": "50fd4c8ab50dd9fc77a169c3b80cb33ba0b62c654dbf11533a65b3db8998873d"
+    },
+    {
+      "path": "docs/visual/v1.3/gallery-dark-executive/slide-08.png",
+      "sha256": "0409b98930a52a930a8676cdfb8138df24be4cac20f7e78e9b4a2336e7b28fec"
+    },
+    {
+      "path": "docs/visual/v1.3/gallery-dark-executive/slide-09.png",
+      "sha256": "057f536e5e4357e183bb51d19051059b00f494138a71b6458f5e4cfe8a4592a6"
+    },
+    {
+      "path": "docs/visual/v1.3/gallery-dark-executive/slide-10.png",
+      "sha256": "631f41f378a5c78189dffd377372305da5249ab30c5e490bdb479e85d7105ba8"
+    },
+    {
+      "path": "docs/visual/v1.3/gallery-dark-executive/slide-11.png",
+      "sha256": "49ac83a8b9c2ffc204d481592d8d0784dd360d075422045b2a1b6666fb1e655f"
+    },
+    {
+      "path": "docs/visual/v1.3/gallery-dark-executive/slide-12.png",
+      "sha256": "d7cc08cf81b274d2afc8d6adfd40d617895784b6d3c1e5c5216ccc7eb8454627"
+    },
+    {
+      "path": "docs/visual/v1.3/gallery-executive-dense/slide-01.png",
+      "sha256": "bf369e83637720ce2abdad151d1783ba660fa35bd2ceeb42d46dd8b246810e08"
+    },
+    {
+      "path": "docs/visual/v1.3/gallery-executive-dense/slide-02.png",
+      "sha256": "56c7c98eda4bcf20818f399555fdf05c5ab57e36d59abba11b1df0a34bc71d58"
+    },
+    {
+      "path": "docs/visual/v1.3/gallery-executive-dense/slide-03.png",
+      "sha256": "1bda837fd79f251a314130d9504aeff1c39eac9a80a3986f53542367d6700954"
+    },
+    {
+      "path": "docs/visual/v1.3/gallery-executive-dense/slide-04.png",
+      "sha256": "c6ff3df31867ef8831001bb7950e73ccc8fea54723f120728ca8880e86091f3c"
+    },
+    {
+      "path": "docs/visual/v1.3/gallery-executive-dense/slide-05.png",
+      "sha256": "d89ba7e586d6919be7d5c6fc80fed5b4c37fbc6cafc12a17cfe3eaf4bec29be6"
+    },
+    {
+      "path": "docs/visual/v1.3/gallery-executive-dense/slide-06.png",
+      "sha256": "c72ec540a5d4540eedaf929ebb9ff30019b0c231ee30638f8ab5dfe8166f8b5a"
+    },
+    {
+      "path": "docs/visual/v1.3/gallery-executive-dense/slide-07.png",
+      "sha256": "824710c5dec73757ebbfd8ad5e7258863c37b11452940940bace4070369514a2"
+    },
+    {
+      "path": "docs/visual/v1.3/gallery-executive-dense/slide-08.png",
+      "sha256": "cb2d9b7a10668d56abacf2d990de0867bab1658e6851acedea60bb971c796c29"
+    },
+    {
+      "path": "docs/visual/v1.3/gallery-executive-dense/slide-09.png",
+      "sha256": "efd8dc5bd637fc40955e2c4cc71beb2b80d7ae88999dbac73e6ac64e96373c04"
+    },
+    {
+      "path": "docs/visual/v1.3/gallery-executive-dense/slide-10.png",
+      "sha256": "1783a55d81483a6e5123f3f5cfff1f1e4e482f4f3b75eb96f39e9ec3f4f079cf"
+    },
+    {
+      "path": "docs/visual/v1.3/gallery-executive-dense/slide-11.png",
+      "sha256": "a220ca4d6740b60df253a020b189c09e35e9e13c66d69a34da875d8854f684c2"
+    },
+    {
+      "path": "docs/visual/v1.3/gallery-executive-dense/slide-12.png",
+      "sha256": "3cff2e7fc582397df14dc95a71f0ba392e3ddee52b3c2a7bf13cc8d20ae0f508"
+    },
+    {
+      "path": "docs/visual/v1.3/ledger/slide-01.png",
+      "sha256": "bd7c2fdaaf4847a9dd0ab3a2a9ebef4b503d3ee849d5e96c73ebacc119239641"
+    },
+    {
+      "path": "docs/visual/v1.3/ledger/slide-02.png",
+      "sha256": "c727a0b94317ca52a367640f538f1b030e9c8954b6000a51459f4cdfadb88611"
+    },
+    {
+      "path": "docs/visual/v1.3/ledger/slide-03.png",
+      "sha256": "058802c97962d33ca4fbdea965f25bd4b18adde27df8dcf66b1be0357e67d3dd"
+    },
+    {
+      "path": "docs/visual/v1.3/ledger/slide-04.png",
+      "sha256": "e22953bda510d45441241d55e72e7a8537e80368c68c973dc218c2ba3a458b00"
+    },
+    {
+      "path": "docs/visual/v1.3/ledger/slide-05.png",
+      "sha256": "1fe7b62434bbaabcf00dba72796c458f0b98b4bf87303c188cb1a1f9c61d1b1b"
+    },
+    {
+      "path": "docs/visual/v1.3/matrix-dark/contact-matrix-dark-1.png",
+      "sha256": "975a564039568ca90898bb0e90e88e379a7b0a19bfc7256ca87d0a7471335fa2"
+    },
+    {
+      "path": "docs/visual/v1.3/matrix-dark/contact-matrix-dark-2.png",
+      "sha256": "4836089d223d5c57c4de291dfff0cc9021c57146cb7c50c51498016ab079fa85"
+    },
+    {
+      "path": "docs/visual/v1.3/matrix-dark/contact-matrix-dark-3.png",
+      "sha256": "f855e5fb56b9dd4cb1b43c4d730b3e940463901e6b23a821b6e40c3af3a8afd6"
+    },
+    {
+      "path": "docs/visual/v1.3/matrix-light/contact-matrix-light-1.png",
+      "sha256": "b88d04b5580c24eaf0fdc3e2fbbb3be3f171e8c65f7bfa3fce40de5bdafd6e16"
+    },
+    {
+      "path": "docs/visual/v1.3/matrix-light/contact-matrix-light-2.png",
+      "sha256": "ced8f75f9e7165609a220b65c2029be021aad5ea3e35b96b59821dfeb55a0a05"
+    },
+    {
+      "path": "docs/visual/v1.3/matrix-light/contact-matrix-light-3.png",
+      "sha256": "b6eb8a7d39b70c99d7b5ce96a80fb79aa921d42c44aa52bdf80d5b8a057364da"
+    },
+    {
+      "path": "docs/visual/v1.3/matrix-supplemental/contact-supplemental-1.png",
+      "sha256": "b37a64fe4da6d3019d258bccde1d0abcf814edc71f0e4913f8b81bf519f73f27"
+    },
+    {
+      "path": "docs/visual/v1.3/relationships/branch-swimlane-dark/montage.png",
+      "sha256": "61eb7c6205637b9474f3d0aafc28b469c48427ab222cbc9618b9816bae56827c"
+    },
+    {
+      "path": "docs/visual/v1.3/relationships/branch-swimlane-dark/slide-01.png",
+      "sha256": "99129e03d5914ee3cffc070a4b416e1c51cfbb7b43ba076701f97cb079485eca"
+    },
+    {
+      "path": "docs/visual/v1.3/relationships/branch-swimlane-light/montage.png",
+      "sha256": "728528f124c617dd8d647c6615a1a504dabad0e8e7317248202642bfb2c5540c"
+    },
+    {
+      "path": "docs/visual/v1.3/relationships/branch-swimlane-light/slide-01.png",
+      "sha256": "aa1d8c260c81c6f4f01227611782fc0fe618737ccdfb16fe68e025b0a1b8833b"
+    },
+    {
+      "path": "docs/visual/v1.3/relationships/dated-timeline-close-dark/montage.png",
+      "sha256": "39d8aea3efb6b54354cfa83fefa6c48cbae48a8839fcde6f8fa4efe474897632"
+    },
+    {
+      "path": "docs/visual/v1.3/relationships/dated-timeline-close-dark/slide-01.png",
+      "sha256": "98a249581ca4204725a6a300bb7d16cd63592c3637d47c0bfcfc352b8a24dfb3"
+    },
+    {
+      "path": "docs/visual/v1.3/relationships/dated-timeline-close-light/montage.png",
+      "sha256": "fd9c84e0bacfbbde726dd1cfd8b7af35febf19fbb86cdd8475db46b7512240fe"
+    },
+    {
+      "path": "docs/visual/v1.3/relationships/dated-timeline-close-light/slide-01.png",
+      "sha256": "69762d88e3b7f0c766467c92802b4092e43f7c5808ff78223ff0587dacab5389"
+    },
+    {
+      "path": "docs/visual/v1.3/relationships/dated-timeline-dark/montage.png",
+      "sha256": "b0d2b7c0acf6a32a7dd7fd948536906427515236d36b2759ca80b774a0f1c5f4"
+    },
+    {
+      "path": "docs/visual/v1.3/relationships/dated-timeline-dark/slide-01.png",
+      "sha256": "e4754fede156347f7bab3d725cb9c2ee5e05d27293a12e5483242f9c3bb53653"
+    },
+    {
+      "path": "docs/visual/v1.3/relationships/dated-timeline-light/montage.png",
+      "sha256": "dab63a7813e705558666b4e4c68f3243fe44630660e2c68005a7fed787ebdee6"
+    },
+    {
+      "path": "docs/visual/v1.3/relationships/dated-timeline-light/slide-01.png",
+      "sha256": "80119580894bb2e19cd8311672ae7e32e145e56b5b880fd58447b0819b3569d2"
+    },
+    {
+      "path": "docs/visual/v1.3/relationships/roadmap-dark/montage.png",
+      "sha256": "9badd8d7c4a64a5f3cd15d911154ee1a3b03dbed0c5e4eddd41133b7e7dd77fd"
+    },
+    {
+      "path": "docs/visual/v1.3/relationships/roadmap-dark/slide-01.png",
+      "sha256": "b3d4167577ec55934b41b4162b01812d33acd479bd33b46a3898af7eb846823a"
+    },
+    {
+      "path": "docs/visual/v1.3/relationships/roadmap-light/montage.png",
+      "sha256": "bb18a450ef162c7d9ebcb533c5d3125a2f590f3dd1167ad6956aa16abf26e9f5"
+    },
+    {
+      "path": "docs/visual/v1.3/relationships/roadmap-light/slide-01.png",
+      "sha256": "a7225ede76dbd2e523894d235c6554c7ee8c764d4aa58f1910330a6bf6153cbf"
+    },
+    {
+      "path": "docs/visual/v1.3/social-preview-1280x640.png",
+      "sha256": "0185436d5c1838865c7da8164d7eada54e6fba66ae9242d64abcce8ea33e5f17"
+    }
+  ],
+  "repairs": [
+    "Native numeric, share/percent, missing line gap and author-category preservation",
+    "Source/output alias protection and native family/axis/paint mutation rejection",
+    "Long title context, relationship factual copy and complete histogram window",
+    "Reject misleading missing/single-point area; preserve tiny negative values; pad negative axes; move category labels outside negative bars",
+    "Reconcile ledger reporting windows and derivative hashes"
+  ],
+  "limitations": [
+    "No native Windows/macOS/ARM64 PowerPoint acceptance",
+    "No company/Agensi platform approval",
+    "No formal WCAG/color-vision certification; dense data and area overlaps require task-specific review",
+    "Source authenticity and business causality remain reviewer responsibilities"
+  ],
+  "publication_approval": "NOT_GRANTED_BY_THIS_VISUAL_RECORD; full tests, exact package and CI are separate gates"
+}

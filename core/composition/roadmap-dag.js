@@ -1,3 +1,4 @@
+const {parseIsoDate}=require('./timeline');
 function buildRoadmapDag(tasks,dependencies) {
   if(!Array.isArray(tasks)||tasks.length<1||tasks.length>9) throw new Error('dependency roadmap requires 1–9 tasks');
   const ids=new Set();
@@ -8,15 +9,25 @@ function buildRoadmapDag(tasks,dependencies) {
     if(ids.has(id)) throw new Error(`duplicate task id ${id}`);
     if(!(typeof task.title==='string'&&task.title.trim())&&!(typeof task.label==='string'&&task.label.trim())) throw new Error(`task ${id} requires a title`);
     if(!Number.isInteger(task.lane)||task.lane<0||task.lane>2) throw new Error(`task ${id} requires an explicit lane 0–2`);
+    for(const [field,limit] of [['owner',40],['date',40],['status',32]]) {
+      const value=task[field];
+      if(value!=null&&(typeof value!=='string'||!value.trim()||value.trim().length>limit)) throw new Error(`task ${id} ${field} must be a nonempty string of at most ${limit} characters`);
+    }
+    if(task.kind!=null&&!['task','decision','milestone'].includes(task.kind)) throw new Error(`task ${id} kind must be task, decision or milestone`);
+    if(typeof task.date==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(task.date))parseIsoDate(task.date,`task ${id} date`);
     ids.add(id);
   }
   if(dependencies!=null&&!Array.isArray(dependencies)) throw new Error('dependencies must be an array');
   const edges=dependencies||[];
+  if(edges.length>12) throw new Error('dependency graph exceeds 12 connectors; split the flow into smaller bounded graphs');
   const seen=new Set(),preds=new Map(tasks.map(task=>[task.id,[]])),succs=new Map(tasks.map(task=>[task.id,[]]));
   for(const [index,edge] of edges.entries()) {
     if(!edge||typeof edge.from!=='string'||typeof edge.to!=='string') throw new Error(`dependencies[${index}] requires from and to`);
     if(!ids.has(edge.from)||!ids.has(edge.to)) throw new Error(`dependency ${edge.from} → ${edge.to} references an unknown task`);
+    const fromTask=tasks.find(task=>task.id===edge.from),toTask=tasks.find(task=>task.id===edge.to);
+    if(/^\d{4}-\d{2}-\d{2}$/.test(fromTask.date||'')&&/^\d{4}-\d{2}-\d{2}$/.test(toTask.date||'')&&toTask.date<fromTask.date)throw new Error(`dependency ${edge.from} → ${edge.to} contradicts declared ISO date order`);
     if(edge.from===edge.to) throw new Error(`dependency ${edge.from} → ${edge.to} is a self-loop`);
+    if(edge.label!=null&&(typeof edge.label!=='string'||!edge.label.trim()||edge.label.trim().length>40)) throw new Error(`dependency ${edge.from} → ${edge.to} label must be a nonempty string of at most 40 characters`);
     const key=edge.from+'\u0000'+edge.to;
     if(seen.has(key)) throw new Error(`duplicate dependency ${edge.from} → ${edge.to}`);
     seen.add(key);preds.get(edge.to).push(edge.from);succs.get(edge.from).push(edge.to);
@@ -42,6 +53,6 @@ function buildRoadmapDag(tasks,dependencies) {
     positions.set(key,task.id);
   }
   const nodes=tasks.map(task=>({...task,stage:stage.get(task.id),title:(task.title||task.label).trim()}));
-  return {nodes,stages:stageCount,edges:edges.map(edge=>({from:edge.from,to:edge.to})),byId:new Map(nodes.map(node=>[node.id,node]))};
+  return {nodes,stages:stageCount,edges:edges.map(edge=>({from:edge.from,to:edge.to,...(edge.label?{label:edge.label.trim()}:{})})),byId:new Map(nodes.map(node=>[node.id,node]))};
 }
 module.exports={buildRoadmapDag};

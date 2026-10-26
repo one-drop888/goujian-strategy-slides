@@ -1,14 +1,23 @@
 const crypto=require('crypto');
 const Ajv=require('ajv/dist/2020');
+const {formatMetric,formatCodeForMetric}=require('../semantics/numeric');
+const {close,compensatedSum}=require('../reasoning/calculations');
 const validate=new Ajv({allErrors:true,strict:false}).compile(require('../schema/analytics.schema.json'));
 const DAY=86400000;
 const finite=x=>{if(x!=null&&!Number.isFinite(x))throw Error('Computed numeric overflow');return x;};
-const sum=xs=>xs.some(x=>x==null)?null:finite(xs.reduce((a,b)=>a+b,0));
+const sum=xs=>xs.some(x=>x==null)?null:finite(compensatedSum(xs));
 const ratio=(a,b)=>a==null||b==null||b===0?null:finite(a/b);
 const difference=(a,b)=>a==null||b==null?null:finite(a-b);
 const change=(a,b)=>ratio(difference(a,b),b);
 const product=(a,b)=>a==null||b==null?null:finite(a*b);
-function fmt(x,unit=''){return x==null?'缺失 / N/A':`${new Intl.NumberFormat('zh-CN',{maximumFractionDigits:2}).format(x)}${unit}`;}
+function displayMetric(x,unit='') {
+ const type=unit==='%'?'percent':unit==='pp'?'pp':'absolute';
+ return {id:'analytics-value',type,storage_scale:type==='absolute'?'unit':'percent',raw_value:x,
+  display_unit:unit,precision:Number.isInteger(x)?0:2,comparison_basis:type==='absolute'?undefined:'declared_recipe',
+  display_notation:x!==0&&(Math.abs(x)<.005||Math.abs(x)>=1e15)?'scientific':'plain'};
+}
+function fmt(x,unit=''){return x==null?'缺失 / N/A':formatMetric(displayMetric(x,unit)).text;}
+
 const pct=x=>x==null?'N/A':fmt(x*100,'%');
 function date(s){const d=new Date(s+'T00:00:00Z');if(!Number.isFinite(+d)||d.toISOString().slice(0,10)!==s)throw Error('Invalid calendar date: '+s);return +d;}
 function unique(xs,key){if(new Set(xs.map(key)).size!==xs.length)throw Error('Duplicate identity: '+key.toString());}
@@ -23,10 +32,12 @@ function analyze(input){
   for(let offset=0;offset<rows.length;offset+=8)add('table',title+(rows.length>8?`（${offset/8+1}）`:''),{headers,rows:rows.slice(offset,offset+8),...fields});
  };
  const chart=(title,labels,series,unit,insight,fields={})=>{
-  // Missing values remain in accompanying tables; charts never fabricate zeroes.
-  const ids=labels.map((_,i)=>i).filter(i=>series.every(s=>s.values[i]!=null));
-  if(ids.length!==labels.length)warnings.push(title+': missing observations omitted from chart, retained as N/A in table');
-  for(let offset=0;offset<ids.length;offset+=10){const chunk=ids.slice(offset,offset+10);add('chart',title+(ids.length>10?`（${offset/10+1}）`:''),{labels:chunk.map(i=>labels[i]),series:series.map(s=>({...s,values:chunk.map(i=>s.values[i])})),unit,period:`${d.period.start} 至 ${d.period.end}`,insight,chartType:'bar',...fields});}
+  const ids=labels.map((_,i)=>i),hasMissing=series.some(s=>s.values.some(v=>v===null));
+  if(hasMissing)warnings.push(title+': missing observations retained as native chart gaps and N/A in table');
+  const values=series.flatMap(s=>s.values).filter(v=>v!=null);
+  const representative=values.find(v=>v!==0&&(Math.abs(v)<.005||Math.abs(v)>=1e15))??values.find(v=>!Number.isInteger(v))??values[0]??0;
+  const numberFormat=formatCodeForMetric(displayMetric(representative,unit));
+  for(let offset=0;offset<ids.length;offset+=10){const chunk=ids.slice(offset,offset+10);add('chart',title+(ids.length>10?`（${offset/10+1}）`:''),{labels:chunk.map(i=>labels[i]),series:series.map(s=>({...s,values:chunk.map(i=>s.values[i])})),unit,period:`${d.period.start} 至 ${d.period.end}`,insight,chartType:'bar',numberFormat,...(hasMissing?{missing_policy:'gap'}:{}),...fields});}
  };
  const score=(title,items)=>{for(let i=0;i<items.length;i+=6)add('kpi-dashboard',title,{items:items.slice(i,i+6)});};
  const summary=(title,items)=>{for(let i=0;i<items.length;i+=5)add('executive-summary',title,{items:items.slice(i,i+5)});};
@@ -42,18 +53,18 @@ function analyze(input){
   const bases=[[d.trend.at(-2),p.previous_month,'previous_month'],[d.trend.find(x=>x.month===priorYearMonth),p.previous_year,'previous_year']];
   for(const [point,baseline,label] of bases)if(point?.actual!=null&&baseline!=null&&point.actual!==baseline)throw Error('Trend observation conflicts with '+label+' baseline');
   if(months.some((m,i)=>i&&date(m+'-01')!==date(new Date(Date.UTC(Number(months[i-1].slice(0,4)),Number(months[i-1].slice(5)),1)).toISOString().slice(0,10))))throw Error('Trend months must be consecutive; supply explicit null for missing months');
-  const total=sum(d.contributions.map(x=>x.actual));if(total!=null&&p.actual!=null&&Math.abs(total-p.actual)>1e-8*Math.max(1,p.actual))throw Error('Contributions must reconcile to primary actual');
-  const previous=sum(d.contributions.map(x=>x.previous));if(previous!=null&&p.previous_month!=null&&Math.abs(previous-p.previous_month)>1e-8*Math.max(1,p.previous_month))throw Error('Previous contributions must reconcile to previous_month');
+  const total=sum(d.contributions.map(x=>x.actual));if(total!=null&&p.actual!=null&&!close(total,p.actual))throw Error('Contributions must reconcile to primary actual');
+  const previous=sum(d.contributions.map(x=>x.previous));if(previous!=null&&p.previous_month!=null&&!close(previous,p.previous_month))throw Error('Previous contributions must reconcile to previous_month');
   metrics.kpis=d.metrics.map(x=>({...x,variance:difference(x.actual,x.target),variance_unit:x.unit==='%'?'pp':x.unit,attainment:ratio(x.actual,x.target),mom:change(x.actual,x.previous_month),yoy:change(x.actual,x.previous_year)}));
   metrics.contributions=d.contributions.map(x=>({...x,share:ratio(x.actual,p.actual),delta:difference(x.actual,x.previous)}));
   metrics.reconciliation={actual:total,previous};
   score(`${p.label}达成 ${pct(ratio(p.actual,p.target))}，目标差异 ${fmt(difference(p.actual,p.target),p.unit==='%'?'pp':p.unit)}`,metrics.kpis.map(x=>({label:x.label,value:fmt(x.actual,x.unit),delta:`目标 ${fmt(x.target,x.unit)} · 同比 ${pct(x.yoy)}`,highlight:x.id===p.id})));
   if(d.metrics.length>=3&&d.metrics.length<=6&&d.trend.length<=12&&d.trend.every(x=>x.actual!=null))slides.at(-1).dashboard={unit:`${p.unit} · 月度实际`,labels:months,series:[{name:p.label,values:d.trend.map(x=>x.actual)}]};
-  chart(`${p.label}实际 ${fmt(p.actual,p.unit)}，目标 ${fmt(p.target,p.unit)}`,[p.label],[{name:'实际',values:[p.actual]},{name:'目标',values:[p.target]}],p.unit,'同一指标、同一月份，避免混合单位比较');
+  chart(`${p.label}实际 ${fmt(p.actual,p.unit)}，目标 ${fmt(p.target,p.unit)}`,[p.label],[{name:'实际',role:'actual',values:[p.actual]},{name:'目标',role:'target',values:[p.target]}],p.unit,'同一指标、同一月份，避免混合单位比较');
   chart(`${p.label}环比 ${pct(change(p.actual,p.previous_month))}`,months,d.trend.length?[{name:p.label,values:d.trend.map(x=>x.actual)}]:[],p.unit,'月度实际值；同比与环比均使用显式提供的基期',{chartType:'line'});
   table('目标差异按指标逐项核对',['指标','单位','实际','目标','差异','达成','环比','同比'],metrics.kpis.map(x=>[x.label,x.unit,fmt(x.actual),fmt(x.target),fmt(x.variance,x.variance_unit),pct(x.attainment),pct(x.mom),pct(x.yoy)]),{subtitle:'百分比指标差异用百分点（pp）；同比、环比均为相对变化'});
   table('趋势保留每个月份及缺失状态',['月份',p.unit],d.trend.map(x=>[x.month,fmt(x.actual)]));
-  chart('贡献分析使用同一总量和基期',d.contributions.map(x=>x.label),[{name:'本月',values:d.contributions.map(x=>x.actual)},{name:'上月',values:d.contributions.map(x=>x.previous)}],p.unit,'分项合计与总量校验；贡献与增长贡献分开解释');
+  chart('贡献分析使用同一总量和基期',d.contributions.map(x=>x.label),[{name:'本月',role:'actual',values:d.contributions.map(x=>x.actual)},{name:'上月',role:'history',values:d.contributions.map(x=>x.previous)}],p.unit,'分项合计与总量校验；贡献与增长贡献分开解释');
   table('贡献份额与增量分开呈现',['分项','本月','上月','份额','增量'],metrics.contributions.map(x=>[x.label,fmt(x.actual),fmt(x.previous),pct(x.share),fmt(x.delta)]));
   summary('管理摘要只陈述可计算差异',metrics.kpis.map(x=>({title:x.label,note:`实际 ${fmt(x.actual,x.unit)}，差异 ${fmt(x.variance,x.variance_unit)}，同比 ${pct(x.yoy)}；原因与行动由管理者验证。`})));
  } else if(d.recipe==='sales-conversion'){
@@ -98,7 +109,7 @@ function analyze(input){
   metrics.total.cost_variance=difference(metrics.total.cost,metrics.total.budget);metrics.total.value_cost=ratio(metrics.total.realized_value,metrics.total.cost);
   const t=metrics.total;
   score('项目总览同时核对交付、人天与成本',[{label:'交付量',value:fmt(t.actual_units,d.unit),delta:`计划 ${fmt(t.planned_units,d.unit)}`},{label:'投入人天',value:fmt(t.actual_days),delta:`计划 ${fmt(t.planned_days)}`},{label:'实际成本',value:fmt(t.cost,' 元'),delta:`预算 ${fmt(t.budget,' 元')}`,highlight:true},{label:'成本差异',value:fmt(t.cost_variance,' 元')},{label:'已实现价值',value:fmt(t.realized_value,' 元')},{label:'价值 / 成本',value:fmt(t.value_cost,' 倍')}]);
-  chart('交付计划与实际按项目同尺度比较',d.projects.map(x=>x.name),[{name:'计划',values:d.projects.map(x=>x.planned_units)},{name:'实际',values:d.projects.map(x=>x.actual_units)}],d.unit,'交付量不代表质量或业务价值；须结合验收状态');
+  chart('交付计划与实际按项目同尺度比较',d.projects.map(x=>x.name),[{name:'计划',role:'target',values:d.projects.map(x=>x.planned_units)},{name:'实际',role:'actual',values:d.projects.map(x=>x.actual_units)}],d.unit,'交付量不代表质量或业务价值；须结合验收状态');
   table('里程碑以截至日判断逾期，未完成不伪造成零天延误',['项目','里程碑','计划','实际','状态','偏差天数'],metrics.milestones.map(x=>[d.projects.find(p=>p.id===x.project_id).name,x.name,x.planned,x.actual||'未完成',x.status,fmt(x.delay_days)]));
   chart('资源投入按计划与实际人天比较',d.projects.map(x=>x.name),[{name:'计划人天',values:d.projects.map(x=>x.planned_days)},{name:'实际人天',values:d.projects.map(x=>x.actual_days)}],'人天','成本 = 实际人天 × 日费率 + 外部费用');
   table('预算与成本逐项保留，超支不等同于亏损',['项目','预算 / 元','成本 / 元','差异 / 元','使用率','已实现价值 / 元','价值成本比'],metrics.projects.map(x=>[x.name,fmt(x.budget),fmt(x.cost),fmt(x.cost_variance),pct(x.budget_usage),fmt(x.realized_value),fmt(x.value_cost)]));

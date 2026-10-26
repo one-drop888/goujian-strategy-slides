@@ -1,7 +1,8 @@
 const { columns } = require('../compositions/layout');
 const {buildRoadmapDag}=require('../../composition/roadmap-dag');
+const {buildTimeline,TIMELINE_AXIS}=require('../../composition/timeline');
 const {resolveTitle,balancedWrap}=require('../../planner/title');
-const {createChartHelper}=require('../charts');
+const {createChartHelper,labelOptions}=require('../charts');
 
 function createSlideRenderers(pptx, style, spec) {
   const { createPrimitives } = require('../primitives/base');
@@ -72,9 +73,19 @@ function createSlideRenderers(pptx, style, spec) {
     if(s.dashboard) {
       const dw=b.w*.59,rx=b.x+b.w*.65,rw=b.w*.35,ch=b.h-.7;
       text(slide,s.dashboard.unit,b.x,b.y,dw,.28,{fontSize:11,color:C.muted,scene:{space:'slide'}});
-      slide.addChart(pptx.ChartType.line,s.dashboard.series.map(x=>({...x,labels:s.dashboard.labels})),charts.options({
+      const dashboardSeries=s.dashboard.series.map(x=>({...x,labels:s.dashboard.labels}));
+      const dashboardMissing=dashboardSeries.some(x=>(x.values||[]).some(value=>value==null));
+      const colors=style.encoding
+        ? style.encoding.colorsFor('line',s.dashboard.series,s)
+        : charts.tokens.chart.palette.slice(0,2);
+      const numberFormat=s.dashboard.numberFormat||'0.##';
+      const labelStrategy=style.encoding?style.encoding.encodingPlan(s).label_strategy:null;
+      slide.addChart(pptx.ChartType.line,dashboardSeries,charts.options({
         x:b.x,y:b.y+.5,w:dw,h:ch,showLegend:true,legendFontSize:11,
-        chartColors:charts.tokens.chart.palette.slice(0,2),showValue:false,
+        ...(dashboardMissing?{displayBlanksAs:'gap'}:{}),
+        chartColors:colors,
+        ...labelOptions('line',labelStrategy,{showValue:false,showCatName:false,showSerName:false,showPercent:false,showLabel:false}),
+        dataLabelFormatCode:numberFormat,valAxisLabelFormatCode:numberFormat,
         catAxisLabelFontSize:12,valAxisLabelFontSize:11,
         valGridLine:{color:charts.tokens.chart.grid,size:.5,style:style.style.chart_grid==='none'?'none':'solid'},
         showMarker:true,lineDataSymbol:'circle',lineDataSymbolSize:5,lineSize:2.5,scene:{space:'slide',role:'evidence'}}));
@@ -146,10 +157,54 @@ function createSlideRenderers(pptx, style, spec) {
   }
 
   function timeline(s) {
-    const slide=pptx.addSlide(); base(slide,s); const items=(s.items||[]);
-    slide.addShape(pptx.ShapeType.line,{x:1.15,y:3.62,w:10.9,h:0,line:{color:C.line,width:2}}); const n=Math.max(1,items.length);
-    items.forEach((it,i)=>{ const x=1.15+(n===1?5.45:i*(10.9/(n-1)));
-      slide.addShape(pptx.ShapeType.ellipse,{x:x-.11,y:3.51,w:.22,h:.22,line:{color:C.accent,width:1},fill:{color:C.accent}});
+    const slide=pptx.addSlide(); base(slide,s); const items=(s.items||[]); const model=buildTimeline(items);
+    const axisX=TIMELINE_AXIS.x,axisW=TIMELINE_AXIS.w,axisY=3.62;
+    slide.addShape(pptx.ShapeType.line,{x:axisX,y:axisY,w:axisW,h:0,line:{color:C.line,width:2},
+      scene:{role:'connector',semantic_role:'timeline_axis',timeline_mode:model.mode,
+        label_lanes:model.label_lanes??null}});
+    if(model.mode==='date') {
+      const xFor=ratio=>axisX+ratio*axisW;
+      const labelX=x=>Math.max(left,Math.min(left+width-1.64,x-.82));
+      const en=String(spec.lang||'').startsWith('en');
+      for(const node of model.nodes) {
+        const x=xFor(node.start_ratio),endX=xFor(node.end_ratio),lane=node.label_lane||0;
+        const dateY=lane?3.93:2.30,titleY=lane?4.31:2.62,noteY=lane?4.88:3.06;
+        if(node.end>node.start) {
+          slide.addShape(pptx.ShapeType.rect,{x,y:axisY-.07,w:endX-x,h:.14,
+            line:{color:C.accent,width:.8},fill:{color:C.accentSoft},
+            scene:{role:'decoration',semantic_role:'timeline_duration',node_id:node.id,label_lane:lane,
+              start_date:node.date,end_date:node.end_date,start_ratio:node.start_ratio,end_ratio:node.end_ratio,
+              duration_days:node.duration_days}});
+          text(slide,en?`${node.duration_days} days`:`${node.duration_days} 天`,x,axisY+.11,Math.max(.9,endX-x),.18,
+            {fontSize:10,color:C.muted,align:'center',fontFace:en?F.latin:F.cjk,fit:'shrink',
+              scene:{role:'evidence',semantic_role:'timeline_duration_label',node_id:node.id}});
+        }
+        slide.addShape(pptx.ShapeType.ellipse,{x:x-.11,y:axisY-.11,w:.22,h:.22,
+          line:{color:C.accent,width:1},fill:{color:C.accent},
+          scene:{role:'decoration',semantic_role:'timeline_marker',node_id:node.id,date:node.date,
+            date_ratio:node.start_ratio,label_lane:lane}});
+        if(lane) slide.addShape(pptx.ShapeType.line,{x,y:axisY+.11,w:0,h:dateY-(axisY+.11),
+          line:{color:C.accent,width:.8,dash:'dash'},
+          scene:{role:'connector',semantic_role:'timeline_leader',node_id:node.id,date:node.date,label_lane:lane}});
+        text(slide,node.date,labelX(x),dateY,1.64,.3,
+          {fontFace:F.latin,fontSize:12,bold:true,color:C.accent,align:'center',fit:'shrink',
+            scene:{role:'evidence',semantic_role:'timeline_date',node_id:node.id,date:node.date,
+              date_ratio:node.start_ratio,label_lane:lane}});
+        text(slide,itemTitle(node),labelX(x),titleY,1.64,.42,
+          {fontSize:14,bold:true,align:'center',valign:'top',fit:'shrink',
+            scene:{role:'evidence',semantic_role:'timeline_title',node_id:node.id,date:node.date,
+              date_ratio:node.start_ratio,label_lane:lane}});
+        const note=[itemNote(node),[node.owner,node.status].filter(Boolean).join(' · ')].filter(Boolean).join('\n');
+        if(note) text(slide,note,labelX(x),noteY,1.64,.44,
+          {fontSize:10.5,color:C.muted,align:'center',valign:'top',fit:'shrink',
+            scene:{role:'evidence',semantic_role:'timeline_note',node_id:node.id,label_lane:lane}});
+      }
+      finish(slide,s);return;
+    }
+    const n=Math.max(1,items.length);
+    items.forEach((it,i)=>{ const x=axisX+(n===1?5.45:i*(axisW/(n-1)));
+      slide.addShape(pptx.ShapeType.ellipse,{x:x-.11,y:axisY-.11,w:.22,h:.22,line:{color:C.accent,width:1},fill:{color:C.accent},
+        scene:{role:'decoration',semantic_role:'timeline_marker',node_id:`milestone-${i+1}`,space:'slide'}});
       slide.addText(it.time||it.period||'',{x:x-.72,y:2.40,w:1.44,h:.3,fontFace:F.latin,fontSize:13,bold:true,color:C.accent,align:'center',margin:0,fit:'shrink'});
       slide.addText(itemTitle(it),{x:x-.82,y:2.86,w:1.64,h:.52,fontFace:F.cjk,fontSize:14,bold:true,color:C.text,align:'center',margin:0,fit:'shrink'});
       if(itemNote(it)) slide.addText(itemNote(it),{x:x-.82,y:3.91,w:1.64,h:.7,fontFace:F.cjk,fontSize:12,color:C.muted,align:'center',margin:0,fit:'shrink'});
@@ -158,28 +213,42 @@ function createSlideRenderers(pptx, style, spec) {
 
   function roadmapDag(slide,s,b,dag) {
     const stageCount=dag.stages,rows=Math.max(...dag.nodes.map(node=>node.lane))+1;
-    const headerH=.30,rowGap=.18,colGap=.44;
+    const headerH=.30,rowGap=.18,colGap=1.0;
     const rowH=Math.min(1.45,(b.h-headerH-rowGap*(rows-1))/rows);
-    const colW=(b.w-colGap*(stageCount-1))/stageCount;
+    const laneLabels=Array.isArray(s.lane_labels)?s.lane_labels:[];
+    const laneW=laneLabels.length?1.18:0;
+    const contentX=b.x+laneW,contentW=b.w-laneW;
+    const colW=(contentW-colGap*(stageCount-1))/stageCount;
     const stageLabels=s.stage_labels||s.stages||[];
+    if(laneLabels.length) {
+      slide.addShape(pptx.ShapeType.line,{x:contentX-.10,y:b.y+headerH,w:0,h:rows*rowH+(rows-1)*rowGap,
+        line:{color:C.line,width:.6},scene:{role:'decoration',semantic_role:'swimlane_divider',space:'slide'}});
+      for(let lane=0;lane<rows;lane++) {
+        const laneY=b.y+headerH+lane*(rowH+rowGap);
+        text(slide,laneLabels[lane]||'',b.x,laneY,laneW-.20,rowH,
+          {fontSize:12,bold:true,color:C.muted,valign:'mid',fit:'shrink',
+            scene:{role:'decoration',semantic_role:'swimlane_label',lane,space:'slide'}});
+      }
+    }
     for(let stage=0;stage<stageCount;stage++) {
-      text(slide,String(stageLabels[stage]||`第${stage+1}阶段`),b.x+stage*(colW+colGap),b.y,colW,headerH,
+      text(slide,String(stageLabels[stage]||`第${stage+1}阶段`),contentX+stage*(colW+colGap),b.y,colW,headerH,
         {fontSize:11,bold:true,color:C.accent,scene:{role:'decoration',semantic_role:'stage_header',space:'slide'}});
     }
-    const boxFor=node=>({x:b.x+node.stage*(colW+colGap),y:b.y+headerH+node.lane*(rowH+rowGap),w:colW,h:rowH});
+    const boxFor=node=>({x:contentX+node.stage*(colW+colGap),y:b.y+headerH+node.lane*(rowH+rowGap),w:colW,h:rowH});
     const boxes=new Map(dag.nodes.map(node=>[node.id,boxFor(node)]));
     for(const node of dag.nodes) {
       const box=boxes.get(node.id);
       slide.addShape(pptx.ShapeType.roundRect,{x:box.x,y:box.y,w:box.w,h:box.h,rectRadius:.05,
         line:{color:C.line,width:.8},fill:{color:C.panel},
-        scene:{role:'decoration',semantic_role:'task_node',task_id:node.id,space:'slide'}});
+        scene:{role:'decoration',semantic_role:'task_node',task_id:node.id,node_kind:node.kind||'task',
+          owner:node.owner,date:node.date,status:node.status,lane:node.lane,stage:node.stage,space:'slide'}});
       slide.addShape(pptx.ShapeType.rect,{x:box.x,y:box.y,w:.06,h:box.h,line:{color:C.accent},fill:{color:C.accent},
         scene:{role:'decoration',semantic_role:'task_accent',space:'slide'}});
       text(slide,node.title.startsWith(node.id)?node.title:`${node.id} ${node.title}`,box.x+.18,box.y+.09,box.w-.3,box.h-.45,
         {fontSize:13,bold:true,valign:'top',fit:'shrink',scene:{id:`task-${node.id}-title`,role:'evidence',task_id:node.id,space:'slide'}});
-      const meta=[node.owner,node.date].filter(Boolean).join(' · ');
+      const meta=[node.owner,node.date,node.status].filter(Boolean).join(' · ');
       if(meta)text(slide,meta,box.x+.18,box.y+box.h-.34,box.w-.3,.26,
-        {fontSize:10,color:C.muted,scene:{id:`task-${node.id}-meta`,role:'evidence',task_id:node.id,space:'slide'}});
+        {fontSize:10,color:C.muted,fit:'shrink',scene:{id:`task-${node.id}-meta`,role:'evidence',task_id:node.id,space:'slide'}});
     }
     const connector=(edge,x,y,w,h,last)=>{
       slide.addShape(pptx.ShapeType.line,{x,y,w,h,line:{color:C.accent,width:1.5,endArrowType:last?'triangle':null},
@@ -209,6 +278,16 @@ function createSlideRenderers(pptx, style, spec) {
       connector(edge,Math.min(xMid,xApproach),yGap,Math.abs(xApproach-xMid),0,false);
       connector(edge,xApproach,Math.min(yGap,to.y+to.h/2),0,Math.abs(yGap-(to.y+to.h/2)),false);
       connector(edge,xApproach,to.y+to.h/2,to.x-xApproach,0,true);
+    }
+    for(const edge of dag.edges) {
+      if(!edge.label) continue;
+      const from=boxes.get(edge.from),to=boxes.get(edge.to);
+      const forward=from.y===to.y&&to.x>from.x&&to.x===from.x+from.w+colGap;
+      const x=forward?(from.x+from.w+to.x)/2-.45:to.x-.98;
+      const y=from.y===to.y?from.y+from.h/2-.34:to.y+to.h/2-.30;
+      text(slide,edge.label,x,y,forward?.9:.88,.22,
+        {fontSize:9,bold:true,color:C.accent,align:forward?'center':'right',valign:'mid',fit:'shrink',
+          scene:{role:'evidence',semantic_role:'decision_edge',from:edge.from,to:edge.to,space:'slide'}});
     }
   }
 

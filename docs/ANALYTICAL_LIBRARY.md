@@ -71,3 +71,12 @@ The implementation uses general, publicly described communication principles in 
 - [Tableau visual best practices](https://help.tableau.com/current/pro/desktop/en-us/visual_best_practices.htm): consistent typography and formatting, deliberate axes and supporting annotation.
 
 Reviewed 2026-10-16. No commercial templates, screenshots, charts, fonts or source code from these references were copied or redistributed. All benchmark numbers and imagery are synthetic or project-authored; the showroom illustration is AI generated and visibly identified.
+
+
+## V1.3 numeric/readback update
+
+The three recipes now share the numeric formatter with the typed presentation layer. Percentage and pp units remain explicit; tiny nonzero values use scientific display rather than silently becoming zero. Missing trend months remain at their original positions as chart gaps and N/A table entries. Contributions use strict reconciliation and stable finite summation, preserving genuine large/small differences instead of accepting a relative1e-8 discrepancy.
+
+The original input schema and CLI remain compatible. Replace the analytical input JSON and rerun `scripts/analyze.js`; it recomputes the spec/data and native output. The V1.3 gallery is a curated, source-reconciled showcase, not an automatic extractor for arbitrary documents or a replacement for these executable recipes. A changed raw source invalidates old showcase evidence; update the agent-authored contract/plan and rebuild rather than reusing stale visuals.
+
+Quality Gate re-derives facts from the original spec and compares actual chart caches, embedded XLSX cells, units, formats, native tables/KPIs and identities. Typed links permit cross-component reconciliation; unknown legacy text meaning stays reviewer-required. See [V1.3 contract](../skill/references/analytical-visual-intelligence.md) and [validation](QUALITY_AND_VALIDATION.md). Raw source truth, cancellation/net-order policy, observational bias, causal explanations and future benefits are never inferred merely from a successful build.

@@ -1,7 +1,7 @@
 ---
 name: goujian-strategy-slides
 metadata:
-  version: "1.2.1"
+  version: "1.3.0"
 description: "专业AI PPT制作技能，适用于经营分析、战略规划、销售汇报、市场研究、项目复盘及技术方案等场景。结合结构化思考、证据分析、汇报叙事与可视化设计，辅助生成原生可编辑PPTX，并提供质量检查与视觉复核流程。"
 license: Apache-2.0
 ---
@@ -15,9 +15,21 @@ Think → Structure → Visualize → Build → Validate
 Build a structured argument using **Question → Evidence → Judgment → Action**.
 High information density ≠ high text density. Preserve the user's decision, evidence and uncertainty.
 
+## Analytical and visual workflow (V1.3)
+
+For an analytical report, first establish the decision question, source ledger, metric definitions, units, time windows, denominators, deduplication and cohort maturity. Separate fact, calculation, hypothesis and recommendation. Preserve limitations and missing values. Do not infer that an optional behavior such as a test drive causes sales.
+
+Use root `metrics` for a reusable Numeric Semantic Contract; explicitly distinguish raw fraction, stored percent and percentage-point difference. Share metric references across title, KPI, table and chart. Select a chart for comparison, trend, composition or distribution; do not rename unsupported renderers. Write `visual_encoding` with stable series IDs, intended roles/emphasis and label strategy. Brand accent is not the only category color. Keep category order consistent across comparable pages; explicit series IDs/registry preserve series colors.
+
+For a complex deck, author the question→claim→evidence→slide→decision narrative graph and the existing Reasoning Plan. Inspect cross-slide redundancy candidates while preserving useful summary/detail pairs and all required evidence. Record appendix/disposition choices. Do not automatically delete matching text or invent owner, timing or benefits. Review opportunities to replace a list of numbers with a useful comparison; this is an agent judgment, not a keyword classifier.
+
+Run Doctor/bootstrap as needed, validate the original spec/plan, build native PPTX, run semantic and structural QA, then render and inspect actual pages. Keep the original rebuildable spec; `effective_spec` is internal. Repair wrong units, misleading claims, unresolved collisions and unreadable charts before delivery. Aesthetic and semantic reviewer judgments remain separate from deterministic PASS.
+
+Details: [numeric and visual contract](skill/references/analytical-visual-intelligence.md), [narrative graph](skill/references/narrative-graph.md), [migration](docs/MIGRATION_V1_3.md). Environment tiers: Python3.9+ core; Python3.11+/Pillow13 secure images/full rendering. Company/Agensi import approval requires actual platform testing, never local QA alone.
+
 ## Runtime and paths
 
-Install the **entire repository**, including `core/`, `skill/`, `package.json` and the lockfile. Run commands from the repository root. Prefer `npm ci` for the committed lockfile, or run `npm run bootstrap` to create an isolated `.venv` and install from the lockfile; `npm run bootstrap -- --dry-run --json` previews the actions. After bootstrap, activate the environment with `. .venv/bin/activate` before running Node/Python helpers so `python3` resolves to the isolated interpreter. Run `npm run doctor -- --json` to report tool presence and recovery without claiming execution. Core QA also requires Python 3.9+. Image preparation and the full test suite require Pillow. Optional rendering additionally needs LibreOffice, Poppler and Noto fonts; use [installation instructions](README.en.md#installation).
+Install the **entire repository**, including `core/`, `skill/`, `package.json` and the lockfile. Run commands from the repository root. Prefer `npm ci` for the committed lockfile, or run `npm run bootstrap` to create an isolated `.venv` and install from the lockfile; `npm run bootstrap -- --dry-run --json` previews the actions. After bootstrap, activate the environment with `. .venv/bin/activate` before running Node/Python helpers so `python3` resolves to the isolated interpreter. Run `npm run doctor -- --json` to report tool presence and recovery without claiming execution. Core QA also requires Python 3.9+. Secure image preparation and the full test suite require Python3.11+ and Pillow13; older Python runs the core-only tier. Optional rendering additionally needs LibreOffice, Poppler and Noto fonts; use [installation instructions](README.en.md#installation).
 
 The repository root contains the only `SKILL.md`. Resolve relative links against that root. The install ZIP is a complete lightweight runtime; the optional showcase ZIP is a separate review artifact and is not required for normal use.
 

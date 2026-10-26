@@ -241,6 +241,15 @@
                 "kind": { "const": "calculation" },
                 "claim_id": { "type": "string" }
               }
+            },
+            {
+              "type": "object",
+              "required": ["kind", "metric_id"],
+              "additionalProperties": false,
+              "properties": {
+                "kind": { "const": "metric" },
+                "metric_id": { "type": "string" }
+              }
             }
           ]
         },

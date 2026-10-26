@@ -70,12 +70,14 @@
       "series": [
         {
           "name": "实际",
+          "role": "actual",
           "values": [
             960
           ]
         },
         {
           "name": "目标",
+          "role": "target",
           "values": [
             1000
           ]
@@ -84,7 +86,8 @@
       "unit": "万元",
       "period": "2026-09-01 至 2026-09-30",
       "insight": "同一指标、同一月份，避免混合单位比较",
-      "chartType": "bar"
+      "chartType": "bar",
+      "numberFormat": "#,##0"
     },
     {
       "type": "chart",
@@ -114,7 +117,8 @@
       "unit": "万元",
       "period": "2026-09-01 至 2026-09-30",
       "insight": "月度实际值；同比与环比均使用显式提供的基期",
-      "chartType": "line"
+      "chartType": "line",
+      "numberFormat": "#,##0"
     },
     {
       "type": "table",
@@ -211,6 +215,7 @@
       "series": [
         {
           "name": "本月",
+          "role": "actual",
           "values": [
             480,
             320,
@@ -219,6 +224,7 @@
         },
         {
           "name": "上月",
+          "role": "history",
           "values": [
             450,
             300,
@@ -229,7 +235,8 @@
       "unit": "万元",
       "period": "2026-09-01 至 2026-09-30",
       "insight": "分项合计与总量校验；贡献与增长贡献分开解释",
-      "chartType": "bar"
+      "chartType": "bar",
+      "numberFormat": "#,##0"
     },
     {
       "type": "table",

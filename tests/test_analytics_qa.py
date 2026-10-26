@@ -8,6 +8,12 @@ class FidelityTests(unittest.TestCase):
         for name,file in [('business-performance','executive-business-review'),('sales-conversion','sales-conversion-diagnostic'),('project-analytics','project-performance-review')]:
             r=qa.inspect(ROOT/f'out/analytics-regression/{name}.pptx',ROOT/f'skill/analytics/{name}.json',ROOT/f'skill/examples/{file}.json')
             self.assertEqual(r['status'],'PASS',r);self.assertGreater(r['native_cells_checked'],0);self.assertGreater(r['native_chart_values_checked'],0)
+    def test_null_chart_cache_values_and_machine_epsilon_tolerance(self):
+        self.assertTrue(qa.equal(None,None))
+        self.assertFalse(qa.equal(None,0))
+        self.assertFalse(qa.equal(0,1e-300))
+        self.assertTrue(qa.equal(0.1+0.2,0.3))
+        self.assertFalse(qa.equal(0.1+0.2,0.3+1e-12))
     def test_edited_spec_cannot_claim_source_fidelity(self):
         with tempfile.TemporaryDirectory() as tmp:
             spec=json.loads((ROOT/'skill/examples/executive-business-review.json').read_text());spec['slides'][1]['items'][0]['value']='999'

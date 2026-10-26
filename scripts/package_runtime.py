@@ -16,7 +16,7 @@ EXCLUDE_DIRS = {'node_modules', '.venv', 'venv', 'out', 'dist', 'build', '__pyca
                 '.pytest_cache', '.mypy_cache', '.ruff_cache', '.cache', '.scratch', '.qoder'}
 FORBIDDEN_NAMES = {'.env', '.env.local', '.npmrc', '.netrc', '.DS_Store', 'id_rsa', 'id_ed25519'}
 FORBIDDEN_SUFFIXES = ('.pyc', '.pem', '.key', '.p12', '.pfx', '.zip')
-SHOWCASE_REL = Path('out/v1.2-showcase')
+SHOWCASE_REL = Path('out/v1.3-showcase')
 FIXED_TIME = (2026, 1, 1, 0, 0, 0)
 FILE_MODE = 0o644
 
@@ -112,7 +112,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('out', nargs='?', help='ZIP output path')
     parser.add_argument('--showcase', action='store_true',
-                        help='Include the approved out/v1.2-showcase subtree (PPTX/render/QA assets)')
+                        help='Include the approved out/v1.3-showcase subtree (PPTX/render/QA assets)')
     parser.add_argument('--json', action='store_true', help='Print machine-readable JSON')
     args = parser.parse_args()
     version = json.loads((ROOT / 'package.json').read_text(encoding='utf-8'))['version']

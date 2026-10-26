@@ -10,6 +10,10 @@ def load_capabilities():
     spec=importlib.util.spec_from_file_location('goujian_capabilities',ROOT/'core/qa/capabilities.py')
     module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);return module
 
+def load_secure_deps():
+    spec=importlib.util.spec_from_file_location('goujian_secure_deps',ROOT/'core/qa/secure_deps.py')
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);return module
+
 def parse_version(text):
     match=re.search(r'(\d+)\.(\d+)\.(\d+)',str(text or ''))
     return tuple(int(x) for x in match.groups()) if match else None
@@ -42,6 +46,13 @@ class SystemProbe:
         try:
             result=self.run([str(python),'-c','import importlib.metadata as m; print(m.version("Pillow"))'],timeout=10)
             return result.stdout.strip() if result.returncode==0 else None
+        except (OSError,subprocess.TimeoutExpired):return None
+    def venv_python_version(self,venv):
+        python=self.venv_python(venv)
+        if not python:return None
+        try:
+            result=self.run([str(python),'-c','import sys; print(".".join(map(str,sys.version_info[:3])))'],timeout=10)
+            return parse_version(result.stdout) if result.returncode==0 else None
         except (OSError,subprocess.TimeoutExpired):return None
     def can_write(self,path):
         try:
@@ -161,21 +172,30 @@ def platform_check(probe):
 def inspect(probe=None):
     probe=probe or SystemProbe()
     root=Path(ROOT)
+    secure_deps=load_secure_deps()
     checks=[]
     checks.append(platform_check(probe))
     checks.append(version_check(probe,'node',['node'],minimum=(18,0,0),impact='Deck build unavailable',recovery='Install Node.js 18+'))
     checks.append(version_check(probe,'npm',['npm','npm.cmd'],impact='Dependency bootstrap unavailable',
                                 recovery='Install Node.js 18+ (includes npm); if Node/npm is installed later, run python3 scripts/bootstrap.py directly'))
     python=probe.python_version();python_tuple=tuple(python[:3]) if python else None
+    secure_python=secure_deps.MIN_PYTHON_SECURE
     if not python_tuple or python_tuple<(3,9):
         checks.append(check(id='python',requirement='REQUIRED',status='BROKEN',detected=version_text(python_tuple),
-                            detail='Requires 3.9 or newer',impact='Validation, QA and asset scripts unavailable',recovery='Use Python 3.9+ or set GOUJIAN_PYTHON during bootstrap'))
+                            detail=f'Requires {version_text((3,9,0))} or newer',impact='Validation, QA and asset scripts unavailable',
+                            recovery='Use Python 3.9+ for the core tier, or Python 3.11+ for the secure image/render tier; set GOUJIAN_PYTHON during bootstrap'))
+    elif python_tuple<secure_python:
+        checks.append(check(id='python',requirement='REQUIRED',status='PRESENT',path=probe.python_executable(),
+                            detected=version_text(python_tuple),
+                            detail=f'Core tier only: secure image/render tier requires {version_text(secure_python)}+'))
     else:
         checks.append(check(id='python',requirement='REQUIRED',status='PRESENT',path=probe.python_executable(),
-                            detected=version_text(python_tuple),detail='Requires 3.9 or newer'))
+                            detected=version_text(python_tuple),
+                            detail=f'Core tier {version_text((3,9,0))}+ and secure image/render tier {version_text(secure_python)}+'))
     checks.append(js_dependency_check(probe,root))
     venv=root/'.venv';venv_python=probe.venv_python(venv) if probe.exists(venv) else None
     venv_pillow=probe.venv_pillow_version(venv) if venv_python else None
+    venv_python_version=probe.venv_python_version(venv) if venv_python else None
     if not probe.exists(venv):
         checks.append(check(id='venv',requirement='OPTIONAL',status='MISSING',path=str(venv),detected=None,
                             impact='Dependencies are not isolated; system Python is used',recovery='Run npm run bootstrap'))
@@ -183,19 +203,44 @@ def inspect(probe=None):
         checks.append(check(id='venv',requirement='OPTIONAL',status='BROKEN',path=str(venv),
                             impact='Dependencies are not isolated; system Python is used',recovery='Rerun npm run bootstrap to repair .venv'))
     else:
-        checks.append(check(id='venv',requirement='OPTIONAL',status='PRESENT',path=str(venv_python),detected={'pillow':venv_pillow},
+        checks.append(check(id='venv',requirement='OPTIONAL',status='PRESENT',path=str(venv_python),
+                            detected={'python':version_text(venv_python_version),'pillow':venv_pillow},
                             detail='Isolated virtual environment found'))
     pillow,error=probe.pillow_version()
-    if pillow:
-        checks.append(check(id='pillow',requirement='OPTIONAL',status='PRESENT',detected=pillow,detail='Active interpreter has Pillow'))
+    pillow_secure=secure_deps.pillow_is_secure(pillow)
+    if pillow and pillow_secure:
+        checks.append(check(id='pillow',requirement='OPTIONAL',status='PRESENT',detected=pillow,
+                            detail=f'Active interpreter has Pillow {pillow} (secure tier)'))
+    elif pillow:
+        checks.append(check(id='pillow',requirement='OPTIONAL',status='BROKEN',detected=pillow,
+                            detail=f'Pillow {pillow} is affected by published advisories and is unsafe for untrusted image processing',
+                            impact='Untrusted raster preparation and secure image rendering unavailable; core spec/geometry/PPTX inspection remains available',
+                            recovery=f'Recreate .venv with Python {version_text(secure_python)}+ and install requirements-render.txt (Pillow {secure_deps.version_text(secure_deps.MIN_PILLOW)}); never install an older vulnerable Pillow fallback'))
     elif error:
         checks.append(check(id='pillow',requirement='OPTIONAL',status='BROKEN',detected=error,
                             impact='Asset preparation and PNG rendering unavailable',
                             recovery='Activate .venv or run npm run bootstrap to install Pillow in isolation'))
     else:
         checks.append(check(id='pillow',requirement='OPTIONAL',status='MISSING',
-                            impact='Asset preparation and PNG rendering unavailable',
-                            recovery='Run npm run bootstrap, then activate .venv before rendering'))
+                            detail='Core tier does not require Pillow',
+                            impact='Untrusted raster preparation and secure image rendering unavailable; core spec/geometry/PPTX inspection remains available',
+                            recovery=f'Optional: run npm run bootstrap with Python {version_text(secure_python)}+ to install the secure image tier'))
+    effective_python=venv_python_version or python_tuple
+    effective_pillow=venv_pillow if venv_python else pillow
+    secure_status=secure_deps.secure_image_status(python=effective_python,pillow=effective_pillow)
+    if secure_status['status']=='AVAILABLE':
+        checks.append(check(id='secure-image',requirement='OPTIONAL',status='PRESENT',
+                            detected={'runtime':'venv' if venv_python else 'active',**secure_status},
+                            detail=f"Secure image/render tier available: {secure_status['reason']}"))
+    else:
+        checks.append(check(id='secure-image',requirement='OPTIONAL',
+                            status='BROKEN' if secure_status['status']=='INSECURE' else 'MISSING',
+                            detected={'runtime':'venv' if venv_python else 'active',**secure_status},
+                            detail=secure_status['reason'],
+                            impact='Untrusted raster preparation and native render/montage unavailable; core spec/geometry/PPTX inspection remains available',
+                            recovery=(f'Use Python {secure_status["min_python"]}+ and install requirements-render.txt (Pillow {secure_status["min_pillow"]}) in an isolated .venv; never fall back to an older vulnerable Pillow'
+                                      if secure_status['status']=='INSECURE' else
+                                      f'Optional: run npm run bootstrap with Python {secure_status["min_python"]}+ to install the secure image tier')))
     checks.append(command_check(probe,'libreoffice',['libreoffice','soffice'],
                                 impact='Native rendering and visual review unavailable',
                                 recovery='Install LibreOffice (OS package manager); PPTX inspection still works'))
@@ -206,7 +251,7 @@ def inspect(probe=None):
     checks.append(writable_check(probe,'cwd-writable',os.getcwd()))
     checks.append(writable_check(probe,'temp-writable',tempfile.gettempdir()))
     python_ready=next(item['status']=='PRESENT' for item in checks if item['id']=='python')
-    capabilities=load_capabilities().detect(probe=probe,python_ready=python_ready)
+    capabilities=load_capabilities().detect(probe=probe,python_ready=python_ready,secure_status=secure_status)
     required_missing=[item for item in checks if item['requirement']=='REQUIRED' and item['status']!='PRESENT']
     optional_gaps=[item for item in checks if item['requirement']=='OPTIONAL' and item['status']!='PRESENT']
     status='BLOCKED' if required_missing else ('READY_WITH_NOTES' if optional_gaps else 'READY')

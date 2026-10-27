@@ -7,6 +7,7 @@ inert PDFs as raw bytes, never execute or fetch them, and exercise both the
 standalone checker and the shared scan/verify gate.
 """
 import argparse
+import builtins
 import hashlib
 import importlib.util
 import json
@@ -16,9 +17,11 @@ import stat
 import subprocess
 import sys
 import tempfile
+import types
 import unittest
 import zipfile
 from pathlib import Path
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[1]
 PREFIX = 'goujian-strategy-slides/'
@@ -450,6 +453,296 @@ class CheckerTests(PdfTestCase):
         pdf = destination / 'pdf-negative-fixture.pdf'
         completed, facts = self.run_checker(pdf)
         self.assert_blocked(completed, facts, 'ACTION_DICTIONARY', 'OPENACTION_SHAPE')
+
+
+class BoundedLaunchTests(PdfTestCase):
+    def env(self):
+        return {
+            'PATH': os.environ.get('PATH', '/usr/local/bin:/usr/bin:/bin'),
+            'PYTHONDONTWRITEBYTECODE': '1',
+            'LANG': 'C.UTF-8',
+            'LC_ALL': 'C.UTF-8',
+        }
+
+    def work(self):
+        return Path(tempfile.mkdtemp(prefix='bounded-launch-', dir=self.base))
+
+    def fake_resource(self, **overrides):
+        import resource as real
+        fake = types.ModuleType('resource')
+        fake.RLIM_INFINITY = getattr(real, 'RLIM_INFINITY', -1)
+        for name in ('RLIMIT_AS', 'RLIMIT_CPU', 'RLIMIT_NOFILE', 'RLIMIT_FSIZE'):
+            if hasattr(real, name):
+                setattr(fake, name, getattr(real, name))
+        fake.getrlimit = lambda resource_id: (fake.RLIM_INFINITY, fake.RLIM_INFINITY)
+        fake.setrlimit = lambda resource_id, value: None
+        for key, value in overrides.items():
+            setattr(fake, key, value)
+        return fake
+
+    def test_child_receives_actual_bounded_limits(self):
+        memory = 512 * 1024 * 1024
+        cpu = 30
+        script = (
+            'import json,resource;'
+            'print(json.dumps({n:list(resource.getrlimit(getattr(resource,n))) '
+            "for n in ('RLIMIT_AS','RLIMIT_CPU','RLIMIT_NOFILE','RLIMIT_FSIZE')}))"
+        )
+        status, stdout, stderr, outcome = gate.run_bounded(
+            [sys.executable, '-c', script], self.work(), self.env(), 60,
+            limits={'memory_bytes': memory, 'cpu_seconds': cpu})
+        self.assertEqual((status, outcome), (0, 'completed'), stderr)
+        limits = json.loads(stdout.decode('utf-8'))
+        for name, requested in (('RLIMIT_AS', memory), ('RLIMIT_CPU', cpu),
+                                ('RLIMIT_NOFILE', 64),
+                                ('RLIMIT_FSIZE', 64 * 1024 * 1024)):
+            soft, hard = limits[name]
+            self.assertEqual(soft, hard, name)
+            self.assertGreater(soft, 0, name)
+            self.assertLessEqual(soft, requested, name)
+
+    def test_existing_stricter_limits_are_never_loosened(self):
+        infinite = -1
+        self.assertEqual(gate.child_rlimit_target(100, 0, infinite, infinite), 0)
+        self.assertEqual(gate.child_rlimit_target(100, 40, infinite, infinite), 40)
+        self.assertEqual(gate.child_rlimit_target(100, 80, 60, infinite), 60)
+        self.assertEqual(gate.child_rlimit_target(100, infinite, infinite, infinite), 100)
+        with self.assertRaises(ValueError):
+            gate.child_rlimit_target(-1, infinite, infinite, infinite)
+
+    def test_missing_resource_module_fails_closed(self):
+        original = builtins.__import__
+
+        def blocked(name, *args, **kwargs):
+            if name == 'resource':
+                raise ImportError('inert missing resource module')
+            return original(name, *args, **kwargs)
+
+        with mock.patch('builtins.__import__', side_effect=blocked):
+            with self.assertRaises(gate.GateFailure) as caught:
+                gate.run_bounded([sys.executable, '-c', 'print("CHILD")'],
+                                 self.work(), self.env(), 10,
+                                 limits={'memory_bytes': 1024 * 1024})
+        self.assertEqual(caught.exception.code, 'RESOURCE_LIMITS_UNAVAILABLE')
+
+    def test_missing_required_rlimit_fails_closed(self):
+        fake = self.fake_resource()
+        del fake.RLIMIT_NOFILE
+        with mock.patch.dict(sys.modules, {'resource': fake}):
+            with self.assertRaises(gate.GateFailure) as caught:
+                gate.run_bounded([sys.executable, '-c', 'print("CHILD")'],
+                                 self.work(), self.env(), 10,
+                                 limits={'memory_bytes': 1024 * 1024})
+        self.assertEqual(caught.exception.code, 'RESOURCE_LIMITS_UNAVAILABLE')
+
+    def test_setrlimit_failure_blocks_the_child_launch(self):
+        def broken_setrlimit(resource_id, value):
+            raise OSError('inert setrlimit fault')
+
+        fake = self.fake_resource(setrlimit=broken_setrlimit)
+        with mock.patch.dict(sys.modules, {'resource': fake}):
+            with self.assertRaises(gate.GateFailure) as caught:
+                gate.run_bounded([sys.executable, '-c', 'print("CHILD")'],
+                                 self.work(), self.env(), 10,
+                                 limits={'memory_bytes': 1024 * 1024})
+        self.assertEqual(caught.exception.code, 'RESOURCE_LIMITS_FAILED')
+
+
+class CheckerChildOutcomeTests(PdfTestCase):
+    def setUp(self):
+        self.pdf = Path(tempfile.mkdtemp(prefix='child-outcome-', dir=self.base)) / 'deck.pdf'
+        self.pdf.write_bytes(benign_pdf())
+        self.sha = sha256(self.pdf)
+        self.evidence = Path(tempfile.mkdtemp(prefix='child-evidence-', dir=self.base))
+        self.work = Path(tempfile.mkdtemp(prefix='child-work-', dir=self.base))
+
+    def run_with(self, replacement, label):
+        with mock.patch.object(gate, 'run_bounded', side_effect=replacement):
+            return gate.run_pdf_checker(
+                self.pdf, self.sha, self.pending, self.config,
+                self.evidence, self.work, label)
+
+    def test_nonzero_exit_with_pass_facts_blocks(self):
+        original = gate.run_bounded
+
+        def wrong_exit(*args, **kwargs):
+            status, stdout, stderr, outcome = original(*args, **kwargs)
+            return 1, stdout, stderr, outcome
+
+        with self.assertRaises(gate.GateFailure) as caught:
+            self.run_with(wrong_exit, 'nonzero')
+        self.assertEqual(caught.exception.code, 'PDF_CHECKER_FAILED')
+        facts = json.loads((self.evidence / 'nonzero.json').read_text(encoding='utf-8'))
+        self.assertEqual(facts['status'], 'PASS')
+        self.assertTrue((self.evidence / 'nonzero.stdout.log').is_file())
+        self.assertTrue((self.evidence / 'nonzero.stderr.log').is_file())
+
+    def test_incomplete_outcome_blocks(self):
+        with self.assertRaises(gate.GateFailure) as caught:
+            self.run_with(lambda *args, **kwargs: (0, b'', b'', 'crashed'), 'crashed')
+        self.assertEqual(caught.exception.code, 'PDF_CHECKER_FAILED')
+
+    def test_timeout_still_blocks(self):
+        with self.assertRaises(gate.GateFailure) as caught:
+            self.run_with(lambda *args, **kwargs: (None, b'', b'', 'timeout'), 'timeout')
+        self.assertEqual(caught.exception.code, 'PDF_REVIEW_TIMEOUT')
+
+    def test_missing_facts_still_blocks(self):
+        with self.assertRaises(gate.GateFailure) as caught:
+            self.run_with(lambda *args, **kwargs: (0, b'', b'', 'completed'), 'missing')
+        self.assertEqual(caught.exception.code, 'PDF_FACTS_MISSING')
+
+
+class PdfFactsContractTests(PdfTestCase):
+    def setUp(self):
+        self.pdf = Path(tempfile.mkdtemp(prefix='facts-contract-', dir=self.base)) / 'deck.pdf'
+        self.pdf.write_bytes(benign_pdf())
+        self.sha = sha256(self.pdf)
+        evidence = Path(tempfile.mkdtemp(prefix='facts-evidence-', dir=self.base))
+        work = Path(tempfile.mkdtemp(prefix='facts-work-', dir=self.base))
+        run = gate.run_pdf_checker(self.pdf, self.sha, self.pending, self.config,
+                                   evidence, work, 'facts')
+        self.assertTrue(run['facts_ok'])
+        self.facts = run['facts']
+
+    def copy_facts(self):
+        return json.loads(json.dumps(self.facts))
+
+    def validate(self, facts, expected_sha=None):
+        return gate.validate_pdf_facts(
+            facts, self.pending, expected_sha or self.sha, self.config)
+
+    def assert_rejects(self, mutate, code='PDF_FACTS_MISMATCH'):
+        facts = self.copy_facts()
+        mutate(facts)
+        with self.assertRaises(gate.GateFailure) as caught:
+            self.validate(facts)
+        self.assertEqual(caught.exception.code, code)
+        return facts
+
+    def test_exact_complete_facts_pass(self):
+        self.assertTrue(self.validate(self.copy_facts()))
+
+    def test_missing_check_is_rejected(self):
+        def mutate(facts):
+            del facts['checks']['no_forbidden_keys']
+        self.assert_rejects(mutate)
+
+    def test_unknown_check_is_rejected(self):
+        def mutate(facts):
+            facts['checks']['unreviewed_check'] = {'status': 'PASS'}
+        self.assert_rejects(mutate)
+
+    def test_file_hash_only_check_map_is_rejected(self):
+        def mutate(facts):
+            facts['checks'] = {'file_hash': {'status': 'PASS'}}
+        self.assert_rejects(mutate)
+
+    def test_contradictory_proof_counts_are_rejected(self):
+        def action_count(facts):
+            facts['proof']['dangerous_view']['action_dictionary_count'] = 999
+
+        def dangerous_value(facts):
+            facts['dangerous']['forbidden_keys'] = [{'key': '/JS', 'owner': 'forged'}]
+
+        def coverage(facts):
+            facts['parsed']['objects'] -= 1
+
+        def pages(facts):
+            facts['parsed']['pages'] = 0
+        for mutate in (action_count, dangerous_value, coverage, pages):
+            self.assert_rejects(mutate)
+
+    def test_nonlocal_destination_and_wrong_array_are_rejected(self):
+        def not_local(facts):
+            facts['open_action']['page']['local_page'] = False
+            facts['open_action']['elements'][0]['local_page'] = False
+        self.assert_rejects(not_local)
+
+        def wrong_shape(facts):
+            facts['open_action']['sha_shape'] = ['page-indirect-ref', '/Fit']
+        self.assert_rejects(wrong_shape)
+
+        def wrong_element(facts):
+            facts['open_action']['elements'][4]['text'] = '1'
+        self.assert_rejects(wrong_element)
+
+    def test_pass_status_with_failures_is_rejected(self):
+        def mutate(facts):
+            facts['failures'] = [{'code': 'FORGED', 'detail': 'inert'}]
+        self.assert_rejects(mutate)
+
+        def warning(facts):
+            facts['parsed']['warnings'] = [{'level': 'WARNING', 'message': 'x'}]
+        self.assert_rejects(warning)
+
+    def test_identity_and_hash_pins_are_enforced(self):
+        def checker(facts):
+            facts['checker']['sha256'] = '0' * 64
+
+        def parser(facts):
+            facts['parser']['version'] = '0.0.0'
+
+        def policy(facts):
+            facts['policy']['sha256'] = '0' * 64
+        self.assert_rejects(checker, 'PDF_CHECKER_IDENTITY_MISMATCH')
+        self.assert_rejects(parser, 'PDF_PARSER_MISMATCH')
+        self.assert_rejects(policy, 'PDF_POLICY_MISMATCH')
+        with self.assertRaises(gate.GateFailure) as caught:
+            self.validate(self.copy_facts(), expected_sha='0' * 64)
+        self.assertEqual(caught.exception.code, 'PDF_HASH_MISMATCH')
+
+    def test_explicit_fail_status_stays_blocking(self):
+        facts = self.copy_facts()
+        facts['status'] = 'FAIL'
+        self.assertFalse(self.validate(facts))
+
+
+class ReceiptPortabilityTests(PdfTestCase):
+    def build_checkout(self, name, policy_bytes):
+        root = self.base / name
+        (root / 'scripts').mkdir(parents=True, exist_ok=True)
+        (root / 'security').mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(CHECKER, root / 'scripts/pdf_structural_check.py')
+        (root / 'security/pdf-structural-policy.json').write_bytes(policy_bytes)
+        for relative in ('security/pdf-parser-requirements.txt',
+                         'security/security-gate.json'):
+            shutil.copyfile(ROOT / relative, root / relative)
+        return root
+
+    def review_in(self, root, pdf_bytes):
+        target = Path(tempfile.mkdtemp(prefix='portable-target-', dir=self.base))
+        (target / 'deck.pdf').write_bytes(pdf_bytes)
+        evidence = Path(tempfile.mkdtemp(prefix='portable-evidence-', dir=self.base))
+        work = Path(tempfile.mkdtemp(prefix='portable-work-', dir=self.base))
+        with mock.patch.object(gate, 'ROOT', root):
+            config = gate.load_config(root / 'security/security-gate.json')
+            policy = gate.load_pdf_policy(
+                root / 'security/pdf-structural-policy.json', config)
+            report = gate.run_pdf_structural_review(
+                target, [dict(finding(), file_path='deck.pdf')], config,
+                policy, evidence, work)
+        return report, evidence
+
+    def test_receipt_verifies_from_a_differently_rooted_fresh_checkout(self):
+        approved = self.policy_variant(
+            'portable-approved.json', status='APPROVED').read_bytes()
+        first_root = self.build_checkout('checkout-a', approved)
+        second_root = self.build_checkout('checkout-b', approved)
+        recorded, evidence_a = self.review_in(first_root, benign_pdf())
+        recomputed, evidence_b = self.review_in(second_root, benign_pdf())
+        self.assertEqual(recorded['status'], 'PASS')
+        self.assertEqual(recomputed['status'], 'PASS')
+        for report in (recorded, recomputed):
+            self.assertEqual(report['policy']['path'],
+                             'security/pdf-structural-policy.json')
+            self.assertEqual(report['checker']['path'],
+                             'scripts/pdf_structural_check.py')
+            self.assertEqual(report['requirements']['path'],
+                             'security/pdf-parser-requirements.txt')
+        self.assertNotEqual(recorded['provenance']['checkout_root'],
+                            recomputed['provenance']['checkout_root'])
+        gate.compare_pdf_reviews(evidence_a, evidence_b, recorded, recomputed)
 
 
 class ReviewPolicyTests(PdfTestCase):

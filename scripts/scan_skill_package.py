@@ -14,10 +14,13 @@ Two independent operations live here:
     version and policy.
 
 ``verify``
-    Re-check a receipt before a release mutation. It is deliberately
-    stdlib-only: it re-hashes the actual ZIP, re-extracts it safely, checks the
-    version/commit/config/lock/ledger bindings, re-hashes every raw report and
-    recomputes the review-bound gate. It never invokes the scanner.
+    Re-check a receipt before a release mutation. It re-hashes the actual ZIP,
+    re-extracts it safely, checks the version/commit/config/lock/ledger
+    bindings, re-hashes every raw report and recomputes the review-bound gate.
+    It never invokes the Cisco scanner, but it is stdlib-only only when the
+    receipt has no eligible PDF facts: in that case it re-runs the real-parser
+    PDF checker on the extracted PDF and therefore needs the same hash-locked
+    ``pypdf`` wheel.
 
 The scanner environment is a separate development/tool dependency. It is not
 part of the Goujian runtime, Bootstrap or production modules.
@@ -69,6 +72,22 @@ PDF_POLICY_ID = 'PDF_STRUCTURAL_OPENACTION_XYZ_LOCAL_PAGE_V1'
 PDF_REQUIRED_KEYWORDS = {'/OpenAction': 1}
 PDF_POLICY_STATUSES = {'PENDING_CODEX_REVIEW', 'APPROVED'}
 PDF_CHECKER_REL = 'scripts/pdf_structural_check.py'
+PDF_REQUIRED_CHECKS = frozenset({
+    'file_hash', 'parser_available', 'strict_parse', 'not_encrypted',
+    'xref_unambiguous', 'no_parser_warnings', 'root_catalog',
+    'full_object_graph', 'within_limits', 'no_object_errors',
+    'no_action_dictionaries', 'no_forbidden_keys',
+    'no_forbidden_object_values', 'no_other_open_actions',
+    'no_unsupported_a_contexts', 'no_invalid_a_values',
+    'open_action_exact', 'open_action_page_local',
+})
+PDF_OPEN_ACTION_SHAPE = ['page-indirect-ref', '/XYZ', 'null', 'null', '0']
+PDF_OPEN_ACTION_SUFFIX = [
+    {'index': 1, 'type': 'name', 'value': '/XYZ'},
+    {'index': 2, 'type': 'null', 'value': None},
+    {'index': 3, 'type': 'null', 'value': None},
+    {'index': 4, 'type': 'number', 'value': 0, 'text': '0'},
+]
 # Kept in sync with scripts/package_runtime.py by a unit regression test.
 SOURCE_TOP_LEVEL = (
     'SKILL.md', 'core', 'skill', 'adapters', 'docs', 'tests', 'scripts', 'security',
@@ -274,6 +293,20 @@ def load_lock(path, config):
 def config_path(value):
     path = Path(value)
     return path if path.is_absolute() else ROOT / path
+
+
+def checkout_relative(path):
+    """Stable reviewed identity for a path inside this checkout.
+
+    Paths outside the checkout (for example a temporary test policy) keep
+    their actual location; tracked inputs compare as relative POSIX paths so a
+    receipt remains verifiable from a differently rooted fresh clone.
+    """
+    resolved = Path(path).resolve()
+    try:
+        return resolved.relative_to(ROOT.resolve()).as_posix()
+    except ValueError:
+        return str(resolved)
 
 
 def load_pdf_parser_lock(path, policy):
@@ -824,34 +857,54 @@ def scanner_environment(config, run_root):
     return env
 
 
+def child_rlimit_target(requested, soft, hard, infinite):
+    """Clamp a requested limit; never loosen an existing soft/hard limit."""
+    if isinstance(requested, bool) or not isinstance(requested, int) or requested < 0:
+        raise ValueError(f'invalid resource limit: {requested!r}')
+    target = requested
+    if hard != infinite:
+        target = min(target, hard)
+    if soft != infinite:
+        target = min(target, soft)
+    return target
+
+
 def run_bounded(command, cwd, env, timeout, limits=None):
     preexec = None
-    if limits:
+    if limits is not None:
+        try:
+            import resource
+        except ImportError as error:
+            fail('RESOURCE_LIMITS_UNAVAILABLE',
+                 f'cannot enforce child resource limits: {error}')
+        specs = (
+            ('RLIMIT_AS', limits.get('memory_bytes')),
+            ('RLIMIT_CPU', limits.get('cpu_seconds')),
+            ('RLIMIT_NOFILE', limits.get('open_files', 64)),
+            ('RLIMIT_FSIZE', limits.get('file_bytes', 64 * 1024 * 1024)),
+        )
+        missing = [name for name, value in specs
+                   if value is not None and not hasattr(resource, name)]
+        if missing:
+            fail('RESOURCE_LIMITS_UNAVAILABLE',
+                 'required RLIMIT is unavailable: ' + ', '.join(missing))
+
         def preexec():  # noqa: F811 - child-only resource limits
-            try:
-                import resource
-            except ImportError:
-                return
-            for name, value in (
-                    ('RLIMIT_AS', limits.get('memory_bytes')),
-                    ('RLIMIT_CPU', limits.get('cpu_seconds')),
-                    ('RLIMIT_NOFILE', limits.get('open_files', 64)),
-                    ('RLIMIT_FSIZE', limits.get('file_bytes', 64 * 1024 * 1024))):
-                if value is None or not hasattr(resource, name):
+            infinite = getattr(resource, 'RLIM_INFINITY', -1)
+            for name, value in specs:
+                if value is None:
                     continue
                 resource_id = getattr(resource, name)
                 soft, hard = resource.getrlimit(resource_id)
-                if hard != resource.RLIM_INFINITY:
-                    value = min(value, hard)
-                if soft != resource.RLIM_INFINITY:
-                    value = min(value, soft) if soft else value
-                try:
-                    resource.setrlimit(resource_id, (value, value))
-                except (ValueError, OSError):
-                    pass
-    process = subprocess.Popen(
-        command, cwd=str(cwd), env=env, stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE, start_new_session=True, preexec_fn=preexec)
+                target = child_rlimit_target(value, soft, hard, infinite)
+                resource.setrlimit(resource_id, (target, target))
+    try:
+        process = subprocess.Popen(
+            command, cwd=str(cwd), env=env, stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE, start_new_session=True, preexec_fn=preexec)
+    except subprocess.SubprocessError as error:
+        fail('RESOURCE_LIMITS_FAILED',
+             f'the child process could not apply its resource limits: {error}')
     try:
         stdout, stderr = process.communicate(timeout=timeout)
         return process.returncode, stdout, stderr, 'completed'
@@ -1297,6 +1350,10 @@ def select_pdf_findings(findings, root):
     return eligible, by_path
 
 
+def pdf_int(value, minimum=0):
+    return isinstance(value, int) and not isinstance(value, bool) and value >= minimum
+
+
 def validate_pdf_facts(facts, policy, expected_sha, config):
     if not isinstance(facts, dict):
         fail('PDF_FACTS_MISMATCH', 'PDF facts are not a JSON object')
@@ -1305,19 +1362,28 @@ def validate_pdf_facts(facts, policy, expected_sha, config):
         fail('PDF_FACTS_MISMATCH', 'PDF facts check identity is not recognized')
     recorded_policy = facts.get('policy') or {}
     if recorded_policy.get('id') != policy['id'] \
-            or recorded_policy.get('sha256') != policy['sha256']:
+            or recorded_policy.get('sha256') != policy['sha256'] \
+            or recorded_policy.get('rule_id') != policy['rule_id'] \
+            or recorded_policy.get('severity') != policy['severity'] \
+            or recorded_policy.get('metadata_detected_keywords') != policy['keywords']:
         fail('PDF_POLICY_MISMATCH', 'PDF facts were produced under a different policy')
     recorded_checker = facts.get('checker') or {}
-    if recorded_checker.get('sha256') != policy['checker']['sha256']:
+    if recorded_checker.get('name') != PDF_CHECKER_REL \
+            or recorded_checker.get('sha256') != policy['checker']['sha256'] \
+            or recorded_checker.get('version') != policy['checker']['version']:
         fail('PDF_CHECKER_IDENTITY_MISMATCH',
              'PDF facts were produced by a different checker')
     recorded_parser = facts.get('parser') or {}
-    if recorded_parser.get('version') != policy['parser']['version'] \
+    if recorded_parser.get('package') != policy['parser']['package'] \
+            or recorded_parser.get('version') != policy['parser']['version'] \
             or recorded_parser.get('wheel_sha256') != policy['parser']['wheel_sha256']:
         fail('PDF_PARSER_MISMATCH', 'PDF facts were produced by a different parser pin')
     recorded_pdf = facts.get('pdf') or {}
     if recorded_pdf.get('sha256') != expected_sha:
         fail('PDF_HASH_MISMATCH', 'PDF facts are bound to different file bytes')
+    if not pdf_int(recorded_pdf.get('bytes'), 1) \
+            or recorded_pdf['bytes'] > policy['semantics']['max_pdf_bytes']:
+        fail('PDF_FACTS_MISMATCH', 'PDF facts report an invalid document size')
     limits = facts.get('process_limits') or {}
     if limits.get('bounded') is not True:
         fail('PDF_RESOURCE_LIMITS_MISSING',
@@ -1325,18 +1391,113 @@ def validate_pdf_facts(facts, policy, expected_sha, config):
     for name, config_key in (('RLIMIT_AS', 'memory_bytes'),
                              ('RLIMIT_CPU', 'cpu_seconds')):
         soft = (limits.get(name) or {}).get('soft')
-        if not isinstance(soft, int) or soft <= 0 \
-                or soft > config['pdf_review'][config_key]:
+        if not pdf_int(soft, 1) or soft > config['pdf_review'][config_key]:
             fail('PDF_RESOURCE_LIMITS_MISSING',
                  f'{name} is not bounded by the configured limit')
-    if facts.get('status') != 'PASS' or facts.get('failures'):
+    if facts.get('status') != 'PASS':
         return False
+    if facts.get('failures'):
+        fail('PDF_FACTS_MISMATCH', 'PDF facts claim PASS while listing failures')
     checks = facts.get('checks')
-    if not isinstance(checks, dict) or not checks:
+    if not isinstance(checks, dict):
         fail('PDF_FACTS_MISMATCH', 'PDF facts have no check results')
-    if any(not isinstance(check, dict) or check.get('status') != 'PASS'
-           for check in checks.values()):
-        return False
+    names = set(checks)
+    if names != PDF_REQUIRED_CHECKS:
+        fail('PDF_FACTS_MISMATCH',
+             'PDF check set differs: missing {} unknown {}'.format(
+                 sorted(PDF_REQUIRED_CHECKS - names), sorted(names - PDF_REQUIRED_CHECKS)))
+    for name, entry in checks.items():
+        if not isinstance(entry, dict) or entry.get('status') != 'PASS':
+            fail('PDF_FACTS_MISMATCH', f'PDF check {name} is not PASS')
+
+    semantics = policy['semantics']
+    parsed = facts.get('parsed')
+    if not isinstance(parsed, dict):
+        fail('PDF_FACTS_MISMATCH', 'PDF facts have no parsed section')
+    if parsed.get('strict') is not True \
+            or parsed.get('warnings') != [] or parsed.get('warning_records') != []:
+        fail('PDF_FACTS_MISMATCH', 'PDF facts did not come from a warning-free strict parse')
+    if parsed.get('object_errors') != []:
+        fail('PDF_FACTS_MISMATCH', 'PDF facts list object parse errors')
+    objects = parsed.get('objects')
+    expected_objects = parsed.get('expected_objects')
+    xref_objects = parsed.get('xref_objects')
+    compressed = parsed.get('compressed_objects')
+    free_entries = parsed.get('free_entries')
+    generations = parsed.get('xref_generations')
+    depth = parsed.get('max_depth_observed')
+    pages = parsed.get('pages')
+    if not pdf_int(objects, 1) or not pdf_int(expected_objects, 1):
+        fail('PDF_FACTS_MISMATCH', 'PDF facts report no object coverage')
+    if objects != expected_objects:
+        fail('PDF_FACTS_MISMATCH',
+             'not every xref/object-stream object was inspected')
+    if not pdf_int(xref_objects) or not pdf_int(compressed) \
+            or not pdf_int(free_entries) or not pdf_int(generations, 1):
+        fail('PDF_FACTS_MISMATCH', 'PDF facts report invalid xref counts')
+    if expected_objects != xref_objects + compressed:
+        fail('PDF_FACTS_MISMATCH', 'PDF facts xref/object-stream counts are inconsistent')
+    if objects > semantics['max_objects']:
+        fail('PDF_FACTS_MISMATCH', 'PDF facts exceed the reviewed object limit')
+    if not pdf_int(depth) or depth > semantics['max_depth']:
+        fail('PDF_FACTS_MISMATCH', 'PDF facts exceed the reviewed depth limit')
+    if not pdf_int(pages, 1):
+        fail('PDF_FACTS_MISMATCH', 'PDF facts report no positive page count')
+
+    action = facts.get('open_action')
+    if not isinstance(action, dict) \
+            or action.get('direct_array') is not True \
+            or action.get('value_type') != 'array' \
+            or action.get('length') != 5 \
+            or action.get('sha_shape') != PDF_OPEN_ACTION_SHAPE:
+        fail('PDF_FACTS_MISMATCH', 'PDF facts do not prove the exact OpenAction shape')
+    page = action.get('page')
+    if not isinstance(page, dict) or page.get('index') != 0 \
+            or page.get('type') != 'indirect' or page.get('local_page') is not True \
+            or page.get('page_type') != '/Page' \
+            or not pdf_int(page.get('object')) or not pdf_int(page.get('generation')):
+        fail('PDF_FACTS_MISMATCH',
+             'PDF facts do not prove a local destination page')
+    elements = action.get('elements')
+    expected_page = {
+        'index': 0, 'type': 'indirect', 'object': page['object'],
+        'generation': page['generation'], 'local_page': True, 'page_type': '/Page',
+    }
+    if not isinstance(elements, list) or len(elements) != 5 \
+            or elements[0] != expected_page or elements[1:] != PDF_OPEN_ACTION_SUFFIX:
+        fail('PDF_FACTS_MISMATCH',
+             'PDF facts do not prove the exact local-page XYZ array')
+
+    dangerous = facts.get('dangerous')
+    if not isinstance(dangerous, dict):
+        fail('PDF_FACTS_MISMATCH', 'PDF facts have no dangerous section')
+    for key in ('action_dictionaries', 'forbidden_keys', 'forbidden_object_values',
+                'other_open_actions', 'unsupported_a_contexts', 'invalid_a_values'):
+        if dangerous.get(key) != []:
+            fail('PDF_FACTS_MISMATCH', f'PDF facts list dangerous {key}')
+    proof = facts.get('proof')
+    if not isinstance(proof, dict):
+        fail('PDF_FACTS_MISMATCH', 'PDF facts have no structural proof')
+    safe = proof.get('safe_view')
+    danger = proof.get('dangerous_view')
+    if not isinstance(safe, dict) or not isinstance(danger, dict):
+        fail('PDF_FACTS_MISMATCH', 'PDF structural proof sections are missing')
+    if safe.get('catalog_object') != 'trailer /Root' \
+            or safe.get('open_action_owner') != 'catalog' \
+            or safe.get('page_count') != pages \
+            or safe.get('destination_page') != page \
+            or safe.get('action_dictionaries') != 0:
+        fail('PDF_FACTS_MISMATCH', 'PDF safe-view proof contradicts the parsed facts')
+    for key in ('action_dictionary_count', 'forbidden_key_count',
+                'forbidden_object_value_count', 'other_open_action_count',
+                'unsupported_a_context_count', 'invalid_a_value_count'):
+        if danger.get(key) != 0:
+            fail('PDF_FACTS_MISMATCH', f'PDF dangerous-view {key} is not zero')
+    if danger.get('objects_checked') != objects \
+            or danger.get('xref_objects_checked') != xref_objects \
+            or danger.get('compressed_objects_checked') != compressed \
+            or danger.get('free_entries_skipped') != free_entries:
+        fail('PDF_FACTS_MISMATCH', 'PDF dangerous-view proof contradicts object coverage')
     return True
 
 
@@ -1362,12 +1523,18 @@ def run_pdf_checker(pdf_path, expected_sha, policy, config, evidence_dir, work_r
     write_bytes(stderr_path, stderr or b'')
     if outcome == 'timeout':
         fail('PDF_REVIEW_TIMEOUT', 'the bounded PDF checker exceeded its timeout')
+    if outcome != 'completed':
+        fail('PDF_CHECKER_FAILED',
+             f'the PDF checker did not complete: outcome {outcome!r}')
     facts = None
     if facts_path.is_file() and not facts_path.is_symlink():
         facts = read_json(facts_path, 'MALFORMED_PDF_FACTS')
     if facts is None:
         fail('PDF_FACTS_MISSING', 'the PDF checker did not produce a facts file')
     facts_ok = validate_pdf_facts(facts, policy, expected_sha, config)
+    if status != 0 and facts_ok:
+        fail('PDF_CHECKER_FAILED',
+             'the PDF checker exited nonzero while its facts claimed PASS')
     return {
         'status': status,
         'outcome': outcome,
@@ -1389,22 +1556,39 @@ def run_pdf_structural_review(target, findings, config, policy, evidence_dir, wo
         'status': 'PASS',
         'reason': 'EXPLICIT_ZERO',
         'policy': {
-            'path': policy['path'],
+            'path': checkout_relative(policy['path']),
             'sha256': policy['sha256'],
             'id': policy['id'],
             'status': policy['status'],
             'approved_by': policy['approved_by'],
             'approved_at': policy['approved_at'],
         },
-        'checker': policy['checker'],
+        'checker': {
+            'path': PDF_CHECKER_REL,
+            'sha256': policy['checker']['sha256'],
+            'version': policy['checker']['version'],
+        },
         'parser': policy['parser'],
-        'requirements': policy['requirements'],
+        'requirements': {
+            'path': policy['parser']['requirements'],
+            'sha256': policy['requirements']['sha256'],
+            'packages': policy['requirements']['packages'],
+            'package': policy['requirements']['package'],
+            'version': policy['requirements']['version'],
+            'wheel_sha256': policy['requirements']['wheel_sha256'],
+        },
         'rule_binding': {
             'rule_id': policy['rule_id'],
             'severity': policy['severity'],
             'metadata_detected_keywords': policy['keywords'],
         },
         'limits': policy['semantics'],
+        'provenance': {
+            'policy_path': str(policy['path']),
+            'checker_path': str(ROOT / PDF_CHECKER_REL),
+            'requirements_path': str(policy['requirements']['path']),
+            'checkout_root': str(ROOT),
+        },
         'eligible': len(eligible),
         'unique_pdfs': 0,
         'adjudicated': 0,

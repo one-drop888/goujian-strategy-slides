@@ -1,13 +1,18 @@
 # Release Security Gate / 发布安全门
 
-Status: **Implementation available in this checkout; current enforcement requires
-actual branch-protection and Actions evidence.**
+Status: **PR #1 is merged on `main` at `e5a83df`; all `main` CI/security checks
+PASS. The read-only release rehearsal `40506964205` FAILed at the security gate
+with 21 raw HIGH `PDF_STRUCTURAL_THREAT` findings, and its write-capable publish
+job was SKIPped. The PDF structural policy remains `PENDING_CODEX_REVIEW`; the
+PDF candidate changes in this checkout have not run in CI.**
 This document describes the permanent package security gate. It does not claim a
 security clearance. Company-platform acceptance is separately tracked.
 
-状态：**实现已在此代码检出中可用；当前的实际强制执行仍需真实的 branch protection 与
-Actions 证据。** 本文描述常驻的软件包安全门，不代表已获得安全认证。公司平台验收另行
-跟踪。
+状态：**PR #1 已合并到 `main`（`e5a83df`），`main` 的全部 CI/安全门检查为 PASS。
+只读 Release 演练 `40506964205` 在安全门处因 21 个原始 HIGH
+`PDF_STRUCTURAL_THREAT` 发现而 FAIL，具备写权限的 publish 作业被 SKIP。PDF 结构策略
+仍为 `PENDING_CODEX_REVIEW`；当前检出中的 PDF 候选改动尚未在 CI 运行。**
+本文描述常驻的软件包安全门，不代表已获得安全认证。公司平台验收另行跟踪。
 
 ## Summary / 概述
 
@@ -34,7 +39,7 @@ HIGH 或 CRITICAL 发现会阻止发布。另有一个范围很窄的 PDF 结构
 - `scripts/security_preflight.py` — the original product preflight, retained
   unchanged. The gate invokes it as a separate process **before** the third-party
   scanner.
-- `scripts/scan_skill_package.py` — the shared stdlib entry point with `scan`
+- `scripts/scan_skill_package.py` — the shared entry point with `scan`
   and `verify` subcommands.
 - `scripts/advisory_check.py` — the shared live dependency-advisory helper used
   by local, PR, and release runs.
@@ -403,10 +408,11 @@ parser wheel.
     hash, then reuses the existing overwrite guard, tag, publish, and
     post-publish verification steps. `security-evidence.json` is uploaded with
     the release assets.
-- Receipt verification and source-identity logic are stdlib-only in code; the
-  named subprocesses are not. When a receipt contains eligible PDF findings,
-  `verify` must run under a Python with the exact hash-locked `pypdf` wheel, or
-  it fails closed on the missing parser. It never falls back to a PASS.
+- Receipt verification and source-identity logic use only the standard library;
+  the named subprocesses do not. When a receipt contains eligible PDF findings,
+  `verify` runs the real-parser checker in a bounded child and must run under a
+  Python with the exact hash-locked `pypdf` wheel, or it fails closed on the
+  missing parser. It never falls back to a PASS.
 - The default `publish=false` is a non-publishing rehearsal: the full validation,
   gate, receipt verification, and evidence binding run with no tag or Release.
 - The historical `v1.3.1` tag, Release, and assets are immutable. The existing

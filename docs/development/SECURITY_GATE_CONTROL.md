@@ -10,6 +10,14 @@ Owner and independent acceptance: Codex. Engineering executor: Qoder CN CLI.
 - Product runtime, renderers, numeric semantics, fonts/images, analysis and QA retain their existing capabilities.
 - This control file tracks engineering decisions. Raw local logs stay in ignored `out/security-gate-control/`; CI archives its own reports on success and failure.
 
+## Observed GitHub state (2026-10-28)
+
+- PR #1 (`feat/permanent-skill-security-gate`) is merged; `main` is `e5a83dfcfe51df11e5def444e356ae9f1fb75cab`.
+- `main` continuation run `40506891052`: all three jobs PASS, including the package security gate — Core-only (Node 18, Python 3.9), Secure image tier (Node 18, Python 3.11) and Secure image tier (Node 24, Python 3.14).
+- Read-only release rehearsal `40506964205` (`Validate and security-gate (no mutation)`) FAILED at step 24, "Security-gate the actual runtime, source and showcase archives", with 21 raw HIGH `PDF_STRUCTURAL_THREAT` findings. The write-capable `Publish Release (explicit publish=true only)` job was SKIPped; no tag, Release or asset changed.
+- Branch protection is verified: required status checks, strict branch, `enforce_admins`, no force pushes or deletions.
+- `security/pdf-structural-policy.json` remains `PENDING_CODEX_REVIEW`. The local PDF candidate on `fix/pdf-destination-security-review` has not been pushed and has not run in CI; local evidence is not CI evidence.
+
 ## Initial live observations
 
 - 2026-10-27: local main clean at the frozen commit; Qoder CN CLI reports 1.1.78.
@@ -37,11 +45,11 @@ Owner and independent acceptance: Codex. Engineering executor: Qoder CN CLI.
 |---|---|---|---|
 | Official tool / dependency / real CLI audit | Qoder | COMPLETE (Phase 1) | versions, hashes, license/advisory inventory, baseline and negative scans |
 | Shared package gate / negative tests | Qoder, Codex review | IMPLEMENTED, acceptance pending | fail-closed tests, real CLI results, input binding |
-| PR/push + pre-publication workflow integration | Qoder, Codex review | IMPLEMENTED locally, Actions NOT_RUN | immutable actions, artifact retention, release rehearsal |
+| PR/push + pre-publication workflow integration | Qoder, Codex review | IMPLEMENTED; `main` CI/security PASS; read-only release rehearsal FAILED at the PDF gate (21 HIGH) | immutable actions, artifact retention, release rehearsal logs |
 | Functional and visual non-regression | Qoder, Codex acceptance | IN_PROGRESS | existing regressions, actual PPTX/render parity as applicable |
 | Documentation + v1.3.1 regex evidence | Qoder, Codex editorial review | IMPLEMENTED, acceptance pending | exact source lines, bounded claims, operating instructions |
-| PR, real CI, protection, safe merge | Qoder execution, Codex Go/No-Go | PENDING (no GitHub writes) | commit/PR/run URLs and live protection configuration |
-| Default-branch release-path rehearsal | Qoder execution, Codex acceptance | PENDING (local rehearsal only) | actual pre-publication gate success without publishing |
+| PR, real CI, protection, safe merge | Qoder execution, Codex Go/No-Go | PR #1 merged (`e5a83df`); protection verified; `main` Actions PASS | commit/PR/run URLs and live protection configuration |
+| Default-branch release-path rehearsal | Qoder execution, Codex acceptance | FAILED (read-only) `40506964205`: 21 HIGH PDF findings, publish SKIP | non-publishing gate success without publishing |
 
 ## Final status contract
 
@@ -75,6 +83,8 @@ Release rehearsal `40506964205` was blocked by 21 raw HIGH `PDF_STRUCTURAL_THREA
 
 The candidate adds `scripts/pdf_structural_check.py`, a bounded deterministic checker using the official `pypdf` 6.21.3 wheel (`c8ca4d9a360dbd5d4b9bb7a8389e2a9ae6a106bee722b496f918040ba2daa17e`, BSD-3-Clause) from the separate one-package lock `security/pdf-parser-requirements.txt`. The checker is pinned by SHA256 `f55536fe1f3823a183463e8cbe4f22e30930e8bdc2934a72267af8c384c7b66e`. It parses the unchanged PDF strictly, inspects classic-xref and object-stream objects including unused/compressed objects, and passes only the exact direct local-page `/XYZ null null 0` destination with no action dictionary, attachment/media/embedded-file value, forbidden key, other `/OpenAction`, unsupported `/A` context, invalid StructElem layout attribute, warning, encryption, ambiguous xref, duplicate key or resource overrun. Child resource limits are observed and recorded, and a forged caller cannot substitute benign metadata: the checker re-derives facts from the bytes.
 
-Local proof on the exact 21 files: 21/21 PASS, 6932 objects inspected (maximum 1037), zero parser warnings, zero action dictionaries, zero forbidden object values, zero unsupported/invalid `/A`, and 21/21 direct local-page exact shapes. The three independent Codex adversarial probes now exit 1 with `FORBIDDEN_ACTION_KEY`/`FORBIDDEN_OBJECT_VALUE`, `FORBIDDEN_OBJECT_VALUE`, and `UNSUPPORTED_A_CONTEXT` respectively. The real-parser suite passes 28/28; gate + advisory + PDF suites pass 85/85 under the PDF environment; ordinary `npm test` passes without importing `pypdf`.
+Local proof on the exact 21 files: 21/21 PASS under the strict facts contract, 6932 objects inspected (maximum 1037), zero parser warnings, zero action dictionaries, zero forbidden object values, zero unsupported/invalid `/A`, and 21/21 direct local-page exact shapes. The three independent Codex adversarial probes still exit 1 with `FORBIDDEN_ACTION_KEY`/`FORBIDDEN_OBJECT_VALUE`, `FORBIDDEN_OBJECT_VALUE`, and `UNSUPPORTED_A_CONTEXT`. The independent facts probe now rejects all five cases: missing checks, contradictory proof counts, unknown checks, nonzero checker exit with PASS facts, and a failed resource-limit launch. The real-parser suite passes 47/47; gate + advisory + workflow + PDF suites pass 116/116 under the PDF environment; ordinary `npm test` was not rerun because no product-runtime bytes changed.
 
-The tracked policy `security/pdf-structural-policy.json` remains `PENDING_CODEX_REVIEW`. Qoder did not approve it, did not edit any ledger, and did not set any raw severity. A pending policy leaves every finding blocking; any checker/parser/policy identity drift, missing parser, error or forged facts fails closed. This record does not claim a GitHub Actions run, branch-protection result, PR, merge or Release. Independent Codex review must decide the policy first. The full local visual showcase was regenerated from the pinned v1.2.1 baseline with fingerprint `9d20bb5fcfb8c50915dafdbc59669f14897cc89bbc806e74c8f313cfa7a84f5b`; rendered PNG bytes are unchanged.
+Four preapproval blockers found by independent review were fixed in the wrapper without changing the checker or the policy: `run_bounded(limits=...)` fails closed when the resource module, a required `RLIMIT` or `setrlimit` is unavailable and never loosens zero or stricter soft limits; `validate_pdf_facts` requires the exact complete 18-name check set plus typed, mutually consistent parsed/proof/open-action/dangerous facts and identity pins; `run_pdf_checker` refuses to approve facts from a child that did not complete with exit code 0; and PDF receipt sections now bind checkout-relative logical paths and hashes, with actual invocation locations kept only as provenance, so a receipt scans in one checkout and verifies in a differently rooted one.
+
+The tracked policy `security/pdf-structural-policy.json` remains `PENDING_CODEX_REVIEW`. Qoder did not approve it, did not edit any ledger, and did not set any raw severity. A pending policy leaves every finding blocking; any checker/parser/policy identity drift, missing parser, error or forged facts fails closed. The candidate itself has not been pushed and has not run in CI; local evidence is not CI evidence. Independent Codex review must decide the policy first. The full local visual showcase was regenerated from the pinned v1.2.1 baseline with fingerprint `9d20bb5fcfb8c50915dafdbc59669f14897cc89bbc806e74c8f313cfa7a84f5b`; rendered PNG bytes are unchanged.

@@ -41,7 +41,7 @@ HIGH 或 CRITICAL 发现会阻止发布。原始证据始终保留，JavaScript 
   metadata for the isolated scanner. These are not a legal opinion or a
   reproducible-build attestation.
 - `security/review-ledger.json` — the trusted, versioned review ledger. It holds
-  thirty-three exact, independently approved reviews (31 CRITICAL, 2 HIGH) bound
+  thirty-eight exact, independently approved reviews (34 CRITICAL, 4 HIGH) bound
   to rule, path, line, file SHA256, root `SKILL.md` SHA256, scanner version,
   policy, and policy fingerprint. Any new or changed finding needs a new
   independent review.
@@ -121,7 +121,7 @@ re-evaluates the review ledger. It also:
   policy bytes make an applicable approval stale and fail the gate;
 - requires the receipt's `source_tree_state` to be `clean`, because an archive
   built from a dirty tree cannot prove that it equals the named commit;
-- rejects forged, stale, or identity-mismatched receipts.
+- rejects inconsistent, stale, or identity-mismatched receipts.
 
 Run the live advisory check and the negative control locally:
 

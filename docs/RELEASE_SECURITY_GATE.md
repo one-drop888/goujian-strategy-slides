@@ -1,11 +1,13 @@
 # Release Security Gate / 发布安全门
 
-Status: **engineering implementation complete, independent acceptance pending.**
+Status: **Implementation available in this checkout; current enforcement requires
+actual branch-protection and Actions evidence.**
 This document describes the permanent package security gate. It does not claim a
 security clearance. Company-platform acceptance is separately tracked.
 
-状态：**工程实现完成，独立验收待进行。** 本文描述常驻的软件包安全门，不代表已获得安全
-认证。公司平台验收另行跟踪。
+状态：**实现已在此代码检出中可用；当前的实际强制执行仍需真实的 branch protection 与
+Actions 证据。** 本文描述常驻的软件包安全门，不代表已获得安全认证。公司平台验收另行
+跟踪。
 
 ## Summary / 概述
 
@@ -264,7 +266,12 @@ out/security-gate/advisory/
     actual runtime/source/showcase archives, runs the live advisory check, and
     re-verifies all three receipts in the non-publishing rehearsal. It then
     writes `dist/security-evidence.json` and injects a hash-bound `security`
-    section into `dist/release-manifest.json`.
+    section into `dist/release-manifest.json`. The unchanged product validation,
+    build, clean-install and capability-parity steps keep the original CPython
+    3.11 setup. Immediately before the isolated scanner install, a second pinned
+    `actions/setup-python` step selects CPython 3.14 for the hash-locked scanner
+    virtual environment. The shared gate, preflight and receipt verification are
+    stdlib-only; the publisher keeps its existing stdlib verification.
   - `publish` (`contents: write`, `needs: validate`) runs only when the manual
     `publish` input is the boolean `true` (default `false`). It downloads this
     run's artifacts, re-verifies all three receipts and hashes against the

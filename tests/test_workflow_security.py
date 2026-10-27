@@ -111,6 +111,34 @@ class WorkflowStructureTests(unittest.TestCase):
                     self.assertRegex(match.group(1), r'^[0-9a-f]{40}(?:\s|#|$)',
                                      f'{name} is not pinned: {match.group(0)}')
 
+    def test_release_scanner_uses_3_14_after_unchanged_product_3_11(self):
+        head = self.release.split('\n  publish:\n', 1)[0]
+        self.assertEqual(head.count("python-version: '3.11'"), 1)
+        self.assertEqual(head.count("python-version: '3.14'"), 1)
+        self.assertEqual(head.count('uses: actions/setup-python@'), 2)
+
+        product_setup = head.index("python-version: '3.11'")
+        product_build = head.index(
+            'name: Clean install, test, build, benchmark, doctor and QA')
+        scanner_setup = head.index(
+            'name: Set up Python 3.14 for the isolated security scanner')
+        scanner_install = head.index(
+            'name: Install the pinned scanner for the release security gate')
+        scanner_venv = head.index('python3 -m venv "$scanner_root"')
+
+        self.assertLess(product_setup, product_build,
+                        'the product 3.11 setup must precede the product build')
+        self.assertLess(product_build, scanner_setup,
+                        'the scanner 3.14 setup must follow product validation')
+        self.assertLess(scanner_setup, scanner_install,
+                        'the scanner 3.14 setup must precede the scanner install')
+        self.assertLess(scanner_install, scanner_venv,
+                        'the scanner venv must be created after the scanner install step')
+        scanner_step = head[scanner_setup:scanner_install]
+        self.assertIn('uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065',
+                      scanner_step)
+        self.assertIn("python-version: '3.14'", scanner_step)
+
 
 if __name__ == '__main__':
     unittest.main()

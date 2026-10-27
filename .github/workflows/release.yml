@@ -769,6 +769,10 @@ jobs:
             --npm-audit-json out/security-gate/advisory/npm-audit.json \
             --npm-audit-exit-code "$npm_status" \
             --out out/security-gate/advisory/osv-check.json
+      - name: Set up Python 3.14 for the isolated security scanner
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: '3.14'
       - name: Install the pinned scanner for the release security gate
         env:
           PIP_DISABLE_PIP_VERSION_CHECK: '1'

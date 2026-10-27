@@ -720,5 +720,20 @@
     }
   ],
   "license_inventory": "dependency-licenses.json",
-  "scope": "Development/release scanner only. No scanner wheels, third-party implementation or environment are redistributed inside Goujian archives."
+  "separate_tools": [
+    {
+      "name": "pypdf",
+      "version": "6.21.3",
+      "wheel": "pypdf-6.21.3-py3-none-any.whl",
+      "sha256": "c8ca4d9a360dbd5d4b9bb7a8389e2a9ae6a106bee722b496f918040ba2daa17e",
+      "license": "BSD-3-Clause",
+      "requires_python": ">=3.9",
+      "official_pypi_metadata": "https://pypi.org/pypi/pypdf/6.21.3/json",
+      "requirements": "security/pdf-parser-requirements.txt",
+      "requirements_sha256": "fe4f31d49d2e30bea846fef6fe3b83c0a0edfca6315c0fea2d07c000d81783ec",
+      "purpose": "Strict structural parsing for the PDF review checker and the release publisher verifier",
+      "scope": "SEPARATE_TOOL_DEPENDENCY_NOT_PART_OF_THE_100_PACKAGE_SDK_LOCK_NOT_IN_RUNTIME"
+    }
+  ],
+  "scope": "Development/release scanner tooling only: 100 hash-locked Cisco skill-scanner SDK packages plus one separately hash-locked PDF parser (pypdf 6.21.3). No scanner wheels, third-party implementation or environment, and no PDF parser wheel are redistributed inside Goujian archives or used by the runtime."
 }

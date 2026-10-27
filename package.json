@@ -17,6 +17,7 @@
     "preflight": "python3 scripts/security_preflight.py",
     "security:scan": "python3 scripts/scan_skill_package.py scan",
     "security:verify": "python3 scripts/scan_skill_package.py verify",
+    "test:pdf": "python3 -m unittest tests.test_pdf_structural_review -v",
     "package": "python3 scripts/package_runtime.py",
     "package:source": "python3 scripts/package_runtime.py --source",
     "package:showcase": "python3 scripts/package_runtime.py --showcase",

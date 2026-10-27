@@ -29,6 +29,13 @@
     }
   },
   "review_ledger": "security/review-ledger.json",
+  "pdf_review": {
+    "policy": "security/pdf-structural-policy.json",
+    "parser_requirements": "security/pdf-parser-requirements.txt",
+    "timeout_seconds": 300,
+    "memory_bytes": 1073741824,
+    "cpu_seconds": 240
+  },
   "advisory": {
     "osv_endpoint": "https://api.osv.dev/v1/querybatch",
     "timeout_seconds": 90

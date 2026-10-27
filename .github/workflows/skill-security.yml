@@ -51,7 +51,7 @@ jobs:
           test -z "$(git status --porcelain)"
           echo "PASS: checked out clean tracked tree at $COMMIT"
 
-      - name: Install the pinned scanner from the hash-locked wheel set
+      - name: Install the pinned scanner and PDF parser from hash-locked wheels
         id: scanner
         env:
           PIP_DISABLE_PIP_VERSION_CHECK: '1'
@@ -64,15 +64,26 @@ jobs:
             --require-hashes --only-binary=:all: \
             --index-url https://pypi.org/simple \
             -r security/requirements-lock.txt
+          "$scanner_root/bin/python" -m pip install \
+            --require-hashes --only-binary=:all: \
+            --index-url https://pypi.org/simple \
+            -r security/pdf-parser-requirements.txt
           "$scanner_root/bin/skill-scanner" --version
+          "$scanner_root/bin/python" -c "import pypdf; assert pypdf.__version__ == '6.21.3', pypdf.__version__"
           "$scanner_root/bin/python" -m pip check
           echo "SCANNER_BIN=$scanner_root/bin/skill-scanner" >> "$GITHUB_ENV"
+          echo "SCANNER_PYTHON=$scanner_root/bin/python" >> "$GITHUB_ENV"
           "$scanner_root/bin/python" - <<'PY' >> "$GITHUB_OUTPUT"
           import importlib.metadata as metadata
           version = metadata.version('cisco-ai-skill-scanner')
           assert version == '2.3.1', version
           print(f'version={version}')
           PY
+
+      - name: Run the real-parser PDF structural suite before any archive scan
+        run: |
+          set -euo pipefail
+          "$SCANNER_PYTHON" -m unittest tests.test_pdf_structural_review -v
 
       - name: Build the actual runtime and source archives
         run: |
@@ -157,7 +168,7 @@ jobs:
             local sha
             sha="$(python3 -c "import json,sys;print(json.load(open('out/security-gate/package-hashes.json'))['archives'][sys.argv[1]]['sha256'])" "$name")"
             echo "::group::gate scan $name ($profile)"
-            if python3 scripts/scan_skill_package.py scan "dist/$name.zip" \
+            if "$SCANNER_PYTHON" scripts/scan_skill_package.py scan "dist/$name.zip" \
                 --profile "$profile" \
                 --version "$EXPECTED_VERSION" \
                 --commit "$COMMIT" \
@@ -213,6 +224,63 @@ jobs:
           print('NOTE: fixture is inert data; the scanner parsed it and never executed it')
           PY
 
+      - name: Real PDF negative control through scanner and structural checker
+        if: always() && steps.scanner.outcome == 'success'
+        run: |
+          set -euo pipefail
+          mkdir -p out/security-gate/pdf-negative-control
+          fixture_root="$RUNNER_TEMP/goujian-pdf-negative-fixture-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
+          python3 scripts/pdf_negative_fixture.py --out "$fixture_root" \
+            > out/security-gate/pdf-negative-fixture.json
+          pdf="$fixture_root/pdf-negative-fixture.pdf"
+          pdf_sha="$(sha256sum "$pdf" | cut -d' ' -f1)"
+          out=out/security-gate/pdf-negative-control
+          set +e
+          "$SCANNER_BIN" scan "$fixture_root" \
+            --policy low-noise --use-behavioral --format json --format sarif \
+            --output-json "$out/findings.json" \
+            --output-sarif "$out/findings.sarif" \
+            --fail-on-severity high
+          scan_status=$?
+          "$SCANNER_PYTHON" scripts/pdf_structural_check.py \
+            --pdf "$pdf" --expected-sha256 "$pdf_sha" \
+            --policy security/pdf-structural-policy.json \
+            --out "$out/checker-facts.json"
+          checker_status=$?
+          set -e
+          printf '%s\n' "$scan_status" > "$out/scanner-exit-code.txt"
+          printf '%s\n' "$checker_status" > "$out/checker-exit-code.txt"
+          "$SCANNER_PYTHON" - "$scan_status" "$checker_status" <<'PY'
+          import json
+          import sys
+          from pathlib import Path
+
+          scan_status, checker_status = int(sys.argv[1]), int(sys.argv[2])
+          report = json.loads(Path(
+              'out/security-gate/pdf-negative-control/findings.json').read_text(encoding='utf-8'))
+          findings = report.get('findings') or []
+          pdf_findings = [item for item in findings
+                          if item.get('rule_id') == 'PDF_STRUCTURAL_THREAT']
+          assert scan_status == 1, f'PDF negative control exit {scan_status}; HIGH threshold did not block'
+          assert pdf_findings, 'scanner did not report PDF_STRUCTURAL_THREAT'
+          assert any(str(item.get('severity', '')).upper() in ('HIGH', 'CRITICAL')
+                     for item in pdf_findings), pdf_findings
+          keywords = {}
+          for item in pdf_findings:
+              keywords.update((item.get('metadata') or {}).get('detected_keywords') or {})
+          assert '/OpenAction' in keywords, keywords
+          assert '/JS' in keywords or '/JavaScript' in keywords, keywords
+          assert checker_status == 1, f'checker exit {checker_status}'
+          facts = json.loads(Path(
+              'out/security-gate/pdf-negative-control/checker-facts.json').read_text(encoding='utf-8'))
+          codes = {item['code'] for item in facts.get('failures') or []}
+          assert facts.get('status') == 'FAIL', facts.get('status')
+          assert {'ACTION_DICTIONARY', 'OPENACTION_SHAPE'} <= codes, codes
+          print(f'PASS: scanner blocked {len(pdf_findings)} raw PDF findings; '
+                f'checker blocked with {sorted(codes)}')
+          print('NOTE: the fixture PDF is inert data; neither tool executed it')
+          PY
+
       - name: Record provenance and fail-closed summary
         if: always()
         run: |
@@ -234,17 +302,38 @@ jobs:
                   capture_output=True, text=True).stdout.strip()
           except Exception as error:  # noqa: BLE001 - provenance must still be written
               scanner_version = f'UNAVAILABLE: {error}'
+          try:
+              pdf_parser_version = subprocess.run(
+                  [os.environ['SCANNER_PYTHON'], '-c',
+                   'import pypdf; print(pypdf.__version__)'], check=True,
+                  capture_output=True, text=True).stdout.strip()
+          except Exception as error:  # noqa: BLE001 - provenance must still be written
+              pdf_parser_version = f'UNAVAILABLE: {error}'
 
           receipts = {}
           for name in ('runtime', 'source'):
               receipt = Path('out/security-gate') / name / 'receipt.json'
               if receipt.is_file():
                   data = json.loads(receipt.read_text(encoding='utf-8'))
+                  pdf_review = data.get('pdf_structural_review') or {}
                   receipts[name] = {
                       'status': data.get('status'),
                       'severity_counts': data.get('findings', {}).get('severity_counts'),
                       'blocking_unreviewed':
                           data.get('findings', {}).get('blocking_unreviewed'),
+                      'blocking_policy_adjudicated':
+                          data.get('findings', {}).get('blocking_policy_adjudicated'),
+                      'pdf_structural_review': {
+                          'status': pdf_review.get('status'),
+                          'reason': pdf_review.get('reason'),
+                          'eligible': pdf_review.get('eligible'),
+                          'adjudicated': pdf_review.get('adjudicated'),
+                          'blocking': pdf_review.get('blocking'),
+                          'policy_id': (pdf_review.get('policy') or {}).get('id'),
+                          'policy_sha256': (pdf_review.get('policy') or {}).get('sha256'),
+                          'checker_sha256':
+                              (pdf_review.get('checker') or {}).get('sha256'),
+                      },
                       'review_scope': data.get('review_ledger'),
                       'source_identity': data.get('source_identity'),
                       'snapshot': data.get('snapshot'),
@@ -254,6 +343,9 @@ jobs:
           advisory_path = Path('out/security-gate/advisory/osv-check.json')
           advisory = json.loads(advisory_path.read_text(encoding='utf-8')) \
               if advisory_path.is_file() else None
+          policy_path = Path('security/pdf-structural-policy.json')
+          policy_status = json.loads(policy_path.read_text(encoding='utf-8')).get('status') \
+              if policy_path.is_file() else None
 
           provenance = {
               'workflow': os.environ.get('GITHUB_WORKFLOW'),
@@ -270,6 +362,18 @@ jobs:
               'lock_sha256': sha('security/requirements-lock.txt'),
               'config_sha256': sha('security/security-gate.json'),
               'review_ledger_sha256': sha('security/review-ledger.json'),
+              'pdf_tool': {
+                  'scope': 'separate tool dependency; not part of the 100-package scanner lock and not in the product runtime',
+                  'parser_version': pdf_parser_version,
+                  'parser_requirements': 'security/pdf-parser-requirements.txt',
+                  'parser_requirements_sha256':
+                      sha('security/pdf-parser-requirements.txt'),
+                  'policy': 'security/pdf-structural-policy.json',
+                  'policy_sha256': sha('security/pdf-structural-policy.json'),
+                  'checker': 'scripts/pdf_structural_check.py',
+                  'checker_sha256': sha('scripts/pdf_structural_check.py'),
+                  'policy_status': policy_status,
+              },
               'advisory': {
                   'status': (advisory or {}).get('status'),
                   'coordinates': (advisory or {}).get('coordinates', {}).get('total'),
@@ -282,6 +386,7 @@ jobs:
                   'bash': 'ANALYZED',
                   'javascript': 'NOT_RUN',
                   'semantic': 'NOT_RUN',
+                  'pdf_structural': 'ANALYZED',
               },
           }
           Path('out/security-gate/provenance.json').write_text(

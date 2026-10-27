@@ -1448,6 +1448,30 @@
       ]
     }
   ],
-  "scope": "Declared third-party wheel license metadata for the isolated developer scanner; tool code/environments are not bundled into Goujian. Not a license conversion or legal opinion.",
+  "separate_tools": [
+    {
+      "name": "pypdf",
+      "version": "6.21.3",
+      "license": null,
+      "license_expression": "BSD-3-Clause",
+      "license_classifiers": [],
+      "license_files": [
+        {
+          "path": "pypdf-6.21.3.dist-info/licenses/LICENSE",
+          "first_line": "Copyright (c) 2006-2008, Mathieu Fenniak"
+        }
+      ],
+      "wheel": "pypdf-6.21.3-py3-none-any.whl",
+      "sha256": "c8ca4d9a360dbd5d4b9bb7a8389e2a9ae6a106bee722b496f918040ba2daa17e",
+      "requirements": "security/pdf-parser-requirements.txt",
+      "requirements_sha256": "fe4f31d49d2e30bea846fef6fe3b83c0a0edfca6315c0fea2d07c000d81783ec",
+      "official_pypi_metadata": "https://pypi.org/pypi/pypdf/6.21.3/json",
+      "scope": "SEPARATE_TOOL_DEPENDENCY_NOT_PART_OF_THE_100_PACKAGE_SDK_LOCK_NOT_IN_RUNTIME"
+    }
+  ],
+  "separate_tool_license_counts": {
+    "BSD-3-Clause": 1
+  },
+  "scope": "Declared third-party wheel license metadata for the isolated developer scanner (100 hash-locked SDK packages) plus one separately hash-locked PDF parser (pypdf 6.21.3). Tool code/environments are not bundled into Goujian. Not a license conversion or legal opinion.",
   "lock_sha256": "f5aecf35036e10d02905c0adef6bfbd0b49be8e9147bfdd33025a7fe629b12f1"
 }

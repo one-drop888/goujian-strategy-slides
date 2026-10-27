@@ -18,6 +18,7 @@ CONFIG = ROOT / 'security/security-gate.json'
 LOCK = ROOT / 'security/requirements-lock.txt'
 PACKAGE_LOCK = ROOT / 'package-lock.json'
 REQUIREMENTS = ROOT / 'requirements-render.txt'
+PDF_LOCK = ROOT / 'security/pdf-parser-requirements.txt'
 
 
 def load(name, relative):
@@ -61,6 +62,7 @@ class AdvisoryTests(unittest.TestCase):
     def args(self, **overrides):
         values = {
             'config': str(CONFIG), 'scanner_lock': str(LOCK),
+            'pdf_parser_lock': None,
             'package_lock': str(PACKAGE_LOCK), 'requirements': str(REQUIREMENTS),
             'npm_audit_json': None, 'npm_audit_exit_code': 0,
             'max_queries': 1000, 'out': str(self.base / 'report.json'),
@@ -87,6 +89,20 @@ class AdvisoryTests(unittest.TestCase):
         render = advisory.parse_pinned_requirements(REQUIREMENTS)
         self.assertIn(('Pillow', '13.0.0'),
                       {(item['name'], item['version']) for item in render})
+
+    def test_pdf_parser_lock_is_one_pinned_coordinate(self):
+        config = json.loads(CONFIG.read_text(encoding='utf-8'))
+        coordinates = advisory.parse_pdf_parser_lock(PDF_LOCK, config)
+        self.assertEqual(coordinates, [{
+            'ecosystem': 'PyPI', 'name': 'pypdf', 'version': '6.21.3',
+            'source': 'pdf-parser-lock',
+        }])
+
+    def test_pdf_parser_lock_outside_the_gate_config_fails_closed(self):
+        config = json.loads(CONFIG.read_text(encoding='utf-8'))
+        with self.assertRaises(advisory.AdvisoryFailure) as caught:
+            advisory.parse_pdf_parser_lock(REQUIREMENTS, config)
+        self.assertEqual(caught.exception.code, 'INVALID_PDF_PARSER_LOCK')
 
     def test_deduplication_keeps_one_coordinate(self):
         rows = [
@@ -182,6 +198,10 @@ class AdvisoryTests(unittest.TestCase):
         report = advisory.run(self.args(), transport=empty_transport)
         self.assertEqual(report['status'], 'PASS')
         self.assertGreater(report['coordinates']['total'], 100)
+        self.assertIn(('pypdf', '6.21.3'),
+                      {(item['name'], item['version'])
+                       for item in report['coordinates']['items']})
+        self.assertIn('pdf_parser_lock', report['sources'])
         self.assertEqual(report['findings'], [])
 
     def test_run_fails_with_public_advisory(self):

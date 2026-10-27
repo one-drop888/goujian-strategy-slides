@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "policy_id": "PDF_STRUCTURAL_OPENACTION_XYZ_LOCAL_PAGE_V1",
+  "status": "APPROVED",
+  "rule_binding": {
+    "rule_id": "PDF_STRUCTURAL_THREAT",
+    "severity": "HIGH",
+    "metadata_detected_keywords": {
+      "/OpenAction": 1
+    }
+  },
+  "checker": {
+    "path": "scripts/pdf_structural_check.py",
+    "version": "1.0.0",
+    "sha256": "f55536fe1f3823a183463e8cbe4f22e30930e8bdc2934a72267af8c384c7b66e"
+  },
+  "parser": {
+    "package": "pypdf",
+    "version": "6.21.3",
+    "wheel": "pypdf-6.21.3-py3-none-any.whl",
+    "wheel_sha256": "c8ca4d9a360dbd5d4b9bb7a8389e2a9ae6a106bee722b496f918040ba2daa17e",
+    "license": "BSD-3-Clause",
+    "requires_python": ">=3.9",
+    "pypi_json": "https://pypi.org/pypi/pypdf/6.21.3/json",
+    "requirements": "security/pdf-parser-requirements.txt",
+    "requirements_sha256": "fe4f31d49d2e30bea846fef6fe3b83c0a0edfca6315c0fea2d07c000d81783ec"
+  },
+  "semantics": {
+    "catalog_open_action": "DIRECT_ARRAY_EXACTLY_LOCAL_PAGE_XYZ_NULL_NULL_0",
+    "max_pdf_bytes": 33554432,
+    "max_objects": 50000,
+    "max_depth": 128
+  },
+  "approval": {
+    "required": "INDEPENDENT_CODEX_REVIEW",
+    "approved_by": "Codex independent security review",
+    "approved_at": "2026-10-27T23:29:51Z",
+    "scope": "Deterministic fact-bound structural adjudication only. Raw HIGH findings and raw scanner reports are retained unchanged; this policy never edits severities or suppresses evidence."
+  }
+}

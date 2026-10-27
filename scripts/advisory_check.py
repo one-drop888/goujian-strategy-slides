@@ -122,6 +122,26 @@ def parse_scanner_lock(path, config):
     return coordinates
 
 
+def parse_pdf_parser_lock(path, config):
+    sys.path.insert(0, str(ROOT / 'scripts'))
+    import scan_skill_package as gate  # shared strict lock/policy parsers
+
+    expected = ROOT / config['pdf_review']['parser_requirements']
+    if Path(path).resolve() != expected.resolve():
+        fail('INVALID_PDF_PARSER_LOCK',
+             'PDF parser lock is not the single file referenced by the gate config')
+    policy_path = ROOT / config['pdf_review']['policy']
+    try:
+        policy = gate.load_pdf_policy(policy_path, config)
+        lock = gate.load_pdf_parser_lock(Path(path), policy)
+    except gate.GateFailure as error:
+        fail('INVALID_PDF_PARSER_LOCK', error.detail)
+    return [{
+        'ecosystem': 'PyPI', 'name': lock['package'], 'version': lock['version'],
+        'source': 'pdf-parser-lock',
+    }]
+
+
 def parse_package_lock(path):
     data = read_json(path, 'INVALID_PACKAGE_LOCK')
     packages = data.get('packages')
@@ -264,8 +284,11 @@ def validate_npm_audit(path, exit_code):
 def run(args, transport=None, npm_audit_data=None):
     started = utc_now()
     config, endpoint, timeout = load_config(args.config)
+    pdf_parser_lock = (Path(args.pdf_parser_lock) if getattr(args, 'pdf_parser_lock', None)
+                       else ROOT / config['pdf_review']['parser_requirements'])
     coordinates = []
     coordinates.extend(parse_scanner_lock(args.scanner_lock, config))
+    coordinates.extend(parse_pdf_parser_lock(pdf_parser_lock, config))
     coordinates.extend(parse_package_lock(args.package_lock))
     coordinates.extend(parse_pinned_requirements(args.requirements))
     coordinates = deduplicate(coordinates)
@@ -275,6 +298,8 @@ def run(args, transport=None, npm_audit_data=None):
     osv = query_osv(coordinates, endpoint, timeout, transport=transport)
     sources = {
         'scanner_lock': {'path': str(args.scanner_lock), 'sha256': sha256_file(args.scanner_lock)},
+        'pdf_parser_lock': {'path': str(pdf_parser_lock),
+                            'sha256': sha256_file(pdf_parser_lock)},
         'package_lock': {'path': str(args.package_lock), 'sha256': sha256_file(args.package_lock)},
         'requirements': {'path': str(args.requirements), 'sha256': sha256_file(args.requirements)},
     }
@@ -317,6 +342,8 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--config', default=str(DEFAULT_CONFIG))
     parser.add_argument('--scanner-lock', default=str(DEFAULT_SCANNER_LOCK))
+    parser.add_argument('--pdf-parser-lock', default=None,
+                        help='defaults to the gate config pdf_review.parser_requirements')
     parser.add_argument('--package-lock', default=str(DEFAULT_PACKAGE_LOCK))
     parser.add_argument('--requirements', default=str(DEFAULT_REQUIREMENTS))
     parser.add_argument('--npm-audit-json')

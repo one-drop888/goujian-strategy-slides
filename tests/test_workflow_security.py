@@ -103,6 +103,22 @@ class WorkflowStructureTests(unittest.TestCase):
         ):
             self.assertIn(token, self.release)
 
+    def test_pdf_structural_suite_is_wired_before_scans_and_verify(self):
+        for text in (self.security, self.release):
+            self.assertIn('security/pdf-parser-requirements.txt', text)
+            self.assertIn('tests.test_pdf_structural_review', text)
+            self.assertIn('"$SCANNER_PYTHON" scripts/scan_skill_package.py scan', text)
+        self.assertIn('scripts/pdf_negative_fixture.py', self.security)
+        self.assertIn('scripts/pdf_structural_check.py', self.security)
+        publisher = self.release.split('\n  publish:\n', 1)[1]
+        verifier = publisher.index(
+            'name: Install only the hash-locked PDF verifier from the shared lock')
+        verify = publisher.index('"$PDF_VERIFIER_PYTHON" scripts/scan_skill_package.py verify')
+        secret_write = publisher.index('GH_TOKEN:')
+        self.assertLess(verifier, verify)
+        self.assertLess(verifier, secret_write)
+        self.assertIn("python-version: '3.14'", publisher[:verifier])
+
     def test_actions_are_pinned_to_commit_shas(self):
         for text in (self.security, self.release):
             for name in ('actions/checkout@', 'actions/setup-python@',
@@ -123,7 +139,7 @@ class WorkflowStructureTests(unittest.TestCase):
         scanner_setup = head.index(
             'name: Set up Python 3.14 for the isolated security scanner')
         scanner_install = head.index(
-            'name: Install the pinned scanner for the release security gate')
+            'name: Install the pinned scanner and PDF parser for the release security gate')
         scanner_venv = head.index('python3 -m venv "$scanner_root"')
 
         self.assertLess(product_setup, product_build,

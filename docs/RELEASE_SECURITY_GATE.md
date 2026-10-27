@@ -475,22 +475,43 @@ destination is a direct local-page `/XYZ null null 0` array, and the only `/A`
 entries are StructElem layout attributes. This is a structural proof on those
 exact bytes; it is not a rendering or execution sandbox.
 
-The tracked policy remains `PENDING_CODEX_REVIEW`. Qoder has **not** approved
-it, has not edited any raw severity, and has not added a ledger entry. The raw
-HIGH findings and raw scanner JSON/SARIF remain unchanged and blocking. No
-GitHub Actions run, branch-protection result, or release approval is claimed
-for this candidate. Independent Codex review must decide the policy before any
-push, pull request, merge or Release.
+At the initial checkpoint the policy was `PENDING_CODEX_REVIEW`, and all 21
+findings remained blocking. Qoder did not approve it or change raw severities.
+The independent decision below supersedes that checkpoint; it does not turn
+the failed rehearsal into a successful run.
 
 ### PDF 结构复核候选
 
 Release rehearsal `40506964205` 被 21 条原始 HIGH `PDF_STRUCTURAL_THREAT` 发现阻断。
 这些发现的 `line_number` 均为 `null`，metadata 精确为 `{"/OpenAction": 1}`；
 其他规则、严重级别或 metadata 形状都不在裁定范围内。上述结论仅针对这 21 个精确字节，
-是结构证明，不是渲染或执行沙箱。被跟踪的策略仍为 `PENDING_CODEX_REVIEW`；Qoder
-未批准、未修改任何原始严重级别、未添加 ledger 记录。原始 HIGH 发现与 JSON/SARIF
-保持原样并继续阻断。本文不声称任何 Actions、branch protection 或发布批准已通过；
-独立 Codex 复核必须先作出策略决定，之后才可 push、开 PR、合并或发布。
+是结构证明，不是渲染或执行沙箱。初始检查点的策略为 `PENDING_CODEX_REVIEW`，
+21 条发现均保持阻断；Qoder 未批准或修改原始严重级别。下述独立决定更新了该检查点，
+但不把此前失败的演练改写为通过。
+
+### Independent policy decision / 独立策略决定 — 2026-10-28
+
+Codex approved the exact checker SHA256
+`f55536fe1f3823a183463e8cbe4f22e30930e8bdc2934a72267af8c384c7b66e`
+after reviewing the implementation and independently running 116/116 gate,
+advisory, real-parser and workflow tests. An independent bounded reparse of all
+21 original CI PDFs inspected 6932 objects. Five malformed-facts/process
+probes and three dangerous-PDF probes were rejected; the real Cisco negative
+PDF control returned CRITICAL and exit 1. Only the exact reviewed local-page
+destination shape is eligible for structural adjudication. Raw HIGH findings
+and JSON/SARIF are retained; any different hash, action, warning, unsupported
+structure or checker failure blocks. This is not general PDF safety,
+JavaScript execution analysis, or company-platform certification.
+
+Codex 已批准与上述 SHA256 精确绑定的检查器，并独立验证 116/116 项测试、
+21 份原始 CI PDF 的 6932 个对象，以及五项证据／进程反例和三项危险 PDF 反例。
+真实 Cisco 恶意 PDF 对照返回 CRITICAL、退出码 1。仅已审查的本地页面定位形状
+可据实裁定；原始 HIGH 与 JSON/SARIF 保留，任何异常继续阻断。这不是通用 PDF
+安全、JavaScript 执行分析或公司平台认证。
+
+The follow-up commit still needs its own actual package scans, protected-branch
+Actions and non-publishing Release rehearsal. Local policy approval is not CI
+or release-path acceptance.
 
 ## Licensing / 许可
 
@@ -514,9 +535,9 @@ inside the 100-package count.
 These are separate outcomes and must not be merged:
 
 - `SOURCE_AND_PACKAGE_SECURITY` — this gate.
-- `PDF_STRUCTURAL_POLICY` — the narrow policy decision, currently
-  `PENDING_CODEX_REVIEW`; it is separate from the gate and cannot be inferred
-  from structural facts or from any Qoder statement.
+- `PDF_STRUCTURAL_POLICY` — `APPROVED` for the exact pinned checker after
+  independent Codex review; changes require a new review. This decision is
+  separate from package, CI and company-platform acceptance.
 - `CI_AND_RELEASE_GATE` — the workflows above.
 - `COMPANY_PLATFORM_SECURITY` — company-side acceptance, not inferred here.
 

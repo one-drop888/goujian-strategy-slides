@@ -135,7 +135,22 @@ class PdfTestCase(unittest.TestCase):
         cls.temp = tempfile.TemporaryDirectory(prefix='goujian-pdf-tests-')
         cls.base = Path(cls.temp.name)
         cls.config = gate.load_config(ROOT / 'security/security-gate.json')
-        cls.pending = gate.load_pdf_policy(BASE_POLICY, cls.config)
+        cls.pending = gate.load_pdf_policy(cls.write_pending_policy(), cls.config)
+
+    @classmethod
+    def write_pending_policy(cls):
+        data = json.loads(BASE_POLICY.read_text(encoding='utf-8'))
+        data['status'] = 'PENDING_CODEX_REVIEW'
+        data['approval'] = {
+            'required': 'INDEPENDENT_CODEX_REVIEW',
+            'approved_by': None,
+            'approved_at': None,
+            'scope': data['approval']['scope'],
+        }
+        path = cls.base / 'policies' / 'pending-source.json'
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps(data, indent=2) + '\n', encoding='utf-8')
+        return path
 
     @classmethod
     def tearDownClass(cls):
@@ -963,7 +978,8 @@ class GatePdfTests(PdfTestCase):
         self.assertIn('FORGED_OR_CHANGED_ARTIFACT', stderr)
 
     def test_pending_policy_blocks_the_whole_gate(self):
-        config = self.config_with_policy('e2e-pending-config.json', BASE_POLICY)
+        config = self.config_with_policy(
+            'e2e-pending-config.json', self.pending['path'])
         code, receipt, out, stdout, stderr = self.scan(config, [finding()])
         self.assertEqual(code, 1)
         self.assertEqual(receipt['status'], 'FAIL')

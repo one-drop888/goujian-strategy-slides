@@ -18,9 +18,9 @@ Two independent operations live here:
     re-extracts it safely, checks the version/commit/config/lock/ledger
     bindings, re-hashes every raw report and recomputes the review-bound gate.
     It never invokes the Cisco scanner, but it is stdlib-only only when the
-    receipt has no eligible PDF facts: in that case it re-runs the real-parser
-    PDF checker on the extracted PDF and therefore needs the same hash-locked
-    ``pypdf`` wheel.
+    receipt has no eligible PDF facts. With eligible PDF facts it re-runs the
+    real-parser PDF checker on the extracted PDF and therefore needs the same
+    hash-locked ``pypdf`` wheel.
 
 The scanner environment is a separate development/tool dependency. It is not
 part of the Goujian runtime, Bootstrap or production modules.

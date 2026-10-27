@@ -1,0 +1,6 @@
+# Isolated PDF structural-review parser. This is a separate tool dependency:
+# it is not part of the 100-package Cisco skill-scanner lock and is not part
+# of the Goujian runtime, Bootstrap or production modules.
+# CPython >=3.11 on the Linux SDK; pure-Python wheel, installed with
+# --require-hashes --only-binary=:all:. The wheel is BSD-3-Clause.
+pypdf==6.21.3 --hash=sha256:c8ca4d9a360dbd5d4b9bb7a8389e2a9ae6a106bee722b496f918040ba2daa17e

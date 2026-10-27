@@ -62,7 +62,13 @@ REQUIRED_CHECKS = (
     'review_binding',
     'gate_threshold',
     'coverage_disclosure',
+    'pdf_structural_review',
 )
+PDF_RULE_ID = 'PDF_STRUCTURAL_THREAT'
+PDF_POLICY_ID = 'PDF_STRUCTURAL_OPENACTION_XYZ_LOCAL_PAGE_V1'
+PDF_REQUIRED_KEYWORDS = {'/OpenAction': 1}
+PDF_POLICY_STATUSES = {'PENDING_CODEX_REVIEW', 'APPROVED'}
+PDF_CHECKER_REL = 'scripts/pdf_structural_check.py'
 # Kept in sync with scripts/package_runtime.py by a unit regression test.
 SOURCE_TOP_LEVEL = (
     'SKILL.md', 'core', 'skill', 'adapters', 'docs', 'tests', 'scripts', 'security',
@@ -212,6 +218,15 @@ def load_config(path):
         fail('INVALID_CONFIG', 'lock section is missing')
     if not isinstance(config.get('review_ledger'), str) or not config['review_ledger']:
         fail('INVALID_CONFIG', 'review_ledger path is missing')
+    pdf_review = config.get('pdf_review')
+    if not isinstance(pdf_review, dict):
+        fail('INVALID_CONFIG', 'pdf_review section is missing')
+    for key in ('policy', 'parser_requirements'):
+        if not isinstance(pdf_review.get(key), str) or not pdf_review[key]:
+            fail('INVALID_CONFIG', f'pdf_review.{key} path is missing')
+    for key in ('timeout_seconds', 'memory_bytes', 'cpu_seconds'):
+        if not isinstance(pdf_review.get(key), int) or pdf_review[key] <= 0:
+            fail('INVALID_CONFIG', f'invalid pdf_review limit: {key}')
     for key in ('max_archive_bytes', 'max_member_bytes', 'max_total_bytes',
                 'max_compression_ratio', 'scan_timeout_seconds'):
         if not isinstance(limits.get(key), int) or limits[key] <= 0:
@@ -254,6 +269,134 @@ def load_lock(path, config):
         fail('INVALID_LOCK', 'scanner wheel hash does not match the lock')
     return {'packages': len(packages), 'sha256': sha256_file(path),
             'scanner_package': scanner['package'], 'scanner_version': scanner['version']}
+
+
+def config_path(value):
+    path = Path(value)
+    return path if path.is_absolute() else ROOT / path
+
+
+def load_pdf_parser_lock(path, policy):
+    text = Path(path).read_text(encoding='utf-8')
+    requirements = []
+    for line in text.splitlines():
+        line = line.strip()
+        if not line or line.startswith('#'):
+            continue
+        requirements.append(line)
+    if len(requirements) != 1:
+        fail('INVALID_PDF_PARSER_LOCK',
+             'the PDF parser lock must contain exactly one pinned requirement')
+    match = re.match(
+        r'^([A-Za-z0-9_.-]+)==([^\s;]+)\s+--hash=sha256:([0-9a-f]{64})$',
+        requirements[0])
+    if not match:
+        fail('INVALID_PDF_PARSER_LOCK',
+             f'the PDF parser requirement is not hash-locked exactly: {requirements[0][:160]}')
+    name, version, wheel_sha = match.groups()
+    parser = policy['parser']
+    if name != parser['package'] or version != parser['version']:
+        fail('INVALID_PDF_PARSER_LOCK',
+             f'PDF parser lock {name}=={version} does not match the policy pin')
+    if wheel_sha != parser['wheel_sha256']:
+        fail('INVALID_PDF_PARSER_LOCK',
+             'PDF parser wheel hash does not match the policy pin')
+    if sha256_file(path) != parser['requirements_sha256']:
+        fail('PDF_PARSER_LOCK_MISMATCH',
+             'PDF parser requirements file changed after policy review')
+    return {
+        'path': str(path),
+        'sha256': sha256_file(path),
+        'packages': 1,
+        'package': name,
+        'version': version,
+        'wheel_sha256': wheel_sha,
+    }
+
+
+def load_pdf_policy(path, config):
+    policy = read_json(path, 'INVALID_PDF_POLICY')
+    if policy.get('schema_version') != 1:
+        fail('INVALID_PDF_POLICY', 'PDF policy schema_version must be 1')
+    if policy.get('policy_id') != PDF_POLICY_ID:
+        fail('INVALID_PDF_POLICY', f'PDF policy_id must be {PDF_POLICY_ID}')
+    status = policy.get('status')
+    if status not in PDF_POLICY_STATUSES:
+        fail('INVALID_PDF_POLICY', 'PDF policy status is not recognized')
+    binding = policy.get('rule_binding')
+    if not isinstance(binding, dict) \
+            or binding.get('rule_id') != PDF_RULE_ID \
+            or binding.get('severity') != 'HIGH' \
+            or binding.get('metadata_detected_keywords') != PDF_REQUIRED_KEYWORDS:
+        fail('INVALID_PDF_POLICY',
+             'PDF policy rule binding is not the exact PDF_STRUCTURAL_THREAT/HIGH/OpenAction rule')
+    checker = policy.get('checker')
+    if not isinstance(checker, dict) or checker.get('path') != PDF_CHECKER_REL:
+        fail('INVALID_PDF_POLICY', 'PDF checker path is not the tracked checker')
+    if not re.match(r'^[0-9a-f]{64}$', str(checker.get('sha256'))):
+        fail('INVALID_PDF_POLICY', 'PDF checker sha256 is missing or malformed')
+    checker_path = ROOT / PDF_CHECKER_REL
+    checker_sha = sha256_file(checker_path)
+    if checker_sha != checker['sha256']:
+        fail('PDF_CHECKER_IDENTITY_MISMATCH',
+             'tracked PDF checker bytes do not match the reviewed policy pin')
+    parser = policy.get('parser')
+    if not isinstance(parser, dict) or parser.get('package') != 'pypdf':
+        fail('INVALID_PDF_POLICY', 'PDF parser must be pypdf')
+    if not re.match(r'^[0-9]+\.[0-9]+\.[0-9]+$', str(parser.get('version'))):
+        fail('INVALID_PDF_POLICY', 'PDF parser version is invalid')
+    if not re.match(r'^[0-9a-f]{64}$', str(parser.get('wheel_sha256'))):
+        fail('INVALID_PDF_POLICY', 'PDF parser wheel hash is invalid')
+    if not re.match(r'^[0-9a-f]{64}$', str(parser.get('requirements_sha256'))):
+        fail('INVALID_PDF_POLICY', 'PDF parser requirements hash is invalid')
+    requirements_rel = parser.get('requirements')
+    if requirements_rel != config['pdf_review']['parser_requirements']:
+        fail('INVALID_PDF_POLICY',
+             'PDF parser requirements path differs from the security gate config')
+    requirements_path = config_path(requirements_rel)
+    parser_lock = load_pdf_parser_lock(requirements_path, policy)
+    semantics = policy.get('semantics')
+    if not isinstance(semantics, dict):
+        fail('INVALID_PDF_POLICY', 'PDF policy semantics are missing')
+    for key in ('max_pdf_bytes', 'max_objects', 'max_depth'):
+        if not isinstance(semantics.get(key), int) or semantics[key] <= 0:
+            fail('INVALID_PDF_POLICY', f'invalid PDF semantic limit: {key}')
+    approval = policy.get('approval') or {}
+    if status == 'APPROVED':
+        if not isinstance(approval.get('approved_by'), str) \
+                or not approval['approved_by'].strip():
+            fail('INVALID_PDF_POLICY',
+                 'APPROVED PDF policy must name the independent approver')
+        try:
+            datetime.datetime.fromisoformat(
+                str(approval.get('approved_at')).replace('Z', '+00:00'))
+        except ValueError:
+            fail('INVALID_PDF_POLICY',
+                 'APPROVED PDF policy must carry an ISO-8601 approved_at')
+    return {
+        'path': str(path),
+        'sha256': sha256_file(path),
+        'id': policy['policy_id'],
+        'status': status,
+        'approved_by': approval.get('approved_by'),
+        'approved_at': approval.get('approved_at'),
+        'rule_id': binding['rule_id'],
+        'severity': binding['severity'],
+        'keywords': binding['metadata_detected_keywords'],
+        'checker': {'path': str(checker_path), 'sha256': checker_sha,
+                    'version': checker.get('version')},
+        'parser': {
+            'package': parser['package'],
+            'version': parser['version'],
+            'wheel': parser.get('wheel'),
+            'wheel_sha256': parser['wheel_sha256'],
+            'license': parser.get('license'),
+            'requirements': requirements_rel,
+            'requirements_sha256': parser.get('requirements_sha256'),
+        },
+        'requirements': parser_lock,
+        'semantics': semantics,
+    }
 
 
 def validate_line(value, code='INVALID_REVIEW'):
@@ -681,10 +824,34 @@ def scanner_environment(config, run_root):
     return env
 
 
-def run_bounded(command, cwd, env, timeout):
+def run_bounded(command, cwd, env, timeout, limits=None):
+    preexec = None
+    if limits:
+        def preexec():  # noqa: F811 - child-only resource limits
+            try:
+                import resource
+            except ImportError:
+                return
+            for name, value in (
+                    ('RLIMIT_AS', limits.get('memory_bytes')),
+                    ('RLIMIT_CPU', limits.get('cpu_seconds')),
+                    ('RLIMIT_NOFILE', limits.get('open_files', 64)),
+                    ('RLIMIT_FSIZE', limits.get('file_bytes', 64 * 1024 * 1024))):
+                if value is None or not hasattr(resource, name):
+                    continue
+                resource_id = getattr(resource, name)
+                soft, hard = resource.getrlimit(resource_id)
+                if hard != resource.RLIM_INFINITY:
+                    value = min(value, hard)
+                if soft != resource.RLIM_INFINITY:
+                    value = min(value, soft) if soft else value
+                try:
+                    resource.setrlimit(resource_id, (value, value))
+                except (ValueError, OSError):
+                    pass
     process = subprocess.Popen(
         command, cwd=str(cwd), env=env, stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE, start_new_session=True)
+        stderr=subprocess.PIPE, start_new_session=True, preexec_fn=preexec)
     try:
         stdout, stderr = process.communicate(timeout=timeout)
         return process.returncode, stdout, stderr, 'completed'
@@ -1094,6 +1261,346 @@ def count_severities(findings):
     return dict(sorted(counts.items()))
 
 
+def select_pdf_findings(findings, root):
+    eligible = []
+    by_path = {}
+    for finding in findings:
+        metadata = finding.get('metadata')
+        keywords = metadata.get('detected_keywords') if isinstance(metadata, dict) else None
+        if finding.get('rule_id') != PDF_RULE_ID \
+                or str(finding.get('severity', '')).upper() != 'HIGH' \
+                or keywords != PDF_REQUIRED_KEYWORDS:
+            continue
+        if finding.get('line_number') is not None:
+            fail('PDF_ELIGIBLE_LOCATION',
+                 'an eligible PDF finding unexpectedly has a line number')
+        raw_path = finding.get('file_path')
+        relative = normalize_finding_path(root, raw_path)
+        if relative == '.' or not relative.lower().endswith('.pdf'):
+            fail('PDF_TARGET_UNSUPPORTED',
+                 f'eligible PDF finding does not name a PDF file: {raw_path!r}')
+        file_sha = finding_file_hash(root, relative)
+        if not file_sha:
+            fail('PDF_TARGET_MISSING',
+                 f'eligible PDF finding target is missing or unsafe: {relative}')
+        previous = by_path.get(relative)
+        if previous is not None and previous['file_sha256'] != file_sha:
+            fail('PDF_TARGET_DRIFT', f'two different bytes for eligible PDF {relative}')
+        entry = {
+            'finding_id': finding.get('id') or 'unknown',
+            'path': relative,
+            'file_sha256': file_sha,
+            'line': None,
+        }
+        eligible.append(entry)
+        by_path[relative] = entry
+    return eligible, by_path
+
+
+def validate_pdf_facts(facts, policy, expected_sha, config):
+    if not isinstance(facts, dict):
+        fail('PDF_FACTS_MISMATCH', 'PDF facts are not a JSON object')
+    if facts.get('check') != 'GOUJIAN_PDF_STRUCTURAL_CHECK' \
+            or facts.get('schema_version') != 1:
+        fail('PDF_FACTS_MISMATCH', 'PDF facts check identity is not recognized')
+    recorded_policy = facts.get('policy') or {}
+    if recorded_policy.get('id') != policy['id'] \
+            or recorded_policy.get('sha256') != policy['sha256']:
+        fail('PDF_POLICY_MISMATCH', 'PDF facts were produced under a different policy')
+    recorded_checker = facts.get('checker') or {}
+    if recorded_checker.get('sha256') != policy['checker']['sha256']:
+        fail('PDF_CHECKER_IDENTITY_MISMATCH',
+             'PDF facts were produced by a different checker')
+    recorded_parser = facts.get('parser') or {}
+    if recorded_parser.get('version') != policy['parser']['version'] \
+            or recorded_parser.get('wheel_sha256') != policy['parser']['wheel_sha256']:
+        fail('PDF_PARSER_MISMATCH', 'PDF facts were produced by a different parser pin')
+    recorded_pdf = facts.get('pdf') or {}
+    if recorded_pdf.get('sha256') != expected_sha:
+        fail('PDF_HASH_MISMATCH', 'PDF facts are bound to different file bytes')
+    limits = facts.get('process_limits') or {}
+    if limits.get('bounded') is not True:
+        fail('PDF_RESOURCE_LIMITS_MISSING',
+             'the checker child did not prove bounded parser resource limits')
+    for name, config_key in (('RLIMIT_AS', 'memory_bytes'),
+                             ('RLIMIT_CPU', 'cpu_seconds')):
+        soft = (limits.get(name) or {}).get('soft')
+        if not isinstance(soft, int) or soft <= 0 \
+                or soft > config['pdf_review'][config_key]:
+            fail('PDF_RESOURCE_LIMITS_MISSING',
+                 f'{name} is not bounded by the configured limit')
+    if facts.get('status') != 'PASS' or facts.get('failures'):
+        return False
+    checks = facts.get('checks')
+    if not isinstance(checks, dict) or not checks:
+        fail('PDF_FACTS_MISMATCH', 'PDF facts have no check results')
+    if any(not isinstance(check, dict) or check.get('status') != 'PASS'
+           for check in checks.values()):
+        return False
+    return True
+
+
+def run_pdf_checker(pdf_path, expected_sha, policy, config, evidence_dir, work_root, label):
+    facts_path = Path(evidence_dir) / f'{label}.json'
+    stdout_path = Path(evidence_dir) / f'{label}.stdout.log'
+    stderr_path = Path(evidence_dir) / f'{label}.stderr.log'
+    command = [
+        sys.executable, str(ROOT / PDF_CHECKER_REL),
+        '--pdf', str(pdf_path),
+        '--expected-sha256', expected_sha,
+        '--policy', policy['path'],
+        '--out', str(facts_path),
+    ]
+    env = scanner_environment(config, Path(work_root) / f'pdf-env-{label}')
+    status, stdout, stderr, outcome = run_bounded(
+        command, Path(work_root), env, config['pdf_review']['timeout_seconds'],
+        limits={
+            'memory_bytes': config['pdf_review']['memory_bytes'],
+            'cpu_seconds': config['pdf_review']['cpu_seconds'],
+        })
+    write_bytes(stdout_path, stdout or b'')
+    write_bytes(stderr_path, stderr or b'')
+    if outcome == 'timeout':
+        fail('PDF_REVIEW_TIMEOUT', 'the bounded PDF checker exceeded its timeout')
+    facts = None
+    if facts_path.is_file() and not facts_path.is_symlink():
+        facts = read_json(facts_path, 'MALFORMED_PDF_FACTS')
+    if facts is None:
+        fail('PDF_FACTS_MISSING', 'the PDF checker did not produce a facts file')
+    facts_ok = validate_pdf_facts(facts, policy, expected_sha, config)
+    return {
+        'status': status,
+        'outcome': outcome,
+        'facts': facts,
+        'facts_ok': facts_ok,
+        'facts_path': facts_path,
+        'stdout_path': stdout_path,
+        'stderr_path': stderr_path,
+        'command': command,
+        'env_keys': sorted(env),
+        'stdout_sha256': sha256_bytes(stdout or b''),
+        'stderr_sha256': sha256_bytes(stderr or b''),
+    }
+
+
+def run_pdf_structural_review(target, findings, config, policy, evidence_dir, work_root):
+    eligible, _ = select_pdf_findings(findings, target)
+    report = {
+        'status': 'PASS',
+        'reason': 'EXPLICIT_ZERO',
+        'policy': {
+            'path': policy['path'],
+            'sha256': policy['sha256'],
+            'id': policy['id'],
+            'status': policy['status'],
+            'approved_by': policy['approved_by'],
+            'approved_at': policy['approved_at'],
+        },
+        'checker': policy['checker'],
+        'parser': policy['parser'],
+        'requirements': policy['requirements'],
+        'rule_binding': {
+            'rule_id': policy['rule_id'],
+            'severity': policy['severity'],
+            'metadata_detected_keywords': policy['keywords'],
+        },
+        'limits': policy['semantics'],
+        'eligible': len(eligible),
+        'unique_pdfs': 0,
+        'adjudicated': 0,
+        'blocking': 0,
+        'items': [],
+        'raw_findings_retained': True,
+        'classification': 'SEMANTIC_STRUCTURAL_CLASSIFIER_PLUS_ROOT_POLICY_REVIEW',
+    }
+    if not eligible:
+        return report
+    report['reason'] = ('POLICY_PENDING' if policy['status'] != 'APPROVED'
+                        else 'PENDING_RUN')
+    grouped = {}
+    for entry in eligible:
+        grouped.setdefault(entry['path'], []).append(entry)
+    unique = sorted(grouped)
+    report['unique_pdfs'] = len(unique)
+    for index, relative in enumerate(unique):
+        entries = grouped[relative]
+        reference = entries[0]
+        pdf_path = Path(target) / PurePosixPath(relative)
+        if not pdf_path.is_file() or pdf_path.is_symlink():
+            fail('PDF_TARGET_MISSING', f'eligible PDF target is missing: {relative}')
+        label = f'pdf-review-{index:02d}'
+        try:
+            run = run_pdf_checker(pdf_path, reference['file_sha256'], policy, config,
+                                  evidence_dir, work_root, label)
+        except GateFailure as error:
+            report['status'] = 'FAIL'
+            report['reason'] = 'FACTS_ERROR'
+            for entry in entries:
+                report['items'].append({
+                    'finding_id': entry['finding_id'],
+                    'path': relative,
+                    'pdf_sha256': entry['file_sha256'],
+                    'decision': 'BLOCKED',
+                    'reason': error.code,
+                    'detail': error.detail,
+                })
+            continue
+        if run['facts_ok']:
+            decision = ('ADJUDICATED_STRUCTURAL_SAFE'
+                        if policy['status'] == 'APPROVED'
+                        else 'PENDING_INDEPENDENT_REVIEW')
+        else:
+            decision = 'BLOCKED'
+        for entry in entries:
+            report['items'].append({
+                'finding_id': entry['finding_id'],
+                'path': relative,
+                'pdf_sha256': entry['file_sha256'],
+                'decision': decision,
+                'facts': descriptor(run['facts_path']),
+                'facts_sha256': sha256_file(run['facts_path']),
+                'checker_exit_code': run['status'],
+                'checker_outcome': run['outcome'],
+                'checker_stdout': descriptor(run['stdout_path']),
+                'checker_stderr': descriptor(run['stderr_path']),
+                'command': run['command'],
+                'env_keys': run['env_keys'],
+                'parser': run['facts'].get('parser'),
+                'checks': run['facts'].get('checks'),
+                'failures': run['facts'].get('failures') or [],
+                'open_action': run['facts'].get('open_action'),
+                'dangerous': run['facts'].get('dangerous'),
+                'proof': run['facts'].get('proof'),
+            })
+            if decision == 'BLOCKED':
+                report['status'] = 'FAIL'
+                report['reason'] = 'FACTS_FAILED'
+            elif decision == 'ADJUDICATED_STRUCTURAL_SAFE':
+                report['adjudicated'] += 1
+    if policy['status'] != 'APPROVED' and report['status'] == 'PASS':
+        report['status'] = 'PENDING'
+    if report['status'] == 'PASS':
+        report['reason'] = 'ALL_ELIGIBLE_FINDINGS_ADJUDICATED'
+    elif report['status'] == 'PENDING':
+        report['reason'] = 'POLICY_PENDING'
+    report['blocking'] = report['eligible'] - report['adjudicated']
+    return report
+
+
+def apply_pdf_review(summaries, review):
+    by_key = {(item['finding_id'], item['path']): item for item in review['items']}
+    adjudicated = 0
+    for summary in summaries:
+        item = by_key.get((summary.get('finding_id'), summary.get('path')))
+        if not item:
+            continue
+        summary['pdf_structural_review'] = {
+            'eligible': True,
+            'policy_id': review['policy']['id'],
+            'policy_status': review['policy']['status'],
+            'checker_sha256': review['checker']['sha256'],
+            'facts_sha256': item.get('facts_sha256'),
+            'decision': item['decision'],
+            'raw_severity_retained': summary['severity'],
+        }
+        is_adjudicated = item['decision'] == 'ADJUDICATED_STRUCTURAL_SAFE'
+        summary['effective_blocking'] = not is_adjudicated
+        if is_adjudicated:
+            adjudicated += 1
+            summary['raw_classification'] = summary['classification']
+            summary['classification'] = 'adjudicated-structural-safe'
+            summary['owner'] = 'independent-policy-reviewer'
+            summary['disposition'] = 'retained-policy-adjudicated'
+            summary['review_status'] = 'APPROVED_EXACT_POLICY'
+            summary['rationale'] = (
+                'Raw HIGH retained. Deterministic structural checker plus the tracked, '
+                'independently approved policy proved the exact benign /OpenAction shape '
+                'and the absence of executable actions in the full parsed object graph.')
+    return adjudicated
+
+
+PDF_REVIEW_IDENTITY_FIELDS = (
+    'status', 'reason', 'eligible', 'unique_pdfs', 'adjudicated', 'blocking',
+    'raw_findings_retained', 'classification',
+)
+PDF_REVIEW_SECTIONS = ('policy', 'checker', 'parser', 'requirements', 'rule_binding', 'limits')
+
+
+def compare_pdf_reviews(artifact_dir, recomputed_dir, recorded, recomputed):
+    if not isinstance(recorded, dict):
+        fail('INVALID_RECEIPT', 'receipt has no PDF structural review record')
+    if recorded.get('status') != 'PASS':
+        fail('PDF_REVIEW_NOT_PASS', 'receipt PDF structural review is not PASS')
+    for field in PDF_REVIEW_IDENTITY_FIELDS:
+        if recorded.get(field) != recomputed.get(field):
+            fail('PDF_REVIEW_MISMATCH', f'recomputed PDF review differs: {field}')
+    for section in PDF_REVIEW_SECTIONS:
+        if recorded.get(section) != recomputed.get(section):
+            fail('PDF_REVIEW_MISMATCH', f'recomputed PDF review differs: {section}')
+    recorded_items = recorded.get('items')
+    recomputed_items = recomputed.get('items')
+    if not isinstance(recorded_items, list) or not isinstance(recomputed_items, list) \
+            or len(recorded_items) != len(recomputed_items):
+        fail('PDF_REVIEW_MISMATCH', 'PDF review item set changed')
+    if recomputed.get('blocking') != 0:
+        fail('PDF_REVIEW_MISMATCH', 'recomputed PDF review still has blocking findings')
+    for old, new in zip(recorded_items, recomputed_items):
+        for field in ('finding_id', 'path', 'pdf_sha256', 'decision', 'facts_sha256'):
+            if old.get(field) != new.get(field):
+                code = 'PDF_FACTS_MISMATCH' if field in ('pdf_sha256', 'facts_sha256') \
+                    else 'PDF_REVIEW_MISMATCH'
+                fail(code, f'PDF review item differs in {field}')
+        if old.get('failures') != new.get('failures'):
+            fail('PDF_FACTS_MISMATCH', 'PDF review item failures changed')
+        if old.get('decision') != 'ADJUDICATED_STRUCTURAL_SAFE':
+            fail('PDF_REVIEW_NOT_PASS',
+                 'receipt lists an eligible finding that was not policy-adjudicated')
+        retained_path = check_receipt_artifact(artifact_dir, old.get('facts'),
+                                               'retained PDF facts')
+        check_receipt_artifact(artifact_dir, old.get('checker_stdout'),
+                               'retained PDF checker stdout')
+        check_receipt_artifact(artifact_dir, old.get('checker_stderr'),
+                               'retained PDF checker stderr')
+        if old.get('facts_sha256') != old['facts'].get('sha256') \
+                or sha256_file(retained_path) != old.get('facts_sha256'):
+            fail('PDF_FACTS_MISMATCH', 'retained PDF facts hash is inconsistent')
+        recomputed_path = check_receipt_artifact(recomputed_dir, new.get('facts'),
+                                                 'recomputed PDF facts')
+        if read_json(retained_path, 'MALFORMED_PDF_FACTS') != \
+                read_json(recomputed_path, 'MALFORMED_PDF_FACTS'):
+            fail('PDF_FACTS_MISMATCH', 'retained PDF facts differ from recomputed facts')
+    if recomputed.get('eligible') != len(recomputed_items):
+        fail('PDF_REVIEW_MISMATCH', 'PDF review eligible count does not match its items')
+
+
+def compare_pdf_summaries(recorded_findings, review):
+    summaries = recorded_findings.get('items')
+    if not isinstance(summaries, list):
+        fail('INVALID_RECEIPT', 'receipt finding items are missing')
+    by_key = {(item['finding_id'], item['path']): item for item in review['items']}
+    for summary in summaries:
+        item = by_key.get((summary.get('finding_id'), summary.get('path')))
+        if item is None:
+            continue
+        evidence = summary.get('pdf_structural_review')
+        if not isinstance(evidence, dict):
+            fail('PDF_REVIEW_MISMATCH', 'eligible finding lacks its PDF review record')
+        if evidence.get('policy_id') != review['policy']['id'] \
+                or evidence.get('policy_status') != review['policy']['status'] \
+                or evidence.get('checker_sha256') != review['checker']['sha256'] \
+                or evidence.get('facts_sha256') != item.get('facts_sha256') \
+                or evidence.get('decision') != item.get('decision'):
+            fail('PDF_REVIEW_MISMATCH', 'recorded PDF review item identity changed')
+        if evidence.get('raw_severity_retained') != summary.get('severity'):
+            fail('PDF_REVIEW_MISMATCH', 'recorded raw severity was modified')
+        expected_blocking = item['decision'] != 'ADJUDICATED_STRUCTURAL_SAFE'
+        if summary.get('effective_blocking') != expected_blocking:
+            fail('PDF_REVIEW_MISMATCH', 'recorded effective blocking decision changed')
+        if not expected_blocking and summary.get('classification') != \
+                'adjudicated-structural-safe':
+            fail('PDF_REVIEW_MISMATCH', 'adjudicated finding is not labeled as such')
+
+
 def scan_command(args):
     out_dir = prepare_output_dir(args.out_dir)
     receipt = {
@@ -1114,13 +1621,14 @@ def scan_command(args):
     }
     work_root = None
     try:
-        config_path = Path(args.config)
-        config = load_config(config_path)
+        config_file = Path(args.config)
+        config = load_config(config_file)
         lock_path = Path(args.lock) if args.lock else ROOT / config['lock']['path']
         ledger_path = Path(args.review_ledger) if args.review_ledger \
             else ROOT / config['review_ledger']
         lock = load_lock(lock_path, config)
         ledger = load_ledger(ledger_path, config)
+        pdf_policy = load_pdf_policy(config_path(config['pdf_review']['policy']), config)
         archive = validate_archive_path(args.archive)
         archive_sha = sha256_file(archive)
         archive_bytes = archive.stat().st_size
@@ -1145,7 +1653,7 @@ def scan_command(args):
             'package': {'version': args.version, 'commit': args.commit,
                         'source_tree_state': args.source_tree_state,
                         'source_tree_state_observed': observed_state},
-            'config': {'path': str(config_path), 'sha256': sha256_file(config_path),
+            'config': {'path': str(config_file), 'sha256': sha256_file(config_file),
                        'scanner_version': config['scanner']['version'],
                        'policy': config['scanner']['policy'],
                        'policy_fingerprint_sha256':
@@ -1242,6 +1750,20 @@ def scan_command(args):
         }
         summaries, blocking, matched, review_scope = evaluate_findings(
             validated['findings'], target, root_skill_sha, config, ledger)
+        receipt['checks']['pdf_structural_review'] = {
+            'status': 'FAIL', 'reason': 'NOT_COMPLETED'}
+        pdf_review = run_pdf_structural_review(
+            target, validated['findings'], config, pdf_policy, out_dir, work_root)
+        adjudicated = apply_pdf_review(summaries, pdf_review)
+        effective_blocking = max(0, len(blocking) - adjudicated)
+        receipt['pdf_structural_review'] = pdf_review
+        receipt['checks']['pdf_structural_review'] = {
+            'status': 'PASS' if pdf_review['status'] == 'PASS' else 'FAIL',
+            'reason': pdf_review['reason'],
+            'eligible': pdf_review['eligible'],
+            'adjudicated': pdf_review['adjudicated'],
+            'blocking': pdf_review['blocking'],
+        }
         tree_after = tree_digest(target)
         archive_after = sha256_file(archive)
         snapshot_after = sha256_file(snapshot)
@@ -1282,7 +1804,8 @@ def scan_command(args):
             'total': len(summaries),
             'severity_counts': counts,
             'blocking_total': len(blocking),
-            'blocking_unreviewed': len(blocking),
+            'blocking_policy_adjudicated': adjudicated,
+            'blocking_unreviewed': effective_blocking,
             'items': summaries,
         }
         receipt['checks'].update({
@@ -1291,13 +1814,19 @@ def scan_command(args):
             'analyzer_evidence': {'status': 'PASS'},
             'policy_fingerprint': {'status': 'PASS'},
             'input_stability': {'status': 'PASS'},
-            'review_binding': {'status': 'PASS' if not blocking else 'FAIL'},
-            'gate_threshold': {'status': 'PASS' if not blocking else 'FAIL'},
+            'review_binding': {'status': 'PASS' if not effective_blocking else 'FAIL'},
+            'gate_threshold': {'status': 'PASS' if not effective_blocking else 'FAIL'},
             'coverage_disclosure': {'status': 'PASS'},
         })
-        if blocking:
+        if pdf_review['status'] == 'PENDING':
+            fail('PDF_POLICY_PENDING',
+                 'eligible PDF findings require the independently approved PDF policy')
+        if pdf_review['status'] == 'FAIL':
+            fail('PDF_STRUCTURAL_REVIEW_FAILED',
+                 'the PDF structural checker blocked one or more eligible findings')
+        if effective_blocking:
             fail('UNREVIEWED_BLOCKING',
-                 f'{len(blocking)} HIGH/CRITICAL finding(s) lack an exact approved review')
+                 f'{effective_blocking} HIGH/CRITICAL finding(s) lack an exact approved review')
         receipt['status'] = 'PASS'
         missing_checks = set(REQUIRED_CHECKS) - set(receipt['checks'])
         if missing_checks:
@@ -1326,6 +1855,13 @@ def scan_command(args):
         'profile': receipt.get('archive', {}).get('profile'),
         'severity_counts': receipt.get('findings', {}).get('severity_counts', {}),
         'blocking_unreviewed': receipt.get('findings', {}).get('blocking_unreviewed'),
+        'pdf_review': {
+            'status': receipt.get('pdf_structural_review', {}).get('status'),
+            'reason': receipt.get('pdf_structural_review', {}).get('reason'),
+            'eligible': receipt.get('pdf_structural_review', {}).get('eligible'),
+            'adjudicated': receipt.get('pdf_structural_review', {}).get('adjudicated'),
+            'blocking': receipt.get('pdf_structural_review', {}).get('blocking'),
+        },
         'review_receipt': str(receipt_path),
         'review_proposal': str(out_dir / 'review-proposal.json')
         if (out_dir / 'review-proposal.json').is_file() else None,
@@ -1394,11 +1930,11 @@ def verify_command(args):
         fail('SOURCE_TREE_NOT_CLEAN',
              'the scanning worktree was observed dirty; the receipt is diagnostic only')
     if args.config:
-        config_path = Path(args.config)
+        config_file = Path(args.config)
     else:
-        config_path = ROOT / 'security/security-gate.json'
-    config = load_config(config_path)
-    if sha256_file(config_path) != receipt.get('config', {}).get('sha256'):
+        config_file = ROOT / 'security/security-gate.json'
+    config = load_config(config_file)
+    if sha256_file(config_file) != receipt.get('config', {}).get('sha256'):
         fail('CONFIG_MISMATCH', 'security gate config changed after scanning')
     if receipt['config'].get('scanner_version') != config['scanner']['version'] \
             or receipt['config'].get('policy') != config['scanner']['policy'] \
@@ -1416,6 +1952,7 @@ def verify_command(args):
     ledger = load_ledger(ledger_path, config)
     if ledger['sha256'] != receipt.get('review_ledger', {}).get('sha256'):
         fail('LEDGER_MISMATCH', 'review ledger changed after scanning')
+    pdf_policy = load_pdf_policy(config_path(config['pdf_review']['policy']), config)
     if args.scanner_sha256 and receipt.get('scanner', {}).get('binary_sha256') != args.scanner_sha256:
         fail('SCANNER_IDENTITY_MISMATCH', 'scanner binary hash does not match the receipt')
     artifact_dir = Path(args.artifact_dir) if args.artifact_dir else receipt_path.parent
@@ -1485,13 +2022,33 @@ def verify_command(args):
                      f'recomputed source identity differs from the receipt: {field}')
         summaries, blocking, matched, review_scope = evaluate_findings(
             validated['findings'], target, root_skill_sha, config, ledger)
+        pdf_evidence = work_root / 'pdf-review'
+        pdf_evidence.mkdir(parents=True, exist_ok=True)
+        pdf_review = run_pdf_structural_review(
+            target, validated['findings'], config, pdf_policy, pdf_evidence, work_root)
+        adjudicated = apply_pdf_review(summaries, pdf_review)
+        effective_blocking = max(0, len(blocking) - adjudicated)
+        if pdf_review['status'] == 'PENDING':
+            fail('PDF_POLICY_PENDING',
+                 'eligible PDF findings require the independently approved PDF policy')
+        if pdf_review['status'] == 'FAIL':
+            fail('PDF_STRUCTURAL_REVIEW_FAILED',
+                 'the PDF structural checker blocked one or more eligible findings')
+        compare_pdf_reviews(artifact_dir, pdf_evidence,
+                            receipt.get('pdf_structural_review'), pdf_review)
+        compare_pdf_summaries(receipt.get('findings') or {}, pdf_review)
         counts = count_severities(validated['findings'])
-        if receipt.get('findings', {}).get('total') != len(summaries) \
-                or receipt.get('findings', {}).get('severity_counts') != counts:
+        recorded_findings = receipt.get('findings', {})
+        if recorded_findings.get('total') != len(summaries) \
+                or recorded_findings.get('severity_counts') != counts:
             fail('FINDINGS_MISMATCH', 'receipt finding summary does not match raw JSON')
-        if blocking:
+        if recorded_findings.get('blocking_total') != len(blocking) \
+                or recorded_findings.get('blocking_policy_adjudicated') != adjudicated \
+                or recorded_findings.get('blocking_unreviewed') != effective_blocking:
+            fail('FINDINGS_MISMATCH', 'receipt blocking summary does not match recomputation')
+        if effective_blocking:
             fail('UNREVIEWED_BLOCKING',
-                 f'{len(blocking)} HIGH/CRITICAL finding(s) lack an exact approved review')
+                 f'{effective_blocking} HIGH/CRITICAL finding(s) lack an exact approved review')
         recorded_ledger = receipt.get('review_ledger', {})
         if recorded_ledger.get('matched_reviews') != len(matched) \
                 or recorded_ledger.get('applicable_reviews') != review_scope['matched'] \
@@ -1526,6 +2083,12 @@ def verify_command(args):
         'receipt': str(receipt_path),
         'reviews_matched': len(matched),
         'severity_counts': count_severities(validated['findings']),
+        'pdf_review': {
+            'status': receipt.get('pdf_structural_review', {}).get('status'),
+            'reason': receipt.get('pdf_structural_review', {}).get('reason'),
+            'eligible': receipt.get('pdf_structural_review', {}).get('eligible'),
+            'adjudicated': receipt.get('pdf_structural_review', {}).get('adjudicated'),
+        },
         'semantic': 'NOT_RUN',
         'javascript_behavioral': 'NOT_RUN',
     }

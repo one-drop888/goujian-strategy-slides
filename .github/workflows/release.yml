@@ -773,7 +773,7 @@ jobs:
         uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
         with:
           python-version: '3.14'
-      - name: Install the pinned scanner for the release security gate
+      - name: Install the pinned scanner and PDF parser for the release security gate
         env:
           PIP_DISABLE_PIP_VERSION_CHECK: '1'
         run: |
@@ -785,9 +785,20 @@ jobs:
             --require-hashes --only-binary=:all: \
             --index-url https://pypi.org/simple \
             -r security/requirements-lock.txt
+          "$scanner_root/bin/python" -m pip install \
+            --require-hashes --only-binary=:all: \
+            --index-url https://pypi.org/simple \
+            -r security/pdf-parser-requirements.txt
           "$scanner_root/bin/skill-scanner" --version
+          "$scanner_root/bin/python" -c "import pypdf; assert pypdf.__version__ == '6.21.3', pypdf.__version__"
           "$scanner_root/bin/python" -m pip check
           echo "SCANNER_BIN=$scanner_root/bin/skill-scanner" >> "$GITHUB_ENV"
+          echo "SCANNER_PYTHON=$scanner_root/bin/python" >> "$GITHUB_ENV"
+
+      - name: Run the real-parser PDF structural suite before any release scan
+        run: |
+          set -euo pipefail
+          "$SCANNER_PYTHON" -m unittest tests.test_pdf_structural_review -v
       - name: Security-gate the actual runtime, source and showcase archives
         env:
           VERSION: ${{ inputs.version }}
@@ -801,7 +812,7 @@ jobs:
             local sha
             sha="$(sha256sum "$archive" | cut -d' ' -f1)"
             echo "::group::gate scan $name ($archive)"
-            if python3 scripts/scan_skill_package.py scan "$archive" \
+            if "$SCANNER_PYTHON" scripts/scan_skill_package.py scan "$archive" \
                 --profile "$profile" \
                 --version "$VERSION" \
                 --commit "$EXPECTED_SHA" \
@@ -836,7 +847,7 @@ jobs:
             esac
             test -f "$archive"
             sha="$(sha256sum "$archive" | cut -d' ' -f1)"
-            python3 scripts/scan_skill_package.py verify "out/security-gate/$name/receipt.json" \
+            "$SCANNER_PYTHON" scripts/scan_skill_package.py verify "out/security-gate/$name/receipt.json" \
               --archive "$archive" \
               --expected-sha256 "$sha" \
               --version "$VERSION" \
@@ -1034,6 +1045,24 @@ jobs:
         with:
           name: release-validation-${{ github.run_id }}-${{ github.run_attempt }}
           path: .
+      - name: Set up Python 3.14 for the isolated PDF verifier
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: '3.14'
+      - name: Install only the hash-locked PDF verifier from the shared lock
+        env:
+          PIP_DISABLE_PIP_VERSION_CHECK: '1'
+        run: |
+          set -euo pipefail
+          verifier_root="$RUNNER_TEMP/goujian-pdf-verifier"
+          rm -rf "$verifier_root"
+          python3 -m venv "$verifier_root"
+          "$verifier_root/bin/python" -m pip install \
+            --require-hashes --only-binary=:all: \
+            --index-url https://pypi.org/simple \
+            -r security/pdf-parser-requirements.txt
+          "$verifier_root/bin/python" -c "import pypdf; assert pypdf.__version__ == '6.21.3', pypdf.__version__"
+          echo "PDF_VERIFIER_PYTHON=$verifier_root/bin/python" >> "$GITHUB_ENV"
       - name: Re-verify approvals, hashes, receipts and same-run binding before any mutation
         env:
           VERSION: ${{ inputs.version }}
@@ -1087,7 +1116,7 @@ jobs:
             esac
             test -f "$archive"
             sha="$(python3 -c "import hashlib,sys;print(hashlib.sha256(open(sys.argv[1],'rb').read()).hexdigest())" "$archive")"
-            python3 scripts/scan_skill_package.py verify "out/security-gate/$name/receipt.json" \
+            "$PDF_VERIFIER_PYTHON" scripts/scan_skill_package.py verify "out/security-gate/$name/receipt.json" \
               --archive "$archive" \
               --expected-sha256 "$sha" \
               --version "$VERSION" \

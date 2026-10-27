@@ -31,6 +31,10 @@ The runtime ZIP's `package.json` is explicitly mapped from `distribution/runtime
 - 两个安装包使用同一版本、同一提交和同一锁定依赖。运行时包内 `package.json` 由 `distribution/runtime-package.json` 显式映射，其余成员须与批准提交逐字节一致。
 - 最终 ZIP 预检使用 runtime/source/legacy 三种画像，扫描全部文本成员并区分可执行代码与惰性字符串/注释。公司平台与 Agensi 的实际上传/审核仍未执行，`COMPANY_PLATFORM_SECURITY=NOT_VERIFIED`；公开静态预检 PASS 不等于企业平台批准。
 
+Every release archive is additionally scanned by the pinned third-party Skill Scanner before any tag or Release. That gate fails closed on unreviewed HIGH/CRITICAL findings and always retains raw JSON/SARIF and logs. JavaScript behavioral and semantic analysis are explicitly NOT_RUN. See the [release security gate](https://github.com/one-drop888/goujian-strategy-slides/blob/main/docs/RELEASE_SECURITY_GATE.md) for the local command, review ledger, lock upgrade and failure artifacts.
+
+每个发布包在打标签或发布前还会由固定版本的第三方 Skill Scanner 扫描。该门禁在存在未评审的 HIGH/CRITICAL 时失败关闭，并始终保留原始 JSON/SARIF 与日志；JavaScript 行为与语义分析明确为 NOT_RUN。本地命令、评审账本、锁升级与失败证据说明见[发布安全门](https://github.com/one-drop888/goujian-strategy-slides/blob/main/docs/RELEASE_SECURITY_GATE.md)。
+
 ## Install project dependencies
 
 From the skill root:

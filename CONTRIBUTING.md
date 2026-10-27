@@ -25,6 +25,15 @@ A contribution should:
 5. pass `npm test`;
 6. render representative examples when changing layout code.
 
+## Release security gate
+
+Packaging, scanner, review and release changes must follow the
+[release security gate](https://github.com/one-drop888/goujian-strategy-slides/blob/main/docs/RELEASE_SECURITY_GATE.md).
+Run `npm test` (which includes the gate unit tests) before opening a change. The
+gate is fail-closed: unreviewed HIGH/CRITICAL findings keep CI and release red
+until an independent reviewer records an exact, content-bound review. Do not
+broaden allowlists, hide keywords, or bypass the scanner to obtain a green run.
+
 ## License
 
 By contributing, you agree that your contribution is licensed under Apache-2.0. Do not submit code or visual assets you do not have the right to redistribute.

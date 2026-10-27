@@ -1,0 +1,301 @@
+name: Skill Package Security
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: skill-security-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PYTHON_VERSION: '3.14'
+  NODE_VERSION: '24'
+  PYTHONDONTWRITEBYTECODE: '1'
+
+jobs:
+  package-security:
+    name: Package security gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Check out the exact commit under test
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Set up Node for the production advisory audit
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Record the commit under test and assert a clean tracked tree
+        run: |
+          set -euo pipefail
+          COMMIT="$(git rev-parse HEAD)"
+          echo "COMMIT=$COMMIT" >> "$GITHUB_ENV"
+          echo "EXPECTED_VERSION=$(python3 -c 'import json;print(json.load(open("package.json"))["version"])')" >> "$GITHUB_ENV"
+          test "$(git rev-parse HEAD)" = "$COMMIT"
+          test -z "$(git status --porcelain)"
+          echo "PASS: checked out clean tracked tree at $COMMIT"
+
+      - name: Install the pinned scanner from the hash-locked wheel set
+        id: scanner
+        env:
+          PIP_DISABLE_PIP_VERSION_CHECK: '1'
+        run: |
+          set -euo pipefail
+          scanner_root="$RUNNER_TEMP/goujian-scanner"
+          rm -rf "$scanner_root"
+          python3 -m venv "$scanner_root"
+          "$scanner_root/bin/python" -m pip install \
+            --require-hashes --only-binary=:all: \
+            --index-url https://pypi.org/simple \
+            -r security/requirements-lock.txt
+          "$scanner_root/bin/skill-scanner" --version
+          "$scanner_root/bin/python" -m pip check
+          echo "SCANNER_BIN=$scanner_root/bin/skill-scanner" >> "$GITHUB_ENV"
+          "$scanner_root/bin/python" - <<'PY' >> "$GITHUB_OUTPUT"
+          import importlib.metadata as metadata
+          version = metadata.version('cisco-ai-skill-scanner')
+          assert version == '2.3.1', version
+          print(f'version={version}')
+          PY
+
+      - name: Build the actual runtime and source archives
+        run: |
+          set -euo pipefail
+          mkdir -p dist out/security-gate
+          python3 scripts/package_runtime.py dist/runtime.zip --json > out/security-gate/runtime-package.json
+          python3 scripts/package_runtime.py dist/source.zip --source --json > out/security-gate/source-package.json
+          python3 - "$EXPECTED_VERSION" "$COMMIT" <<'PY'
+          import hashlib
+          import json
+          import subprocess
+          import sys
+          import zipfile
+          from pathlib import Path
+
+          version, commit = sys.argv[1:3]
+          assert commit and len(commit) == 40, commit
+          prefix = 'goujian-strategy-slides/'
+          mapping_path = Path('distribution/runtime-package.json')
+          mapping = json.loads(mapping_path.read_text(encoding='utf-8'))
+          root_package = json.loads(Path('package.json').read_text(encoding='utf-8'))
+          assert root_package['version'] == version, (root_package['version'], version)
+          for field in ('name', 'version', 'license', 'dependencies', 'engines', 'overrides', 'repository'):
+              assert mapping.get(field) == root_package.get(field), f'runtime package mapping differs for {field}'
+
+          def git_head(relative):
+              return subprocess.run(['git', 'show', f'HEAD:{relative}'],
+                                    check=True, capture_output=True).stdout
+
+          def verify(path, mapped_package):
+              archive_path = Path(path)
+              with zipfile.ZipFile(archive_path) as archive:
+                  names = archive.namelist()
+                  assert names and len(names) == len(set(names)), f'{path}: empty or duplicate members'
+                  assert [name for name in names if name.endswith('/SKILL.md')] == [prefix + 'SKILL.md'], path
+                  for name in names:
+                      assert name.startswith(prefix), f'{path}: member outside prefix: {name}'
+                      relative = name[len(prefix):]
+                      if relative == 'package.json' and mapped_package:
+                          expected = mapping_path.read_bytes()
+                      else:
+                          expected = git_head(relative)
+                      assert archive.read(name) == expected, f'{path}: {relative} differs from HEAD'
+              return archive_path.stat().st_size, len(names), hashlib.sha256(archive_path.read_bytes()).hexdigest()
+
+          report = {'version': version, 'commit': commit, 'archives': {}}
+          for name, mapped in (('runtime', True), ('source', False)):
+              path = f'dist/{name}.zip'
+              if not Path(path).is_file():
+                  continue
+              size, count, digest = verify(path, mapped)
+              report['archives'][name] = {'path': path, 'bytes': size, 'members': count, 'sha256': digest}
+              assert not report['archives'][name]['members'] < 100, (name, count)
+          assert set(report['archives']) == {'runtime', 'source'}, sorted(report['archives'])
+          Path('out/security-gate/package-hashes.json').write_text(
+              json.dumps(report, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+          print('PASS: runtime and source archives match HEAD; package.json mapped only for runtime')
+          for name, item in report['archives'].items():
+              print(f"  {name}: members={item['members']} sha256={item['sha256']}")
+          PY
+
+      - name: Live public advisory check (fails closed on service errors)
+        run: |
+          set -euo pipefail
+          mkdir -p out/security-gate/advisory
+          set +e
+          npm audit --omit=dev --json > out/security-gate/advisory/npm-audit.json
+          npm_status=$?
+          set -e
+          printf '%s\n' "$npm_status" > out/security-gate/advisory/npm-audit-exit-code.txt
+          python3 scripts/advisory_check.py \
+            --npm-audit-json out/security-gate/advisory/npm-audit.json \
+            --npm-audit-exit-code "$npm_status" \
+            --out out/security-gate/advisory/osv-check.json
+
+      - name: Scan the actual archives through the shared gate
+        run: |
+          set -euo pipefail
+          status=0
+          run_scan() {
+            local name="$1" profile="$2"
+            local sha
+            sha="$(python3 -c "import json,sys;print(json.load(open('out/security-gate/package-hashes.json'))['archives'][sys.argv[1]]['sha256'])" "$name")"
+            echo "::group::gate scan $name ($profile)"
+            if python3 scripts/scan_skill_package.py scan "dist/$name.zip" \
+                --profile "$profile" \
+                --version "$EXPECTED_VERSION" \
+                --commit "$COMMIT" \
+                --repo "$GITHUB_WORKSPACE" \
+                --source-tree-state clean \
+                --expected-sha256 "$sha" \
+                --scanner "$SCANNER_BIN" \
+                --out-dir "out/security-gate/$name"; then
+              echo "PASS: $name security gate"
+            else
+              echo "FAIL: $name security gate (see out/security-gate/$name)"
+              status=1
+            fi
+            echo "::endgroup::"
+          }
+          run_scan runtime runtime
+          run_scan source source
+          # The gate is fail-closed: any unreviewed HIGH/CRITICAL keeps this red.
+          exit "$status"
+
+      - name: Real negative control with the pinned scanner (data only, never executed)
+        if: always() && steps.scanner.outcome == 'success'
+        run: |
+          set -euo pipefail
+          mkdir -p out/security-gate
+          fixture_root="$RUNNER_TEMP/goujian-negative-fixture-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
+          python3 scripts/negative_skill_fixture.py --out "$fixture_root" \
+            > out/security-gate/negative-control-fixture.json
+          mkdir -p out/security-gate/negative-control
+          set +e
+          "$SCANNER_BIN" scan "$fixture_root" \
+            --policy low-noise \
+            --use-behavioral --format json --format sarif \
+            --output-json out/security-gate/negative-control/findings.json \
+            --output-sarif out/security-gate/negative-control/findings.sarif \
+            --fail-on-severity high
+          scan_status=$?
+          set -e
+          printf '%s\n' "$scan_status" > out/security-gate/negative-control/exit-code.txt
+          python3 - "$scan_status" <<'PY'
+          import json
+          import sys
+          from pathlib import Path
+
+          status = int(sys.argv[1])
+          report = json.loads(Path('out/security-gate/negative-control/findings.json').read_text(encoding='utf-8'))
+          findings = report.get('findings') or []
+          severities = sorted({str(item.get('severity', '')).upper() for item in findings})
+          assert status == 1, f'negative control exit {status}; the HIGH threshold did not block'
+          assert findings, 'negative control produced no findings'
+          assert {'HIGH', 'CRITICAL'} & set(severities), severities
+          print(f'PASS: pinned scanner blocked {len(findings)} real negative findings {severities}')
+          print('NOTE: fixture is inert data; the scanner parsed it and never executed it')
+          PY
+
+      - name: Record provenance and fail-closed summary
+        if: always()
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib
+          import json
+          import os
+          import subprocess
+          from pathlib import Path
+
+          def sha(path):
+              candidate = Path(path)
+              return hashlib.sha256(candidate.read_bytes()).hexdigest() if candidate.is_file() else None
+
+          try:
+              scanner_version = subprocess.run(
+                  [os.environ['SCANNER_BIN'], '--version'], check=True,
+                  capture_output=True, text=True).stdout.strip()
+          except Exception as error:  # noqa: BLE001 - provenance must still be written
+              scanner_version = f'UNAVAILABLE: {error}'
+
+          receipts = {}
+          for name in ('runtime', 'source'):
+              receipt = Path('out/security-gate') / name / 'receipt.json'
+              if receipt.is_file():
+                  data = json.loads(receipt.read_text(encoding='utf-8'))
+                  receipts[name] = {
+                      'status': data.get('status'),
+                      'severity_counts': data.get('findings', {}).get('severity_counts'),
+                      'blocking_unreviewed':
+                          data.get('findings', {}).get('blocking_unreviewed'),
+                      'review_scope': data.get('review_ledger'),
+                      'source_identity': data.get('source_identity'),
+                      'snapshot': data.get('snapshot'),
+                      'receipt_sha256': sha(receipt),
+                  }
+
+          advisory_path = Path('out/security-gate/advisory/osv-check.json')
+          advisory = json.loads(advisory_path.read_text(encoding='utf-8')) \
+              if advisory_path.is_file() else None
+
+          provenance = {
+              'workflow': os.environ.get('GITHUB_WORKFLOW'),
+              'event': os.environ.get('GITHUB_EVENT_NAME'),
+              'run_id': os.environ.get('GITHUB_RUN_ID'),
+              'run_attempt': os.environ.get('GITHUB_RUN_ATTEMPT'),
+              'ref': os.environ.get('GITHUB_REF'),
+              'head_sha': os.environ.get('GITHUB_SHA'),
+              'commit': os.environ.get('COMMIT'),
+              'version': os.environ.get('EXPECTED_VERSION'),
+              'python': subprocess.run(['python3', '--version'], capture_output=True, text=True).stdout.strip(),
+              'scanner_version': scanner_version,
+              'scanner_bin': os.environ.get('SCANNER_BIN'),
+              'lock_sha256': sha('security/requirements-lock.txt'),
+              'config_sha256': sha('security/security-gate.json'),
+              'review_ledger_sha256': sha('security/review-ledger.json'),
+              'advisory': {
+                  'status': (advisory or {}).get('status'),
+                  'coordinates': (advisory or {}).get('coordinates', {}).get('total'),
+                  'findings': len((advisory or {}).get('findings') or []),
+                  'receipt_sha256': sha(advisory_path),
+              },
+              'receipts': receipts,
+              'coverage': {
+                  'python': 'ANALYZED',
+                  'bash': 'ANALYZED',
+                  'javascript': 'NOT_RUN',
+                  'semantic': 'NOT_RUN',
+              },
+          }
+          Path('out/security-gate/provenance.json').write_text(
+              json.dumps(provenance, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+          print(json.dumps(provenance['receipts'], ensure_ascii=False, indent=2))
+          PY
+
+      - name: Upload security evidence even on failure
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: skill-security-evidence-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            out/security-gate
+            dist/*.zip
+          if-no-files-found: warn
+          retention-days: 14

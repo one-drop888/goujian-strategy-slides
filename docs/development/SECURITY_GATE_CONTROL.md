@@ -1,0 +1,70 @@
+# Permanent release security gate — control record
+
+Owner and independent acceptance: Codex. Engineering executor: Qoder CN CLI.
+
+## Baseline and scope
+
+- Frozen public v1.3.1: `25f269f8db333e27f23915ecb472eed6cb2709c6`.
+- Official runtime SHA256: `7ee0d15488368a876ac2624546f72a13de8bdf01f322ed1055bb8c099d67b3dd`.
+- Historical tag, Release and assets must not change. No version bump or new Release is authorized by gate completion alone.
+- Product runtime, renderers, numeric semantics, fonts/images, analysis and QA retain their existing capabilities.
+- This control file tracks engineering decisions. Raw local logs stay in ignored `out/security-gate-control/`; CI archives its own reports on success and failure.
+
+## Initial live observations
+
+- 2026-10-27: local main clean at the frozen commit; Qoder CN CLI reports 1.1.78.
+- GitHub repository is public; current account has repository admin permission. Main has no branch protection and no rulesets. This is an observed gap, not an enforced control.
+- Cisco official PyPI package 2.3.1 requires Python >=3.11,<3.15 and declares Apache-2.0. Linux x86_64 wheel SHA256: `e3ea642577578ddb41872b640253a44f7a11858d5d30fa426040b69528a6df23`. Tool and transitive dependency verification is complete in Phase 1; live advisories are re-queried on every PR/push/release run.
+- PIOS search returned no applicable shared record; no Goujian project ID is known. No isolated-test PIOS output is treated as production authority.
+- Company v1.3.1 upload is FAIL. Three exact `exec(` bytes occur in static detector regex strings at security_preflight.py:90,91,714; server-side attribution remains unverified.
+
+## Architecture decisions
+
+1. Keep `scripts/security_preflight.py` and all existing rules/tests. The new scanner orchestrates it rather than replacing it.
+2. One shared package scanning entry point for local/PR/push/release. Scan a safely extracted, hash-bound snapshot of each actual runtime/source/showcase ZIP. Recheck identity before accepting evidence or publishing.
+3. Cisco remains a separate development/release dependency in an isolated Python environment. Do not add scanner/LLM packages to the production runtime or Bootstrap.
+4. Pin the official scanner and transitive installation artifacts; retain provenance, licenses and advisory evidence. Pin newly used Actions to audited commit references.
+5. Static and behavioral checks run without model credentials. No cloud/LLM calls, repository secrets or private company data. SEMANTIC_SCAN=NOT_RUN until separately approved.
+6. Default blocking threshold is HIGH/CRITICAL. Preserve raw findings. Any false-positive adjudication must be explicit, independently reviewed, tied to unchanged input content and recorded alongside raw evidence; no blanket exclusions or keyword concealment.
+7. Fail closed on scanner errors, missing analyzer evidence, malformed results, input/hash drift, stale reviews and missing required release receipts. Always retain failure artifacts.
+8. Negative controls must demonstrate actual third-party detection plus orchestration failure behavior; target sample source is data and is never executed.
+9. PR/push workflow has minimal permissions and no fork secrets. The existing Release workflow must call the same entry on its actual ZIPs before tag/release/upload operations. A non-publishing rehearsal must exercise this path without changing old releases.
+10. Required GitHub status checks must be actually configured and verified. Merge through normal protected-branch rules only after independent review and real Actions success. Do not use admin bypass or synthetic success statuses.
+
+## Workstreams and current state
+
+| Workstream | Executor | State | Required evidence |
+|---|---|---|---|
+| Official tool / dependency / real CLI audit | Qoder | COMPLETE (Phase 1) | versions, hashes, license/advisory inventory, baseline and negative scans |
+| Shared package gate / negative tests | Qoder, Codex review | IMPLEMENTED, acceptance pending | fail-closed tests, real CLI results, input binding |
+| PR/push + pre-publication workflow integration | Qoder, Codex review | IMPLEMENTED locally, Actions NOT_RUN | immutable actions, artifact retention, release rehearsal |
+| Functional and visual non-regression | Qoder, Codex acceptance | IN_PROGRESS | existing regressions, actual PPTX/render parity as applicable |
+| Documentation + v1.3.1 regex evidence | Qoder, Codex editorial review | IMPLEMENTED, acceptance pending | exact source lines, bounded claims, operating instructions |
+| PR, real CI, protection, safe merge | Qoder execution, Codex Go/No-Go | PENDING (no GitHub writes) | commit/PR/run URLs and live protection configuration |
+| Default-branch release-path rehearsal | Qoder execution, Codex acceptance | PENDING (local rehearsal only) | actual pre-publication gate success without publishing |
+
+## Final status contract
+
+SOURCE_AND_PACKAGE_SECURITY, CI_AND_RELEASE_GATE and COMPANY_PLATFORM_SECURITY are separate outcomes. Semantic, cross-platform visual and native PowerPoint checks remain separately reported. No NOT_RUN is converted to PASS. Company platform acceptance cannot be inferred from Cisco or GitHub Actions.
+
+## Phase 1 acceptance (2026-10-27)
+
+Real Cisco 2.3.1 is verified against its official wheel and upstream tag. An initial filelock 3.32.7 resolution had a HIGH advisory; the approved isolated scanner lock uses compatible filelock 3.20.3, with zero advisories across all 100 packages. Rejected evidence remains retained. Runtime dependencies do not change.
+
+Eight raw CRITICAL findings were the initial independent-review candidates: three detector regex strings, four fixed-argv child_process imports, and one intentionally hostile input fixture. Codex subsequently audited the full unchanged v1.3.1 blocking set and approved **33 exact identities** (31 CRITICAL, 2 HIGH) in `security/review-ledger.json`, bound to rule, path, line, file SHA256, root `SKILL.md` SHA256, scanner version, policy, and the observed policy fingerprint. The ledger must not be overwritten or reset; new or changed findings require a new independent review. The third-party CLI needs an explicit HIGH threshold; its default exit status is not a gate.
+
+Vendor coverage is bounded: static detection plus Python/Bash behavioral analysis; JavaScript behavioral dataflow and LLM semantics are NOT_RUN. Do not describe this as full semantic security. Provision the scanner separately, never redistribute its environment inside Goujian archives.
+
+## Independent local acceptance (2026-10-27)
+
+Codex independently ran 43 shared-gate, 12 advisory and 10 workflow tests: 65/65 passed. The frozen public runtime and a newly built clean-commit runtime passed actual Cisco scanning; the clean-commit receipt was independently re-verified. A real private negative control returned exit1 with 3 CRITICAL, 3 HIGH and 1 MEDIUM findings, without executing sample code. Five additional source-only findings in negative_skill_fixture.py:37-41 were independently proven to be AST Constant text (lines29-42) and approved with exact content identities. The ledger now has 38 reviews (34 CRITICAL, 4 HIGH); raw severity remains unchanged.
+
+Core, skill, security_preflight.py and production dependency files are byte-unchanged from the frozen v1.3.1 baseline. Full regression, clean-install and same-host 183-PNG/18-canonical-PPTX comparison evidence is retained locally. Native PowerPoint and cross-platform visual equivalence remain NOT_RUN. The final 38-review package scans, real PR/push Actions, branch protection and non-publishing Release-path rehearsal must still be completed; these are not inferred from local tests.
+
+## Release-path Python split (2026-10-27)
+
+An independent pre-merge audit found that `release.yml` set up only CPython 3.11, while `security/requirements-lock.txt` is a Linux x86_64 CPython 3.14 wheel set; the PR/push security workflow already used 3.14.
+
+The minimal fix keeps the original product CPython 3.11 setup and every product validation, build, clean-install and capability-parity step unchanged. Immediately before the isolated scanner install, `release.yml` adds a second pinned `actions/setup-python` step that selects CPython 3.14, so `python3 -m venv` creates the scanner environment required by the lock. There is no second product engine, no dependency update and no product output change. The shared gate, preflight and receipt verification are stdlib-only; the publisher's existing stdlib verification is unchanged.
+
+A structural regression in `tests/test_workflow_security.py` fails if the scanner 3.14 setup stops preceding the scanner install, or if the product 3.11 setup is removed or moved after the product build. Implementation is available in this checkout; current enforcement requires actual branch-protection and Actions evidence. No PASS is claimed for CI, branch protection, the non-publishing Release-path rehearsal or company-platform acceptance.

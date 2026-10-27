@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "gate": "GOUJIAN_SKILL_PACKAGE_SECURITY_GATE",
+  "scanner": {
+    "package": "cisco-ai-skill-scanner",
+    "version": "2.3.1",
+    "wheel_sha256": "e3ea642577578ddb41872b640253a44f7a11858d5d30fa426040b69528a6df23",
+    "policy": "low-noise",
+    "policy_fingerprint_sha256": "016a0d9c2bc9f0eabcf31aa1962130df1507c4d1fe98ee3fe3284f40c020f9c5",
+    "fail_on_severity": "high",
+    "required_analyzers": [
+      "static_analyzer",
+      "behavioral_analyzer"
+    ],
+    "allowed_analyzers": [
+      "static_analyzer",
+      "bytecode",
+      "pipeline",
+      "correlation",
+      "behavioral_analyzer"
+    ]
+  },
+  "lock": {
+    "path": "security/requirements-lock.txt",
+    "expected_package_count": 100,
+    "required_pins": {
+      "cisco-ai-skill-scanner": "2.3.1",
+      "filelock": "3.20.3"
+    }
+  },
+  "review_ledger": "security/review-ledger.json",
+  "advisory": {
+    "osv_endpoint": "https://api.osv.dev/v1/querybatch",
+    "timeout_seconds": 90
+  },
+  "limits": {
+    "max_archive_bytes": 134217728,
+    "max_member_bytes": 33554432,
+    "max_total_bytes": 268435456,
+    "max_compression_ratio": 1000,
+    "scan_timeout_seconds": 900
+  },
+  "env_allowlist": [
+    "PATH",
+    "LANG",
+    "LC_ALL",
+    "TZ",
+    "PYTHONNOUSERSITE",
+    "PYTHONDONTWRITEBYTECODE",
+    "HOME",
+    "TMPDIR",
+    "XDG_CACHE_HOME",
+    "XDG_CONFIG_HOME"
+  ],
+  "behavioral_coverage": {
+    "python": "ANALYZED",
+    "bash": "ANALYZED",
+    "javascript": "NOT_RUN",
+    "semantic": "NOT_RUN"
+  }
+}

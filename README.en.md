@@ -55,7 +55,7 @@ Actual rendering also needs LibreOffice, Poppler and fonts (Noto Sans / Noto San
 
 Alternatively download the installer and SHA256 from [GitHub Releases](https://github.com/one-drop888/goujian-strategy-slides/releases). Extract it, enter `goujian-strategy-slides/`, let your agent discover its only root `SKILL.md`, and install as above. One product, one core: adapters connect it to different agent platforms.
 
-V1.3.1 is an enterprise security compatibility patch: the primary installer is the minimal runtime, with a complete source archive and an optional review archive. Product capabilities, native rendering and historical acceptance evidence are unchanged. Company-platform and Agensi approval remain unverified: `COMPANY_PLATFORM_SECURITY=NOT_VERIFIED`. [Patch notes](docs/V1_3_1_RELEASE_NOTES.md) · [Security and capability parity](docs/SECURITY_PARITY_V1_3_1.md)
+V1.3.1 is an enterprise security compatibility patch: the primary installer is the minimal runtime, with a complete source archive and an optional review archive. Product capabilities, native rendering and historical acceptance evidence are unchanged. The old v1.3.1 company-platform submission remains `FAIL`; the current compatibility submission is `BLOCKED` and the candidate is `NOT_VERIFIED`. Agensi approval also remains unverified (`COMPANY_PLATFORM_SECURITY=NOT_VERIFIED`). [Patch notes](docs/V1_3_1_RELEASE_NOTES.md) · [Security and capability parity](docs/SECURITY_PARITY_V1_3_1.md) · [Release security gate](https://github.com/one-drop888/goujian-strategy-slides/blob/main/docs/RELEASE_SECURITY_GATE.md)
 
 ## Use it
 

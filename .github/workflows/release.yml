@@ -10,17 +10,23 @@ on:
         description: "Approved 40-character commit SHA on main"
         required: true
         type: string
+      publish:
+        description: "Create the tag and publish the Release. Default false is a non-publishing rehearsal."
+        required: false
+        type: boolean
+        default: false
 permissions:
   contents: read
 concurrency:
   group: release-${{ inputs.version }}
   cancel-in-progress: false
 jobs:
-  release:
+  validate:
+    name: Validate and security-gate (no mutation)
     if: github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: read
     env:
       VERSION: "1.3.1"
       EXPECTED_SHA: ${{ inputs.expected_sha }}
@@ -37,10 +43,11 @@ jobs:
           set -euo pipefail
           test "$VERSION" = "1.3.1"
           printf '%s' "$EXPECTED_SHA" | grep -Eq '^[0-9a-f]{40}$'
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           ref: ${{ env.EXPECTED_SHA }}
           fetch-depth: 0
+          persist-credentials: false
       - name: Verify approved commit, remote main and V1.3.1 metadata
         env:
           VERSION: ${{ inputs.version }}
@@ -103,11 +110,11 @@ jobs:
           test "$(node -p "require('$v12_parent/content/package.json').version")" = "1.2.1"
           printf 'V13_BASELINE_ROOT=%s\n' "$v13_parent/content" >> "$GITHUB_ENV"
           printf 'V12_BASELINE_ROOT=%s\n' "$v12_parent/content" >> "$GITHUB_ENV"
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: 24
           cache: npm
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
         with:
           python-version: '3.11'
       - name: Install declared Linux render prerequisites
@@ -749,6 +756,344 @@ jobs:
           (dist / 'release-manifest.json').write_text(json.dumps(manifest, indent=2) + '\n', encoding='utf-8')
           print('PASS: external release manifest records all three ZIP hashes, preflights, parity, immutable baselines and the pre-tag clean-install receipt')
           PY
+      - name: Live public advisory check (fails closed on service errors)
+        run: |
+          set -euo pipefail
+          mkdir -p out/security-gate/advisory
+          set +e
+          npm audit --omit=dev --json > out/security-gate/advisory/npm-audit.json
+          npm_status=$?
+          set -e
+          printf '%s\n' "$npm_status" > out/security-gate/advisory/npm-audit-exit-code.txt
+          python3 scripts/advisory_check.py \
+            --npm-audit-json out/security-gate/advisory/npm-audit.json \
+            --npm-audit-exit-code "$npm_status" \
+            --out out/security-gate/advisory/osv-check.json
+      - name: Install the pinned scanner for the release security gate
+        env:
+          PIP_DISABLE_PIP_VERSION_CHECK: '1'
+        run: |
+          set -euo pipefail
+          scanner_root="$RUNNER_TEMP/goujian-release-scanner"
+          rm -rf "$scanner_root"
+          python3 -m venv "$scanner_root"
+          "$scanner_root/bin/python" -m pip install \
+            --require-hashes --only-binary=:all: \
+            --index-url https://pypi.org/simple \
+            -r security/requirements-lock.txt
+          "$scanner_root/bin/skill-scanner" --version
+          "$scanner_root/bin/python" -m pip check
+          echo "SCANNER_BIN=$scanner_root/bin/skill-scanner" >> "$GITHUB_ENV"
+      - name: Security-gate the actual runtime, source and showcase archives
+        env:
+          VERSION: ${{ inputs.version }}
+          EXPECTED_SHA: ${{ inputs.expected_sha }}
+        run: |
+          set -euo pipefail
+          mkdir -p out/security-gate
+          status=0
+          run_scan() {
+            local name="$1" profile="$2" archive="$3"
+            local sha
+            sha="$(sha256sum "$archive" | cut -d' ' -f1)"
+            echo "::group::gate scan $name ($archive)"
+            if python3 scripts/scan_skill_package.py scan "$archive" \
+                --profile "$profile" \
+                --version "$VERSION" \
+                --commit "$EXPECTED_SHA" \
+                --repo "$GITHUB_WORKSPACE" \
+                --source-tree-state clean \
+                --expected-sha256 "$sha" \
+                --scanner "$SCANNER_BIN" \
+                --out-dir "out/security-gate/$name"; then
+              echo "PASS: $name security gate"
+            else
+              echo "FAIL: $name security gate (see out/security-gate/$name)"
+              status=1
+            fi
+            echo "::endgroup::"
+          }
+          run_scan runtime runtime "dist/goujian-strategy-slides-v$VERSION.zip"
+          run_scan source source "dist/goujian-strategy-slides-v$VERSION-source.zip"
+          run_scan showcase showcase "dist/goujian-strategy-slides-v$VERSION-showcase.zip"
+          # Fail closed: any unreviewed HIGH/CRITICAL keeps the release red.
+          exit "$status"
+      - name: Verify all three receipts in the non-publishing rehearsal
+        env:
+          VERSION: ${{ inputs.version }}
+          EXPECTED_SHA: ${{ inputs.expected_sha }}
+        run: |
+          set -euo pipefail
+          for name in runtime source showcase; do
+            case "$name" in
+              runtime) archive="dist/goujian-strategy-slides-v$VERSION.zip" ;;
+              source) archive="dist/goujian-strategy-slides-v$VERSION-source.zip" ;;
+              showcase) archive="dist/goujian-strategy-slides-v$VERSION-showcase.zip" ;;
+            esac
+            test -f "$archive"
+            sha="$(sha256sum "$archive" | cut -d' ' -f1)"
+            python3 scripts/scan_skill_package.py verify "out/security-gate/$name/receipt.json" \
+              --archive "$archive" \
+              --expected-sha256 "$sha" \
+              --version "$VERSION" \
+              --commit "$EXPECTED_SHA" \
+              --repo "$GITHUB_WORKSPACE" \
+              --config security/security-gate.json \
+              --lock security/requirements-lock.txt \
+              --review-ledger security/review-ledger.json \
+              --artifact-dir "out/security-gate/$name"
+          done
+      - name: Bind hash-bound security evidence into the external release manifest
+        env:
+          RUN_ID: ${{ github.run_id }}
+          RUN_ATTEMPT: ${{ github.run_attempt }}
+        run: |
+          set -euo pipefail
+          python3 - "$RUN_ID" "$RUN_ATTEMPT" <<'PY'
+          import hashlib
+          import json
+          import sys
+          from pathlib import Path
+
+          run_id, run_attempt = sys.argv[1:3]
+
+          def sha(path):
+              return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+
+          def load(path):
+              return json.loads(Path(path).read_text(encoding='utf-8'))
+
+          advisory_path = Path('out/security-gate/advisory/osv-check.json')
+          advisory = load(advisory_path)
+          assert advisory['status'] == 'PASS', advisory['findings']
+          assert advisory['findings'] == []
+          profiles = {}
+          for name in ('runtime', 'source', 'showcase'):
+              root = Path('out/security-gate') / name
+              receipt_path = root / 'receipt.json'
+              assert receipt_path.is_file(), receipt_path
+              receipt = load(receipt_path)
+              assert receipt['status'] == 'PASS', (name, receipt['failure_reasons'])
+              reports = receipt['reports']
+              profiles[name] = {
+                  'status': receipt['status'],
+                  'archive_sha256': receipt['archive']['sha256'],
+                  'receipt': {'path': str(receipt_path), 'sha256': sha(receipt_path)},
+                  'scanner_json': {'file': reports['json']['file'],
+                                   'sha256': reports['json']['sha256']},
+                  'scanner_sarif': {'file': reports['sarif']['file'],
+                                    'sha256': reports['sarif']['sha256']},
+                  'review_ledger_sha256': receipt['review_ledger']['sha256'],
+                  'review_proposal': receipt['review_ledger'].get('proposal'),
+                  'config_sha256': receipt['config']['sha256'],
+                  'lock_sha256': receipt['lock']['sha256'],
+                  'snapshot_sha256': receipt['snapshot']['sha256'],
+                  'source_identity': {
+                      key: receipt['source_identity'][key]
+                      for key in ('commit', 'profile', 'compared_members',
+                                  'mapped_members', 'generated_exception',
+                                  'member_digest_sha256')
+                  },
+              }
+          security = {
+              'status': 'PASS',
+              'gate': 'GOUJIAN_SKILL_PACKAGE_SECURITY_GATE',
+              'workflow_run': {'run_id': run_id, 'run_attempt': run_attempt},
+              'artifact': {'name': 'release-validation-{}-{}'.format(run_id, run_attempt),
+                           'retention_days': 90},
+              'coverage': {'python': 'ANALYZED', 'bash': 'ANALYZED',
+                           'javascript': 'NOT_RUN', 'semantic': 'NOT_RUN'},
+              'tool_metadata': {
+                  name: {'path': 'security/' + name,
+                         'sha256': sha(Path('security') / name)}
+                  for name in ('scanner-provenance.json', 'dependency-licenses.json')
+              },
+              'advisory': {
+                  'status': advisory['status'],
+                  'coordinates': advisory['coordinates']['total'],
+                  'findings': len(advisory['findings']),
+                  'report': {'path': str(advisory_path), 'sha256': sha(advisory_path)},
+                  'osv': {
+                      'endpoint': advisory['osv']['endpoint'],
+                      'query_count': advisory['osv']['query_count'],
+                      'request_sha256': advisory['osv']['request_sha256'],
+                      'response_sha256': advisory['osv']['response_sha256'],
+                      'started_at': advisory['osv']['started_at'],
+                      'finished_at': advisory['osv']['finished_at'],
+                      'elapsed_ms': advisory['osv']['elapsed_ms'],
+                  },
+                  'npm_audit': {
+                      'report_sha256': advisory['sources']['npm_audit']['sha256'],
+                      'metadata_vulnerabilities':
+                          (advisory['npm_audit'] or {}).get('metadata_vulnerabilities'),
+                  },
+              },
+              'profiles': profiles,
+          }
+          index_path = Path('dist/security-evidence.json')
+          index_path.write_text(json.dumps(security, ensure_ascii=False, indent=2) + '\n',
+                                encoding='utf-8')
+          security['evidence_index'] = {'file': index_path.name,
+                                        'sha256': sha(index_path)}
+          manifest_path = Path('dist/release-manifest.json')
+          manifest = load(manifest_path)
+          manifest['security'] = security
+          manifest['published'] = False
+          manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + '\n',
+                                   encoding='utf-8')
+          print('PASS: release manifest records hash-bound security evidence for all three profiles')
+          PY
+      - name: Record the same-run binding for the publisher
+        if: always()
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+
+          def sha(path):
+              candidate = Path(path)
+              return hashlib.sha256(candidate.read_bytes()).hexdigest() if candidate.is_file() else None
+
+          binding = {
+              'run_id': os.environ.get('GITHUB_RUN_ID'),
+              'run_attempt': os.environ.get('GITHUB_RUN_ATTEMPT'),
+              'workflow': os.environ.get('GITHUB_WORKFLOW'),
+              'event': os.environ.get('GITHUB_EVENT_NAME'),
+              'ref': os.environ.get('GITHUB_REF'),
+              'commit': os.environ.get('EXPECTED_SHA'),
+              'version': os.environ.get('VERSION'),
+          }
+          receipts = {}
+          for name in ('runtime', 'source', 'showcase'):
+              receipt_path = Path('out/security-gate') / name / 'receipt.json'
+              if receipt_path.is_file():
+                  receipts[name] = {
+                      'status': json.loads(receipt_path.read_text(encoding='utf-8')).get('status'),
+                      'sha256': sha(receipt_path),
+                  }
+          advisory_path = Path('out/security-gate/advisory/osv-check.json')
+          advisory = json.loads(advisory_path.read_text(encoding='utf-8')) \
+              if advisory_path.is_file() else {}
+          binding['security'] = {
+              'receipts': receipts,
+              'advisory': advisory.get('status'),
+              'advisory_sha256': sha(advisory_path),
+          }
+          Path('out/security-gate').mkdir(parents=True, exist_ok=True)
+          Path('out/security-gate/run-binding.json').write_text(
+              json.dumps(binding, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+          print('PASS: recorded same-run binding', binding['run_id'], binding['commit'])
+          PY
+      - name: Upload validated archives and security receipts
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: release-validation-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            dist
+            out/security-gate
+            out/release-*.json
+          if-no-files-found: error
+          retention-days: 90
+
+  publish:
+    name: Publish Release (explicit publish=true only)
+    needs: validate
+    if: github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch' && inputs.publish == true
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      VERSION: "1.3.1"
+      EXPECTED_SHA: ${{ inputs.expected_sha }}
+      V13_BASELINE_COMMIT: f592ff82b2399fb3e08f3d9128f92a1d82039065
+      V13_BASELINE_TAG_OBJECT: 5af41b05281c043dded880fc2ffe19ddb69f667c
+      V12_BASELINE_COMMIT: fb55b1cc92e52923027c2a5ad405d3ee92b42f25
+      V12_BASELINE_TAG_OBJECT: 5a4fd156b7bb1daaf756489704ab420e68329cf5
+    steps:
+      - name: Validate publish inputs
+        env:
+          VERSION: ${{ inputs.version }}
+          EXPECTED_SHA: ${{ inputs.expected_sha }}
+        run: |
+          set -euo pipefail
+          test "$VERSION" = "1.3.1"
+          printf '%s' "$EXPECTED_SHA" | grep -Eq '^[0-9a-f]{40}$'
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ env.EXPECTED_SHA }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Download this run's validated archives and security receipts
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: release-validation-${{ github.run_id }}-${{ github.run_attempt }}
+          path: .
+      - name: Re-verify approvals, hashes, receipts and same-run binding before any mutation
+        env:
+          VERSION: ${{ inputs.version }}
+          EXPECTED_SHA: ${{ inputs.expected_sha }}
+          RUN_ID: ${{ github.run_id }}
+          RUN_ATTEMPT: ${{ github.run_attempt }}
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$EXPECTED_SHA"
+          test "$(git ls-remote origin refs/heads/main | cut -f1)" = "$EXPECTED_SHA"
+          test "$(node -p "require('./package.json').version")" = "$VERSION"
+          test "$(node -p "require('./distribution/runtime-package.json').version")" = "$VERSION"
+          grep -q 'version: "1.3.1"' SKILL.md
+          python3 - "$VERSION" "$EXPECTED_SHA" "$RUN_ID" "$RUN_ATTEMPT" <<'PY'
+          import hashlib, json, os, sys
+          from pathlib import Path
+
+          version, commit, run_id, run_attempt = sys.argv[1:5]
+          binding = json.loads(Path('out/security-gate/run-binding.json').read_text(encoding='utf-8'))
+          assert binding['run_id'] == run_id, (binding['run_id'], run_id)
+          assert binding['run_attempt'] == run_attempt, (binding['run_attempt'], run_attempt)
+          assert binding['commit'] == commit, (binding['commit'], commit)
+          assert binding['version'] == version, (binding['version'], version)
+          manifest = json.loads(Path('dist/release-manifest.json').read_text(encoding='utf-8'))
+          assert manifest['commit'] == commit, manifest['commit']
+          assert manifest['version'] == version, manifest['version']
+          security = manifest.get('security')
+          assert isinstance(security, dict), 'external manifest has no security section'
+          assert security['status'] == 'PASS', security['status']
+          assert security['workflow_run'] == {'run_id': run_id,
+                                              'run_attempt': run_attempt}, security['workflow_run']
+          assert security['advisory']['status'] == 'PASS', security['advisory']
+          index_path = Path('dist') / security['evidence_index']['file']
+          assert index_path.is_file(), index_path
+          index_sha = hashlib.sha256(index_path.read_bytes()).hexdigest()
+          assert index_sha == security['evidence_index']['sha256'], 'security evidence index changed'
+          assert set(security['profiles']) == {'runtime', 'source', 'showcase'}
+          for name, profile in security['profiles'].items():
+              receipt = Path('out/security-gate') / name / 'receipt.json'
+              assert receipt.is_file(), receipt
+              assert hashlib.sha256(receipt.read_bytes()).hexdigest() == \
+                  profile['receipt']['sha256'], f'{name} receipt changed'
+              assert profile['status'] == 'PASS', (name, profile['status'])
+          print('PASS: same-run binding, approved commit, manifest and hash-bound security evidence agree')
+          PY
+          for name in runtime source showcase; do
+            case "$name" in
+              runtime) archive="dist/goujian-strategy-slides-v$VERSION.zip" ;;
+              source) archive="dist/goujian-strategy-slides-v$VERSION-source.zip" ;;
+              showcase) archive="dist/goujian-strategy-slides-v$VERSION-showcase.zip" ;;
+            esac
+            test -f "$archive"
+            sha="$(python3 -c "import hashlib,sys;print(hashlib.sha256(open(sys.argv[1],'rb').read()).hexdigest())" "$archive")"
+            python3 scripts/scan_skill_package.py verify "out/security-gate/$name/receipt.json" \
+              --archive "$archive" \
+              --expected-sha256 "$sha" \
+              --version "$VERSION" \
+              --commit "$EXPECTED_SHA" \
+              --repo "$GITHUB_WORKSPACE" \
+              --config security/security-gate.json \
+              --lock security/requirements-lock.txt \
+              --review-ledger security/review-ledger.json \
+              --artifact-dir "out/security-gate/$name"
+          done
       - name: Stop before overwriting an existing release
         env:
           GH_TOKEN: ${{ github.token }}
@@ -761,6 +1106,7 @@ jobs:
           fi
       - name: Create annotated tag if it does not exist
         env:
+          GH_TOKEN: ${{ github.token }}
           VERSION: ${{ inputs.version }}
           EXPECTED_SHA: ${{ inputs.expected_sha }}
         run: |
@@ -782,7 +1128,7 @@ jobs:
             git config user.name 'Goujian release automation'
             git config user.email 'noreply@github.com'
             git tag -a "v$VERSION" "$EXPECTED_SHA" -m "Goujian Strategy Slides v$VERSION"
-            git push origin "refs/tags/v$VERSION"
+            git push "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "refs/tags/v$VERSION"
           fi
           test "$(git rev-parse "v$VERSION^{commit}")" = "$EXPECTED_SHA"
           remote_tag="$(git ls-remote origin "refs/tags/v$VERSION" | cut -f1)"
@@ -807,7 +1153,15 @@ jobs:
           for artifact in manifest['artifacts'].values():
               actual = hashlib.sha256(Path(artifact['file']).read_bytes()).hexdigest()
               assert actual == artifact['sha256'], f"{artifact['file']} changed after the release manifest was written"
-          print('PASS: external manifest still matches the exact ZIP bytes')
+          security = manifest.get('security') or {}
+          assert security.get('status') == 'PASS', 'release manifest has no passing security evidence'
+          index = Path(security['evidence_index']['file'])
+          assert index.is_file(), index
+          assert hashlib.sha256(index.read_bytes()).hexdigest() == \
+              security['evidence_index']['sha256'], 'security evidence index changed'
+          for name, profile in security['profiles'].items():
+              assert profile['status'] == 'PASS', (name, profile['status'])
+          print('PASS: external manifest still matches the exact ZIP bytes and security evidence')
           PY
           gh release create "v$VERSION" --verify-tag \
             --title "Goujian Strategy Slides v$VERSION" \
@@ -815,7 +1169,7 @@ jobs:
             "goujian-strategy-slides-v$VERSION.zip" \
             "goujian-strategy-slides-v$VERSION-source.zip" \
             "goujian-strategy-slides-v$VERSION-showcase.zip" \
-            SHA256SUMS.txt release-manifest.json \
+            SHA256SUMS.txt release-manifest.json security-evidence.json \
             release-runtime-preflight.json release-source-preflight.json release-showcase-preflight.json \
             release-runtime-package.json release-source-package.json release-showcase-package.json \
             release-capability-parity.json release-runtime-clean-install.json

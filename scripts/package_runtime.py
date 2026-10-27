@@ -16,11 +16,12 @@ import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
 PREFIX = 'goujian-strategy-slides'
-SOURCE_INCLUDE = ['SKILL.md', 'core', 'skill', 'adapters', 'docs', 'tests', 'scripts', '.github',
-                  'distribution', 'package.json', 'package-lock.json', 'requirements-render.txt',
-                  'README.md', 'README.zh-CN.md', 'README.en.md', 'CONTRIBUTING.md', 'CHANGELOG.md',
-                  'LICENSE', 'THIRD_PARTY_NOTICE.md', '.gitignore']
-EXCLUDE_DIRS = {'node_modules', '.venv', 'venv', 'out', 'dist', 'build', '__pycache__', '.git',
+SOURCE_INCLUDE = ['SKILL.md', 'core', 'skill', 'adapters', 'docs', 'tests', 'scripts', 'security',
+                  '.github', 'distribution', 'package.json', 'package-lock.json',
+                  'requirements-render.txt', 'README.md', 'README.zh-CN.md', 'README.en.md',
+                  'CONTRIBUTING.md', 'AGENTS.md', 'CHANGELOG.md', 'LICENSE', 'THIRD_PARTY_NOTICE.md',
+                  '.gitignore']
+EXCLUDE_DIRS = {'node_modules', '.venv', '.venv-security', 'venv', 'out', 'dist', 'build', '__pycache__', '.git',
                 '.pytest_cache', '.mypy_cache', '.ruff_cache', '.cache', '.scratch', '.qoder'}
 FORBIDDEN_NAMES = {'.env', '.env.local', '.npmrc', '.netrc', '.DS_Store', 'id_rsa', 'id_ed25519'}
 FORBIDDEN_SUFFIXES = ('.pyc', '.pem', '.key', '.p12', '.pfx', '.zip')

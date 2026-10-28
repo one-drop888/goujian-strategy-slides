@@ -80,3 +80,22 @@ The old company upload is **FAIL**. The new candidate company upload/security
 is **NOT_VERIFIED**. JavaScript behavioral dataflow, model semantic security
 analysis and native Windows/macOS PowerPoint acceptance are not established by
 this review. Public CI or Cisco approval cannot substitute for company review.
+
+## CI portability follow-up
+
+PR #5 run `40705348100` at `fab8521` failed on Python 3.9 and 3.11 because
+the new test pinned `ast.dump` serialization from Python 3.14. Those failures
+remain in history; the security gate itself passed. Repair `7c0b62d` changes
+only the test invariant to the exact source blocks of the same 26 AST-selected
+detectors. Codex independently parsed the SHA-locked official v1.3.1 ZIP and
+the current file on Python 3.10.22 and 3.14.4: all 26 blocks are byte-identical
+and hash to `f75f32ee543e11f1a7cd656d921114529b16aa8951925c34e3fcadaa6493e680`.
+Changed-literal and missing-node probes are rejected. No detector, production
+code, runtime payload, scanner setting or PDF policy changes.
+
+Codex reviewed the test diff and the two unchanged inert HIGH string literals,
+now at lines 455 and 479, and rebound only those two ledger entries to the new
+test-file hash. The other 36 exact reviews are unchanged. This is not an
+approval to skip the real Python 3.9/3.11 CI rerun; all required checks must
+pass at the repaired commit before merge. Historical Phase 1b test counts
+remain historical, not retroactively increased.

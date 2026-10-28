@@ -6,8 +6,16 @@ scanner gate, the live advisory check, the receipt re-verification, the
 hash-bound release evidence, or the typed publish approval. They do not run
 GitHub Actions.
 """
+import hashlib
 import json
+import os
 import re
+import shlex
+import shutil
+import subprocess
+import sys
+import tempfile
+import textwrap
 import unittest
 from pathlib import Path
 
@@ -15,6 +23,27 @@ ROOT = Path(__file__).resolve().parents[1]
 CI = ROOT / '.github/workflows/ci.yml'
 SECURITY = ROOT / '.github/workflows/skill-security.yml'
 RELEASE = ROOT / '.github/workflows/release.yml'
+
+CAPTURE_ANCHOR = 'npm test 2>&1 | tee "$RUNNER_TEMP/source-archive-test.log"'
+PIPESTATUS_CAPTURE = 'npm_test_status=("${PIPESTATUS[@]}")'
+
+
+def _capture_snippet(text):
+    lines = text.splitlines()
+    index = next(i for i, line in enumerate(lines) if CAPTURE_ANCHOR in line)
+    if lines[index - 1].strip() != 'set +e':
+        raise AssertionError('the capture snippet must open with set +e')
+    return textwrap.dedent('\n'.join(lines[index - 1:index + 5])) + '\n'
+
+
+def _receipt_snippet(text):
+    lines = text.splitlines()
+    index = next(i for i, line in enumerate(lines)
+                 if line.lstrip().startswith('python3 - ')
+                 and 'source-archive-test.log' in line
+                 and 'source-archive-acceptance.json' in line)
+    end = next(i for i in range(index + 1, len(lines)) if lines[i].strip() == 'PY')
+    return textwrap.dedent('\n'.join(lines[index + 1:end])) + '\n'
 
 
 class WorkflowStructureTests(unittest.TestCase):
@@ -206,7 +235,15 @@ class WorkflowStructureTests(unittest.TestCase):
             self.assertIn(receipt, text, path)
             self.assertIn('goujian-source-acceptance', text, path)
             self.assertIn('source-archive-acceptance', text, path)
-            self.assertIn('npm test | tee', text, path)
+            self.assertIn(CAPTURE_ANCHOR, text, path)
+            self.assertIn(PIPESTATUS_CAPTURE, text, path)
+            self.assertIn('test "${npm_test_status[0]}" -eq 0', text, path)
+            self.assertIn('test "${npm_test_status[1]}" -eq 0', text, path)
+            self.assertIn('"${npm_test_status[0]}" "${npm_test_status[1]}" <<\'PY\'',
+                          text, path)
+            self.assertIn("'test_exit_statuses': {'npm': npm_status, 'tee': tee_status}",
+                          text, path)
+            self.assertNotIn('# fail 0', text, path)
             self.assertIn('installed_runtime_execution', text, path)
         self.assertIn("CAPABILITY_PARITY_V1_3_1_TO_V1_3_2'", self.ci)
         self.assertIn('release-runtime-acceptance.json release-source-archive-acceptance.json',
@@ -215,6 +252,17 @@ class WorkflowStructureTests(unittest.TestCase):
             (ROOT / 'distribution/runtime-manifest.json').read_text(encoding='utf-8'))
         for relative in ('scripts/runtime_acceptance.py', 'tests/test_runtime_acceptance.py'):
             self.assertNotIn(relative, manifest['runtime_files'], relative)
+
+    def test_source_acceptance_capture_and_receipt_are_shared_and_exit_based(self):
+        for text in (self.ci, self.release):
+            self.assertEqual(text.count(PIPESTATUS_CAPTURE), 1,
+                             'PIPESTATUS must be saved once, immediately after the pipeline')
+            self.assertIn('set +e', text)
+            self.assertIn('set -e', text)
+            self.assertIn('"${npm_test_status[0]}" "${npm_test_status[1]}"', text)
+            self.assertNotIn('# fail 0', text)
+        self.assertEqual(_capture_snippet(self.ci), _capture_snippet(self.release))
+        self.assertEqual(_receipt_snippet(self.ci), _receipt_snippet(self.release))
 
     def test_actions_are_pinned_to_commit_shas(self):
         for text in (self.security, self.release):
@@ -251,6 +299,163 @@ class WorkflowStructureTests(unittest.TestCase):
         self.assertIn('uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065',
                       scanner_step)
         self.assertIn("python-version: '3.14'", scanner_step)
+
+
+class SourceAcceptanceReceiptTests(unittest.TestCase):
+    REQUIRED_SOURCE_FILES = (
+        'scripts/package_runtime.py',
+        'scripts/security_preflight.py',
+        'scripts/runtime_acceptance.py',
+        'tests/test_runtime_acceptance.py',
+        'skill/reasoning/fixtures/hostile-source/plan.json',
+        'skill/reasoning/fixtures/hostile-source/sources/hostile.md',
+    )
+
+    @classmethod
+    def setUpClass(cls):
+        ci_text = CI.read_text(encoding='utf-8')
+        cls.capture = _capture_snippet(ci_text)
+        cls.receipt = _receipt_snippet(ci_text)
+
+    def setUp(self):
+        self._tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self._tmp.cleanup)
+        self.tmp = Path(self._tmp.name)
+        self.bin = self.tmp / 'bin'
+        self.bin.mkdir()
+        self.runner_temp = self.tmp / 'runner-temp'
+        self.runner_temp.mkdir()
+        self.path = os.pathsep.join((str(self.bin), '/usr/bin', '/bin'))
+        if shutil.which('bash', path=self.path) is None:
+            self.skipTest('bash is required to exercise the embedded capture snippet')
+
+    def _install_fake_npm(self, stdout, stderr, code):
+        script = self.bin / 'npm'
+        script.write_text(
+            '#!/bin/bash\n'
+            "cat <<'JIAN_STDOUT'\n" + stdout + 'JIAN_STDOUT\n'
+            "cat <<'JIAN_STDERR' >&2\n" + stderr + 'JIAN_STDERR\n'
+            f'exit {code}\n',
+            encoding='utf-8')
+        script.chmod(0o755)
+
+    def _run_capture(self, runner_temp=None):
+        runner_temp = self.runner_temp if runner_temp is None else runner_temp
+        script = self.tmp / 'capture.sh'
+        script.write_text(
+            'set -euo pipefail\n'
+            f'export PATH={shlex.quote(self.path)}\n'
+            f'export RUNNER_TEMP={shlex.quote(str(runner_temp))}\n'
+            + self.capture,
+            encoding='utf-8')
+        return subprocess.run(
+            ['bash', str(script)],
+            capture_output=True, text=True)
+
+    def _read_log(self):
+        return (self.runner_temp / 'source-archive-test.log').read_text(encoding='utf-8')
+
+    def test_capture_accepts_tap_and_unicode_spec_success(self):
+        self._install_fake_npm(
+            'TAP version 13\nok 1 - native case\n1..1\n# fail 0\n\u2139 fail 0\n',
+            '\u2139 stderr diagnostic\n', 0)
+        result = self._run_capture()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        log_text = self._read_log()
+        self.assertIn('# fail 0', log_text)
+        self.assertIn('\u2139 fail 0', log_text)
+        self.assertIn('stderr diagnostic', log_text)
+
+    def test_capture_rejects_nonzero_npm_even_when_output_claims_success(self):
+        self._install_fake_npm(
+            'TAP version 13\nnot ok 1 - forced case\n1..1\n# fail 0\nPASS\n',
+            'forced failure diagnostic\n', 1)
+        result = self._run_capture()
+        self.assertNotEqual(
+            result.returncode, 0,
+            'a nonzero npm test must be rejected regardless of the printed text')
+        log_text = self._read_log()
+        self.assertIn('# fail 0', log_text)
+        self.assertIn('PASS', log_text)
+        self.assertIn('forced failure diagnostic', log_text)
+
+    def test_capture_rejects_failed_log_capture(self):
+        self._install_fake_npm('TAP version 13\n1..0\n', '', 0)
+        result = self._run_capture(runner_temp=self.tmp / 'missing' / 'nested')
+        self.assertNotEqual(result.returncode, 0, 'a tee failure must reject the receipt')
+
+    def _receipt_fixture(self, version='1.3.2', missing=None):
+        source_root = self.tmp / 'source-root'
+        for relative in self.REQUIRED_SOURCE_FILES:
+            if relative == missing:
+                continue
+            path = source_root / relative
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text('{}\n', encoding='utf-8')
+        (source_root / 'package.json').write_text(
+            json.dumps({'version': version}) + '\n', encoding='utf-8')
+        archive = self.tmp / 'source.zip'
+        archive.write_bytes(b'archive-bytes')
+        log = self.tmp / 'source-archive-test.log'
+        log.write_text('TAP version 13\n1..1\n# fail 0\n\u2139 fail 0\n', encoding='utf-8')
+        receipt_path = self.tmp / 'out' / 'source-archive-acceptance.json'
+        return source_root, archive, log, receipt_path
+
+    def _run_receipt(self, source_root, archive, log, receipt_path,
+                     version='1.3.2', npm_status='0', tee_status='0'):
+        script = self.tmp / 'receipt.py'
+        script.write_text(self.receipt, encoding='utf-8')
+        return subprocess.run(
+            [sys.executable, str(script),
+             str(archive), str(source_root), str(log), str(receipt_path),
+             version, npm_status, tee_status],
+            capture_output=True, text=True)
+
+    def test_receipt_accepts_real_success_and_records_exit_statuses(self):
+        fixture = self._receipt_fixture()
+        result = self._run_receipt(*fixture)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        receipt = json.loads(fixture[3].read_text(encoding='utf-8'))
+        self.assertEqual(receipt['status'], 'PASS')
+        self.assertEqual(receipt['test_exit_statuses'], {'npm': 0, 'tee': 0})
+        self.assertEqual(receipt['source_version'], '1.3.2')
+        self.assertTrue(receipt['required_source_files_present'])
+        log_text = fixture[2].read_text(encoding='utf-8')
+        self.assertEqual(receipt['test_log_sha256'],
+                         hashlib.sha256(log_text.encode('utf-8')).hexdigest())
+        self.assertEqual(receipt['archive']['sha256'],
+                         hashlib.sha256(fixture[1].read_bytes()).hexdigest())
+
+    def test_receipt_rejects_empty_log(self):
+        source_root, archive, log, receipt_path = self._receipt_fixture()
+        log.write_text('', encoding='utf-8')
+        result = self._run_receipt(source_root, archive, log, receipt_path)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertFalse(receipt_path.exists())
+
+    def test_receipt_rejects_nonzero_npm_status_even_with_success_text(self):
+        fixture = self._receipt_fixture()
+        result = self._run_receipt(*fixture, npm_status='1')
+        self.assertNotEqual(result.returncode, 0)
+        self.assertFalse(fixture[3].exists())
+
+    def test_receipt_rejects_nonzero_tee_status(self):
+        fixture = self._receipt_fixture()
+        result = self._run_receipt(*fixture, tee_status='1')
+        self.assertNotEqual(result.returncode, 0)
+        self.assertFalse(fixture[3].exists())
+
+    def test_receipt_rejects_version_mismatch(self):
+        fixture = self._receipt_fixture(version='1.3.1')
+        result = self._run_receipt(*fixture, version='1.3.2')
+        self.assertNotEqual(result.returncode, 0)
+        self.assertFalse(fixture[3].exists())
+
+    def test_receipt_rejects_missing_required_source_file(self):
+        fixture = self._receipt_fixture(missing='scripts/runtime_acceptance.py')
+        result = self._run_receipt(*fixture)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertFalse(fixture[3].exists())
 
 
 if __name__ == '__main__':

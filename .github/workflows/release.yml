@@ -354,8 +354,13 @@ jobs:
           cd "$source_root"
           npm ci
           python3 -m pip install -r requirements-render.txt
-          npm test | tee "$RUNNER_TEMP/source-archive-test.log"
-          python3 - "$GITHUB_WORKSPACE/dist/goujian-strategy-slides-v$VERSION-source.zip" "$source_root" "$RUNNER_TEMP/source-archive-test.log" "$GITHUB_WORKSPACE/out/release-source-archive-acceptance.json" "$VERSION" <<'PY'
+          set +e
+          npm test 2>&1 | tee "$RUNNER_TEMP/source-archive-test.log"
+          npm_test_status=("${PIPESTATUS[@]}")
+          set -e
+          test "${npm_test_status[0]}" -eq 0
+          test "${npm_test_status[1]}" -eq 0
+          python3 - "$GITHUB_WORKSPACE/dist/goujian-strategy-slides-v$VERSION-source.zip" "$source_root" "$RUNNER_TEMP/source-archive-test.log" "$GITHUB_WORKSPACE/out/release-source-archive-acceptance.json" "$VERSION" "${npm_test_status[0]}" "${npm_test_status[1]}" <<'PY'
           import hashlib
           import json
           import sys
@@ -366,11 +371,14 @@ jobs:
           log = Path(sys.argv[3])
           receipt_path = Path(sys.argv[4])
           version = sys.argv[5]
+          npm_status = int(sys.argv[6])
+          tee_status = int(sys.argv[7])
           package = json.loads((source_root / 'package.json').read_text(encoding='utf-8'))
           log_text = log.read_text(encoding='utf-8')
           assert package['version'] == version, (package['version'], version)
           assert log_text.strip(), 'the full source suite produced no output'
-          assert '# fail 0' in log_text, log_text[-2000:]
+          assert npm_status == 0, f'npm test exited {npm_status}'
+          assert tee_status == 0, f'test log capture (tee) exited {tee_status}'
           for relative in ('scripts/package_runtime.py', 'scripts/security_preflight.py',
                            'scripts/runtime_acceptance.py', 'tests/test_runtime_acceptance.py',
                            'skill/reasoning/fixtures/hostile-source/plan.json',
@@ -384,8 +392,10 @@ jobs:
                           'sha256': hashlib.sha256(archive.read_bytes()).hexdigest()},
               'source_version': package['version'],
               'test_command': 'npm test',
+              'test_exit_statuses': {'npm': npm_status, 'tee': tee_status},
               'test_log_sha256': hashlib.sha256(log_text.encode('utf-8')).hexdigest(),
               'source_only_members_present': True,
+              'required_source_files_present': True,
               'installed_runtime_execution': False,
               'visual_qa': 'NOT_RUN',
               'company_platform_security': 'NOT_VERIFIED',

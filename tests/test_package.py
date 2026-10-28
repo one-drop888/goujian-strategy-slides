@@ -158,7 +158,8 @@ def assert_source_only_repack_guards(temp, install_root, packager, digest):
     skill.write_bytes(skill.read_bytes() + b'\ntampered\n')
     result = run_repack(packager, temp / 'tampered.zip', tampered, expect_sha256=digest)
     assert result.returncode != 0, 'expected-SHA repack accepted a tampered member'
-    assert 'does not match the expected' in result.stderr, result.stderr
+    assert ('payload differs from the approved Source bytes' in result.stderr
+            or 'does not match the expected' in result.stderr), result.stderr
 
     metadata = copy_case('runtime-metadata')
     manifest = metadata / 'distribution/runtime-manifest.json'
@@ -166,6 +167,13 @@ def assert_source_only_repack_guards(temp, install_root, packager, digest):
     result = run_repack(packager, temp / 'metadata.zip', metadata)
     assert result.returncode != 0, 'repack accepted metadata that differs from the Source identity'
     assert 'approved Source identity' in result.stderr, result.stderr
+
+    payload = copy_case('runtime-payload')
+    chart = payload / 'core/renderer/charts.js'
+    chart.write_bytes(chart.read_bytes() + b'\n// tampered payload comment\n')
+    result = run_repack(packager, temp / 'payload.zip', payload)
+    assert result.returncode != 0, 'repack accepted a tampered payload member without an expected SHA'
+    assert 'payload differs from the approved Source bytes' in result.stderr, result.stderr
 
     extra = copy_case('runtime-extra')
     (extra / 'stowaway.js').write_text('x = 1\n', encoding='utf-8')
@@ -204,6 +212,63 @@ def assert_source_only_repack_guards(temp, install_root, packager, digest):
                             capture_output=True, text=True)
     assert result.returncode != 0, 'repack accepted a missing output path'
     assert 'explicit output path' in result.stderr, result.stderr
+
+
+def assert_output_location_guard(temp, packager):
+    fixture = temp / 'guard-source'
+    entries = {}
+    for relative in ('core/renderer/charts.js', 'skill/scripts/build_deck.js',
+                     'package.json', 'SKILL.md'):
+        target = fixture / relative
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text(f'fixture {relative}\n', encoding='utf-8')
+        entries[PREFIX + relative] = target
+    packager.validate_output_location(temp / 'out' / 'normal.zip', None, entries)
+    for value in entries.values():
+        try:
+            packager.validate_output_location(value, None, entries)
+        except ValueError:
+            pass
+        else:
+            raise AssertionError(f'guard accepted overwriting selected input {value}')
+    linked = temp / 'out' / 'linked.zip'
+    linked.parent.mkdir(parents=True, exist_ok=True)
+    linked.symlink_to(next(iter(entries.values())))
+    try:
+        packager.validate_output_location(linked, None, entries)
+    except ValueError:
+        pass
+    else:
+        raise AssertionError('guard accepted an output symlink to a selected Source input')
+    for protected in (ROOT / 'scripts/package_runtime.py', ROOT / 'package.json',
+                      ROOT / 'distribution/runtime-manifest.json', ROOT / 'SKILL.md'):
+        try:
+            packager.validate_output_location(protected, None, entries)
+        except ValueError:
+            pass
+        else:
+            raise AssertionError(f'guard accepted overwriting {protected}')
+    installed = temp / 'installed-guard'
+    installed.mkdir()
+    try:
+        packager.validate_output_location(installed / 'inside.zip', installed, entries)
+    except ValueError:
+        pass
+    else:
+        raise AssertionError('guard accepted output inside the installed runtime')
+
+    package_before = (ROOT / 'package.json').read_bytes()
+    packager_before = (ROOT / 'scripts/package_runtime.py').read_bytes()
+    for out, kwargs in ((ROOT / 'package.json', {'source': True}),
+                        (ROOT / 'scripts/package_runtime.py', {})):
+        try:
+            packager.build(out, **kwargs)
+        except ValueError as error:
+            assert 'must not overwrite' in str(error), error
+        else:
+            raise AssertionError(f'build mode {kwargs} accepted a Source input output path')
+    assert (ROOT / 'package.json').read_bytes() == package_before
+    assert (ROOT / 'scripts/package_runtime.py').read_bytes() == packager_before
 
 
 def main():
@@ -247,6 +312,7 @@ def main():
 
     with tempfile.TemporaryDirectory(prefix='goujian-package-test-') as temp:
         temp = Path(temp)
+        assert_output_location_guard(temp, packager)
         first, second = temp / 'runtime-first.zip', temp / 'runtime-second.zip'
         result = subprocess.run([sys.executable, 'scripts/package_runtime.py', str(first), '--json'],
                                 cwd=ROOT, capture_output=True, text=True)

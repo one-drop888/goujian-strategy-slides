@@ -217,6 +217,88 @@ class PreflightTests(unittest.TestCase):
         self.assertEqual(report['status'], 'FAIL')
         self.assertIn('RUNTIME_MANIFEST', codes(report))
 
+    def downgrade(self, members, version, drop_commands=(), restore_commands=()):
+        def package(data):
+            value = json.loads(data)
+            value['version'] = version
+            for command in drop_commands:
+                value['scripts'].pop(command, None)
+            for command in restore_commands:
+                value['scripts'].setdefault(command, f'python3 {command}.py')
+            return json.dumps(value, indent=2).encode('utf-8')
+
+        def lock(data):
+            value = json.loads(data)
+            value['version'] = version
+            if isinstance(value.get('packages'), dict) and '' in value['packages']:
+                value['packages']['']['version'] = version
+            return json.dumps(value, indent=2).encode('utf-8')
+
+        def manifest(data):
+            value = json.loads(data)
+            value['schema_version'] = version
+            value['omitted_commands'] = [name for name in value.get('omitted_commands') or []
+                                         if name not in restore_commands]
+            return json.dumps(value, indent=2).encode('utf-8')
+
+        out = []
+        for info, data in members:
+            if info.filename in (PREFIX + 'package.json', PREFIX + 'distribution/runtime-package.json'):
+                data = package(data)
+            elif info.filename == PREFIX + 'package-lock.json':
+                data = lock(data)
+            elif info.filename == PREFIX + 'SKILL.md':
+                data = data.replace(b'version: "1.3.2"', f'version: "{version}"'.encode('utf-8'))
+            elif info.filename == PREFIX + 'distribution/runtime-manifest.json':
+                data = manifest(data)
+            out.append((info, data))
+        return out
+
+    def test_historical_v131_runtime_contract_is_audited_not_rejected(self):
+        members = self.downgrade(self.members(), '1.3.1', restore_commands=('package', 'preflight'))
+        for tool in ('scripts/security_preflight.py', 'scripts/package_runtime.py'):
+            members.append((info_for(PREFIX + tool), (ROOT / tool).read_bytes()))
+        report = preflight.preflight(self.variant('historical-runtime.zip', members))
+        self.assertEqual(report['profile'], 'runtime')
+        self.assertEqual(report['status'], 'PASS', report['violations'])
+        self.assertTrue(any('historical runtime schema 1.3.1' in note
+                            for note in report['checks']['metadata']['notes']))
+
+    def test_new_runtime_cannot_be_relabelled_as_historical(self):
+        def wrong_schema(data):
+            manifest = json.loads(data)
+            manifest['schema_version'] = '1.3.1'
+            return json.dumps(manifest, indent=2).encode('utf-8')
+        members = self.replace_member('distribution/runtime-manifest.json', wrong_schema)
+        report = preflight.preflight(self.variant('relabelled.zip', members))
+        self.assertEqual(report['status'], 'FAIL')
+        self.assertTrue(any('schema_version must equal' in item['detail']
+                            for item in report['violations'] if item['code'] == 'RUNTIME_METADATA'))
+
+    def test_historical_v131_source_does_not_require_later_gate_commands(self):
+        members = read_members(self.source)
+        members = self.downgrade(members, '1.3.1', drop_commands=('test:pdf',))
+        report = preflight.preflight(self.variant('historical-source.zip', members))
+        self.assertEqual(report['profile'], 'source')
+        self.assertEqual(report['status'], 'PASS', report['violations'])
+        self.assertTrue(any('historical source 1.3.1' in note
+                            for note in report['checks']['metadata']['notes']))
+
+    def test_locked_official_v131_runtime_passes_historical_audit(self):
+        official = ROOT / 'out/v132-control/official-v1.3.1-runtime.zip'
+        if not official.is_file():
+            self.skipTest('locked official v1.3.1 runtime is not available in this checkout')
+        digest = hashlib.sha256(official.read_bytes()).hexdigest()
+        self.assertEqual(digest,
+                         '7ee0d15488368a876ac2624546f72a13de8bdf01f322ed1055bb8c099d67b3dd')
+        with zipfile.ZipFile(official) as archive:
+            self.assertEqual(len(archive.infolist()), 190)
+        report = preflight.preflight(official, profile='runtime')
+        self.assertEqual(report['profile'], 'runtime')
+        self.assertEqual(report['status'], 'PASS', report['violations'])
+        self.assertTrue(any('historical runtime schema 1.3.1' in note
+                            for note in report['checks']['metadata']['notes']))
+
     def test_executable_risk_detectors_are_ast_identical_to_v1_3_1(self):
         """Pin the detector AST; equality with tag v1.3.1 (25f269f) was proven in Phase 1."""
         names = (

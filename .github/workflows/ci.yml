@@ -506,6 +506,7 @@ jobs:
             --baseline-zip "$RUNNER_TEMP/goujian-v1.3.1-installer.zip" \
             --baseline-root "$baseline_root" \
             --node-modules "$GITHUB_WORKSPACE/node_modules" \
+            --artifact-dir "$GITHUB_WORKSPACE/out/runtime-acceptance-artifacts-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" \
             --json out/runtime-acceptance.json > "$RUNNER_TEMP/runtime-acceptance-stdout.json"
           python3 - "$GITHUB_WORKSPACE/out/runtime-acceptance.json" <<'PY'
           import json
@@ -517,15 +518,73 @@ jobs:
           assert result['capability_parity'] == 'CAPABILITY_PARITY_V1_3_1_TO_V1_3_2'
           assert result['contract']['candidate_version'] == '1.3.2', result['contract']
           assert result['contract']['baseline_version'] == '1.3.1', result['contract']
+          execution = result['execution']
+          assert execution['installed_runtime_cli'] is True
+          assert execution['imports_installed_code'] is False
+          assert execution['injects_developer_overlay'] is False
           assert result['installed_runtime']['python']['isolated_prefix'] is True
           assert result['installed_runtime']['baseline']['evidence']['status'] == 'PASS'
           assert result['installed_runtime']['candidate']['evidence']['status'] == 'PASS'
-          assert set(result['comparisons']) == {'q4-generated', 'executive-review'}, result['comparisons']
+          candidate_modules = result['installed_runtime']['candidate']['node_modules']
+          assert candidate_modules['status'] == 'PASS', candidate_modules
+          assert candidate_modules['owned'] is True, candidate_modules
+          assert candidate_modules['source'] == 'root-owned', candidate_modules
+          assert candidate_modules['dependencies_match_lock'] is True, candidate_modules
+          baseline_modules = result['installed_runtime']['baseline']['node_modules']
+          assert baseline_modules['status'] == 'PASS', baseline_modules
+          assert baseline_modules['dependencies_match_lock'] is True, baseline_modules
+          coverage = result['coverage']
+          assert coverage['status'] == 'PASS', coverage
+          matrix = coverage['matrix']
+          assert matrix['cells'] == 96, matrix
+          assert matrix['accepted'] == 72 and matrix['rejected'] == 24, matrix
+          families = {'bar', 'column', 'line', 'area', 'pie', 'doughnut'}
+          assert set(matrix['families']) == families, matrix['families']
+          for theme in ('light', 'dark'):
+              theme_cells = matrix['themes'][theme]
+              assert theme_cells['accepted_cells'] == 36, theme_cells
+              assert theme_cells['native_charts'] == 36, theme_cells
+              assert set(theme_cells['families']) == families, theme_cells
+              assert theme_cells['status'] == 'PASS', theme_cells
+          rejections = matrix['rejections']
+          assert rejections['status'] == 'PASS', rejections
+          assert rejections['attempted'] == 24 and rejections['matched'] == 24, rejections
+          assert rejections['by_code'] == {
+              'CATEGORY_PALETTE_CAPACITY': 8, 'AREA_SINGLE_POINT': 2, 'AREA_MISSING': 2,
+              'PIE_SINGLE_SERIES': 4, 'PIE_NONNEGATIVE': 4, 'PIE_MISSING': 4,
+          }, rejections['by_code']
+          multimodal = coverage['multimodal']
+          assert multimodal['status'] == 'PASS', multimodal
+          assert multimodal['embedded_images'] >= 9, multimodal
+          assert multimodal['image_nodes'] >= 9, multimodal
+          assert multimodal['embedded_image_nodes'] == multimodal['image_nodes'], multimodal
+          analytics = coverage['analytics']
+          assert analytics['status'] == 'PASS', analytics
+          assert {item['recipe'] for item in analytics['recipes']} == {
+              'business-performance', 'project-analytics', 'sales-conversion'}, analytics
+          assert analytics['percentage_fields'] >= 3, analytics
+          assert analytics['percentage_point_fields'] >= 1, analytics
+          assert analytics['branches'] >= 1, analytics
+          reasoning = coverage['reasoning']
+          assert reasoning['status'] == 'PASS', reasoning
+          assert {item['plan'] for item in reasoning['plans']} == {
+              'q4-six-actions', 'multimodal-consolidation',
+              'executive-incomplete-business'}, reasoning
+          relationships = coverage['relationships']
+          assert relationships['status'] == 'PASS', relationships
+          assert set(relationships['cases']) == {
+              'dated-timeline', 'dated-timeline-close', 'branch-swimlane', 'roadmap'}, relationships
+          assert set(relationships['themes']) == {'light', 'dark'}, relationships
+          assert relationships['outputs'] == 8, relationships
+          assert len(result['comparisons']) == 20, sorted(result['comparisons'])
           for name, case in result['comparisons'].items():
               assert case['status'] == 'PASS', (name, case['failures'])
+          assert result['artifacts']['retained_on_failure'] is True
+          assert result['artifacts']['manifest_count'] > 0
           assert result['visual_qa'] == 'NOT_RUN', result['visual_qa']
           assert result['company_platform_security'] == 'NOT_VERIFIED'
-          print('PASS: the installed candidate runtime matched the locked v1.3.1 runtime for both Spec cases')
+          print('PASS: the installed candidate runtime matched the locked v1.3.1 runtime '
+                'across the full case matrix, analytics, reasoning and relationship coverage')
           PY
       - name: Package and preflight the optional V1.3 showcase
         if: matrix.node == 24
@@ -572,6 +631,7 @@ jobs:
             out/source-preflight.json
             out/source-archive-acceptance.json
             out/runtime-acceptance.json
+            out/runtime-acceptance-artifacts-*
             out/showcase-package.json
             out/showcase-preflight.json
           if-no-files-found: error

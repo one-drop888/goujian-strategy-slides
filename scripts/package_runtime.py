@@ -99,16 +99,25 @@ def installed_extras(root, expected):
     return extras
 
 
-def validate_output_location(out, root):
+def protected_source_paths(entries):
+    protected = {Path(__file__).resolve()}
+    for relative in ('package.json', RUNTIME_MANIFEST, 'distribution/runtime-package.json',
+                     'SKILL.md', 'package-lock.json'):
+        protected.add((ROOT / relative).resolve())
+    for value in (entries or {}).values():
+        if isinstance(value, (str, Path)):
+            protected.add(Path(value).resolve())
+    return protected
+
+
+def validate_output_location(out, root=None, entries=None):
     out_resolved = Path(out).resolve()
-    root_resolved = Path(root).resolve()
-    if out_resolved == root_resolved or root_resolved in out_resolved.parents:
-        fail('Output ZIP must not be written inside the installed runtime root')
-    protected = (ROOT / 'package.json', ROOT / RUNTIME_MANIFEST,
-                 ROOT / 'distribution/runtime-package.json', ROOT / 'SKILL.md',
-                 ROOT / 'package-lock.json')
-    if out_resolved in {path.resolve() for path in protected}:
-        fail(f'Output ZIP must not overwrite a Source identity input: {out}')
+    if root is not None:
+        root_resolved = Path(root).resolve()
+        if out_resolved == root_resolved or root_resolved in out_resolved.parents:
+            fail('Output ZIP must not be written inside the installed runtime root')
+    if out_resolved in protected_source_paths(entries):
+        fail(f'Output ZIP must not overwrite a Source input or the active packager: {out}')
 
 
 def allowed_path(path, include_pptx, allow_out=False):
@@ -251,7 +260,11 @@ def runtime_root_entries(root):
     entries = {}
     expected = set()
     for relative in manifest.get('runtime_files') or []:
-        entries[f'{PREFIX}/{relative}'] = installed_member(root, relative)
+        installed = installed_member(root, relative)
+        canonical = manifest_source(relative)
+        if installed.read_bytes() != canonical.read_bytes():
+            fail(f'Installed runtime payload differs from the approved Source bytes: {relative}')
+        entries[f'{PREFIX}/{relative}'] = installed
         expected.add(relative)
     entries[f'{PREFIX}/{mapping["archive_path"]}'] = package_path
     expected.add(mapping['archive_path'])
@@ -328,11 +341,11 @@ def write_entries(out, entries):
 
 
 def build(out, showcase=False, source=False, runtime_root=None, expect_sha256=None):
+    root = None
     if runtime_root is not None:
         if source or showcase:
             fail('--runtime-root cannot be combined with --source or --showcase')
         root = installed_root(runtime_root)
-        validate_output_location(out, root)
         entries = runtime_root_entries(root)
         mode = 'runtime'
     elif showcase and source:
@@ -343,6 +356,7 @@ def build(out, showcase=False, source=False, runtime_root=None, expect_sha256=No
     else:
         entries, _manifest = runtime_entries(showcase=showcase)
         mode = 'showcase' if showcase else 'runtime'
+    validate_output_location(out, root, entries)
     digest, count = write_entries(out, entries)
     if expect_sha256 is not None and digest != expect_sha256:
         fail(f'Rebuilt archive SHA-256 {digest} does not match the expected {expect_sha256}')

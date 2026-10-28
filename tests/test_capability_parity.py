@@ -482,6 +482,17 @@ class BaselineArchiveTests(unittest.TestCase):
         self.assertEqual(result['status'], 'FAIL')
         self.assertEqual(result['missing_members'], ['a.txt'])
 
+    def test_wrong_digest_fails_before_zip_is_opened_or_parsed(self):
+        with mock.patch.object(parity.zipfile, 'ZipFile',
+                               side_effect=AssertionError('ZIP must not be opened')):
+            result = parity.baseline_archive_evidence(self.zip_path, self.tree,
+                                                      locked_sha256='0' * 64)
+        self.assertEqual(result['status'], 'FAIL')
+        self.assertFalse(result['locked_zip_verified'])
+        self.assertEqual(result['archive_members'], 0)
+        self.assertEqual(result['tree_members_compared'], 0)
+        self.assertIn('not parsed', result['reason'])
+
 
 class ContractTests(unittest.TestCase):
     """The parity contract is fixed; callers cannot supply versions or hashes."""

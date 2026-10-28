@@ -896,6 +896,8 @@ class GatePdfTests(PdfTestCase):
                 destination.parent.mkdir(parents=True, exist_ok=True)
                 destination.write_bytes(archive.read(info))
         cls.commit = scan_tests.GateTests.init_repo(cls.repo)
+        cls.version = json.loads(
+            (ROOT / 'package.json').read_text(encoding='utf-8'))['version']
         cls.scanner_dir = cls.root / 'scanner'
         cls.scanner_dir.mkdir()
         cls.scanner = cls.scanner_dir / 'skill-scanner'
@@ -937,7 +939,7 @@ class GatePdfTests(PdfTestCase):
         out = Path(tempfile.mkdtemp(prefix='scan-out-', dir=self.root))
         code, stdout, stderr = self.run_gate(
             'scan', str(self.archive), '--profile', 'showcase',
-            '--version', '1.3.1', '--commit', self.commit,
+            '--version', self.version, '--commit', self.commit,
             '--repo', str(self.repo), '--source-tree-state', 'clean',
             '--config', str(config), '--lock', str(ROOT / 'security/requirements-lock.txt'),
             '--review-ledger', str(self.empty_ledger),
@@ -948,7 +950,7 @@ class GatePdfTests(PdfTestCase):
     def verify(self, receipt, out, config):
         return self.run_gate(
             'verify', str(out / 'receipt.json'), '--archive', str(self.archive),
-            '--version', '1.3.1', '--commit', self.commit,
+            '--version', self.version, '--commit', self.commit,
             '--repo', str(self.repo), '--config', str(config),
             '--lock', str(ROOT / 'security/requirements-lock.txt'),
             '--review-ledger', str(self.empty_ledger), '--artifact-dir', str(out))

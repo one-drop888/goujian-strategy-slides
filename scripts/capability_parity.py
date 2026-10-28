@@ -1089,7 +1089,11 @@ def version_failures(baseline_version, candidate_version, rule):
 
 
 def baseline_archive_evidence(zip_path, baseline_root, locked_sha256=None):
-    """Prove the compared baseline tree is the locked archive's member bytes."""
+    """Prove the compared baseline tree is the locked archive's member bytes.
+
+    A digest mismatch fails before the ZIP is opened, decompressed or its member
+    paths are inspected, so untrusted baseline input never reaches the parser.
+    """
     zip_path = Path(zip_path)
     root = Path(baseline_root)
     locked_sha256 = LOCKED_BASELINE_ZIP_SHA256 if locked_sha256 is None else locked_sha256
@@ -1097,7 +1101,22 @@ def baseline_archive_evidence(zip_path, baseline_root, locked_sha256=None):
         return {'status': 'FAIL', 'reason': 'baseline ZIP is missing', 'zip_sha256': None,
                 'locked_zip_verified': False}
     digest = sha256_bytes(zip_path.read_bytes())
-    locked = digest == locked_sha256
+    if digest != locked_sha256:
+        return {
+            'status': 'FAIL',
+            'reason': 'baseline ZIP SHA-256 does not match the locked installer; archive was not parsed',
+            'zip_sha256': digest,
+            'locked_zip_sha256': locked_sha256,
+            'locked_zip_verified': False,
+            'package_root_prefix': None,
+            'archive_members': 0,
+            'tree_members_compared': 0,
+            'missing_count': 0,
+            'changed_count': 0,
+            'missing_members': [],
+            'changed_members': [],
+            'rule': 'A wrong digest fails closed before ZIP parsing; only the fixed contract digest is accepted.',
+        }
     with zipfile.ZipFile(zip_path) as archive:
         members = {info.filename: sha256_bytes(archive.read(info.filename))
                    for info in archive.infolist() if not info.is_dir()}
@@ -1115,12 +1134,12 @@ def baseline_archive_evidence(zip_path, baseline_root, locked_sha256=None):
         compared += 1
         if sha256_bytes(target.read_bytes()) != member_hash:
             changed.append(relative)
-    status = 'PASS' if locked and not missing and not changed else 'FAIL'
+    status = 'PASS' if not missing and not changed else 'FAIL'
     return {
         'status': status,
         'zip_sha256': digest,
         'locked_zip_sha256': locked_sha256,
-        'locked_zip_verified': locked,
+        'locked_zip_verified': True,
         'package_root_prefix': prefix,
         'archive_members': len(members),
         'tree_members_compared': compared,

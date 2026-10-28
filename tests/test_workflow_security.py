@@ -46,6 +46,23 @@ def _receipt_snippet(text):
     return textwrap.dedent('\n'.join(lines[index + 1:end])) + '\n'
 
 
+def _runtime_summary_snippet(text):
+    lines = text.splitlines()
+    marker = next(i for i, line in enumerate(lines)
+                  if 'FAIL: installed runtime acceptance exited' in line)
+    index = max(i for i in range(marker) if lines[i].lstrip().startswith('python3 - '))
+    heredoc = next(i for i in range(index + 1, len(lines)) if "<<'PY'" in lines[i])
+    end = next(i for i in range(heredoc + 1, len(lines)) if lines[i].strip() == 'PY')
+    return textwrap.dedent('\n'.join(lines[heredoc + 1:end])) + '\n'
+
+
+def _step_block(text, name):
+    marker = f'- name: {name}'
+    start = text.index(marker)
+    nxt = text.find('\n      - name: ', start + len(marker))
+    return text[start:nxt if nxt != -1 else len(text)]
+
+
 class WorkflowStructureTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -266,6 +283,99 @@ class WorkflowStructureTests(unittest.TestCase):
         self.assertEqual(_capture_snippet(self.ci), _capture_snippet(self.release))
         self.assertEqual(_receipt_snippet(self.ci), _receipt_snippet(self.release))
 
+    def test_installed_runtime_acceptance_failure_evidence_is_retained_and_uploaded(self):
+        ci_step = _step_block(
+            self.ci,
+            'Accept the actual installed candidate runtime against the locked v1.3.1 runtime')
+        release_step = _step_block(
+            self.release,
+            'Accept the installed candidate runtime against the locked v1.3.1 runtime')
+        for acceptance in (ci_step, release_step):
+            self.assertIn('set +e', acceptance)
+            self.assertIn('acceptance_status=$?', acceptance)
+            self.assertIn('set -e', acceptance)
+            self.assertIn('> "$GITHUB_WORKSPACE/out/', acceptance)
+            self.assertIn('-stderr.log"', acceptance)
+            self.assertIn("print(f'FAIL: installed runtime acceptance exited", acceptance)
+            self.assertIn('exit "$acceptance_status"', acceptance)
+            self.assertLess(
+                acceptance.index('exit "$acceptance_status"'),
+                acceptance.index("assert result['status'] == 'PASS'"),
+                'the success assertion must run only after the exact nonzero status is propagated')
+            self.assertNotIn('failure-summary.json', acceptance)
+        self.assertIn('--json "$GITHUB_WORKSPACE/out/runtime-acceptance.json"', ci_step)
+        self.assertIn(
+            '--json "$GITHUB_WORKSPACE/out/release-runtime-acceptance.json"', release_step)
+        self.assertNotIn('$RUNNER_TEMP/runtime-acceptance-stdout.json', ci_step)
+
+        upload = _step_block(
+            self.ci,
+            'Upload the real CI showcase, parity and acceptance evidence for independent review')
+        self.assertIn('if: always() && matrix.node == 24', upload)
+        self.assertIn('if-no-files-found: error', upload)
+        for relative in (
+            'out/runtime-acceptance.json',
+            'out/runtime-acceptance-stdout.json',
+            'out/runtime-acceptance-stderr.log',
+            'out/runtime-acceptance-artifacts-*',
+        ):
+            self.assertIn(relative, upload)
+
+        release_upload = _step_block(self.release, 'Upload validated archives and security receipts')
+        self.assertIn('if: always()', release_upload)
+        for relative in (
+            'out/release-*.json',
+            'out/release-runtime-acceptance-stderr.log',
+            'out/release-runtime-acceptance-artifacts-*',
+        ):
+            self.assertIn(relative, release_upload)
+
+    def test_actual_workflow_run_blocks_parse_as_bash(self):
+        if shutil.which('bash') is None:
+            self.skipTest('bash is required to check workflow shell syntax')
+        for path, text in ((CI, self.ci), (RELEASE, self.release)):
+            lines = text.splitlines()
+            checked = 0
+            for index, line in enumerate(lines):
+                match = re.fullmatch(r'( *)run: \|[+-]?', line)
+                if not match:
+                    continue
+                indent = len(match.group(1))
+                end = index + 1
+                while end < len(lines):
+                    following = lines[end]
+                    if following.strip() and len(following) - len(following.lstrip()) <= indent:
+                        break
+                    end += 1
+                script = textwrap.dedent('\n'.join(lines[index + 1:end])) + '\n'
+                result = subprocess.run(['bash', '-n'], input=script,
+                                        text=True, capture_output=True)
+                self.assertEqual(result.returncode, 0,
+                                 f'{path}:{index + 1}: {result.stderr}')
+                checked += 1
+            self.assertGreater(checked, 0, path)
+
+    def test_installed_runtime_installs_baseline_owned_dependencies(self):
+        cases = (
+            (self.ci,
+             'Accept the actual installed candidate runtime against the locked v1.3.1 runtime',
+             'cd "$baseline_root"'),
+            (self.release,
+             'Accept the installed candidate runtime against the locked v1.3.1 runtime',
+             'cd "$baseline_root"'),
+        )
+        for text, name, baseline_cd in cases:
+            block = _step_block(text, name)
+            self.assertIn(baseline_cd, block)
+            self.assertIn('NPM_CONFIG_USERCONFIG="$empty_npmrc"', block)
+            self.assertIn('npm ci --ignore-scripts', block)
+            self.assertIn("assert baseline_modules['owned'] is True", block)
+            self.assertIn("assert baseline_modules['source'] == 'root-owned'", block)
+            self.assertLess(
+                block.index('npm ci --ignore-scripts'),
+                block.index('scripts/runtime_acceptance.py'),
+                'the baseline must own its lock-matched install before the harness runs')
+
     def test_actions_are_pinned_to_commit_shas(self):
         for text in (self.security, self.release):
             for name in ('actions/checkout@', 'actions/setup-python@',
@@ -458,6 +568,112 @@ class SourceAcceptanceReceiptTests(unittest.TestCase):
         result = self._run_receipt(*fixture)
         self.assertNotEqual(result.returncode, 0)
         self.assertFalse(fixture[3].exists())
+
+
+class RuntimeAcceptanceFailureCaptureTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.summary = _runtime_summary_snippet(CI.read_text(encoding='utf-8'))
+
+    def setUp(self):
+        self._tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self._tmp.cleanup)
+        self.tmp = Path(self._tmp.name)
+        self.out = self.tmp / 'out'
+        self.out.mkdir()
+        if shutil.which('bash') is None:
+            self.skipTest('bash is required to exercise the embedded capture snippet')
+
+    def _run(self, code, result_payload=None, stdout='', stderr=''):
+        if result_payload is not None:
+            (self.out / 'result.json').write_text(result_payload, encoding='utf-8')
+        harness = self.tmp / 'fake-acceptance-harness'
+        harness.write_text(
+            '#!/usr/bin/env bash\n'
+            f'printf %s {shlex.quote(stdout)}\n'
+            f'printf %s {shlex.quote(stderr)} >&2\n'
+            f'exit {code}\n',
+            encoding='utf-8')
+        harness.chmod(0o755)
+        script = self.tmp / 'acceptance-wrapper.sh'
+        script.write_text(
+            'set -euo pipefail\n'
+            f'out_dir={shlex.quote(str(self.out))}\n'
+            'set +e\n'
+            f'{shlex.quote(str(harness))} > "$out_dir/stdout.json" 2> "$out_dir/stderr.log"\n'
+            'acceptance_status=$?\n'
+            'set -e\n'
+            'if [ "$acceptance_status" -ne 0 ]; then\n'
+            '  python3 - "$out_dir/result.json" "$out_dir/stderr.log" '
+            '"$acceptance_status" <<\'PY\'\n'
+            + self.summary +
+            'PY\n'
+            '  exit "$acceptance_status"\n'
+            'fi\n',
+            encoding='utf-8')
+        return subprocess.run(['bash', str(script)], capture_output=True, text=True)
+
+    def test_failure_is_bounded_and_the_exact_exit_status_is_propagated(self):
+        failures = [f'failure-{index:02d}-' + 'x' * 400 for index in range(25)]
+        payload = json.dumps({
+            'status': 'FAIL',
+            'coverage': {'status': 'FAIL'},
+            'failures': failures,
+            'comparisons': {
+                'failed-case': {'status': 'FAIL',
+                                'failures': [f'case-{index}' for index in range(7)]},
+                'passing-case': {'status': 'PASS', 'failures': []},
+            },
+            'artifacts': {'root': '/tmp/artifacts', 'manifest_count': 3,
+                          'manifest_sha256': 'a' * 64},
+        })
+        stderr = ''.join(f'stderr-line-{index:02d}\n' for index in range(50))
+        result = self._run(42, result_payload=payload,
+                           stdout='stdout-diagnostic\n', stderr=stderr)
+        self.assertEqual(result.returncode, 42, result.stderr)
+        self.assertIn('FAIL: installed runtime acceptance exited 42', result.stdout)
+        self.assertEqual(result.stdout.count('  failure: '), 20)
+        self.assertNotIn('failure-20-', result.stdout)
+        self.assertEqual(result.stdout.count('  comparison failed-case: '), 5)
+        self.assertNotIn('comparison passing-case:', result.stdout)
+        self.assertIn('stderr-line-49', result.stdout)
+        self.assertNotIn('stderr-line-09', result.stdout)
+        self.assertNotIn('stdout-diagnostic', result.stdout)
+        self.assertEqual(
+            json.loads((self.out / 'result.json').read_text(encoding='utf-8')),
+            json.loads(payload),
+            'the full harness result must remain on disk unchanged')
+        self.assertEqual((self.out / 'stderr.log').read_text(encoding='utf-8'), stderr)
+        self.assertFalse((self.out / 'summary.json').exists())
+
+    def test_crash_without_result_retains_stderr_and_exit_status(self):
+        result = self._run(1, result_payload=None, stderr='boom before result\n')
+        self.assertEqual(result.returncode, 1, result.stderr)
+        self.assertIn('FAIL: installed runtime acceptance exited 1', result.stdout)
+        self.assertIn('boom before result', result.stdout)
+        self.assertFalse((self.out / 'result.json').exists())
+
+    def test_malformed_result_does_not_mask_the_exit_status(self):
+        result = self._run(1, result_payload='{not json', stderr='parser noise\n')
+        self.assertEqual(result.returncode, 1, result.stderr)
+        self.assertIn('FAIL: installed runtime acceptance exited 1', result.stdout)
+        self.assertIn('result unreadable', result.stdout)
+        self.assertIn('parser noise', result.stdout)
+
+    def test_success_exits_zero_without_failure_output(self):
+        payload = json.dumps({'status': 'PASS', 'coverage': {'status': 'PASS'},
+                              'failures': [], 'comparisons': {},
+                              'artifacts': {'root': '/tmp/artifacts',
+                                            'manifest_count': 1,
+                                            'manifest_sha256': 'b' * 64}})
+        result = self._run(0, result_payload=payload)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertNotIn('FAIL:', result.stdout)
+        self.assertEqual(
+            json.loads((self.out / 'result.json').read_text(encoding='utf-8')),
+            json.loads(payload))
+        self.assertTrue((self.out / 'stdout.json').is_file())
+        self.assertTrue((self.out / 'stderr.log').is_file())
 
 
 if __name__ == '__main__':

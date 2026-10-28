@@ -112,3 +112,13 @@ workflow artifacts and hashed as bytes, so their recorded digest can be
 independently reproduced. Neither source-test execution nor any safety gate is
 removed. Runtime bytes, the renderer and all 38 exact reviews remain unchanged;
 the corrected full CI and Release rehearsal are still required.
+
+## Installed-runtime CI environment correction (2026-10-29)
+
+CI run `40714601548` on `c9832b1` passed the extracted Source suite, then failed installed-runtime parity. Independent local reproduction retained nine failed QA comparisons: the baseline used a lock-matched `NODE_PATH` fallback but had no local `node_modules`, while the candidate had a real install. Doctor correctly reads its own installation and therefore reported different SPEC_ONLY availability. This was an unequal test environment, not an observed renderer regression. The previous failure and original checkpoint records remain intact.
+
+CI and Release now install the frozen baseline's own locked dependencies with `npm ci --ignore-scripts`, and require both dependency roots to be owned and lock-matched. They retain full stdout/stderr and owned evidence on failure; a bounded diagnostic preserves the harness failure status. Product code, comparison rules, thresholds, scanner policies and the review ledger are unchanged.
+
+Codex independently rehashed all 776 files of the corrected local run (manifest `46f8e3973ebc145f78e4364377022754610c49a19e46fe1e78794e68070ba624`): 20/20 comparisons PASS, 96 matrix cells (72 accepted, 24 named rejections), nine images, three analytics recipes, three reasoning plans and eight relationship outputs. Representative multimodal and dark matrix montages were visually reviewed with existing density notes. Runtime remains `2c91da60eef1489cf6b74a9d059aea53850e0aa80cab0718777fbcdbcd8ea094`. Focused workflow tests passed on Python 3.10 and 3.14. This is a local checkpoint: new remote CI, main, release rehearsal and final publication still require their own evidence. Company-platform security remains NOT_VERIFIED; native Microsoft PowerPoint remains NOT_RUN.
+
+Before push, the new failure diagnostic was also checked as actual YAML shell: an indented heredoc terminator was corrected before commit. All 50 CI/Release `run` blocks pass `bash -n`, both indented-terminator negative controls are rejected, and 35 workflow tests pass on Python 3.10 and 3.14. Standalone dedented Python-fragment tests do not substitute for this shell parse check.

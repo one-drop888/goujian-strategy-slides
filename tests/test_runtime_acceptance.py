@@ -245,6 +245,14 @@ class ModuleEvidenceTests(unittest.TestCase):
         self.assertEqual(evidence['source'], 'root-owned')
         self.assertTrue(evidence['owned'])
 
+    def test_baseline_root_owned_node_modules_passes(self):
+        make_install(self.root / 'node_modules', self.versions)
+        evidence = acceptance.module_evidence('baseline', self.root, None)
+        self.assertEqual(evidence['status'], 'PASS', evidence['failures'])
+        self.assertEqual(evidence['source'], 'root-owned')
+        self.assertTrue(evidence['owned'])
+        self.assertTrue(evidence['dependencies_match_lock'])
+
 
 class MatrixFixtureTests(unittest.TestCase):
     def setUp(self):

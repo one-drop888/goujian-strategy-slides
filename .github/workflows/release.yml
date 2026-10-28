@@ -600,14 +600,58 @@ jobs:
               source.extractall(target)
           print(f'PASS: extracted the locked v1.3.1 baseline ({len(names)} members) without install state or symlinks')
           PY
+          baseline_root="$baseline_parent/goujian-strategy-slides"
+          empty_npmrc="$RUNNER_TEMP/goujian-empty-npmrc"
+          : > "$empty_npmrc"
+          (
+            cd "$baseline_root"
+            export NPM_CONFIG_USERCONFIG="$empty_npmrc"
+            npm ci --ignore-scripts
+          )
+          set +e
           "$candidate_root/.venv/bin/python" scripts/runtime_acceptance.py \
             --source-root "$GITHUB_WORKSPACE" \
             --runtime-root "$candidate_root" \
             --baseline-zip "$RUNNER_TEMP/goujian-v1.3.1-installer.zip" \
-            --baseline-root "$baseline_parent/goujian-strategy-slides" \
+            --baseline-root "$baseline_root" \
             --node-modules "$GITHUB_WORKSPACE/node_modules" \
             --artifact-dir "$GITHUB_WORKSPACE/out/release-runtime-acceptance-artifacts-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" \
-            --json out/release-runtime-acceptance.json > /dev/null
+            --json "$GITHUB_WORKSPACE/out/release-runtime-acceptance.json" \
+            > "$GITHUB_WORKSPACE/out/release-runtime-acceptance-stdout.json" \
+            2> "$GITHUB_WORKSPACE/out/release-runtime-acceptance-stderr.log"
+          acceptance_status=$?
+          set -e
+          if [ "$acceptance_status" -ne 0 ]; then
+          python3 - "$GITHUB_WORKSPACE/out/release-runtime-acceptance.json" \
+                   "$GITHUB_WORKSPACE/out/release-runtime-acceptance-stderr.log" \
+                   "$acceptance_status" <<'PY'
+          import json
+          import sys
+          from pathlib import Path
+
+          result_path, stderr_path = Path(sys.argv[1]), Path(sys.argv[2])
+          print(f'FAIL: installed runtime acceptance exited {sys.argv[3]}')
+          if result_path.is_file():
+              try:
+                  result = json.loads(result_path.read_text(encoding='utf-8'))
+              except (OSError, ValueError) as error:
+                  print(f'  result unreadable: {type(error).__name__}: {error}'[:400])
+              else:
+                  for item in (result.get('failures') or [])[:20]:
+                      print(f'  failure: {str(item)[:300]}')
+                  for name, case in sorted((result.get('comparisons') or {}).items()):
+                      if case.get('status') == 'PASS':
+                          continue
+                      for item in (case.get('failures') or [])[:5]:
+                          print(f'  comparison {name}: {str(item)[:200]}')
+          if stderr_path.is_file():
+              lines = stderr_path.read_text(
+                  encoding='utf-8', errors='replace').splitlines()[-40:]
+              for line in lines:
+                  print(f'  stderr: {line[:400]}')
+          PY
+            exit "$acceptance_status"
+          fi
           python3 - "$GITHUB_WORKSPACE/out/release-runtime-acceptance.json" "$VERSION" <<'PY'
           import json
           import sys
@@ -633,6 +677,8 @@ jobs:
           assert candidate_modules['dependencies_match_lock'] is True, candidate_modules
           baseline_modules = result['installed_runtime']['baseline']['node_modules']
           assert baseline_modules['status'] == 'PASS', baseline_modules
+          assert baseline_modules['owned'] is True, baseline_modules
+          assert baseline_modules['source'] == 'root-owned', baseline_modules
           assert baseline_modules['dependencies_match_lock'] is True, baseline_modules
           coverage = result['coverage']
           assert coverage['status'] == 'PASS', coverage
@@ -1343,6 +1389,7 @@ jobs:
             dist
             out/security-gate
             out/release-*.json
+            out/release-runtime-acceptance-stderr.log
             out/release-source-archive-test.log
             out/release-runtime-acceptance-artifacts-*
           if-no-files-found: error

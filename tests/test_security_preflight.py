@@ -5,6 +5,8 @@ Dangerous fixture payloads are plain strings for transparent inspection. They
 are never executed: tests write them into temporary ZIPs and inspect findings.
 Inert fixtures verify that rules and examples are not treated as live code.
 """
+import ast
+import hashlib
 import importlib.util
 import json
 import subprocess
@@ -128,6 +130,10 @@ class PreflightTests(unittest.TestCase):
         members = self.members()
         members = [item for item in members
                    if not item[0].filename.startswith(PREFIX + 'distribution/')]
+        # v1.3.1 kept the release tools inside the installer; restore them for the
+        # historical legacy profile now that they are Source-only.
+        for tool in ('scripts/security_preflight.py', 'scripts/package_runtime.py'):
+            members.append((info_for(PREFIX + tool), (ROOT / tool).read_bytes()))
         members.append((info_for(PREFIX + 'tests/test_security_preflight.py'), b'legacy = True\n'))
         dynamic = ('import importlib.util\nspec = importlib.util.spec_from_file_location("m", "/tmp/x.py")\nmodule = importlib.util.module_from_spec(spec)\nspec.loader.exec_module(module)\n')
         legacy_members = members + [
@@ -151,6 +157,90 @@ class PreflightTests(unittest.TestCase):
         report = preflight.preflight(self.variant('legacy-unsafe.zip', unsafe))
         self.assertEqual(report['status'], 'FAIL')
         self.assertIn('UNSAFE_PATH', codes(report))
+
+    def test_runtime_omits_exactly_the_four_source_only_members(self):
+        report = preflight.preflight(self.actual)
+        self.assertEqual(report['status'], 'PASS', report['violations'])
+        with zipfile.ZipFile(self.actual) as package:
+            names = set(package.namelist())
+            manifest = json.loads(package.read(PREFIX + 'distribution/runtime-manifest.json'))
+            runtime_package = json.loads(package.read(PREFIX + 'package.json'))
+        self.assertEqual(len(manifest['runtime_files']), 185)
+        self.assertEqual(len(names), 186)
+        for relative in ('scripts/security_preflight.py', 'scripts/package_runtime.py',
+                         'skill/reasoning/fixtures/hostile-source/plan.json',
+                         'skill/reasoning/fixtures/hostile-source/sources/hostile.md'):
+            self.assertNotIn(relative, manifest['runtime_files'], relative)
+            self.assertNotIn(PREFIX + relative, names, relative)
+        self.assertEqual(runtime_package['version'], '1.3.2')
+        for command in ('package', 'preflight'):
+            self.assertNotIn(command, runtime_package['scripts'])
+            self.assertIn(command, manifest['omitted_commands'])
+        for command in ('validate:all', 'test', 'test:core'):
+            self.assertIn(command, runtime_package['scripts'])
+
+    def test_source_keeps_release_commands_and_tools(self):
+        report = preflight.preflight(self.source)
+        self.assertEqual(report['status'], 'PASS', report['violations'])
+        with zipfile.ZipFile(self.source) as package:
+            names = set(package.namelist())
+            scripts = json.loads(package.read(PREFIX + 'package.json'))['scripts']
+        for command in ('package', 'package:source', 'preflight',
+                        'security:scan', 'security:verify', 'test:pdf'):
+            self.assertIn(command, scripts, command)
+        for relative in ('scripts/security_preflight.py', 'scripts/package_runtime.py',
+                         'skill/reasoning/fixtures/hostile-source/plan.json',
+                         'skill/reasoning/fixtures/hostile-source/sources/hostile.md'):
+            self.assertIn(PREFIX + relative, names, relative)
+
+    def test_runtime_cannot_reintroduce_source_only_commands(self):
+        def add_script(data):
+            package = json.loads(data)
+            package['scripts']['package'] = 'python3 scripts/package_runtime.py'
+            return json.dumps(package, indent=2).encode('utf-8')
+        members = self.replace_member('package.json', add_script)
+        members = [item for item in members if item[0].filename != PREFIX + 'distribution/runtime-package.json']
+        members.append((info_for(PREFIX + 'distribution/runtime-package.json'),
+                        add_script((ROOT / 'distribution/runtime-package.json').read_bytes())))
+        report = preflight.preflight(self.variant('runtime-command.zip', members))
+        self.assertEqual(report['status'], 'FAIL')
+        self.assertIn('RUNTIME_METADATA', codes(report))
+
+    def test_runtime_manifest_must_declare_source_only_commands_omitted(self):
+        def drop_omitted(data):
+            manifest = json.loads(data)
+            manifest['omitted_commands'] = [name for name in manifest['omitted_commands']
+                                            if name != 'package']
+            return json.dumps(manifest, indent=2).encode('utf-8')
+        members = self.replace_member('distribution/runtime-manifest.json', drop_omitted)
+        report = preflight.preflight(self.variant('runtime-omitted.zip', members))
+        self.assertEqual(report['status'], 'FAIL')
+        self.assertIn('RUNTIME_MANIFEST', codes(report))
+
+    def test_executable_risk_detectors_are_ast_identical_to_v1_3_1(self):
+        """Pin the detector AST; equality with tag v1.3.1 (25f269f) was proven in Phase 1."""
+        names = (
+            'SUBPROCESS_NAMES', 'DANGEROUS_DOTTED', 'SHELL_EXECUTABLES', 'PYTHON_EXECUTABLES',
+            'NODE_EXECUTABLES', 'JS_PATTERNS', 'INVENTORY_PATTERNS', 'strip_javascript_noise',
+            'static_string_call_argument', 'position_in_spans', 'python_inert_spans', 'scope_of',
+            'inventory_scope', 'scan_inventory', 'scan_literal', 'dotted_name', 'keyword_value',
+            'collect_python_aliases', 'resolve_dotted', 'literal_prefix', 'executable_name',
+            'scan_python_source', 'js_child_process_vars', 'js_alias_patterns',
+            'scan_javascript_source', 'finding',
+        )
+        tree = ast.parse((ROOT / 'scripts/security_preflight.py').read_text(encoding='utf-8'))
+        found = {}
+        for node in tree.body:
+            if isinstance(node, (ast.FunctionDef, ast.ClassDef)):
+                found[node.name] = node
+            elif isinstance(node, ast.Assign):
+                for target in node.targets:
+                    if isinstance(target, ast.Name):
+                        found[target.id] = node.value
+        payload = '\n'.join(name + '\n' + ast.dump(found[name], include_attributes=False)
+                            for name in names)
+        self.assertEqual(hashlib.sha256(payload.encode('utf-8')).hexdigest(),
+                         'b0756be5aea1511cbf8fd9919abcf1d32a8acd95ecf2aa44b454b2d866f20433')
 
     def test_dynamic_module_loading_is_rejected_in_runtime(self):
         source = ('import importlib.util\nspec = importlib.util.spec_from_file_location("m", "/tmp/x.py")\nmodule = importlib.util.module_from_spec(spec)\nspec.loader.exec_module(module)\n')

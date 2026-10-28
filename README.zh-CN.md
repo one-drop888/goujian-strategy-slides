@@ -55,7 +55,7 @@ Bootstrap 只安装项目 npm 依赖并创建本地 `.venv`，不安装系统工
 
 也可从 [GitHub Releases](https://github.com/one-drop888/goujian-strategy-slides/releases) 下载带 SHA256 的安装 ZIP。解压后进入 `goujian-strategy-slides/`，在 Agent 平台中发现该目录唯一的根 `SKILL.md`，运行上述安装步骤。所有 Agent 平台使用同一套开源内核，无需公司专用分支。
 
-V1.3.1 是企业安全兼容补丁：主安装包为精简运行时，另提供完整源码包与可选评审包；产品能力、原生渲染和历史验收证据不变。公司平台旧的 v1.3.1 提交仍为 `FAIL`，当前兼容提交为 `BLOCKED`、候选包 `NOT_VERIFIED`；Agensi 同样未验收（`COMPANY_PLATFORM_SECURITY=NOT_VERIFIED`）。[补丁说明](docs/V1_3_1_RELEASE_NOTES.md) · [安全与能力对等](docs/SECURITY_PARITY_V1_3_1.md) · [发布安全门](https://github.com/one-drop888/goujian-strategy-slides/blob/main/docs/RELEASE_SECURITY_GATE.md)
+V1.3.2 是企业运行时优化补丁：官方主安装包是完整精简运行时，仅将 4 个源码专用成员移入完整源码包（发布打包器、静态预检器和两个敌意来源负向夹具），运行时代码、产品能力和原生渲染不变。`package`、`preflight`、安全门和完整测试等开发/发布命令由 `-source.zip` 提供；已安装运行时可在源码身份与预期 SHA256 约束下由源码打包器以数据输入方式确定性重建。公司平台与 Agensi 仍未实际验收（`COMPANY_PLATFORM_SECURITY=NOT_VERIFIED`），当前不宣称企业平台或发布验证通过。[补丁说明](https://github.com/one-drop888/goujian-strategy-slides/blob/main/docs/V1_3_2_RELEASE_NOTES.md) · [安装与恢复](docs/INSTALLATION.md) · [发布安全门](https://github.com/one-drop888/goujian-strategy-slides/blob/main/docs/RELEASE_SECURITY_GATE.md)
 
 ## 用起来
 

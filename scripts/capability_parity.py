@@ -1,9 +1,14 @@
 #!/usr/bin/env python3
-"""Compare locked V1.3.0 and candidate V1.3.1 capability outcomes.
+"""Compare locked and candidate capability outcomes.
+
+Two fixed contracts are supported. The default preserves V1.3.0 -> V1.3.1;
+`--contract CAPABILITY_PARITY_V1_3_1_TO_V1_3_2` selects the frozen V1.3.1
+baseline for the V1.3.2 candidate. Versions and locked installer hashes come
+only from these fixed entries, never from caller-supplied values.
 
 This verifier consumes independently generated `out/v1.3-showcase` trees. It
 does not rebuild showcase artifacts itself: the baseline tree must already be
-produced from the immutable V1.3.0 tag/installer and the candidate tree from
+produced from the immutable baseline tag/installer and the candidate tree from
 the candidate checkout under the same environment. It then compares native
 PPTX parts, embedded workbook parts, media bytes, rendered PNG pixels, specs,
 scenes and QA evidence. Only collection timestamps and declared output-path
@@ -27,9 +32,25 @@ import time
 import zipfile
 
 CAPABILITY_PARITY_V1_3_0_TO_V1_3_1 = 'CAPABILITY_PARITY_V1_3_0_TO_V1_3_1'
-BASELINE_VERSION = '1.3.0'
-CANDIDATE_VERSION = '1.3.1'
-LOCKED_BASELINE_ZIP_SHA256 = '7df25c241d74c3bb34fc5569e021320fec675bded72c1e44d439a6f8485ad519'
+CAPABILITY_PARITY_V1_3_1_TO_V1_3_2 = 'CAPABILITY_PARITY_V1_3_1_TO_V1_3_2'
+CONTRACTS = {
+    CAPABILITY_PARITY_V1_3_0_TO_V1_3_1: {
+        'baseline_version': '1.3.0',
+        'candidate_version': '1.3.1',
+        'baseline_release': 'v1.3.0',
+        'locked_baseline_zip_sha256': '7df25c241d74c3bb34fc5569e021320fec675bded72c1e44d439a6f8485ad519',
+    },
+    CAPABILITY_PARITY_V1_3_1_TO_V1_3_2: {
+        'baseline_version': '1.3.1',
+        'candidate_version': '1.3.2',
+        'baseline_release': 'v1.3.1',
+        'locked_baseline_zip_sha256': '7ee0d15488368a876ac2624546f72a13de8bdf01f322ed1055bb8c099d67b3dd',
+    },
+}
+DEFAULT_CONTRACT = CAPABILITY_PARITY_V1_3_0_TO_V1_3_1
+BASELINE_VERSION = CONTRACTS[DEFAULT_CONTRACT]['baseline_version']
+CANDIDATE_VERSION = CONTRACTS[DEFAULT_CONTRACT]['candidate_version']
+LOCKED_BASELINE_ZIP_SHA256 = CONTRACTS[DEFAULT_CONTRACT]['locked_baseline_zip_sha256']
 EXPECTED_MATRIX = {
     'cells': 96,
     'accepted': 72,
@@ -1058,15 +1079,25 @@ def performance_sample(baseline_root, candidate_root, repeats):
             'note': 'Local wall-clock sample only; not a machine-independent claim.'}
 
 
-def baseline_archive_evidence(zip_path, baseline_root):
+def version_failures(baseline_version, candidate_version, rule):
+    failures = []
+    if baseline_version != rule['baseline_version']:
+        failures.append(f'baseline version is {baseline_version}, expected {rule["baseline_version"]}')
+    if candidate_version != rule['candidate_version']:
+        failures.append(f'candidate version is {candidate_version}, expected {rule["candidate_version"]}')
+    return failures
+
+
+def baseline_archive_evidence(zip_path, baseline_root, locked_sha256=None):
     """Prove the compared baseline tree is the locked archive's member bytes."""
     zip_path = Path(zip_path)
     root = Path(baseline_root)
+    locked_sha256 = LOCKED_BASELINE_ZIP_SHA256 if locked_sha256 is None else locked_sha256
     if not zip_path.is_file():
         return {'status': 'FAIL', 'reason': 'baseline ZIP is missing', 'zip_sha256': None,
                 'locked_zip_verified': False}
     digest = sha256_bytes(zip_path.read_bytes())
-    locked = digest == LOCKED_BASELINE_ZIP_SHA256
+    locked = digest == locked_sha256
     with zipfile.ZipFile(zip_path) as archive:
         members = {info.filename: sha256_bytes(archive.read(info.filename))
                    for info in archive.infolist() if not info.is_dir()}
@@ -1088,7 +1119,7 @@ def baseline_archive_evidence(zip_path, baseline_root):
     return {
         'status': status,
         'zip_sha256': digest,
-        'locked_zip_sha256': LOCKED_BASELINE_ZIP_SHA256,
+        'locked_zip_sha256': locked_sha256,
         'locked_zip_verified': locked,
         'package_root_prefix': prefix,
         'archive_members': len(members),
@@ -1101,16 +1132,18 @@ def baseline_archive_evidence(zip_path, baseline_root):
     }
 
 
-def verify(baseline_root, candidate_root, baseline_zip=None, performance=False, repeats=3):
+def verify(baseline_root, candidate_root, baseline_zip=None, performance=False, repeats=3,
+           contract=DEFAULT_CONTRACT):
     baseline_root = Path(baseline_root).resolve()
     candidate_root = Path(candidate_root).resolve()
+    rule = CONTRACTS.get(contract)
     checks = {}
     failures = []
     result = {
-        'schema_version': '1.3.1',
-        'capability_parity': CAPABILITY_PARITY_V1_3_0_TO_V1_3_1,
+        'schema_version': rule['candidate_version'] if rule else None,
+        'capability_parity': contract,
         'baseline': {'root': str(baseline_root), 'version': None, 'zip_sha256': None,
-                     'locked_zip_sha256': LOCKED_BASELINE_ZIP_SHA256,
+                     'locked_zip_sha256': rule['locked_baseline_zip_sha256'] if rule else None,
                      'locked_zip_verified': False},
         'candidate': {'root': str(candidate_root), 'version': None},
         'checks': checks,
@@ -1127,14 +1160,18 @@ def verify(baseline_root, candidate_root, baseline_zip=None, performance=False, 
                                'provenance hashes', 'event timestamps', 'file URLs', 'nested content hashes'],
         },
     }
+    if rule is None:
+        failures.append(f'unknown capability parity contract: {contract}')
+        result['failures'] = failures
+        return result
     archive = None
     if baseline_zip:
-        archive = baseline_archive_evidence(baseline_zip, baseline_root)
+        archive = baseline_archive_evidence(baseline_zip, baseline_root, rule['locked_baseline_zip_sha256'])
         result['baseline']['zip_sha256'] = archive['zip_sha256']
         result['baseline']['locked_zip_verified'] = archive['locked_zip_verified']
         result['baseline']['archive_member_equality'] = archive
         if not archive['locked_zip_verified']:
-            failures.append('baseline ZIP SHA-256 does not match the locked V1.3.0 installer')
+            failures.append(f'baseline ZIP SHA-256 does not match the locked {rule["baseline_release"]} installer')
         if archive['status'] != 'PASS':
             failures.append('baseline tree bytes do not match the locked archive members')
             result['failures'] = failures
@@ -1153,10 +1190,7 @@ def verify(baseline_root, candidate_root, baseline_zip=None, performance=False, 
     candidate = read_json(candidate_manifest_path)
     result['baseline']['version'] = baseline.get('version')
     result['candidate']['version'] = candidate.get('version')
-    if baseline.get('version') != BASELINE_VERSION:
-        failures.append(f'baseline version is {baseline.get("version")}, expected {BASELINE_VERSION}')
-    if candidate.get('version') != CANDIDATE_VERSION:
-        failures.append(f'candidate version is {candidate.get("version")}, expected {CANDIDATE_VERSION}')
+    failures.extend(version_failures(baseline.get('version'), candidate.get('version'), rule))
     for suite in ('matrix', 'gallery', 'ledger'):
         if (baseline.get(suite) or {}).get('status') != 'PASS':
             failures.append(f'baseline {suite} is not PASS')
@@ -1207,13 +1241,15 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('baseline_root', help='checkout/extraction containing out/v1.3-showcase')
     parser.add_argument('candidate_root', help='candidate checkout containing out/v1.3-showcase')
-    parser.add_argument('--baseline-zip', help='optional locked V1.3.0 installer ZIP to hash-check')
+    parser.add_argument('--baseline-zip', help='optional locked baseline installer ZIP to hash-check')
+    parser.add_argument('--contract', choices=sorted(CONTRACTS), default=DEFAULT_CONTRACT,
+                        help='fixed capability parity contract; versions and locked SHA come from the contract')
     parser.add_argument('--performance', action='store_true', help='run an informational repeated timing sample')
     parser.add_argument('--repeats', type=int, default=3)
     parser.add_argument('--json', help='write the result JSON to this path')
     args = parser.parse_args()
     result = verify(args.baseline_root, args.candidate_root, args.baseline_zip,
-                    performance=args.performance, repeats=args.repeats)
+                    performance=args.performance, repeats=args.repeats, contract=args.contract)
     payload = json.dumps(result, ensure_ascii=False, indent=2) + '\n'
     if args.json:
         Path(args.json).parent.mkdir(parents=True, exist_ok=True)

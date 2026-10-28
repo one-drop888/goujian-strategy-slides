@@ -1,6 +1,6 @@
 {
   "name": "goujian-strategy-slides",
-  "version": "1.3.1",
+  "version": "1.3.2",
   "private": false,
   "description": "Goujian Strategy Slides — production-grade Presentation Intelligence for AI agents",
   "license": "Apache-2.0",
@@ -14,8 +14,6 @@
     "library": "python3 skill/scripts/library_report.py",
     "test": "python3 scripts/runtime_smoke.py --tier auto",
     "test:core": "python3 scripts/runtime_smoke.py --tier core",
-    "preflight": "python3 scripts/security_preflight.py",
-    "package": "python3 scripts/package_runtime.py",
     "render:example": "python3 skill/scripts/render_deck.py out/executive-review.pptx out/render",
     "capabilities": "python3 core/qa/capabilities.py",
     "doctor": "python3 scripts/doctor.py",

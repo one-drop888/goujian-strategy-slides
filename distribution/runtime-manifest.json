@@ -1,7 +1,7 @@
 {
-  "schema_version": "1.3.1",
+  "schema_version": "1.3.2",
   "distribution": "runtime",
-  "selection_policy": "Explicit per-file runtime list derived from reachability (phase0-runtime-deps.json) plus V1.3.1 production helpers. No directory-name pruning; tests/ and development tooling stay outside except the operational validate:all validator.",
+  "selection_policy": "Explicit per-file runtime list derived from reachability (phase0-runtime-deps.json) plus V1.3.2 production helpers. No directory-name pruning; tests/ and development tooling stay outside except the operational validate:all validator. V1.3.2 moves release packaging/security-preflight tools and the hostile-source negative fixture to Source only; every product capability and production helper stays in the runtime.",
   "package_mapping": {
     "archive_path": "package.json",
     "source_path": "distribution/runtime-package.json"
@@ -18,9 +18,11 @@
     "fixtures",
     "fixtures:phase2",
     "showcase",
-    "package:showcase"
+    "package:showcase",
+    "package",
+    "preflight"
   ],
-  "omitted_scope": "Only development benchmark/showcase/fixture commands are omitted from the runtime manifest. Production validate/build/QA/analyze/doctor/bootstrap/package/preflight/validate:all commands remain.",
+  "omitted_scope": "Development benchmark/showcase/fixture commands and the Source-only release packaging/preflight commands are omitted from the runtime manifest. Production validate/build/QA/analyze/doctor/bootstrap/validate:all commands remain.",
   "deterministic": {
     "fixed_timestamp": "2026-01-01T00:00:00",
     "file_mode": "0644",
@@ -129,10 +131,8 @@
     "scripts/analyze.js",
     "scripts/bootstrap.py",
     "scripts/doctor.py",
-    "scripts/package_runtime.py",
     "scripts/probe_env.py",
     "scripts/runtime_smoke.py",
-    "scripts/security_preflight.py",
     "skill/__init__.py",
     "skill/analytics/business-performance.json",
     "skill/analytics/project-analytics.json",
@@ -186,8 +186,6 @@
     "skill/profiles/training/profile.json",
     "skill/reasoning/fixtures/executive-incomplete-business/plan.json",
     "skill/reasoning/fixtures/executive-incomplete-business/sources/business-performance.json",
-    "skill/reasoning/fixtures/hostile-source/plan.json",
-    "skill/reasoning/fixtures/hostile-source/sources/hostile.md",
     "skill/reasoning/fixtures/multimodal-consolidation/plan.json",
     "skill/reasoning/fixtures/multimodal-consolidation/sources/synthetic-context.md",
     "skill/reasoning/fixtures/q4-six-actions/plan.json",

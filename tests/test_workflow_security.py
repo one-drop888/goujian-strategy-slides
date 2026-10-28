@@ -6,6 +6,7 @@ scanner gate, the live advisory check, the receipt re-verification, the
 hash-bound release evidence, or the typed publish approval. They do not run
 GitHub Actions.
 """
+import json
 import re
 import unittest
 from pathlib import Path
@@ -132,6 +133,88 @@ class WorkflowStructureTests(unittest.TestCase):
         self.assertLess(verifier, verify)
         self.assertLess(verifier, secret_write)
         self.assertIn("python-version: '3.14'", publisher[:verifier])
+
+    def test_runtime_selection_counts_are_185_declared_and_186_members(self):
+        for path, text in ((CI, self.ci), (RELEASE, self.release)):
+            self.assertIn('len(files) == 185', text, path)
+            self.assertIn('assert len(names) == 186', text, path)
+            self.assertNotIn('189', text, path)
+            self.assertNotIn('== 190', text, path)
+        self.assertIn("'archive_entries': 186", self.release)
+        for relative in ('scripts/package_runtime.py', 'scripts/security_preflight.py',
+                         'skill/reasoning/fixtures/hostile-source/plan.json',
+                         'skill/reasoning/fixtures/hostile-source/sources/hostile.md'):
+            self.assertIn(relative, self.release)
+
+    def test_candidate_version_and_release_notes_are_exactly_1_3_2(self):
+        self.assertEqual(self.release.count('VERSION: "1.3.2"'), 2)
+        self.assertEqual(self.release.count('test "$VERSION" = "1.3.2"'), 2)
+        self.assertEqual(self.release.count('version: "1.3.2"'), 2)
+        self.assertEqual(self.release.count("manifest.version !== '1.3.2'"), 1)
+        self.assertEqual(self.release.count('V1_3_2_RELEASE_NOTES.md'), 1)
+        self.assertNotIn('V1_3_1_RELEASE_NOTES.md', self.release)
+        self.assertIn("manifest.version !== '1.3.2'", self.ci)
+
+    def test_frozen_v1_3_1_baseline_and_both_parity_contracts_are_wired(self):
+        for text in (self.ci, self.release):
+            self.assertIn('25f269f8db333e27f23915ecb472eed6cb2709c6', text)
+            self.assertIn('72df06c921a80bbe1128a0964f22e187811943c6', text)
+            self.assertIn('7ee0d15488368a876ac2624546f72a13de8bdf01f322ed1055bb8c099d67b3dd', text)
+            self.assertIn('CAPABILITY_PARITY_V1_3_0_TO_V1_3_1', text)
+            self.assertIn('CAPABILITY_PARITY_V1_3_1_TO_V1_3_2', text)
+        self.assertIn('releases/download/v1.3.1/goujian-strategy-slides-v1.3.1.zip', self.ci)
+        self.assertIn('releases/download/$release/goujian-strategy-slides-$release.zip', self.release)
+        self.assertEqual(self.release.count('V131_BASELINE_COMMIT: 25f269f8db333e27f23915ecb472eed6cb2709c6'), 2)
+        self.assertEqual(self.release.count('V131_BASELINE_TAG_OBJECT: 72df06c921a80bbe1128a0964f22e187811943c6'), 2)
+        self.assertIn('--contract CAPABILITY_PARITY_V1_3_1_TO_V1_3_2', self.release)
+        self.assertIn('--contract CAPABILITY_PARITY_V1_3_0_TO_V1_3_1', self.release)
+        self.assertIn('V131_BASELINE_ROOT', self.release)
+        self.assertIn('distribution/runtime-package.json" "$v131_parent/content/package.json"',
+                      self.release)
+
+    def test_installed_runtime_repacks_use_the_source_packager_from_outside(self):
+        self.assertIn('"$GITHUB_WORKSPACE/scripts/package_runtime.py"', self.ci)
+        self.assertIn('--runtime-root "$PWD"', self.ci)
+        self.assertIn('--expect-sha256', self.ci)
+        self.assertEqual(self.release.count('"$GITHUB_WORKSPACE/scripts/package_runtime.py"'), 2)
+        self.assertEqual(self.release.count('--runtime-root "$PWD"'), 2)
+        self.assertEqual(self.release.count('"$GITHUB_WORKSPACE/scripts/security_preflight.py"'), 1)
+
+        in_runtime = self.release.split(
+            'cd "$RUNNER_TEMP/runtime-install/goujian-strategy-slides"', 1)[1]
+        self.assertNotIn('npm run package', in_runtime)
+        self.assertNotIn('npm run preflight', in_runtime)
+        self.assertIn('"$GITHUB_WORKSPACE/scripts/package_runtime.py"', in_runtime)
+
+        fresh_clone = self.release.split(
+            'git clone --depth 1 --branch "v$VERSION"', 1)[1].split(
+            'cd "$RUNNER_TEMP/runtime-install/goujian-strategy-slides"', 1)[0]
+        self.assertIn('npm run package', fresh_clone)
+        self.assertIn('npm run package:source', fresh_clone)
+        self.assertIn('python3 scripts/security_preflight.py', fresh_clone)
+
+    def test_candidate_source_archive_full_suite_and_runtime_acceptance_are_wired(self):
+        for path, text, receipt in (
+            (CI, self.ci, 'out/runtime-acceptance.json'),
+            (RELEASE, self.release, 'out/release-runtime-acceptance.json'),
+        ):
+            self.assertIn('scripts/runtime_acceptance.py', text, path)
+            self.assertIn('--source-root "$GITHUB_WORKSPACE"', text, path)
+            self.assertIn('--baseline-zip "$RUNNER_TEMP/goujian-v1.3.1-installer.zip"', text, path)
+            self.assertIn('--baseline-root', text, path)
+            self.assertIn('--node-modules "$GITHUB_WORKSPACE/node_modules"', text, path)
+            self.assertIn(receipt, text, path)
+            self.assertIn('goujian-source-acceptance', text, path)
+            self.assertIn('source-archive-acceptance', text, path)
+            self.assertIn('npm test | tee', text, path)
+            self.assertIn('installed_runtime_execution', text, path)
+        self.assertIn("CAPABILITY_PARITY_V1_3_1_TO_V1_3_2'", self.ci)
+        self.assertIn('release-runtime-acceptance.json release-source-archive-acceptance.json',
+                      self.release)
+        manifest = json.loads(
+            (ROOT / 'distribution/runtime-manifest.json').read_text(encoding='utf-8'))
+        for relative in ('scripts/runtime_acceptance.py', 'tests/test_runtime_acceptance.py'):
+            self.assertNotIn(relative, manifest['runtime_files'], relative)
 
     def test_actions_are_pinned_to_commit_shas(self):
         for text in (self.security, self.release):

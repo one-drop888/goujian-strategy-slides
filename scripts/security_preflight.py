@@ -55,7 +55,7 @@ COMMON_REQUIRED = {
     'THIRD_PARTY_NOTICE.md', 'package.json', 'package-lock.json',
     'requirements-render.txt', 'core/renderer/index.js', 'core/renderer/charts.js',
     'core/schema/deck.schema.json', 'core/qa/secure_deps.py',
-    'scripts/security_preflight.py', 'skill/scripts/build_deck.js',
+    'skill/scripts/build_deck.js',
 }
 NEW_PATCH_FILES = {
     'core/__init__.py', 'core/qa/__init__.py', 'skill/__init__.py',
@@ -64,9 +64,11 @@ NEW_PATCH_FILES = {
     'scripts/runtime_smoke.py', 'tests/validate_examples.py',
     'distribution/runtime-manifest.json', 'distribution/runtime-package.json',
 }
+# V1.3.2 moves release packaging/security-preflight tools to Source only.
+SOURCE_TOOLS = {'scripts/security_preflight.py', 'scripts/package_runtime.py'}
 RUNTIME_REQUIRED = COMMON_REQUIRED | NEW_PATCH_FILES
-SOURCE_REQUIRED = COMMON_REQUIRED | NEW_PATCH_FILES | {'tests/test_security_preflight.py'}
-LEGACY_REQUIRED = COMMON_REQUIRED | {'tests/test_security_preflight.py'}
+SOURCE_REQUIRED = COMMON_REQUIRED | NEW_PATCH_FILES | SOURCE_TOOLS | {'tests/test_security_preflight.py'}
+LEGACY_REQUIRED = COMMON_REQUIRED | SOURCE_TOOLS | {'tests/test_security_preflight.py'}
 # Historical public name retained for callers that do not pass a profile.
 REQUIRED_FILES = SOURCE_REQUIRED
 
@@ -949,11 +951,23 @@ def runtime_metadata_violations(profile, contents, allow_showcase=False, strict_
                     else:
                         notes.append(detail)
                 scripts = package.get('scripts') or {}
-                for command in ('test', 'test:core', 'validate:all', 'preflight', 'package'):
+                for command in ('test', 'test:core', 'validate:all'):
                     if command not in scripts:
                         problems.append(violation('RUNTIME_METADATA',
                                                   f'runtime package is missing command {command}',
                                                   PREFIX + 'package.json'))
+                omitted = set(manifest.get('omitted_commands') or [])
+                for command in ('package', 'preflight'):
+                    if command in scripts:
+                        problems.append(violation(
+                            'RUNTIME_METADATA',
+                            f'runtime package must omit the Source-only command {command}',
+                            PREFIX + 'package.json'))
+                    if command not in omitted:
+                        problems.append(violation(
+                            'RUNTIME_MANIFEST',
+                            f'runtime manifest must declare the Source-only command as omitted: {command}',
+                            PREFIX + 'distribution/runtime-manifest.json'))
                 if ('runtime_smoke.py' not in str(scripts.get('test', ''))
                         or '--tier auto' not in str(scripts.get('test', ''))):
                     problems.append(violation('RUNTIME_METADATA',
@@ -969,16 +983,13 @@ def runtime_metadata_violations(profile, contents, allow_showcase=False, strict_
                                               PREFIX + 'package.json'))
     elif profile == 'source':
         scripts = package.get('scripts') or {}
-        if 'package:source' not in scripts:
-            problems.append(violation('SOURCE_METADATA', 'source package is missing package:source',
-                                      PREFIX + 'package.json'))
-        if 'test:runtime' not in scripts:
-            problems.append(violation('SOURCE_METADATA', 'source package is missing test:runtime',
-                                      PREFIX + 'package.json'))
-        if 'benchmark' not in scripts:
-            problems.append(violation('SOURCE_METADATA',
-                                      'source package must retain the full development benchmark command',
-                                      PREFIX + 'package.json'))
+        required = ('preflight', 'package', 'package:source', 'security:scan',
+                    'security:verify', 'test:pdf', 'test:runtime', 'benchmark')
+        for command in required:
+            if command not in scripts:
+                problems.append(violation('SOURCE_METADATA',
+                                          f'source package is missing command {command}',
+                                          PREFIX + 'package.json'))
     return problems, notes
 
 

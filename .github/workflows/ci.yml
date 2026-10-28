@@ -101,9 +101,11 @@ jobs:
           manifest = json.loads((root / 'distribution/runtime-manifest.json').read_text(encoding='utf-8'))
           files = manifest['runtime_files']
           assert manifest['distribution'] == 'runtime'
-          assert len(files) == 189 and len(set(files)) == 189
+          assert len(files) == 185 and len(set(files)) == 185
           assert 'package.json' not in files
-          assert len(names) == 190
+          assert len(names) == 186
+          assert 'scripts/package_runtime.py' not in files
+          assert 'scripts/security_preflight.py' not in files
           assert (root / 'package.json').read_bytes() == (root / 'distribution/runtime-package.json').read_bytes()
           print(f'PASS: extracted {len(names)} runtime members into a Unicode directory; no node_modules, .venv, symlink or development overlay')
           PY
@@ -168,19 +170,18 @@ jobs:
           assert data['visual_qa'] in {'NOT_RUN', 'UNAVAILABLE'}, data['visual_qa']
           print('PASS: Doctor reports the isolated core tier honestly; secure-image is not claimed; VISUAL_QA is not approved')
           PY
-          python3 scripts/package_runtime.py "$RUNNER_TEMP/ci-runtime-rebuilt.zip" --json > "$RUNNER_TEMP/ci-runtime-rebuilt.json"
-          python3 - "$RUNNER_TEMP/ci-runtime-rebuilt.json" "$GITHUB_WORKSPACE/dist/runtime.zip" <<'PY'
-          import hashlib
+          digest="$(sha256sum "$GITHUB_WORKSPACE/dist/runtime.zip" | cut -d' ' -f1)"
+          python3 "$GITHUB_WORKSPACE/scripts/package_runtime.py" "$RUNNER_TEMP/ci-runtime-rebuilt.zip" \
+            --runtime-root "$PWD" --expect-sha256 "$digest" --json > "$RUNNER_TEMP/ci-runtime-rebuilt.json"
+          python3 - "$RUNNER_TEMP/ci-runtime-rebuilt.json" "$digest" <<'PY'
           import json
           import sys
           from pathlib import Path
 
           rebuilt = json.loads(Path(sys.argv[1]).read_text(encoding='utf-8'))
-          original = Path(sys.argv[2])
-          digest = hashlib.sha256(original.read_bytes()).hexdigest()
-          assert rebuilt['entries'] == 190, rebuilt['entries']
-          assert rebuilt['sha256'] == digest, (rebuilt['sha256'], digest)
-          print('PASS: repackaging from the clean core installation is byte-identical to the runtime ZIP')
+          assert rebuilt['entries'] == 186, rebuilt['entries']
+          assert rebuilt['sha256'] == sys.argv[2], (rebuilt['sha256'], sys.argv[2])
+          print('PASS: the Source packager reproduced the installed runtime byte-identically from data only')
           PY
 
   secure:
@@ -222,7 +223,7 @@ jobs:
           node - <<'JS'
           const fs = require('fs');
           const manifest = JSON.parse(fs.readFileSync('out/v1.3-showcase/showcase.manifest.json', 'utf8'));
-          if (manifest.version !== '1.3.1') throw new Error('showcase version is not 1.3.1');
+          if (manifest.version !== '1.3.2') throw new Error('showcase version is not 1.3.2');
           if (manifest.baseline !== null) throw new Error('Public showcase must not use a baseline path');
           if (!manifest.scenarios.length || !manifest.scenarios.every(item => item.comparison.status === 'NOT_RUN')) throw new Error('Public showcase comparison must be NOT_RUN');
           if (!(manifest.matrix.status === 'PASS' && manifest.gallery.status === 'PASS' && manifest.ledger.status === 'PASS')) throw new Error('A public V1.3 suite is not PASS');
@@ -235,53 +236,92 @@ jobs:
           const fingerprint = JSON.parse(fs.readFileSync('out/v1.3-showcase/engine-source-fingerprint.json', 'utf8'));
           if (preview.engine_source_fingerprint?.aggregate_sha256 !== fingerprint.aggregate_sha256) throw new Error('Checked-in previews are stale for this engine source');
           JS
-      - name: V1.3.0 tagged baseline and capability parity
+      - name: Tagged V1.3.0/V1.3.1 baselines and both capability parity contracts
         if: matrix.node == 24
         run: |
           set -euo pipefail
           V13_BASELINE_COMMIT=f592ff82b2399fb3e08f3d9128f92a1d82039065
           V13_BASELINE_TAG_OBJECT=5af41b05281c043dded880fc2ffe19ddb69f667c
+          V131_BASELINE_COMMIT=25f269f8db333e27f23915ecb472eed6cb2709c6
+          V131_BASELINE_TAG_OBJECT=72df06c921a80bbe1128a0964f22e187811943c6
           git fetch --tags origin
           if ! git rev-parse -q --verify refs/tags/v1.3.0 >/dev/null; then
+            git fetch --tags "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY.git"
+          fi
+          if ! git rev-parse -q --verify refs/tags/v1.3.1 >/dev/null; then
             git fetch --tags "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY.git"
           fi
           test "$(git cat-file -t refs/tags/v1.3.0)" = tag
           test "$(git rev-parse refs/tags/v1.3.0)" = "$V13_BASELINE_TAG_OBJECT"
           test "$(git rev-parse 'v1.3.0^{commit}')" = "$V13_BASELINE_COMMIT"
-          baseline_parent="$RUNNER_TEMP/v1.3.0-source"
-          rm -rf "$baseline_parent"
-          mkdir -p "$baseline_parent"
-          git archive --format=tar.gz --prefix=content/ 'v1.3.0' -o "$RUNNER_TEMP/v1.3.0-tag.tar.gz"
-          tar -xzf "$RUNNER_TEMP/v1.3.0-tag.tar.gz" -C "$baseline_parent"
-          baseline_root="$baseline_parent/content"
-          ln -sfn "$GITHUB_WORKSPACE/node_modules" "$baseline_root/node_modules"
+          test "$(git cat-file -t refs/tags/v1.3.1)" = tag
+          test "$(git rev-parse refs/tags/v1.3.1)" = "$V131_BASELINE_TAG_OBJECT"
+          test "$(git rev-parse 'v1.3.1^{commit}')" = "$V131_BASELINE_COMMIT"
+          for release in v1.3.0 v1.3.1; do
+            release_parent="$RUNNER_TEMP/$release-source"
+            rm -rf "$release_parent"
+            mkdir -p "$release_parent"
+            git archive --format=tar.gz --prefix=content/ "$release" -o "$RUNNER_TEMP/$release-tag.tar.gz"
+            tar -xzf "$RUNNER_TEMP/$release-tag.tar.gz" -C "$release_parent"
+            ln -sfn "$GITHUB_WORKSPACE/node_modules" "$release_parent/content/node_modules"
+          done
+          # The official Runtime ZIP's only differing member is package.json, which
+          # is mapped from distribution/runtime-package.json at that tag.
+          cp "$RUNNER_TEMP/v1.3.1-source/content/distribution/runtime-package.json" \
+             "$RUNNER_TEMP/v1.3.1-source/content/package.json"
           (
-            cd "$baseline_root"
+            cd "$RUNNER_TEMP/v1.3.0-source/content"
+            node scripts/build_showcase.js --no-previews
+          )
+          (
+            cd "$RUNNER_TEMP/v1.3.1-source/content"
             node scripts/build_showcase.js --no-previews
           )
           node - <<'JS'
           const fs = require('fs');
           const path = require('path');
-          const baseline = JSON.parse(fs.readFileSync(path.join(process.env.RUNNER_TEMP, 'v1.3.0-source/content/out/v1.3-showcase/showcase.manifest.json'), 'utf8'));
-          if (baseline.version !== '1.3.0') throw new Error('V1.3.0 baseline showcase version is not 1.3.0');
-          if (!(baseline.matrix.status === 'PASS' && baseline.gallery.status === 'PASS' && baseline.ledger.status === 'PASS')) throw new Error('A V1.3.0 baseline suite is not PASS');
+          const base = process.env.RUNNER_TEMP;
+          const v130 = JSON.parse(fs.readFileSync(path.join(base, 'v1.3.0-source/content/out/v1.3-showcase/showcase.manifest.json'), 'utf8'));
+          if (v130.version !== '1.3.0') throw new Error('V1.3.0 baseline showcase version is not 1.3.0');
+          if (!(v130.matrix.status === 'PASS' && v130.gallery.status === 'PASS' && v130.ledger.status === 'PASS')) throw new Error('A V1.3.0 baseline suite is not PASS');
+          const v131 = JSON.parse(fs.readFileSync(path.join(base, 'v1.3.1-source/content/out/v1.3-showcase/showcase.manifest.json'), 'utf8'));
+          if (v131.version !== '1.3.1') throw new Error('V1.3.1 baseline showcase version is not 1.3.1');
+          if (!(v131.matrix.status === 'PASS' && v131.gallery.status === 'PASS' && v131.ledger.status === 'PASS')) throw new Error('A V1.3.1 baseline suite is not PASS');
           JS
           curl --fail --location --proto "=https" --tlsv1.2 \
             "https://github.com/one-drop888/goujian-strategy-slides/releases/download/v1.3.0/goujian-strategy-slides-v1.3.0.zip" \
             --output "$RUNNER_TEMP/goujian-v1.3.0-installer.zip"
           printf '7df25c241d74c3bb34fc5569e021320fec675bded72c1e44d439a6f8485ad519  %s\n' "$RUNNER_TEMP/goujian-v1.3.0-installer.zip" | sha256sum --check -
-          python3 scripts/capability_parity.py "$baseline_root" "$GITHUB_WORKSPACE" --baseline-zip "$RUNNER_TEMP/goujian-v1.3.0-installer.zip" --json out/capability-parity.json
+          curl --fail --location --proto "=https" --tlsv1.2 \
+            "https://github.com/one-drop888/goujian-strategy-slides/releases/download/v1.3.1/goujian-strategy-slides-v1.3.1.zip" \
+            --output "$RUNNER_TEMP/goujian-v1.3.1-installer.zip"
+          printf '7ee0d15488368a876ac2624546f72a13de8bdf01f322ed1055bb8c099d67b3dd  %s\n' "$RUNNER_TEMP/goujian-v1.3.1-installer.zip" | sha256sum --check -
+          python3 scripts/capability_parity.py \
+            "$RUNNER_TEMP/v1.3.0-source/content" "$RUNNER_TEMP/v1.3.1-source/content" \
+            --baseline-zip "$RUNNER_TEMP/goujian-v1.3.0-installer.zip" \
+            --contract CAPABILITY_PARITY_V1_3_0_TO_V1_3_1 \
+            --json out/capability-parity-v130-v131.json
+          python3 scripts/capability_parity.py \
+            "$RUNNER_TEMP/v1.3.1-source/content" "$GITHUB_WORKSPACE" \
+            --baseline-zip "$RUNNER_TEMP/goujian-v1.3.1-installer.zip" \
+            --contract CAPABILITY_PARITY_V1_3_1_TO_V1_3_2 \
+            --json out/capability-parity-v131-v132.json
           python3 - <<'PY'
           import json
           from pathlib import Path
-          result = json.loads(Path('out/capability-parity.json').read_text(encoding='utf-8'))
-          assert result['status'] == 'PASS', result['failures']
-          assert result['capability_parity'] == 'CAPABILITY_PARITY_V1_3_0_TO_V1_3_1'
-          assert result['baseline']['version'] == '1.3.0'
-          assert result['candidate']['version'] == '1.3.1'
-          assert result['visual_review'] == 'NOT_RUN'
-          assert result['company_platform_security'] == 'NOT_VERIFIED'
-          print('PASS: V1.3.0 -> V1.3.1 capability parity')
+          checks = (
+              ('out/capability-parity-v130-v131.json', 'CAPABILITY_PARITY_V1_3_0_TO_V1_3_1', '1.3.0', '1.3.1'),
+              ('out/capability-parity-v131-v132.json', 'CAPABILITY_PARITY_V1_3_1_TO_V1_3_2', '1.3.1', '1.3.2'),
+          )
+          for path, contract, baseline, candidate in checks:
+              result = json.loads(Path(path).read_text(encoding='utf-8'))
+              assert result['status'] == 'PASS', (path, result['failures'])
+              assert result['capability_parity'] == contract, (path, result['capability_parity'])
+              assert result['baseline']['version'] == baseline, (path, result['baseline']['version'])
+              assert result['candidate']['version'] == candidate, (path, result['candidate']['version'])
+              assert result['visual_review'] == 'NOT_RUN', path
+              assert result['company_platform_security'] == 'NOT_VERIFIED', path
+          print('PASS: V1.3.0 -> V1.3.1 and V1.3.1 -> V1.3.2 capability parity')
           PY
       - name: Keep tracked source clean before packaging
         if: matrix.node == 24
@@ -325,6 +365,168 @@ jobs:
           PY
           python3 scripts/security_preflight.py dist/runtime.zip --profile runtime --strict-manifest --json out/runtime-preflight.json
           python3 scripts/security_preflight.py dist/source.zip --profile source --json out/source-preflight.json
+      - name: Accept the extracted candidate source archive with the full original suite
+        if: matrix.node == 24
+        run: |
+          set -euo pipefail
+          archive_root="$RUNNER_TEMP/goujian-source-acceptance"
+          rm -rf "$archive_root"
+          python3 - "$archive_root" dist/source.zip <<'PY'
+          import stat
+          import sys
+          import zipfile
+          from pathlib import Path
+
+          target = Path(sys.argv[1])
+          archive = Path(sys.argv[2])
+          prefix = 'goujian-strategy-slides/'
+          with zipfile.ZipFile(archive) as source:
+              infos = source.infolist()
+              names = [info.filename for info in infos]
+              assert names and len(names) == len(set(names))
+              assert [name for name in names if name.endswith('/SKILL.md')] == [prefix + 'SKILL.md']
+              for info in infos:
+                  name = info.filename
+                  assert name.startswith(prefix), f'member outside the declared prefix: {name}'
+                  assert not info.is_dir(), f'unexpected directory entry: {name}'
+                  mode = (info.external_attr >> 16) & 0xFFFF
+                  assert not stat.S_ISLNK(mode), f'symlink member: {name}'
+                  relative = name[len(prefix):]
+                  assert not relative.startswith(('node_modules/', '.venv/', 'out/', 'dist/')), f'install-state member: {name}'
+              target.mkdir(parents=True)
+              source.extractall(target)
+          print(f'PASS: extracted {len(names)} source members without install state or symlinks')
+          PY
+          source_root="$archive_root/goujian-strategy-slides"
+          test -f "$source_root/scripts/runtime_acceptance.py"
+          test -f "$source_root/tests/test_runtime_acceptance.py"
+          test -f "$source_root/security/review-ledger.json"
+          test -f "$source_root/.github/workflows/release.yml"
+          cd "$source_root"
+          npm ci
+          npm test | tee "$RUNNER_TEMP/source-archive-test.log"
+          python3 - "$GITHUB_WORKSPACE/dist/source.zip" "$source_root" "$RUNNER_TEMP/source-archive-test.log" "$GITHUB_WORKSPACE/out/source-archive-acceptance.json" <<'PY'
+          import hashlib
+          import json
+          import sys
+          from pathlib import Path
+
+          archive = Path(sys.argv[1])
+          source_root = Path(sys.argv[2])
+          log = Path(sys.argv[3])
+          receipt_path = Path(sys.argv[4])
+          package = json.loads((source_root / 'package.json').read_text(encoding='utf-8'))
+          log_text = log.read_text(encoding='utf-8')
+          assert package['version'] == '1.3.2', package['version']
+          assert log_text.strip(), 'the full source suite produced no output'
+          assert '# fail 0' in log_text, log_text[-2000:]
+          for relative in ('scripts/package_runtime.py', 'scripts/security_preflight.py',
+                           'scripts/runtime_acceptance.py', 'tests/test_runtime_acceptance.py',
+                           'skill/reasoning/fixtures/hostile-source/plan.json',
+                           'skill/reasoning/fixtures/hostile-source/sources/hostile.md'):
+              assert (source_root / relative).is_file(), relative
+          receipt = {
+              'schema_version': '1.3.2',
+              'status': 'PASS',
+              'gate': 'extracted_source_archive_full_suite',
+              'archive': {'file': 'dist/source.zip',
+                          'sha256': hashlib.sha256(archive.read_bytes()).hexdigest()},
+              'source_version': package['version'],
+              'test_command': 'npm test',
+              'test_log_sha256': hashlib.sha256(log_text.encode('utf-8')).hexdigest(),
+              'source_only_members_present': True,
+              'installed_runtime_execution': False,
+              'visual_qa': 'NOT_RUN',
+              'company_platform_security': 'NOT_VERIFIED',
+          }
+          receipt_path.parent.mkdir(parents=True, exist_ok=True)
+          receipt_path.write_text(json.dumps(receipt, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+          print('PASS: the extracted candidate source archive passed the full original suite')
+          PY
+      - name: Accept the actual installed candidate runtime against the locked v1.3.1 runtime
+        if: matrix.node == 24
+        run: |
+          set -euo pipefail
+          candidate_parent="$RUNNER_TEMP/goujian-candidate-runtime"
+          baseline_parent="$RUNNER_TEMP/goujian-baseline-runtime"
+          rm -rf "$candidate_parent" "$baseline_parent"
+          python3 - "$candidate_parent" dist/runtime.zip "$baseline_parent" "$RUNNER_TEMP/goujian-v1.3.1-installer.zip" <<'PY'
+          import stat
+          import sys
+          import zipfile
+          from pathlib import Path
+
+          prefix = 'goujian-strategy-slides/'
+          def extract(target, archive):
+              target = Path(target)
+              with zipfile.ZipFile(Path(archive)) as source:
+                  infos = source.infolist()
+                  names = [info.filename for info in infos]
+                  assert names and len(names) == len(set(names))
+                  assert [name for name in names if name.endswith('/SKILL.md')] == [prefix + 'SKILL.md']
+                  for info in infos:
+                      name = info.filename
+                      assert name.startswith(prefix), f'member outside the declared prefix: {name}'
+                      assert not info.is_dir(), f'unexpected directory entry: {name}'
+                      mode = (info.external_attr >> 16) & 0xFFFF
+                      assert not stat.S_ISLNK(mode), f'symlink member: {name}'
+                      relative = name[len(prefix):]
+                      assert not relative.startswith(('node_modules/', '.venv/', 'out/', 'dist/')), f'install-state member: {name}'
+                  target.mkdir(parents=True)
+                  source.extractall(target)
+              return len(names)
+          candidate = extract(sys.argv[1], sys.argv[2])
+          baseline = extract(sys.argv[3], sys.argv[4])
+          assert candidate == 186, candidate
+          print(f'PASS: extracted candidate runtime ({candidate} members) and the locked v1.3.1 baseline ({baseline} members)')
+          PY
+          candidate_root="$candidate_parent/goujian-strategy-slides"
+          baseline_root="$baseline_parent/goujian-strategy-slides"
+          empty_npmrc="$RUNNER_TEMP/goujian-empty-npmrc"
+          : > "$empty_npmrc"
+          (
+            cd "$candidate_root"
+            export NPM_CONFIG_USERCONFIG="$empty_npmrc"
+            python3 scripts/bootstrap.py --python "$(command -v python3)" --json > "$RUNNER_TEMP/candidate-bootstrap.json"
+          )
+          python3 - "$RUNNER_TEMP/candidate-bootstrap.json" <<'PY'
+          import json
+          import sys
+          from pathlib import Path
+
+          data = json.loads(Path(sys.argv[1]).read_text(encoding='utf-8'))
+          assert data['status'] == 'READY', data
+          assert data['tier'] == 'secure', data['tier']
+          assert data['secure_image'] == 'AVAILABLE', data['secure_image']
+          print(f"PASS: the candidate runtime clean install used isolated Pillow {data['pillow']}")
+          PY
+          "$candidate_root/.venv/bin/python" scripts/runtime_acceptance.py \
+            --source-root "$GITHUB_WORKSPACE" \
+            --runtime-root "$candidate_root" \
+            --baseline-zip "$RUNNER_TEMP/goujian-v1.3.1-installer.zip" \
+            --baseline-root "$baseline_root" \
+            --node-modules "$GITHUB_WORKSPACE/node_modules" \
+            --json out/runtime-acceptance.json > "$RUNNER_TEMP/runtime-acceptance-stdout.json"
+          python3 - "$GITHUB_WORKSPACE/out/runtime-acceptance.json" <<'PY'
+          import json
+          import sys
+          from pathlib import Path
+
+          result = json.loads(Path(sys.argv[1]).read_text(encoding='utf-8'))
+          assert result['status'] == 'PASS', result['failures']
+          assert result['capability_parity'] == 'CAPABILITY_PARITY_V1_3_1_TO_V1_3_2'
+          assert result['contract']['candidate_version'] == '1.3.2', result['contract']
+          assert result['contract']['baseline_version'] == '1.3.1', result['contract']
+          assert result['installed_runtime']['python']['isolated_prefix'] is True
+          assert result['installed_runtime']['baseline']['evidence']['status'] == 'PASS'
+          assert result['installed_runtime']['candidate']['evidence']['status'] == 'PASS'
+          assert set(result['comparisons']) == {'q4-generated', 'executive-review'}, result['comparisons']
+          for name, case in result['comparisons'].items():
+              assert case['status'] == 'PASS', (name, case['failures'])
+          assert result['visual_qa'] == 'NOT_RUN', result['visual_qa']
+          assert result['company_platform_security'] == 'NOT_VERIFIED'
+          print('PASS: the installed candidate runtime matched the locked v1.3.1 runtime for both Spec cases')
+          PY
       - name: Package and preflight the optional V1.3 showcase
         if: matrix.node == 24
         run: |
@@ -359,14 +561,17 @@ jobs:
         if: matrix.node == 24
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: v1.3.1-ci-showcase-node24-python314
+          name: v1.3.2-ci-showcase-node24-python314
           path: |
             out/v1.3-showcase
-            out/capability-parity.json
+            out/capability-parity-v130-v131.json
+            out/capability-parity-v131-v132.json
             out/runtime-package.json
             out/runtime-preflight.json
             out/source-package.json
             out/source-preflight.json
+            out/source-archive-acceptance.json
+            out/runtime-acceptance.json
             out/showcase-package.json
             out/showcase-preflight.json
           if-no-files-found: error

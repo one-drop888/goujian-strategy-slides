@@ -4,6 +4,7 @@ import shutil
 import sys
 import tempfile
 import unittest
+from unittest import mock
 import zipfile
 from pathlib import Path
 
@@ -127,8 +128,10 @@ class BaselineEvidenceTests(unittest.TestCase):
         self.assertEqual(evidence['archive']['tree_members_compared'], len(self.members))
 
     def test_wrong_locked_digest_is_rejected(self):
-        evidence = acceptance.baseline_runtime_evidence(
-            self.archive, self.root, self.contract('0' * 64))
+        with mock.patch.object(acceptance.zipfile, 'ZipFile') as opener:
+            evidence = acceptance.baseline_runtime_evidence(
+                self.archive, self.root, self.contract('0' * 64))
+        opener.assert_not_called()
         self.assertEqual(evidence['status'], 'FAIL')
         self.assertFalse(evidence['archive']['locked_zip_verified'])
 

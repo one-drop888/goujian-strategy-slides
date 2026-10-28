@@ -338,6 +338,9 @@ def baseline_runtime_evidence(zip_path, root, contract):
         zip_path, root, locked_sha256=contract['locked_baseline_zip_sha256'])
     if evidence.get('status') != 'PASS':
         failures.append('locked v1.3.1 baseline archive/tree identity failed')
+    if not evidence.get('locked_zip_verified'):
+        return {'status': 'FAIL', 'failures': failures, 'version': None,
+                'archive': evidence, 'symlinks': []}
     package_path = root / 'package.json'
     skill_path = root / 'SKILL.md'
     for path in (package_path, skill_path):

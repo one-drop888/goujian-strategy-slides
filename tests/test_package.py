@@ -241,6 +241,7 @@ def assert_output_location_guard(temp, packager):
     else:
         raise AssertionError('guard accepted an output symlink to a selected Source input')
     for protected in (ROOT / 'scripts/package_runtime.py', ROOT / 'package.json',
+                      ROOT / 'core/renderer/charts.js',
                       ROOT / 'distribution/runtime-manifest.json', ROOT / 'SKILL.md'):
         try:
             packager.validate_output_location(protected, None, entries)

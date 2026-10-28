@@ -104,9 +104,13 @@ def protected_source_paths(entries):
     for relative in ('package.json', RUNTIME_MANIFEST, 'distribution/runtime-package.json',
                      'SKILL.md', 'package-lock.json'):
         protected.add((ROOT / relative).resolve())
-    for value in (entries or {}).values():
+    for name, value in (entries or {}).items():
         if isinstance(value, (str, Path)):
             protected.add(Path(value).resolve())
+        if name.startswith(PREFIX + '/'):
+            canonical = ROOT / name[len(PREFIX) + 1:]
+            if canonical.is_file():
+                protected.add(canonical.resolve())
     return protected
 
 

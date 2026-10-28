@@ -33,6 +33,41 @@ def load(name, relative):
 preflight = load('goujian_security_preflight', 'scripts/security_preflight.py')
 packager = load('goujian_package_runtime', 'scripts/package_runtime.py')
 
+DETECTOR_SOURCE_NAMES = (
+    'SUBPROCESS_NAMES', 'DANGEROUS_DOTTED', 'SHELL_EXECUTABLES', 'PYTHON_EXECUTABLES',
+    'NODE_EXECUTABLES', 'JS_PATTERNS', 'INVENTORY_PATTERNS', 'strip_javascript_noise',
+    'static_string_call_argument', 'position_in_spans', 'python_inert_spans', 'scope_of',
+    'inventory_scope', 'scan_inventory', 'scan_literal', 'dotted_name', 'keyword_value',
+    'collect_python_aliases', 'resolve_dotted', 'literal_prefix', 'executable_name',
+    'scan_python_source', 'js_child_process_vars', 'js_alias_patterns',
+    'scan_javascript_source', 'finding',
+)
+# SHA-256 of the 26 detector source blocks extracted from the frozen official
+# v1.3.1 runtime (ZIP 7ee0d15..., tag 25f269f), not from the current file.
+DETECTOR_SOURCE_SHA256_V1_3_1 = 'f75f32ee543e11f1a7cd656d921114529b16aa8951925c34e3fcadaa6493e680'
+
+
+def detector_source_blocks(source):
+    tree = ast.parse(source)
+    found = {}
+    for node in tree.body:
+        if isinstance(node, (ast.FunctionDef, ast.ClassDef)):
+            found[node.name] = node
+        elif isinstance(node, ast.Assign):
+            for target in node.targets:
+                if isinstance(target, ast.Name):
+                    found[target.id] = node.value
+    missing = [name for name in DETECTOR_SOURCE_NAMES if name not in found]
+    if missing:
+        raise ValueError(f'missing detector top-level nodes: {missing}')
+    return {name: ast.get_source_segment(source, found[name]) for name in DETECTOR_SOURCE_NAMES}
+
+
+def detector_source_digest(source):
+    blocks = detector_source_blocks(source)
+    payload = '\n'.join(name + '\n' + blocks[name] for name in DETECTOR_SOURCE_NAMES)
+    return hashlib.sha256(payload.encode('utf-8')).hexdigest()
+
 
 def info_for(name, mode=FILE_MODE):
     info = zipfile.ZipInfo(name, FIXED_TIME)
@@ -299,30 +334,37 @@ class PreflightTests(unittest.TestCase):
         self.assertTrue(any('historical runtime schema 1.3.1' in note
                             for note in report['checks']['metadata']['notes']))
 
-    def test_executable_risk_detectors_are_ast_identical_to_v1_3_1(self):
-        """Pin the detector AST; equality with tag v1.3.1 (25f269f) was proven in Phase 1."""
-        names = (
-            'SUBPROCESS_NAMES', 'DANGEROUS_DOTTED', 'SHELL_EXECUTABLES', 'PYTHON_EXECUTABLES',
-            'NODE_EXECUTABLES', 'JS_PATTERNS', 'INVENTORY_PATTERNS', 'strip_javascript_noise',
-            'static_string_call_argument', 'position_in_spans', 'python_inert_spans', 'scope_of',
-            'inventory_scope', 'scan_inventory', 'scan_literal', 'dotted_name', 'keyword_value',
-            'collect_python_aliases', 'resolve_dotted', 'literal_prefix', 'executable_name',
-            'scan_python_source', 'js_child_process_vars', 'js_alias_patterns',
-            'scan_javascript_source', 'finding',
-        )
-        tree = ast.parse((ROOT / 'scripts/security_preflight.py').read_text(encoding='utf-8'))
-        found = {}
-        for node in tree.body:
-            if isinstance(node, (ast.FunctionDef, ast.ClassDef)):
-                found[node.name] = node
-            elif isinstance(node, ast.Assign):
-                for target in node.targets:
-                    if isinstance(target, ast.Name):
-                        found[target.id] = node.value
-        payload = '\n'.join(name + '\n' + ast.dump(found[name], include_attributes=False)
-                            for name in names)
-        self.assertEqual(hashlib.sha256(payload.encode('utf-8')).hexdigest(),
-                         'b0756be5aea1511cbf8fd9919abcf1d32a8acd95ecf2aa44b454b2d866f20433')
+    def test_detector_source_blocks_are_byte_identical_to_v1_3_1(self):
+        """Pin the 26 unchanged detector source blocks; the digest is derived from the
+        frozen v1.3.1 reference (ZIP 7ee0d15..., tag 25f269f), not from current code."""
+        current = (ROOT / 'scripts/security_preflight.py').read_text(encoding='utf-8')
+        blocks = detector_source_blocks(current)
+        self.assertEqual(set(blocks), set(DETECTOR_SOURCE_NAMES))
+        self.assertEqual(detector_source_digest(current), DETECTOR_SOURCE_SHA256_V1_3_1)
+
+        official = ROOT / 'out/v132-control/official-v1.3.1-runtime.zip'
+        if not official.is_file():
+            return
+        self.assertEqual(hashlib.sha256(official.read_bytes()).hexdigest(),
+                         '7ee0d15488368a876ac2624546f72a13de8bdf01f322ed1055bb8c099d67b3dd')
+        with zipfile.ZipFile(official) as archive:
+            old = archive.read(PREFIX + 'scripts/security_preflight.py').decode('utf-8')
+        old_blocks = detector_source_blocks(old)
+        self.assertEqual(detector_source_digest(old), DETECTOR_SOURCE_SHA256_V1_3_1)
+        self.assertEqual(blocks, old_blocks)
+
+    def test_detector_source_pin_rejects_changed_or_missing_blocks(self):
+        current = (ROOT / 'scripts/security_preflight.py').read_text(encoding='utf-8')
+        changed = current.replace(
+            "SHELL_EXECUTABLES = {'sh', 'bash', 'zsh', 'dash'",
+            "SHELL_EXECUTABLES = {'sh', 'bash', 'zsh2', 'dash'", 1)
+        self.assertNotEqual(changed, current)
+        self.assertNotEqual(detector_source_digest(changed), DETECTOR_SOURCE_SHA256_V1_3_1)
+
+        missing = current.replace('def scan_literal(', 'def scan_literal_missing(', 1)
+        self.assertNotEqual(missing, current)
+        with self.assertRaisesRegex(ValueError, 'scan_literal'):
+            detector_source_digest(missing)
 
     def test_dynamic_module_loading_is_rejected_in_runtime(self):
         source = ('import importlib.util\nspec = importlib.util.spec_from_file_location("m", "/tmp/x.py")\nmodule = importlib.util.module_from_spec(spec)\nspec.loader.exec_module(module)\n')

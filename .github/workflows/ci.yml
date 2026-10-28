@@ -7,7 +7,7 @@ permissions:
 jobs:
   core:
     name: Core-only (Node ${{ matrix.node }}, Python ${{ matrix.python }})
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     strategy:
       matrix:
         include:
@@ -185,7 +185,7 @@ jobs:
 
   secure:
     name: Secure image tier (Node ${{ matrix.node }}, Python ${{ matrix.python }})
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     strategy:
       matrix:
         include:

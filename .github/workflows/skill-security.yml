@@ -20,7 +20,7 @@ env:
 jobs:
   package-security:
     name: Package security gate
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 60
     steps:
       - name: Check out the exact commit under test

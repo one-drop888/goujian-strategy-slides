@@ -360,6 +360,7 @@ jobs:
           set -e
           test "${npm_test_status[0]}" -eq 0
           test "${npm_test_status[1]}" -eq 0
+          cp "$RUNNER_TEMP/source-archive-test.log" "$GITHUB_WORKSPACE/out/release-source-archive-test.log"
           python3 - "$GITHUB_WORKSPACE/dist/goujian-strategy-slides-v$VERSION-source.zip" "$source_root" "$RUNNER_TEMP/source-archive-test.log" "$GITHUB_WORKSPACE/out/release-source-archive-acceptance.json" "$VERSION" "${npm_test_status[0]}" "${npm_test_status[1]}" <<'PY'
           import hashlib
           import json
@@ -374,7 +375,8 @@ jobs:
           npm_status = int(sys.argv[6])
           tee_status = int(sys.argv[7])
           package = json.loads((source_root / 'package.json').read_text(encoding='utf-8'))
-          log_text = log.read_text(encoding='utf-8')
+          log_bytes = log.read_bytes()
+          log_text = log_bytes.decode('utf-8')
           assert package['version'] == version, (package['version'], version)
           assert log_text.strip(), 'the full source suite produced no output'
           assert npm_status == 0, f'npm test exited {npm_status}'
@@ -393,7 +395,7 @@ jobs:
               'source_version': package['version'],
               'test_command': 'npm test',
               'test_exit_statuses': {'npm': npm_status, 'tee': tee_status},
-              'test_log_sha256': hashlib.sha256(log_text.encode('utf-8')).hexdigest(),
+              'test_log_sha256': hashlib.sha256(log_bytes).hexdigest(),
               'source_only_members_present': True,
               'required_source_files_present': True,
               'installed_runtime_execution': False,
@@ -1341,6 +1343,7 @@ jobs:
             dist
             out/security-gate
             out/release-*.json
+            out/release-source-archive-test.log
             out/release-runtime-acceptance-artifacts-*
           if-no-files-found: error
           retention-days: 90

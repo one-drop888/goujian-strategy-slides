@@ -99,3 +99,16 @@ test-file hash. The other 36 exact reviews are unchanged. This is not an
 approval to skip the real Python 3.9/3.11 CI rerun; all required checks must
 pass at the repaired commit before merge. Historical Phase 1b test counts
 remain historical, not retroactively increased.
+
+The repaired run `40707924666` subsequently passed both older-Python tiers,
+security and historical parity, then exposed a receipt-format defect: the
+extracted Source ZIP's tests succeeded, but a TAP-only output assertion rejected
+Node 24's Unicode spec reporter. Repair `c20a386` captures the real npm and tee
+exit codes immediately, rejects either failure and binds both codes to the
+existing receipt. Codex reviewed the capture and failure probes, reran 28 tests
+on Python 3.10 and 3.14, and strengthened the positive receipt fixture to contain
+only the actual Unicode reporter format. Raw test logs are retained in both
+workflow artifacts and hashed as bytes, so their recorded digest can be
+independently reproduced. Neither source-test execution nor any safety gate is
+removed. Runtime bytes, the renderer and all 38 exact reviews remain unchanged;
+the corrected full CI and Release rehearsal are still required.

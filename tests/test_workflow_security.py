@@ -254,6 +254,8 @@ class WorkflowStructureTests(unittest.TestCase):
             self.assertNotIn(relative, manifest['runtime_files'], relative)
 
     def test_source_acceptance_capture_and_receipt_are_shared_and_exit_based(self):
+        self.assertIn('out/source-archive-test.log', self.ci)
+        self.assertIn('out/release-source-archive-test.log', self.release)
         for text in (self.ci, self.release):
             self.assertEqual(text.count(PIPESTATUS_CAPTURE), 1,
                              'PIPESTATUS must be saved once, immediately after the pipeline')
@@ -397,7 +399,7 @@ class SourceAcceptanceReceiptTests(unittest.TestCase):
         archive = self.tmp / 'source.zip'
         archive.write_bytes(b'archive-bytes')
         log = self.tmp / 'source-archive-test.log'
-        log.write_text('TAP version 13\n1..1\n# fail 0\n\u2139 fail 0\n', encoding='utf-8')
+        log.write_text('\u2139 tests 1\n\u2139 pass 1\n\u2139 fail 0\n', encoding='utf-8')
         receipt_path = self.tmp / 'out' / 'source-archive-acceptance.json'
         return source_root, archive, log, receipt_path
 

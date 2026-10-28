@@ -422,6 +422,26 @@ parser wheel.
   Release is the durable evidence record; do not claim workflow artifacts are
   retained forever.
 
+### Validated runner pin / 已验证 Runner 固定 — 2026-10-28
+
+PR #2's `Core-only (Node 18, Python 3.9)` job `122539321007` passed on the
+`ubuntu-24.04` image with CPython 3.9.25. After merge, `main` CI run
+`40605205828` ran the same job (`122542872231`) on `ubuntu-26.04`, where
+`actions/setup-python` had no 3.9 build and failed before any product test ran.
+This is a runner image migration, not a transient download failure. All five
+`runs-on` labels in the three existing workflows are therefore pinned to
+`ubuntu-24.04`, the same validated OS family as the passing PR and baseline,
+while keeping every Python/Node leg, scan, preflight, negative control, check
+name, publisher dependency, typed `publish=false` default, permission and
+action pin unchanged. This does not claim Ubuntu 26.04 support, and it does not
+claim that `main` CI passed before the fixed run actually completes.
+
+PR #2 的 CORE 作业在 `ubuntu-24.04` 上以 CPython 3.9.25 通过；合并后 `main`
+CI 的同一作业被调度到 `ubuntu-26.04`，因 `actions/setup-python` 无 3.9 构建而在
+产品测试前失败。这是 Runner 镜像迁移，不是瞬时下载故障。三个现有工作流的五个
+`runs-on` 因此固定到 `ubuntu-24.04`；在修复后的实际运行完成前，不声称 `main`
+CI 已通过，也不声称支持 Ubuntu 26.04。
+
 No GitHub status or workflow may fake a PASS. A red gate is the correct state
 until reviews are independently approved.
 

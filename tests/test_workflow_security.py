@@ -11,6 +11,7 @@ import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+CI = ROOT / '.github/workflows/ci.yml'
 SECURITY = ROOT / '.github/workflows/skill-security.yml'
 RELEASE = ROOT / '.github/workflows/release.yml'
 
@@ -18,8 +19,21 @@ RELEASE = ROOT / '.github/workflows/release.yml'
 class WorkflowStructureTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
+        cls.ci = CI.read_text(encoding='utf-8')
         cls.security = SECURITY.read_text(encoding='utf-8')
         cls.release = RELEASE.read_text(encoding='utf-8')
+
+    def test_all_jobs_pin_validated_runner_and_core_leg_survives(self):
+        for path in (CI, SECURITY, RELEASE):
+            text = path.read_text(encoding='utf-8')
+            self.assertNotIn('ubuntu-latest', text, path)
+            labels = re.findall(r'^\s+runs-on:\s*(\S+)\s*$', text, re.MULTILINE)
+            self.assertTrue(labels, f'{path} declares no runs-on label')
+            self.assertEqual(set(labels), {'ubuntu-24.04'}, (path, labels))
+        core_job = self.ci.split('\n  core:\n', 1)[1].split('\n  secure:\n', 1)[0]
+        self.assertIn('runs-on: ubuntu-24.04', core_job)
+        self.assertIn('- node: 18', core_job)
+        self.assertRegex(core_job, r"python:\s*'3\.9'")
 
     def test_pr_workflow_scans_runtime_and_source_with_git_identity(self):
         self.assertIn('scripts/scan_skill_package.py scan', self.security)

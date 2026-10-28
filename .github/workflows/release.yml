@@ -24,7 +24,7 @@ jobs:
   validate:
     name: Validate and security-gate (no mutation)
     if: github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       contents: read
     env:
@@ -1016,7 +1016,7 @@ jobs:
     name: Publish Release (explicit publish=true only)
     needs: validate
     if: github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch' && inputs.publish == true
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       contents: write
     env:

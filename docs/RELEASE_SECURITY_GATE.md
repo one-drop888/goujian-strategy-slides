@@ -1,17 +1,39 @@
 # Release Security Gate / 发布安全门
 
-Status: **PR #1 is merged on `main` at `e5a83df`; all `main` CI/security checks
-PASS. The read-only release rehearsal `40506964205` FAILed at the security gate
-with 21 raw HIGH `PDF_STRUCTURAL_THREAT` findings, and its write-capable publish
-job was SKIPped. The PDF structural policy remains `PENDING_CODEX_REVIEW`; the
-PDF candidate changes in this checkout have not run in CI.**
+Status (observed checkpoint, commit `6b14f7fd833e7b74f44be2e8835e6ba8e1a9af70`,
+2026-10-28): **on this exact commit, `main` CI
+[`40608352111`](https://github.com/one-drop888/goujian-strategy-slides/actions/runs/40608352111)
+PASSed all three tiers (Core-only Node 18/Python 3.9; Secure image Node
+18/Python 3.11; Secure image Node 24/Python 3.14), the push security gate
+[`40608352264`](https://github.com/one-drop888/goujian-strategy-slides/actions/runs/40608352264)
+PASSed, and the `publish=false` Release rehearsal
+[`40608419843`](https://github.com/one-drop888/goujian-strategy-slides/actions/runs/40608419843)
+PASSed with its write-capable publish job SKIPped. The three downloaded archives
+were independently re-verified from a fresh remote clone
+(`out/security-gate-control/github/final-release-artifact/CODEX_FINAL_ARTIFACT_ACCEPTANCE.json`),
+and the 125 live public advisory coordinates returned zero findings. The PDF
+policy at this commit is `APPROVED` (independent Codex review,
+`2026-10-27T23:29:51Z`); the showcase retains all 21 raw HIGH
+`PDF_STRUCTURAL_THREAT` findings, every one adjudicated only through the exact
+structural policy and never suppressed. Any later revision requires its own
+scans, CI and rehearsal and does not inherit this PASS.**
 This document describes the permanent package security gate. It does not claim a
 security clearance. Company-platform acceptance is separately tracked.
 
-状态：**PR #1 已合并到 `main`（`e5a83df`），`main` 的全部 CI/安全门检查为 PASS。
-只读 Release 演练 `40506964205` 在安全门处因 21 个原始 HIGH
-`PDF_STRUCTURAL_THREAT` 发现而 FAIL，具备写权限的 publish 作业被 SKIP。PDF 结构策略
-仍为 `PENDING_CODEX_REVIEW`；当前检出中的 PDF 候选改动尚未在 CI 运行。**
+状态（观察检查点，提交 `6b14f7fd833e7b74f44be2e8835e6ba8e1a9af70`，2026-10-28）：
+**在该精确提交上，`main` CI
+[`40608352111`](https://github.com/one-drop888/goujian-strategy-slides/actions/runs/40608352111)
+三个分层全部 PASS（Core-only Node 18/Python 3.9；Secure image Node 18/Python 3.11；
+Secure image Node 24/Python 3.14），push 安全门
+[`40608352264`](https://github.com/one-drop888/goujian-strategy-slides/actions/runs/40608352264)
+PASS，`publish=false` Release 演练
+[`40608419843`](https://github.com/one-drop888/goujian-strategy-slides/actions/runs/40608419843)
+PASS，具备写权限的 publish 作业被 SKIP。三份下载归档已在全新远程克隆中独立复验
+（`out/security-gate-control/github/final-release-artifact/CODEX_FINAL_ARTIFACT_ACCEPTANCE.json`），
+125 个实时公共公告坐标零发现。该提交的 PDF 策略为 `APPROVED`（独立 Codex 评审，
+`2026-10-27T23:29:51Z`）；showcase 保留全部 21 条原始 HIGH
+`PDF_STRUCTURAL_THREAT` 发现，仅经精确结构策略逐条裁定，从未被抑制。任何后续修订都需
+自行运行扫描、CI 与演练，不继承本 PASS。**
 本文描述常驻的软件包安全门，不代表已获得安全认证。公司平台验收另行跟踪。
 
 ## Summary / 概述
@@ -22,17 +44,20 @@ Skill Scanner in an isolated environment. A HIGH or CRITICAL finding blocks the
 release unless an independent reviewer has recorded an exact, content-bound
 review. A separate, narrowly scoped PDF structural review may adjudicate only
 `PDF_STRUCTURAL_THREAT` findings whose metadata is exactly
-`{"/OpenAction": 1}`; it never edits raw severities. That policy is currently
-`PENDING_CODEX_REVIEW`, so it does not unblock anything. Raw evidence is always
-retained, and JavaScript behavioral and semantic analysis are explicitly
-`NOT_RUN`.
+`{"/OpenAction": 1}`; it never edits raw severities. At checkpoint `6b14f7f`
+that policy is `APPROVED` for the exact pinned identities, so it unblocks only
+those exact structural facts; a pending policy, or any new or changed
+checker/parser/policy, requires a new independent review and fails closed. Raw
+evidence is always retained, and JavaScript behavioral and semantic analysis are
+explicitly `NOT_RUN`.
 
 **中文.** 每个发布包都从已批准的提交构建，先经过既有产品预检，再在隔离环境中由固定版本、
 哈希锁定的 Cisco Skill Scanner 扫描。除非独立评审记录了与内容精确绑定的审查结论，否则
 HIGH 或 CRITICAL 发现会阻止发布。另有一个范围很窄的 PDF 结构复核，只能裁定元数据精确为
-`{"/OpenAction": 1}` 的 `PDF_STRUCTURAL_THREAT` 发现，且绝不修改原始严重级别。该策略当前为
-`PENDING_CODEX_REVIEW`，不会解除任何阻断。原始证据始终保留，JavaScript 行为分析与语义分析
-明确标记为 `NOT_RUN`。
+`{"/OpenAction": 1}` 的 `PDF_STRUCTURAL_THREAT` 发现，且绝不修改原始严重级别。在检查点
+`6b14f7f`，该策略对精确固定的身份为 `APPROVED`，仅解除这些精确结构事实的阻断；待定策略
+或任何新增、变更的检查器/解析器/策略都需新的独立评审并失败关闭。原始证据始终保留，
+JavaScript 行为分析与语义分析明确标记为 `NOT_RUN`。
 
 ## Architecture / 架构
 
@@ -53,9 +78,9 @@ HIGH 或 CRITICAL 发现会阻止发布。另有一个范围很窄的 PDF 结构
   hash-locked `pypdf` wheel used only by the PDF checker. It is **not** part of
   the 100-package scanner lock and is **not** in the product runtime or
   Bootstrap.
-- `security/pdf-structural-policy.json` — the tracked PDF policy. Its current
-  status is `PENDING_CODEX_REVIEW`; only an independent Codex review may change
-  that status.
+- `security/pdf-structural-policy.json` — the tracked PDF policy. At checkpoint
+  `6b14f7f` its status is `APPROVED` for the exact pinned checker, parser and
+  policy identities; only a new independent Codex review may change that status.
 - `tests/test_pdf_structural_review.py` — real-parser positive/negative tests,
   including attachment, embedded-file, spoofed `/A`, indirect, escaped,
   compressed, encrypted, malformed, resource-limit and forged-metadata cases.
@@ -253,9 +278,10 @@ rendered or fetched.
     attribute, parser warning/error, encryption, ambiguous/incremental xref,
     duplicate key, or resource-limit overrun. `pypdf` object semantics are used;
     `/S` in StructElem layout attributes and ExtGState transparency is not
-    treated as an action. Any unsupported shape fails closed. The policy is
-    currently pending independent approval; a pending policy leaves the finding
-    blocking.
+    treated as an action. Any unsupported shape fails closed. At checkpoint
+    `6b14f7f` the policy is `APPROVED` for the exact pinned identities; a pending
+    policy, or any new or changed checker/parser/policy, leaves the finding
+    blocking and fails closed.
 
 ## Coverage and limits / 覆盖范围与限制
 
@@ -264,7 +290,7 @@ rendered or fetched.
 | Static detection (Python, JS, docs, config) | ANALYZED |
 | Python behavioral analysis | ANALYZED |
 | Bash behavioral analysis | ANALYZED |
-| PDF structural OpenAction adjudication (narrow policy) | ANALYZED, POLICY PENDING |
+| PDF structural OpenAction adjudication (narrow policy) | ANALYZED, POLICY APPROVED (exact pins) |
 | PDF rendering, execution, JavaScript or semantic behavior | **NOT_RUN** |
 | JavaScript behavioral dataflow | **NOT_RUN** |
 | Semantic / LLM intent and alignment | **NOT_RUN** |
@@ -309,8 +335,11 @@ security. 第三方扫描器没有 JavaScript 数据流分析，JavaScript 仅�
   computes `effective_blocking`. The receipt records the policy id/SHA, checker
   SHA, parser version/wheel hash, eligible count, adjudicated count, blocking
   count, object/page facts and the hash of the exact facts file.
-- The tracked policy is currently `PENDING_CODEX_REVIEW`, so even verified
-  structural facts do not unblock a finding. Qoder must not set `APPROVED`.
+- The tracked policy at checkpoint `6b14f7f` is `APPROVED` for the exact pinned
+  checker/parser/policy identities, so only verified structural facts on those
+  exact bytes unblock an eligible finding. A pending policy, or any new or
+  changed checker, parser, policy or observed fingerprint, requires a new
+  independent review and fails closed; Qoder must not set or refresh `APPROVED`.
 - `verify` re-runs the checker on the exact extracted PDF and compares the
   recomputed facts with the retained facts byte-for-byte. A changed PDF, forged
   facts, changed checker/policy/parser identity, missing parser, checker error,
@@ -435,12 +464,20 @@ while keeping every Python/Node leg, scan, preflight, negative control, check
 name, publisher dependency, typed `publish=false` default, permission and
 action pin unchanged. This does not claim Ubuntu 26.04 support, and it does not
 claim that `main` CI passed before the fixed run actually completes.
+At checkpoint `6b14f7f` (2026-10-28) the pinned `ubuntu-24.04` configuration
+later passed CI
+[`40608352111`](https://github.com/one-drop888/goujian-strategy-slides/actions/runs/40608352111)
+with all three tiers; the earlier `40605205828` failure remains a historical
+event and is not rewritten.
 
 PR #2 的 CORE 作业在 `ubuntu-24.04` 上以 CPython 3.9.25 通过；合并后 `main`
 CI 的同一作业被调度到 `ubuntu-26.04`，因 `actions/setup-python` 无 3.9 构建而在
 产品测试前失败。这是 Runner 镜像迁移，不是瞬时下载故障。三个现有工作流的五个
 `runs-on` 因此固定到 `ubuntu-24.04`；在修复后的实际运行完成前，不声称 `main`
 CI 已通过，也不声称支持 Ubuntu 26.04。
+在检查点 `6b14f7f`（2026-10-28），固定后的 `ubuntu-24.04` 配置随后通过 CI
+[`40608352111`](https://github.com/one-drop888/goujian-strategy-slides/actions/runs/40608352111)
+三个分层；此前的 `40605205828` 失败保留为历史事件，不予改写。
 
 No GitHub status or workflow may fake a PASS. A red gate is the correct state
 until reviews are independently approved.
@@ -482,9 +519,11 @@ proved those exact bytes caused the failure.
 **边界声明.** 上述三行是公司上传报错的强候选，且与不可变的 v1.3.1 包及其源码绑定，
 但服务端归因**尚未**验证。不得声称公司服务器已证明正是这三处字节导致失败。
 
-### PDF structural review candidate / PDF 结构复核候选
+### Historical PDF structural review candidate / 历史 PDF 结构复核候选
 
-Release rehearsal `40506964205` was blocked by 21 raw HIGH
+**Historical pending candidate at commit `e5a83df` (2026-10-27).** This section
+records the checkpoint before policy approval. Release rehearsal `40506964205`
+was blocked by 21 raw HIGH
 `PDF_STRUCTURAL_THREAT` findings. Every one has `line_number: null` and metadata
 exactly `{"/OpenAction": 1}`; no other rule, severity or metadata shape is
 eligible. The 21 PDFs were parsed byte-for-byte with the pinned `pypdf` 6.21.3
@@ -495,17 +534,18 @@ destination is a direct local-page `/XYZ null null 0` array, and the only `/A`
 entries are StructElem layout attributes. This is a structural proof on those
 exact bytes; it is not a rendering or execution sandbox.
 
-At the initial checkpoint the policy was `PENDING_CODEX_REVIEW`, and all 21
+At that historical checkpoint the policy was `PENDING_CODEX_REVIEW`, and all 21
 findings remained blocking. Qoder did not approve it or change raw severities.
 The independent decision below supersedes that checkpoint; it does not turn
 the failed rehearsal into a successful run.
 
-### PDF 结构复核候选
+### 历史 PDF 结构复核候选
 
+**提交 `e5a83df`（2026-10-27）的历史待定候选。** 本节记录策略批准前的检查点。
 Release rehearsal `40506964205` 被 21 条原始 HIGH `PDF_STRUCTURAL_THREAT` 发现阻断。
 这些发现的 `line_number` 均为 `null`，metadata 精确为 `{"/OpenAction": 1}`；
 其他规则、严重级别或 metadata 形状都不在裁定范围内。上述结论仅针对这 21 个精确字节，
-是结构证明，不是渲染或执行沙箱。初始检查点的策略为 `PENDING_CODEX_REVIEW`，
+是结构证明，不是渲染或执行沙箱。该历史检查点的策略为 `PENDING_CODEX_REVIEW`，
 21 条发现均保持阻断；Qoder 未批准或修改原始严重级别。下述独立决定更新了该检查点，
 但不把此前失败的演练改写为通过。
 
@@ -529,9 +569,12 @@ Codex 已批准与上述 SHA256 精确绑定的检查器，并独立验证 116/1
 可据实裁定；原始 HIGH 与 JSON/SARIF 保留，任何异常继续阻断。这不是通用 PDF
 安全、JavaScript 执行分析或公司平台认证。
 
-The follow-up commit still needs its own actual package scans, protected-branch
-Actions and non-publishing Release rehearsal. Local policy approval is not CI
-or release-path acceptance.
+The approval is local policy acceptance only. The follow-up at commit
+`6b14f7fd833e7b74f44be2e8835e6ba8e1a9af70` subsequently ran its own protected-
+branch CI `40608352111`, push security gate `40608352264` and `publish=false`
+Release rehearsal `40608419843`, all PASS; the rehearsal's write-capable publish
+job was SKIPped. Any later revision requires its own scans, CI and rehearsal and
+does not inherit those results.
 
 ## Licensing / 许可
 

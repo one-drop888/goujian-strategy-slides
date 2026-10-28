@@ -10,13 +10,22 @@ Owner and independent acceptance: Codex. Engineering executor: Qoder CN CLI.
 - Product runtime, renderers, numeric semantics, fonts/images, analysis and QA retain their existing capabilities.
 - This control file tracks engineering decisions. Raw local logs stay in ignored `out/security-gate-control/`; CI archives its own reports on success and failure.
 
-## Observed GitHub state (2026-10-28)
+## Observed GitHub state (checkpoint commit `6b14f7fd833e7b74f44be2e8835e6ba8e1a9af70`, 2026-10-28)
 
-- PR #1 (`feat/permanent-skill-security-gate`) is merged; `main` is `e5a83dfcfe51df11e5def444e356ae9f1fb75cab`.
-- `main` continuation run `40506891052`: all three jobs PASS, including the package security gate — Core-only (Node 18, Python 3.9), Secure image tier (Node 18, Python 3.11) and Secure image tier (Node 24, Python 3.14).
-- Read-only release rehearsal `40506964205` (`Validate and security-gate (no mutation)`) FAILED at step 24, "Security-gate the actual runtime, source and showcase archives", with 21 raw HIGH `PDF_STRUCTURAL_THREAT` findings. The write-capable `Publish Release (explicit publish=true only)` job was SKIPped; no tag, Release or asset changed.
-- Branch protection is verified: required status checks, strict branch, `enforce_admins`, no force pushes or deletions.
-- `security/pdf-structural-policy.json` remains `PENDING_CODEX_REVIEW`. The local PDF candidate on `fix/pdf-destination-security-review` has not been pushed and has not run in CI; local evidence is not CI evidence.
+- On this exact commit, `main` CI `40608352111` PASSed all three jobs: Core-only (Node 18, Python 3.9), Secure image tier (Node 18, Python 3.11) and Secure image tier (Node 24, Python 3.14).
+- Push security gate `40608352264` PASSed on the same commit.
+- `publish=false` Release rehearsal `40608419843` PASSed; the write-capable `Publish Release (explicit publish=true only)` job was SKIPped, so no tag, Release or asset changed.
+- `security/pdf-structural-policy.json` is `APPROVED` (independent Codex review, `2026-10-27T23:29:51Z`) for the exact pinned checker/parser/policy identities. Any new or changed checker/parser/policy requires a new independent review and fails closed.
+- The three downloaded archives were independently re-verified from a fresh remote clone; acceptance is `out/security-gate-control/github/final-release-artifact/CODEX_FINAL_ARTIFACT_ACCEPTANCE.json`. The showcase retains 21 raw HIGH PDF findings, all 21 structurally adjudicated; 125 live public advisory coordinates returned zero findings.
+- Branch protection is verified: four required Actions checks, strict up-to-date checks, `enforce_admins`, no force pushes or deletions.
+- Any later revision requires its own scans, CI and rehearsal; it does not inherit this checkpoint's PASS.
+
+Historical events (immutable, not rewritten):
+
+- PR #1 (`feat/permanent-skill-security-gate`) was merged; `main` was then `e5a83dfcfe51df11e5def444e356ae9f1fb75cab`.
+- `main` continuation run `40506891052`: all three jobs PASSed.
+- Read-only release rehearsal `40506964205` FAILED at the security-gate step with 21 raw HIGH `PDF_STRUCTURAL_THREAT` findings. The write-capable `Publish Release (explicit publish=true only)` job was SKIPped; no tag, Release or asset changed.
+- `main` CI `40605205828` failed the Core-only job on `ubuntu-26.04` because `actions/setup-python` had no 3.9 build; all `runs-on` labels were then pinned to the validated `ubuntu-24.04` image.
 
 ## Initial live observations
 
@@ -44,12 +53,12 @@ Owner and independent acceptance: Codex. Engineering executor: Qoder CN CLI.
 | Workstream | Executor | State | Required evidence |
 |---|---|---|---|
 | Official tool / dependency / real CLI audit | Qoder | COMPLETE (Phase 1) | versions, hashes, license/advisory inventory, baseline and negative scans |
-| Shared package gate / negative tests | Qoder, Codex review | IMPLEMENTED, acceptance pending | fail-closed tests, real CLI results, input binding |
-| PR/push + pre-publication workflow integration | Qoder, Codex review | IMPLEMENTED; `main` CI/security PASS; read-only release rehearsal FAILED at the PDF gate (21 HIGH) | immutable actions, artifact retention, release rehearsal logs |
+| Shared package gate / negative tests | Qoder, Codex review | IMPLEMENTED; accepted by independent Codex at `6b14f7f` | fail-closed tests, real CLI results, input binding |
+| PR/push + pre-publication workflow integration | Qoder, Codex review | IMPLEMENTED; at `6b14f7f` CI `40608352111` and security `40608352264` PASS; `publish=false` rehearsal `40608419843` PASS | immutable actions, artifact retention, release rehearsal logs |
 | Functional and visual non-regression | Qoder, Codex acceptance | IN_PROGRESS | existing regressions, actual PPTX/render parity as applicable |
-| Documentation + v1.3.1 regex evidence | Qoder, Codex editorial review | IMPLEMENTED, acceptance pending | exact source lines, bounded claims, operating instructions |
-| PR, real CI, protection, safe merge | Qoder execution, Codex Go/No-Go | PR #1 merged (`e5a83df`); protection verified; `main` Actions PASS | commit/PR/run URLs and live protection configuration |
-| Default-branch release-path rehearsal | Qoder execution, Codex acceptance | FAILED (read-only) `40506964205`: 21 HIGH PDF findings, publish SKIP | non-publishing gate success without publishing |
+| Documentation + v1.3.1 regex evidence | Qoder, Codex editorial review | IMPLEMENTED; status correction pending independent review | exact source lines, bounded claims, operating instructions |
+| PR, real CI, protection, safe merge | Qoder execution, Codex Go/No-Go | Checkpoint `6b14f7f`: CI/security/rehearsal PASS; protection verified; no admin/force merge | commit/PR/run URLs and live protection configuration |
+| Default-branch release-path rehearsal | Qoder execution, Codex acceptance | PASS (non-publishing) `40608419843`, publish SKIPped; historical failure `40506964205` retained | non-publishing gate success without publishing |
 
 ## Final status contract
 
@@ -77,7 +86,7 @@ The minimal fix keeps the original product CPython 3.11 setup and every product 
 
 A structural regression in `tests/test_workflow_security.py` fails if the scanner 3.14 setup stops preceding the scanner install, or if the product 3.11 setup is removed or moved after the product build. Implementation is available in this checkout; current enforcement requires actual branch-protection and Actions evidence. No PASS is claimed for CI, branch protection, the non-publishing Release-path rehearsal or company-platform acceptance.
 
-## PDF structural review candidate (2026-10-27)
+## PDF structural review candidate (historical, 2026-10-27)
 
 Release rehearsal `40506964205` was blocked by 21 raw HIGH `PDF_STRUCTURAL_THREAT` findings. All 21 are eligible only because their severity is `HIGH`, their rule is exactly `PDF_STRUCTURAL_THREAT`, their `line_number` is null, and their metadata is exactly `{"/OpenAction": 1}`. Raw severity, raw JSON/SARIF and all 38 ledger reviews remain unchanged.
 
@@ -87,10 +96,10 @@ Local proof on the exact 21 files: 21/21 PASS under the strict facts contract, 6
 
 Four preapproval blockers found by independent review were fixed in the wrapper without changing the checker or the policy: `run_bounded(limits=...)` fails closed when the resource module, a required `RLIMIT` or `setrlimit` is unavailable and never loosens zero or stricter soft limits; `validate_pdf_facts` requires the exact complete 18-name check set plus typed, mutually consistent parsed/proof/open-action/dangerous facts and identity pins; `run_pdf_checker` refuses to approve facts from a child that did not complete with exit code 0; and PDF receipt sections now bind checkout-relative logical paths and hashes, with actual invocation locations kept only as provenance, so a receipt scans in one checkout and verifies in a differently rooted one.
 
-The tracked policy `security/pdf-structural-policy.json` remains `PENDING_CODEX_REVIEW`. Qoder did not approve it, did not edit any ledger, and did not set any raw severity. A pending policy leaves every finding blocking; any checker/parser/policy identity drift, missing parser, error or forged facts fails closed. The candidate itself has not been pushed and has not run in CI; local evidence is not CI evidence. Independent Codex review must decide the policy first. The full local visual showcase was regenerated from the pinned v1.2.1 baseline with fingerprint `9d20bb5fcfb8c50915dafdbc59669f14897cc89bbc806e74c8f313cfa7a84f5b`; rendered PNG bytes are unchanged.
+At this historical checkpoint the tracked policy `security/pdf-structural-policy.json` was `PENDING_CODEX_REVIEW`. Qoder did not approve it, did not edit any ledger, and did not set any raw severity. A pending policy leaves every finding blocking; any checker/parser/policy identity drift, missing parser, error or forged facts fails closed. The candidate itself had not been pushed and had not run in CI at this checkpoint; local evidence is not CI evidence. Independent Codex review had to decide the policy first. The full local visual showcase was regenerated from the pinned v1.2.1 baseline with fingerprint `9d20bb5fcfb8c50915dafdbc59669f14897cc89bbc806e74c8f313cfa7a84f5b`; rendered PNG bytes are unchanged.
 
 ## Independent PDF policy acceptance (2026-10-28)
 
 Codex independently reviewed candidate `9fe62b8` and hardening commit `9110c89`, then approved only checker SHA256 `f55536fe1f3823a183463e8cbe4f22e30930e8bdc2934a72267af8c384c7b66e` under the exact typed local-page policy. Independent results: 116/116 focused tests; all five malformed-facts/process probes rejected; all three attachment/embedded-file/spoofed-action PDF probes rejected; 21/21 unchanged CI PDFs reparsed in bounded children, 6932 objects inspected. A real Cisco negative PDF scan returned CRITICAL and exit 1 without executing the sample. The policy remains structural adjudication only; raw HIGH/JSON/SARIF stay unchanged.
 
-Main protection was freshly verified: four required Actions checks, strict up-to-date checks, administrator enforcement, no force push or branch deletion. Remote main remains `e5a83df`; official v1.3.1 runtime SHA256 remains unchanged. The follow-up has not yet run public CI, been merged or passed a Release-path rehearsal. Current source/package and CI/release completion cannot be inferred from this local policy approval. Company upload remains FAIL; current compatibility is not verified.
+Main protection was freshly verified: four required Actions checks, strict up-to-date checks, administrator enforcement, no force push or branch deletion. Official v1.3.1 runtime SHA256 remains unchanged. This section records the 2026-10-28 local policy acceptance; the later checkpoint at `6b14f7f` (see "Observed GitHub state") ran its own protected-branch CI, push security gate and `publish=false` Release rehearsal, all PASS. That checkpoint is commit-specific. Company upload remains FAIL; current compatibility is NOT_VERIFIED.

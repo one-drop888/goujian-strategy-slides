@@ -608,3 +608,50 @@ Company-platform status: the old public `v1.3.1` upload remains **FAIL**; the
 current compatibility submission is **BLOCKED**; the current candidate is
 **NOT_VERIFIED**. Semantic, cross-platform visual, and native PowerPoint checks
 remain separately reported. No `NOT_RUN` is converted to `PASS`.
+
+## Scanner dependency security repair / 扫描器依赖安全修复 — 2026-10-29
+
+**Source-only release-tooling checkpoint, locally observed at
+`2026-10-28T23:28:49Z`; not yet pushed or independently reviewed.** The live
+public advisory check began failing on the isolated scanner graph: the pinned
+`filelock` 3.20.3 has two public advisories, GHSA-69hj-f68j-2879 and
+GHSA-8mx5-7m5m-r77g, both first fixed in 4.2.1. The previously pinned
+`litellm` 1.106.4 (and the later 1.106.6) declare `filelock<4.0`, so raising
+`filelock` alone would require overriding that declared cap, which this gate
+does not allow.
+
+The minimal repair keeps the scanner toolchain isolated and changes exactly two
+of the 100 locked packages:
+
+- `litellm` 1.106.4 to 1.103.10, the latest stable 1.103.x whose official
+  wheel metadata declares no `filelock` requirement
+  (wheel SHA256 `f639bd02ac34869080b7792732336345bc066ffb04be301093090425f6caa2bc`), and
+- `filelock` 3.20.3 to 4.2.1, the official MIT wheel whose license expression
+  changed from the old Unlicense wheel
+  (wheel SHA256 `7be2662e9e826b9bba28afc0f843a123280d799a2ea44bb5d35ccec67905ae44`).
+
+The package count stays 100 and the other 98 pins are unchanged. An actual
+offline pip resolver dry-run of the exact 100-package graph resolves with only
+these two version changes and no added, removed or transitive package. The
+pinned `cisco-ai-skill-scanner` 2.3.1 requires `litellm>=1.89.7,<2,!=1.107.0`,
+which 1.103.10 satisfies. The separate `pypdf` 6.21.3 parser lock, the scanner
+version 2.3.1, the policy fingerprint
+`016a0d9c2bc9f0eabcf31aa1962130df1507c4d1fe98ee3fe3284f40c020f9c5`, the
+required analyzers, the review ledger, the PDF policy and every product runtime
+file are unchanged.
+
+On the exact repaired graph the 125 live OSV coordinates return zero findings,
+and `npm audit` against the official registry returns zero. A real scan with
+the repaired isolated environment reproduces the previously retained raw
+findings: 192 Source findings (34 CRITICAL, 4 HIGH, 147 LOW, 7 MEDIUM) and 30
+Runtime findings (4 CRITICAL, 26 LOW), with no new blocking finding. The frozen
+runtime ZIP stays
+`2c91da60eef1489cf6b74a9d059aea53850e0aa80cab0718777fbcdbcd8ea094`.
+
+This checkpoint does not rewrite the earlier zero-advisory observation, and it
+does not inherit the prior CI or rehearsal PASS. The new commit requires its own
+scans, CI and rehearsal, and remains subject to independent review before any
+push, merge, tag, release or publish.
+
+此检查点仅修复隔离发布工具的依赖，不改变产品运行时或 100 包之外的数量；新提交需自行运行
+扫描、CI 与演练，并在独立评审前不推送、不合并、不打标签、不发布。

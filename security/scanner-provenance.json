@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "verified_at_utc": "2026-10-27T10:02:30Z",
+  "verified_at_utc": "2026-10-28T23:28:49Z",
   "scanner": {
     "name": "cisco-ai-skill-scanner",
     "version": "2.3.1",
@@ -16,7 +16,7 @@
     "platform": "Linux x86_64 (manylinux)",
     "package": "cisco-ai-skill-scanner==2.3.1"
   },
-  "lock_sha256": "f5aecf35036e10d02905c0adef6bfbd0b49be8e9147bfdd33025a7fe629b12f1",
+  "lock_sha256": "ed1f8699c3b7b53e7d109fd1a3e2832a37977fae5d0da6dd01a2c57edc1dff7a",
   "packages": [
     {
       "name": "aiohappyeyeballs",
@@ -181,10 +181,10 @@
     },
     {
       "name": "filelock",
-      "version": "3.20.3",
-      "wheel": "filelock-3.20.3-py3-none-any.whl",
-      "sha256": "4b0dda527ee31078689fc205ec4f1c1bf7d56cf88b6dc9426c4f230e46c2dce1",
-      "official_pypi_metadata": "https://pypi.org/pypi/filelock/3.20.3/json"
+      "version": "4.2.1",
+      "wheel": "filelock-4.2.1-py3-none-any.whl",
+      "sha256": "7be2662e9e826b9bba28afc0f843a123280d799a2ea44bb5d35ccec67905ae44",
+      "official_pypi_metadata": "https://pypi.org/pypi/filelock/4.2.1/json"
     },
     {
       "name": "flatbuffers",
@@ -328,10 +328,10 @@
     },
     {
       "name": "litellm",
-      "version": "1.106.4",
-      "wheel": "litellm-1.106.4-cp310-abi3-manylinux_2_28_x86_64.whl",
-      "sha256": "d4cd1c1cab5c1e7f32d6a06a74e88176575fcbf427e8a4b6a434207aca007fb4",
-      "official_pypi_metadata": "https://pypi.org/pypi/litellm/1.106.4/json"
+      "version": "1.103.10",
+      "wheel": "litellm-1.103.10-cp310-abi3-manylinux_2_28_x86_64.whl",
+      "sha256": "f639bd02ac34869080b7792732336345bc066ffb04be301093090425f6caa2bc",
+      "official_pypi_metadata": "https://pypi.org/pypi/litellm/1.103.10/json"
     },
     {
       "name": "magika",

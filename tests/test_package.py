@@ -5,6 +5,7 @@ import importlib.util
 import json
 import posixpath
 import re
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -31,6 +32,19 @@ REQUIRED_RUNTIME = {
     'scripts/probe_env.py', 'scripts/runtime_smoke.py', 'tests/validate_examples.py',
     'distribution/runtime-manifest.json', 'distribution/runtime-package.json',
 }
+# V1.3.2 moved exactly these four members from Runtime to Source-only.
+SOURCE_ONLY_MEMBERS = (
+    'scripts/security_preflight.py',
+    'scripts/package_runtime.py',
+    'skill/reasoning/fixtures/hostile-source/plan.json',
+    'skill/reasoning/fixtures/hostile-source/sources/hostile.md',
+)
+EXPECTED_RUNTIME_DECLARED = 185
+EXPECTED_RUNTIME_MEMBERS = 186
+SOURCE_ONLY_COMMANDS = ('package', 'preflight')
+PRODUCTION_COMMANDS = ('validate:all', 'test', 'test:core')
+SOURCE_RELEASE_COMMANDS = ('package', 'package:source', 'preflight',
+                           'security:scan', 'security:verify', 'test:pdf')
 
 
 def load_packager():
@@ -109,16 +123,153 @@ def assert_runtime_commands(archive):
     for field in MAPPING_FIELDS:
         assert runtime_package[field] == source_package[field], f'runtime package mapping differs: {field}'
     scripts = runtime_package['scripts']
-    for omitted in ('benchmark', 'benchmark:v13', 'fixtures', 'fixtures:phase2', 'showcase', 'package:showcase'):
-        assert omitted not in scripts
-    for required in ('validate:all', 'package', 'preflight', 'test', 'test:core'):
-        assert required in scripts
+    for omitted in ('benchmark', 'benchmark:v13', 'fixtures', 'fixtures:phase2', 'showcase',
+                    'package:showcase') + SOURCE_ONLY_COMMANDS:
+        assert omitted not in scripts, omitted
+    for required in PRODUCTION_COMMANDS:
+        assert required in scripts, required
+    # Source keeps the release/security commands the runtime omits.
+    for required in SOURCE_RELEASE_COMMANDS:
+        assert required in source_package['scripts'], required
     for command in scripts.values():
         for match in re.finditer(r'(?:^|\s)(?:python3|node)\s+([A-Za-z0-9_./-]+)', command):
             target = match.group(1)
             if target.startswith('out/'):
                 continue
             assert PREFIX + target in names, f'runtime command references missing member {target}'
+
+
+def run_repack(packager, out, root, expect_sha256=None, extra=()):
+    command = [sys.executable, str(packager), str(out), '--runtime-root', str(root)]
+    if expect_sha256 is not None:
+        command += ['--expect-sha256', expect_sha256]
+    command += list(extra)
+    return subprocess.run(command, capture_output=True, text=True)
+
+
+def assert_source_only_repack_guards(temp, install_root, packager, digest):
+    def copy_case(name):
+        target = temp / name
+        shutil.copytree(install_root, target)
+        return target
+
+    tampered = copy_case('runtime-tampered')
+    skill = tampered / 'SKILL.md'
+    skill.write_bytes(skill.read_bytes() + b'\ntampered\n')
+    result = run_repack(packager, temp / 'tampered.zip', tampered, expect_sha256=digest)
+    assert result.returncode != 0, 'expected-SHA repack accepted a tampered member'
+    assert ('payload differs from the approved Source bytes' in result.stderr
+            or 'does not match the expected' in result.stderr), result.stderr
+
+    metadata = copy_case('runtime-metadata')
+    manifest = metadata / 'distribution/runtime-manifest.json'
+    manifest.write_bytes(manifest.read_bytes() + b' ')
+    result = run_repack(packager, temp / 'metadata.zip', metadata)
+    assert result.returncode != 0, 'repack accepted metadata that differs from the Source identity'
+    assert 'approved Source identity' in result.stderr, result.stderr
+
+    payload = copy_case('runtime-payload')
+    chart = payload / 'core/renderer/charts.js'
+    chart.write_bytes(chart.read_bytes() + b'\n// tampered payload comment\n')
+    result = run_repack(packager, temp / 'payload.zip', payload)
+    assert result.returncode != 0, 'repack accepted a tampered payload member without an expected SHA'
+    assert 'payload differs from the approved Source bytes' in result.stderr, result.stderr
+
+    extra = copy_case('runtime-extra')
+    (extra / 'stowaway.js').write_text('x = 1\n', encoding='utf-8')
+    result = run_repack(packager, temp / 'extra.zip', extra)
+    assert result.returncode != 0, 'repack accepted a file outside the manifest'
+    assert 'outside the approved manifest' in result.stderr, result.stderr
+
+    missing = copy_case('runtime-missing')
+    (missing / 'skill/scripts/build_deck.js').unlink()
+    result = run_repack(packager, temp / 'missing.zip', missing)
+    assert result.returncode != 0, 'repack accepted a missing member'
+    assert 'missing or not a regular file' in result.stderr, result.stderr
+
+    linked = copy_case('runtime-symlink')
+    target = linked / 'skill/scripts/build_deck.js'
+    target.unlink()
+    target.symlink_to(ROOT / 'skill/scripts/build_deck.js')
+    result = run_repack(packager, temp / 'symlink.zip', linked)
+    assert result.returncode != 0, 'repack accepted a symlinked member'
+    assert 'symlink' in result.stderr.lower(), result.stderr
+
+    result = run_repack(packager, install_root / 'inside.zip', install_root)
+    assert result.returncode != 0, 'repack wrote output inside the installed runtime'
+    assert 'must not be written inside' in result.stderr, result.stderr
+
+    for flag in ('--source', '--showcase'):
+        result = run_repack(packager, temp / 'mixed.zip', install_root, extra=(flag,))
+        assert result.returncode != 0, f'--runtime-root accepted {flag}'
+        assert 'cannot be combined' in result.stderr, result.stderr
+
+    result = run_repack(packager, temp / 'badsha.zip', install_root, expect_sha256='not-a-digest')
+    assert result.returncode != 0, 'repack accepted a malformed expected SHA'
+    assert 'lowercase 64-character' in result.stderr, result.stderr
+
+    result = subprocess.run([sys.executable, str(packager), '--runtime-root', str(install_root)],
+                            capture_output=True, text=True)
+    assert result.returncode != 0, 'repack accepted a missing output path'
+    assert 'explicit output path' in result.stderr, result.stderr
+
+
+def assert_output_location_guard(temp, packager):
+    fixture = temp / 'guard-source'
+    entries = {}
+    for relative in ('core/renderer/charts.js', 'skill/scripts/build_deck.js',
+                     'package.json', 'SKILL.md'):
+        target = fixture / relative
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text(f'fixture {relative}\n', encoding='utf-8')
+        entries[PREFIX + relative] = target
+    packager.validate_output_location(temp / 'out' / 'normal.zip', None, entries)
+    for value in entries.values():
+        try:
+            packager.validate_output_location(value, None, entries)
+        except ValueError:
+            pass
+        else:
+            raise AssertionError(f'guard accepted overwriting selected input {value}')
+    linked = temp / 'out' / 'linked.zip'
+    linked.parent.mkdir(parents=True, exist_ok=True)
+    linked.symlink_to(next(iter(entries.values())))
+    try:
+        packager.validate_output_location(linked, None, entries)
+    except ValueError:
+        pass
+    else:
+        raise AssertionError('guard accepted an output symlink to a selected Source input')
+    for protected in (ROOT / 'scripts/package_runtime.py', ROOT / 'package.json',
+                      ROOT / 'core/renderer/charts.js',
+                      ROOT / 'distribution/runtime-manifest.json', ROOT / 'SKILL.md'):
+        try:
+            packager.validate_output_location(protected, None, entries)
+        except ValueError:
+            pass
+        else:
+            raise AssertionError(f'guard accepted overwriting {protected}')
+    installed = temp / 'installed-guard'
+    installed.mkdir()
+    try:
+        packager.validate_output_location(installed / 'inside.zip', installed, entries)
+    except ValueError:
+        pass
+    else:
+        raise AssertionError('guard accepted output inside the installed runtime')
+
+    package_before = (ROOT / 'package.json').read_bytes()
+    packager_before = (ROOT / 'scripts/package_runtime.py').read_bytes()
+    for out, kwargs in ((ROOT / 'package.json', {'source': True}),
+                        (ROOT / 'scripts/package_runtime.py', {})):
+        try:
+            packager.build(out, **kwargs)
+        except ValueError as error:
+            assert 'must not overwrite' in str(error), error
+        else:
+            raise AssertionError(f'build mode {kwargs} accepted a Source input output path')
+    assert (ROOT / 'package.json').read_bytes() == package_before
+    assert (ROOT / 'scripts/package_runtime.py').read_bytes() == packager_before
 
 
 def main():
@@ -162,6 +313,7 @@ def main():
 
     with tempfile.TemporaryDirectory(prefix='goujian-package-test-') as temp:
         temp = Path(temp)
+        assert_output_location_guard(temp, packager)
         first, second = temp / 'runtime-first.zip', temp / 'runtime-second.zip'
         result = subprocess.run([sys.executable, 'scripts/package_runtime.py', str(first), '--json'],
                                 cwd=ROOT, capture_output=True, text=True)
@@ -172,9 +324,14 @@ def main():
         assert hashlib.sha256(first.read_bytes()).hexdigest() == hashlib.sha256(second.read_bytes()).hexdigest()
 
         names = archive_names(first)
+        assert len(manifest['runtime_files']) == EXPECTED_RUNTIME_DECLARED, len(manifest['runtime_files'])
+        assert len(names) == EXPECTED_RUNTIME_MEMBERS, len(names)
         expected = {PREFIX + item for item in manifest['runtime_files']} | {PREFIX + 'package.json'}
         assert set(names) == expected, 'runtime archive members differ from the explicit manifest + package mapping'
         assert {PREFIX + item for item in REQUIRED_RUNTIME} <= set(names)
+        for relative in SOURCE_ONLY_MEMBERS:
+            assert relative not in manifest['runtime_files'], relative
+            assert PREFIX + relative not in set(names), relative
         assert not any(name.startswith(PREFIX + 'tests/test_') for name in names)
         assert not any(name.endswith(('.pptx', '.pdf')) for name in names)
         with zipfile.ZipFile(first) as package:
@@ -188,12 +345,19 @@ def main():
         extracted = temp / 'runtime-extracted'
         with zipfile.ZipFile(first) as package:
             package.extractall(extracted)
-        repacked = extracted / 'repacked.zip'
-        result = subprocess.run([sys.executable, 'scripts/package_runtime.py', str(repacked), '--json'],
-                                cwd=extracted / 'goujian-strategy-slides', capture_output=True, text=True)
+        install_root = extracted / 'goujian-strategy-slides'
+        source_packager = ROOT / 'scripts/package_runtime.py'
+        digest = hashlib.sha256(first.read_bytes()).hexdigest()
+        repacked = temp / 'repacked.zip'
+        result = subprocess.run([sys.executable, str(source_packager), str(repacked),
+                                 '--runtime-root', str(install_root),
+                                 '--expect-sha256', digest, '--json'],
+                                cwd=temp, capture_output=True, text=True)
         assert result.returncode == 0, result.stdout + result.stderr
-        assert hashlib.sha256(first.read_bytes()).hexdigest() == hashlib.sha256(repacked.read_bytes()).hexdigest(), \
-            'runtime archive is not reproducible from its own declared payload'
+        assert hashlib.sha256(repacked.read_bytes()).hexdigest() == digest, \
+            'runtime archive is not reproducible from the installed runtime payload'
+        assert json.loads(result.stdout)['entries'] == EXPECTED_RUNTIME_MEMBERS
+        assert_source_only_repack_guards(temp, install_root, source_packager, digest)
 
         source = temp / 'source.zip'
         result = subprocess.run([sys.executable, 'scripts/package_runtime.py', str(source), '--source', '--json'],

@@ -23,6 +23,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 PREFIX = 'goujian-strategy-slides/'
 FIXED_TIME = (2026, 1, 1, 0, 0, 0)
+VERSION = json.loads((ROOT / 'package.json').read_text(encoding='utf-8'))['version']
 
 
 def load(name, relative):
@@ -214,7 +215,7 @@ class GateTests(unittest.TestCase):
         out = self.out_dir()
         code, stdout, stderr = self.run_gate(
             'scan', str(self.archive), '--profile', 'runtime',
-            '--version', '1.3.1', '--commit', self.commit,
+            '--version', VERSION, '--commit', self.commit,
             '--repo', str(self.repo),
             '--source-tree-state', 'clean',
             '--config', str(self.config), '--lock', str(self.lock),
@@ -226,7 +227,7 @@ class GateTests(unittest.TestCase):
     def verify(self, receipt, out, ledger=None, extra=()):
         return self.run_gate(
             'verify', str(receipt), '--archive', str(self.archive),
-            '--version', '1.3.1', '--commit', self.commit,
+            '--version', VERSION, '--commit', self.commit,
             '--repo', str(self.repo),
             '--config', str(self.config), '--lock', str(self.lock),
             '--review-ledger', str(ledger or self.empty_ledger),
@@ -497,7 +498,7 @@ class GateTests(unittest.TestCase):
         changed.write_bytes(self.archive.read_bytes() + b'x')
         code, _, stderr = self.run_gate(
             'verify', str(out / 'receipt.json'), '--archive', str(changed),
-            '--version', '1.3.1', '--commit', self.commit,
+            '--version', VERSION, '--commit', self.commit,
             '--repo', str(self.repo),
             '--config', str(self.config), '--lock', str(self.lock),
             '--review-ledger', str(self.empty_ledger),
@@ -521,7 +522,7 @@ class GateTests(unittest.TestCase):
         self.assertEqual(code, 0)
         code, _, stderr = self.run_gate(
             'verify', str(out / 'receipt.json'), '--archive', str(self.archive),
-            '--version', '1.3.1', '--commit', 'b' * 40,
+            '--version', VERSION, '--commit', 'b' * 40,
             '--repo', str(self.repo),
             '--config', str(self.config), '--lock', str(self.lock),
             '--review-ledger', str(self.empty_ledger),
@@ -545,7 +546,7 @@ class GateTests(unittest.TestCase):
         try:
             code, _, stderr = self.run_gate(
                 'scan', str(self.archive), '--profile', 'runtime',
-                '--version', '1.3.1', '--commit', self.commit,
+                '--version', VERSION, '--commit', self.commit,
                 '--repo', str(self.repo),
                 '--source-tree-state', 'clean',
                 '--config', str(self.config), '--lock', str(self.lock),

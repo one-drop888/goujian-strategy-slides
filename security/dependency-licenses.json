@@ -1,7 +1,7 @@
 {
-  "generated_at_utc": "2026-10-27T10:02:30Z",
+  "generated_at_utc": "2026-10-28T23:28:49Z",
   "license_counts": {
-    "MIT": 39,
+    "MIT": 40,
     "Apache-2.0": 15,
     "BSD-3-Clause": 11,
     "License :: OSI Approved :: MIT License": 4,
@@ -27,8 +27,7 @@
     "MIT-0": 1,
     "MPL-2.0": 1,
     "MPL-2.0 AND MIT": 1,
-    "The MIT License (MIT) Copyright (c) 2014 Cory Benfield Permission is hereby granted, free of charge, to any person obtai": 1,
-    "Unlicense": 1
+    "The MIT License (MIT) Copyright (c) 2014 Cory Benfield Permission is hereby granted, free of charge, to any person obtai": 1
   },
   "packages": [
     {
@@ -338,16 +337,16 @@
     },
     {
       "name": "filelock",
-      "version": "3.20.3",
+      "version": "4.2.1",
       "license": null,
-      "license_expression": "Unlicense",
+      "license_expression": "MIT",
       "license_classifiers": [
-        "License :: OSI Approved :: The Unlicense (Unlicense)"
+        "License :: OSI Approved :: MIT License"
       ],
       "license_files": [
         {
-          "path": "filelock-3.20.3.dist-info/licenses/LICENSE",
-          "first_line": "This is free and unencumbered software released into the public domain."
+          "path": "filelock-4.2.1.dist-info/licenses/LICENSE",
+          "first_line": "MIT License"
         }
       ]
     },
@@ -626,13 +625,13 @@
     },
     {
       "name": "litellm",
-      "version": "1.106.4",
+      "version": "1.103.10",
       "license": null,
       "license_expression": "MIT",
       "license_classifiers": [],
       "license_files": [
         {
-          "path": "litellm-1.106.4.dist-info/licenses/LICENSE",
+          "path": "litellm-1.103.10.dist-info/licenses/LICENSE",
           "first_line": "Portions of this software are licensed as follows:"
         }
       ]
@@ -1473,5 +1472,5 @@
     "BSD-3-Clause": 1
   },
   "scope": "Declared third-party wheel license metadata for the isolated developer scanner (100 hash-locked SDK packages) plus one separately hash-locked PDF parser (pypdf 6.21.3). Tool code/environments are not bundled into Goujian. Not a license conversion or legal opinion.",
-  "lock_sha256": "f5aecf35036e10d02905c0adef6bfbd0b49be8e9147bfdd33025a7fe629b12f1"
+  "lock_sha256": "ed1f8699c3b7b53e7d109fd1a3e2832a37977fae5d0da6dd01a2c57edc1dff7a"
 }

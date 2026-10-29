@@ -482,6 +482,90 @@ class BaselineArchiveTests(unittest.TestCase):
         self.assertEqual(result['status'], 'FAIL')
         self.assertEqual(result['missing_members'], ['a.txt'])
 
+    def test_wrong_digest_fails_before_zip_is_opened_or_parsed(self):
+        with mock.patch.object(parity.zipfile, 'ZipFile',
+                               side_effect=AssertionError('ZIP must not be opened')):
+            result = parity.baseline_archive_evidence(self.zip_path, self.tree,
+                                                      locked_sha256='0' * 64)
+        self.assertEqual(result['status'], 'FAIL')
+        self.assertFalse(result['locked_zip_verified'])
+        self.assertEqual(result['archive_members'], 0)
+        self.assertEqual(result['tree_members_compared'], 0)
+        self.assertIn('not parsed', result['reason'])
+
+
+class ContractTests(unittest.TestCase):
+    """The parity contract is fixed; callers cannot supply versions or hashes."""
+
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.root = Path(self.temp.name)
+        self.zip_path = self.root / 'baseline.zip'
+        self.zip_path.write_bytes(zip_bytes({'pkg/a.txt': 'alpha'}))
+        self.digest = parity.sha256_bytes(self.zip_path.read_bytes())
+        self.tree = self.root / 'tree'
+        self.tree.mkdir()
+        (self.tree / 'a.txt').write_text('alpha', encoding='utf-8')
+
+    def tearDown(self):
+        self.temp.cleanup()
+
+    def test_default_contract_is_the_original_v130_to_v131(self):
+        self.assertEqual(parity.DEFAULT_CONTRACT, 'CAPABILITY_PARITY_V1_3_0_TO_V1_3_1')
+        self.assertEqual(parity.BASELINE_VERSION, '1.3.0')
+        self.assertEqual(parity.CANDIDATE_VERSION, '1.3.1')
+        self.assertEqual(parity.LOCKED_BASELINE_ZIP_SHA256,
+                         '7df25c241d74c3bb34fc5569e021320fec675bded72c1e44d439a6f8485ad519')
+
+    def test_v131_to_v132_contract_is_frozen(self):
+        self.assertEqual(parity.CONTRACTS['CAPABILITY_PARITY_V1_3_1_TO_V1_3_2'], {
+            'baseline_version': '1.3.1',
+            'candidate_version': '1.3.2',
+            'baseline_release': 'v1.3.1',
+            'locked_baseline_zip_sha256':
+                '7ee0d15488368a876ac2624546f72a13de8bdf01f322ed1055bb8c099d67b3dd',
+        })
+        self.assertEqual(sorted(parity.CONTRACTS),
+                         ['CAPABILITY_PARITY_V1_3_0_TO_V1_3_1',
+                          'CAPABILITY_PARITY_V1_3_1_TO_V1_3_2'])
+
+    def test_contract_versions_are_exact(self):
+        rule = parity.CONTRACTS['CAPABILITY_PARITY_V1_3_1_TO_V1_3_2']
+        self.assertEqual(parity.version_failures('1.3.1', '1.3.2', rule), [])
+        self.assertTrue(parity.version_failures('1.3.0', '1.3.2', rule))
+        self.assertTrue(parity.version_failures('1.3.1', '1.3.1', rule))
+        self.assertTrue(parity.version_failures('1.3.1', '1.3.3', rule))
+
+    def test_unknown_contract_fails_closed(self):
+        result = parity.verify(self.root, self.root, contract='CAPABILITY_PARITY_ARBITRARY')
+        self.assertEqual(result['status'], 'FAIL')
+        self.assertIn('unknown capability parity contract', result['failures'][0])
+        self.assertIsNone(result['schema_version'])
+
+    def test_verify_uses_the_contract_identity(self):
+        result = parity.verify(self.root, self.root,
+                               contract='CAPABILITY_PARITY_V1_3_1_TO_V1_3_2')
+        self.assertEqual(result['schema_version'], '1.3.2')
+        self.assertEqual(result['baseline']['locked_zip_sha256'],
+                         '7ee0d15488368a876ac2624546f72a13de8bdf01f322ed1055bb8c099d67b3dd')
+
+    def test_explicit_locked_sha_rejects_unrelated_archives(self):
+        result = parity.baseline_archive_evidence(self.zip_path, self.tree,
+                                                  locked_sha256=self.digest)
+        self.assertEqual(result['status'], 'PASS', result)
+        result = parity.baseline_archive_evidence(self.zip_path, self.tree,
+                                                  locked_sha256='0' * 64)
+        self.assertEqual(result['status'], 'FAIL')
+        self.assertFalse(result['locked_zip_verified'])
+
+    def test_wrong_baseline_zip_cannot_reach_member_comparison(self):
+        result = parity.verify(self.root, self.root, baseline_zip=self.zip_path,
+                               contract='CAPABILITY_PARITY_V1_3_1_TO_V1_3_2')
+        self.assertEqual(result['status'], 'FAIL')
+        self.assertFalse(result['baseline']['locked_zip_verified'])
+        self.assertTrue(any('does not match the locked v1.3.1 installer' in item
+                            for item in result['failures']), result['failures'])
+
 
 def matrix_fixture():
     accepted = [f'A-{index}' for index in range(72)]

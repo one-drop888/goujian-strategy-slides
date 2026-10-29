@@ -1,7 +1,7 @@
 ---
 name: goujian-strategy-slides
 metadata:
-  version: "1.3.1"
+  version: "1.3.2"
 description: "专业AI PPT制作技能，适用于经营分析、战略规划、销售汇报、市场研究、项目复盘及技术方案等场景。结合结构化思考、证据分析、汇报叙事与可视化设计，辅助生成原生可编辑PPTX，并提供质量检查与视觉复核流程。"
 license: Apache-2.0
 ---
@@ -29,9 +29,9 @@ Details: [numeric and visual contract](skill/references/analytical-visual-intell
 
 ## Runtime and paths
 
-Install the **entire repository**, including `core/`, `skill/`, `package.json` and the lockfile. Run commands from the repository root. Prefer `npm ci` for the committed lockfile, or run `npm run bootstrap` to create an isolated `.venv` and install from the lockfile; `npm run bootstrap -- --dry-run --json` previews the actions. After bootstrap, activate the environment with `. .venv/bin/activate` before running Node/Python helpers so `python3` resolves to the isolated interpreter. Run `npm run doctor -- --json` to report tool presence and recovery without claiming execution. Core QA also requires Python 3.9+. Secure image preparation and the full test suite require Python3.11+ and Pillow13; older Python runs the core-only tier. Optional rendering additionally needs LibreOffice, Poppler and Noto fonts; use [installation instructions](README.en.md#installation).
+Install the official complete Runtime ZIP **or** a full Source checkout. Run commands from the installed skill root. Prefer `npm ci` for the committed lockfile, or run `npm run bootstrap` to create an isolated `.venv` and install from the lockfile; `npm run bootstrap -- --dry-run --json` previews the actions. After bootstrap, activate the environment with `. .venv/bin/activate` before running Node/Python helpers so `python3` resolves to the isolated interpreter. Run `npm run doctor -- --json` to report tool presence and recovery without claiming execution. Core QA also requires Python 3.9+. Secure image preparation and the full test suite require Python3.11+ and Pillow13; older Python runs the core-only tier. Optional rendering additionally needs LibreOffice, Poppler and Noto fonts; use [installation instructions](README.en.md#installation).
 
-The repository root contains the only `SKILL.md`. Resolve relative links against that root. The install ZIP is a complete lightweight runtime; the optional showcase ZIP is a separate review artifact and is not required for normal use.
+The repository root contains the only `SKILL.md`. Resolve relative links against that root. The official installation ZIP is the complete lightweight runtime: it carries every product capability but omits the Source-only release packaging, security-preflight tooling and hostile-source negative fixtures. Install the full Source tree to run those developer/release commands, the complete release security gate or the full test suite. The optional showcase ZIP is a separate review artifact and is not required for normal use.
 
 ## Route and plan
 

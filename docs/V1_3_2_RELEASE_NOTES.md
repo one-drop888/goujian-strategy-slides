@@ -1,0 +1,37 @@
+# Goujian Strategy Slides v1.3.2
+
+**Enterprise runtime optimization patch｜企业运行时优化补丁**
+
+This file is part of the complete source archive. The installed runtime omits release packaging and security-preflight tooling, so it links here through the public repository rather than shipping a local copy.
+
+## 简体中文
+
+V1.3.2 是企业运行时优化补丁。它不改变产品能力、原生图表、数值语义、艺术方向或历史验收证据，重点是让官方运行时只保留生产运行所需内容，并把发布与开发工具明确交给完整源码包。
+
+主要变化：
+
+- 运行时仅移出 4 个源码专用成员：`scripts/package_runtime.py`、`scripts/security_preflight.py`，以及两个敌意来源负向夹具 `skill/reasoning/fixtures/hostile-source/plan.json` 和 `skill/reasoning/fixtures/hostile-source/sources/hostile.md`。完整源码包保留这些工具、夹具和全部负向行为测试。
+- 运行时明确声明 185 个文件，加上由 `distribution/runtime-package.json` 映射的 `package.json`，共 186 个成员。其余生产模块、Schema、配方、注册表、QA/渲染/字体/图片/Reasoning 资产与校验测试保留。
+- 命令归属迁移：运行时不再提供 `package` 和 `preflight`，并在运行时清单中声明为省略；完整源码包保留 `package`、`package:source`、`package:showcase`、`preflight`、`security:scan`、`security:verify` 和 `test:pdf`。运行时仍提供 `test`、`test:core` 和 `validate:all`。
+- 已安装运行时仍可确定性重建。源码打包器新增 `--runtime-root` 数据模式与 `--expect-sha256`：它把已安装运行时当作数据读取，不导入或执行目标目录中的工具；校验批准源码清单与运行时 `package.json` 身份，拒绝额外、缺失、符号链接或被篡改的成员及不安全输出位置，并断言重建 ZIP 的 SHA256 与原始运行时一致。`--source` 和 `--showcase` 与运行时根同时使用会被拒绝。
+- 复用现有能力对等引擎，新增固定的 `CAPABILITY_PARITY_V1_3_1_TO_V1_3_2` 契约。它以冻结的 v1.3.1 提交与安装包为基线，并校验锁定的安装包 SHA256 `7ee0d15488368a876ac2624546f72a13de8bdf01f322ed1055bb8c099d67b3dd`。原 v1.3.0→v1.3.1 契约与默认行为保持不变；CI 与 Release 同时运行两个契约，并保留 v1.2.1 历史回归。
+- 版本、锁文件根版本、Skill 元数据和运行时元数据更新为 1.3.2。产品运行依赖未变，无 JSON Spec 格式变化，不新增 HTML 或 Pro 功能。隔离扫描工具将 `filelock` 更新为 4.2.1，并采用 Cisco 官方约束允许的 `litellm 1.103.10`，修复 GHSA-69hj-f68j-2879 与 GHSA-8mx5-7m5m-r77g；其余 98 项锁定依赖不变。
+- 预检与打包器的检测规则、Python AST 可执行风险判断、依赖/元数据/映射与严格清单语义保持不变；新增的只是按画像区分的必需文件与命令守卫。运行时不再携带发布工具，完整源码包继续保留发布安全门和 PDF 结构检查。
+- 安全与验收边界（2026-10-28 实现检查点）：本说明描述候选包的实现内容，固定事实包括版本 1.3.2、运行时 185 个声明文件 / 186 个成员、4 个源码专用成员，以及固定的 `CAPABILITY_PARITY_V1_3_1_TO_V1_3_2` 契约与基线 SHA256 `7ee0d15488368a876ac2624546f72a13de8bdf01f322ed1055bb8c099d67b3dd`。验收策略是：发布安全门、精确复审账本绑定、干净安装与已安装运行时能力对等必须在冻结的候选提交上重新运行，其结论与证据由该候选的外部发布记录（Release 工作流的验证与发布产物）承载，并以此作为发布验证的唯一依据；v1.3.1 的既有批准绑定于其冻结内容，不会自动延续到本补丁。公司平台与 Agensi 验收不由本补丁给出：`COMPANY_PLATFORM_SECURITY=NOT_VERIFIED`；公开静态预检 PASS 不等于企业平台批准。历史 v1.3.1 文档、tag 与 release 不被改写。
+
+版本与契约细节见[安装与恢复](INSTALLATION.md)、[变更记录](../CHANGELOG.md)和[发布安全门](RELEASE_SECURITY_GATE.md)。历史 v1.3.1 安全与能力对等记录仍见 [SECURITY_PARITY_V1_3_1.md](SECURITY_PARITY_V1_3_1.md)。
+
+## English
+
+V1.3.2 is an enterprise runtime optimization patch. It does not change product capabilities, native charts, numeric semantics, art direction or historical acceptance evidence. It keeps the official runtime to what production execution needs and assigns release and development tooling explicitly to the complete source archive.
+
+- Exactly four source-only members leave the runtime: `scripts/package_runtime.py`, `scripts/security_preflight.py`, and the hostile-source negative fixtures `skill/reasoning/fixtures/hostile-source/plan.json` and `skill/reasoning/fixtures/hostile-source/sources/hostile.md`. The complete source archive retains these tools, fixtures and all negative-behaviour tests.
+- The runtime explicitly declares 185 files; with the `package.json` mapped from `distribution/runtime-package.json`, the archive has 186 members. Every other production module, schema, recipe, registry, QA/render/font/image/Reasoning asset and validation test remains.
+- Command ownership moved: the runtime no longer provides `package` or `preflight` and declares them omitted, while the complete source archive retains `package`, `package:source`, `package:showcase`, `preflight`, `security:scan`, `security:verify` and `test:pdf`. The runtime still provides `test`, `test:core` and `validate:all`.
+- An installed runtime remains deterministically rebuildable. The source packager adds a data-only `--runtime-root` mode with `--expect-sha256`: it reads the installed runtime as data and does not import or execute tools from the target root. It verifies the approved source manifest and runtime `package.json` identity, rejects extra, missing, symlinked or tampered members and unsafe output locations, and asserts that the rebuilt ZIP matches the original runtime SHA256. Combining `--source` or `--showcase` with a runtime root is rejected.
+- The existing capability-parity engine gains the fixed `CAPABILITY_PARITY_V1_3_1_TO_V1_3_2` contract. It uses the frozen v1.3.1 commit and installer as baseline and verifies the locked installer SHA256 `7ee0d15488368a876ac2624546f72a13de8bdf01f322ed1055bb8c099d67b3dd`. The original v1.3.0→v1.3.1 contract and default behaviour are unchanged; CI and Release run both contracts and retain the v1.2.1 historical regression.
+- Version, lockfile root, Skill metadata and runtime metadata are now 1.3.2. Production-runtime dependencies and the JSON Spec format are unchanged; no HTML or Pro feature was added. The isolated scanner uses `filelock 4.2.1` with the Cisco-supported `litellm 1.103.10` to address GHSA-69hj-f68j-2879 and GHSA-8mx5-7m5m-r77g. Its other 98 locked dependencies are unchanged.
+- Preflight and packager detection rules, Python AST executable-risk classification, and dependency/metadata/mapping/strict-manifest semantics are unchanged; only required-file and command guards became profile-appropriate. The runtime no longer carries release tooling, while the source archive keeps the release security gate and PDF structural checker.
+- Security and acceptance boundaries (2026-10-28 implementation checkpoint): this note describes what the candidate archive contains, with the fixed facts of version 1.3.2, 185 declared runtime files / 186 archive members, four source-only members, and the fixed `CAPABILITY_PARITY_V1_3_1_TO_V1_3_2` contract with baseline SHA256 `7ee0d15488368a876ac2624546f72a13de8bdf01f322ed1055bb8c099d67b3dd`. The acceptance policy is that the release security gate, the exact review-ledger binding, the clean install and the installed-runtime capability parity must run again on the frozen candidate commit, and that their conclusions and evidence are carried by that candidate's external release record (the Release workflow's validation and publish artifacts), which is the sole basis for release validation; v1.3.1 approvals are bound to that frozen content and do not carry over to this patch. Company-platform and Agensi acceptance are not asserted by this patch: `COMPANY_PLATFORM_SECURITY=NOT_VERIFIED`, and a public static preflight PASS is not enterprise-platform approval. Historical v1.3.1 documents, tags and releases are not rewritten.
+
+See [installation and recovery](INSTALLATION.md), the [changelog](../CHANGELOG.md) and the [release security gate](RELEASE_SECURITY_GATE.md) for the version and contract details. The historical v1.3.1 security and capability-parity record remains in [SECURITY_PARITY_V1_3_1.md](SECURITY_PARITY_V1_3_1.md).

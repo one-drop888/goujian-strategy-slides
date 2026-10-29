@@ -6,6 +6,8 @@ Default output is the minimal runtime payload declared by
 `distribution/runtime-package.json`. `--source` builds the complete
 source/development archive with the root package.json and full test workflow.
 `--showcase` adds the review-only `out/v1.3-showcase` subtree to the runtime.
+`--runtime-root PATH` repackages an already extracted installed runtime as
+data, using the Source manifest and this Source implementation only.
 """
 from pathlib import Path, PurePosixPath
 import argparse
@@ -30,6 +32,7 @@ RUNTIME_MANIFEST = Path('distribution/runtime-manifest.json')
 FIXED_TIME = (2026, 1, 1, 0, 0, 0)
 FILE_MODE = 0o644
 MAPPING_FIELDS = ('name', 'version', 'license', 'dependencies', 'engines', 'overrides', 'repository')
+INSTALL_STATE_DIRS = EXCLUDE_DIRS
 
 
 def fail(message):
@@ -54,6 +57,71 @@ def manifest_source(relative):
     if not path.is_file():
         fail(f'Declared runtime file is missing or not a regular file: {relative}')
     return path
+
+
+def installed_root(path):
+    root = Path(path)
+    if root.is_symlink():
+        fail('Installed runtime root must not be a symlink')
+    if not root.is_dir():
+        fail(f'Installed runtime root is not a directory: {root}')
+    return root
+
+
+def installed_member(root, relative):
+    if (not isinstance(relative, str) or not relative or '\\' in relative
+            or any(ord(char) < 32 for char in relative)
+            or relative.startswith('/') or re.match(r'^[A-Za-z]:', relative)
+            or any(part in ('', '.', '..') for part in relative.split('/'))):
+        fail(f'Unsafe installed runtime path: {relative!r}')
+    path = Path(root)
+    for part in PurePosixPath(relative).parts:
+        path = path / part
+        if path.is_symlink():
+            fail(f'Refusing symlink in installed runtime: {relative}')
+    if not path.is_file():
+        fail(f'Installed runtime member is missing or not a regular file: {relative}')
+    return path
+
+
+def installed_extras(root, expected):
+    extras = []
+    for path in sorted(Path(root).rglob('*')):
+        relative = path.relative_to(root).as_posix()
+        parts = relative.split('/')
+        if any(part in INSTALL_STATE_DIRS for part in parts[:-1]):
+            continue
+        if path.is_symlink():
+            fail(f'Refusing symlink in installed runtime: {relative}')
+        if not path.is_file() or relative in expected or relative.endswith('.pyc'):
+            continue
+        extras.append(relative)
+    return extras
+
+
+def protected_source_paths(entries):
+    protected = {Path(__file__).resolve()}
+    for relative in ('package.json', RUNTIME_MANIFEST, 'distribution/runtime-package.json',
+                     'SKILL.md', 'package-lock.json'):
+        protected.add((ROOT / relative).resolve())
+    for name, value in (entries or {}).items():
+        if isinstance(value, (str, Path)):
+            protected.add(Path(value).resolve())
+        if name.startswith(PREFIX + '/'):
+            canonical = ROOT / name[len(PREFIX) + 1:]
+            if canonical.is_file():
+                protected.add(canonical.resolve())
+    return protected
+
+
+def validate_output_location(out, root=None, entries=None):
+    out_resolved = Path(out).resolve()
+    if root is not None:
+        root_resolved = Path(root).resolve()
+        if out_resolved == root_resolved or root_resolved in out_resolved.parents:
+            fail('Output ZIP must not be written inside the installed runtime root')
+    if out_resolved in protected_source_paths(entries):
+        fail(f'Output ZIP must not overwrite a Source input or the active packager: {out}')
 
 
 def allowed_path(path, include_pptx, allow_out=False):
@@ -137,9 +205,13 @@ def runtime_script_targets(command):
 def validate_runtime_commands(manifest, entries):
     package = read_json(manifest_source(manifest['package_mapping']['source_path']))
     scripts = package.get('scripts') or {}
-    for name in manifest.get('omitted_commands') or []:
+    omitted = manifest.get('omitted_commands') or []
+    for name in omitted:
         if name in scripts:
             fail(f'Development command must be omitted from the runtime manifest: {name}')
+    for name in ('package', 'preflight'):
+        if name not in omitted:
+            fail(f'Runtime manifest must declare the Source-only command as omitted: {name}')
     archive_targets = {name for name in entries if name.startswith(PREFIX + '/')}
     for name, command in scripts.items():
         for target in runtime_script_targets(command):
@@ -148,7 +220,7 @@ def validate_runtime_commands(manifest, entries):
             archive_name = f'{PREFIX}/{target}'
             if archive_name not in archive_targets:
                 fail(f'Runtime command {name!r} references missing payload member: {target}')
-    for required in ('validate:all', 'package', 'preflight', 'test', 'test:core'):
+    for required in ('validate:all', 'test', 'test:core'):
         if required not in scripts:
             fail(f'Runtime manifest must keep production command: {required}')
 
@@ -169,6 +241,43 @@ def runtime_entries(showcase=False):
     if showcase:
         entries.update(showcase_entries(manifest))
     return entries, manifest
+
+
+def runtime_root_entries(root):
+    manifest = load_runtime_manifest()
+    mapping = manifest['package_mapping']
+    identities = {
+        RUNTIME_MANIFEST.as_posix(): manifest_source(RUNTIME_MANIFEST.as_posix()),
+        mapping['source_path']: manifest_source(mapping['source_path']),
+    }
+    for relative, source in identities.items():
+        installed = installed_member(root, relative)
+        if installed.read_bytes() != source.read_bytes():
+            fail(f'Installed runtime metadata differs from the approved Source identity: {relative}')
+    package_path = installed_member(root, mapping['archive_path'])
+    if package_path.read_bytes() != identities[mapping['source_path']].read_bytes():
+        fail('Installed runtime package.json differs from distribution/runtime-package.json')
+    package = read_json(package_path)
+    compare_package_mapping(read_json(ROOT / 'package.json'), package)
+    if manifest.get('schema_version') != package.get('version'):
+        fail('Runtime manifest schema_version does not match the installed runtime version')
+    entries = {}
+    expected = set()
+    for relative in manifest.get('runtime_files') or []:
+        installed = installed_member(root, relative)
+        canonical = manifest_source(relative)
+        if installed.read_bytes() != canonical.read_bytes():
+            fail(f'Installed runtime payload differs from the approved Source bytes: {relative}')
+        entries[f'{PREFIX}/{relative}'] = installed
+        expected.add(relative)
+    entries[f'{PREFIX}/{mapping["archive_path"]}'] = package_path
+    expected.add(mapping['archive_path'])
+    extras = installed_extras(root, expected)
+    if extras:
+        fail('Installed runtime contains files outside the approved manifest: ' + ', '.join(extras[:5]))
+    validate_runtime_commands(manifest, entries)
+    return entries
+
 
 
 def showcase_entries(manifest):
@@ -235,16 +344,26 @@ def write_entries(out, entries):
     return digest, len(ordered)
 
 
-def build(out, showcase=False, source=False):
-    if showcase and source:
+def build(out, showcase=False, source=False, runtime_root=None, expect_sha256=None):
+    root = None
+    if runtime_root is not None:
+        if source or showcase:
+            fail('--runtime-root cannot be combined with --source or --showcase')
+        root = installed_root(runtime_root)
+        entries = runtime_root_entries(root)
+        mode = 'runtime'
+    elif showcase and source:
         fail('--source and --showcase are mutually exclusive')
-    if source:
+    elif source:
         entries = source_entries()
         mode = 'source'
     else:
         entries, _manifest = runtime_entries(showcase=showcase)
         mode = 'showcase' if showcase else 'runtime'
+    validate_output_location(out, root, entries)
     digest, count = write_entries(out, entries)
+    if expect_sha256 is not None and digest != expect_sha256:
+        fail(f'Rebuilt archive SHA-256 {digest} does not match the expected {expect_sha256}')
     return {'archive': str(out), 'mode': mode, 'entries': count, 'sha256': digest}
 
 
@@ -255,12 +374,30 @@ def main():
                         help='Build the complete source/development archive instead of the runtime payload')
     parser.add_argument('--showcase', action='store_true',
                         help='Add the approved out/v1.3-showcase review artifact to the runtime payload')
+    parser.add_argument('--runtime-root', metavar='PATH',
+                        help='Repackage an extracted installed runtime directory as data; '
+                             'requires an explicit output path and cannot be combined with --source/--showcase')
+    parser.add_argument('--expect-sha256', metavar='HEX',
+                        help='With --runtime-root, fail unless the rebuilt archive has this SHA-256')
     parser.add_argument('--json', action='store_true', help='Print machine-readable JSON')
     args = parser.parse_args()
-    version = read_json(ROOT / 'package.json')['version']
-    suffix = '-source' if args.source else ('-showcase' if args.showcase else '')
-    out = Path(args.out) if args.out else ROOT / 'dist' / f'goujian-strategy-slides-v{version}{suffix}.zip'
-    result = build(out, showcase=args.showcase, source=args.source)
+    if args.runtime_root:
+        if not args.out:
+            parser.error('--runtime-root requires an explicit output path')
+        if args.source or args.showcase:
+            parser.error('--runtime-root cannot be combined with --source or --showcase')
+        if args.expect_sha256 and not re.match(r'^[0-9a-f]{64}$', args.expect_sha256):
+            parser.error('--expect-sha256 must be a lowercase 64-character SHA-256 digest')
+    elif args.expect_sha256:
+        parser.error('--expect-sha256 is only valid with --runtime-root')
+    if args.runtime_root:
+        out = Path(args.out)
+    else:
+        version = read_json(ROOT / 'package.json')['version']
+        suffix = '-source' if args.source else ('-showcase' if args.showcase else '')
+        out = Path(args.out) if args.out else ROOT / 'dist' / f'goujian-strategy-slides-v{version}{suffix}.zip'
+    result = build(out, showcase=args.showcase, source=args.source,
+                   runtime_root=args.runtime_root, expect_sha256=args.expect_sha256)
     if args.json:
         print(json.dumps(result, ensure_ascii=False, indent=2))
     else:

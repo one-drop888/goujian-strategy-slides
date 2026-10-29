@@ -1,0 +1,109 @@
+{
+  "phase": "1b",
+  "status": "READY_FOR_ROOT_REVIEW",
+  "date": "2026-10-28",
+  "branch": "fix/enterprise-runtime-package",
+  "base_commit": "9d4902d963da0d8ba5bdd97a213cca5ae6856c86",
+  "implementation_commit": "3054ab46cb3b1064479b513eb38b7fea6a4506fc",
+  "diff": {
+    "files": 13,
+    "insertions": 2553,
+    "deletions": 233
+  },
+  "root_findings": {
+    "1_output_guard_all_modes_symlink": "RESOLVED",
+    "2_installed_member_canonical_bytes_before_write": "RESOLVED",
+    "3_digest_fail_closed_before_zip_open": "RESOLVED",
+    "4_official_v131_runtime_passes_strict_v132_and_history_kept": "RESOLVED",
+    "5_full_installed_cli_coverage_and_candidate_owned_modules": "RESOLVED",
+    "6_fresh_artifact_retention_and_ci_release_uploads": "RESOLVED",
+    "7_docstrings_labels_short_circuits_failure_evidence": "RESOLVED",
+    "8_skill_first_runtime_paragraph_zip_or_source": "RESOLVED_AWAITING_CODEX_REVIEW",
+    "9_release_notes_dated_checkpoint_no_permanent_not_run": "RESOLVED"
+  },
+  "changed_files": {
+    ".github/workflows/ci.yml": "26d8efcf3b945ddfa602eca72661f039fdf4f2499bf688cc5e77f0c15d9a98e1",
+    ".github/workflows/release.yml": "56db05ceaf67dfe226405b3f3115adb52112e705966f42d5055442bae2c75a3f",
+    "SKILL.md": "72bf047c8ce3cd2b8c88ca3f7f7315b47f7de03b41a2d3c91e9e14bec4f3247d",
+    "docs/V1_3_2_RELEASE_NOTES.md": "79741e21c92da4e682ae36d7217218b00392116b00ea5682801a0e67e46c8fc6",
+    "scripts/capability_parity.py": "c045c788d823ea4c0be4c1bb8648e88e82b3c15905ca8869ec7579e7a4cfea65",
+    "scripts/package_runtime.py": "f9a5c57b8f9ea8425d6d06dab1d4432ad8d9a2ea97039730744218e217e761d2",
+    "scripts/runtime_acceptance.py": "db9f42ddd255ca76fc67ed7afb63d0b5d8232897a32f9950ec15b77e6cbac923",
+    "scripts/security_preflight.py": "22c29bf8191c948ee5e450ebc666db2388249d9301b8f33e24d67196c93f146d",
+    "tests/test_capability_parity.py": "c041ebd8caf47aa58cf3b92ebac0e6afa93f0c7a8c7eccd4e80568adf792a7da",
+    "tests/test_package.py": "07c4e47116228c6b8c056715d345810b90ac0274e488224e48a637097bf56791",
+    "tests/test_pdf_structural_review.py": "8206d3759b44f34f7f11b8afc5a115f3b4244daee9cde59eda2607e0d8964926",
+    "tests/test_runtime_acceptance.py": "116da9b7a44ab0a15a2421df66e2f9f532b8b4f3d119f62e2f7b076326e3624c",
+    "tests/test_security_preflight.py": "955c866ac684cdcb6ef0d711909606a993873d59bd2828f21240828bfadb95ad"
+  },
+  "focused_tests": {
+    "tests/test_runtime_acceptance.py": "32 OK",
+    "tests/test_capability_parity.py": "45 OK",
+    "tests/test_security_preflight.py": "30 OK",
+    "tests/test_pdf_structural_review.py": "47 OK (isolated SDK Python, pypdf 6.21.3)",
+    "tests/test_package.py": "PASS",
+    "tests/test_workflow_security.py": "18 OK",
+    "tests/test_scan_skill_package.py": "43 OK",
+    "tests/test_advisory_check.py": "14 OK",
+    "tests/test_secure_deps.py": "7 OK",
+    "tests/test_qa.py": "9 OK (secure Pillow 13.0.0)",
+    "tests/test_bootstrap.py": "18 OK (1 skipped)",
+    "tests/test_doctor.py": "16 OK",
+    "compileall": "OK",
+    "python_3_9_syntax_floor": "OK (ast.parse feature_version 3.9 over core/, skill/, scripts/)",
+    "workflow_yaml": "OK (CI and Release parse)"
+  },
+  "runtime_acceptance": {
+    "status": "PASS",
+    "result_json": "out/phase1b-acceptance-4.json",
+    "artifact_dir": "out/phase1b-acceptance-artifacts-4",
+    "artifact_manifest_count": 776,
+    "artifact_manifest_sha256": "c1a16b0bca5a0d7a019570898720c16643e552904123be17710802cc0e008d84",
+    "capability_parity": "CAPABILITY_PARITY_V1_3_1_TO_V1_3_2",
+    "source_cases": ["q4-generated", "executive-review"],
+    "matrix": {
+      "cells": 96,
+      "accepted": 72,
+      "rejected": 24,
+      "native_charts_per_theme": 36,
+      "rejected_by_code": {
+        "CATEGORY_PALETTE_CAPACITY": 8,
+        "AREA_SINGLE_POINT": 2,
+        "AREA_MISSING": 2,
+        "PIE_SINGLE_SERIES": 4,
+        "PIE_NONNEGATIVE": 4,
+        "PIE_MISSING": 4
+      }
+    },
+    "multimodal_embedded_images": 9,
+    "analytics_recipes": ["business-performance", "project-analytics", "sales-conversion"],
+    "reasoning_plans": ["q4-six-actions", "multimodal-consolidation", "executive-incomplete-business"],
+    "relationship_cases": ["dated-timeline", "dated-timeline-close", "branch-swimlane", "roadmap"],
+    "relationship_outputs": 8,
+    "comparisons": 20,
+    "candidate_node_modules": "root-owned and lock-matched",
+    "baseline_node_modules": "lock-matched linked dependencies with provenance",
+    "visual_qa": "NOT_RUN",
+    "company_platform_security": "NOT_VERIFIED"
+  },
+  "boundaries_preserved": {
+    "dependencies_or_lockfiles_changed": false,
+    "scanner_pins_or_lock_changed": false,
+    "pdf_policy_changed": false,
+    "review_ledger_entries": 38,
+    "review_ledger_changed": false,
+    "repository_skill_md_count": 1,
+    "archives_built_only_by_package_runtime": true
+  },
+  "pending": [
+    "Codex independent reprobe of all nine boundaries and review of the root SKILL.md wording change",
+    "New exact content-bound ledger approvals if required by the frozen candidate scan",
+    "Full package validation, real CI dispatch and formal Release after explicit authorization"
+  ],
+  "stopped_before": [
+    "git push",
+    "real CI dispatch",
+    "review ledger refresh",
+    "formal Release"
+  ]
+}

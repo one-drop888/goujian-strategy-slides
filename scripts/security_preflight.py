@@ -55,7 +55,7 @@ COMMON_REQUIRED = {
     'THIRD_PARTY_NOTICE.md', 'package.json', 'package-lock.json',
     'requirements-render.txt', 'core/renderer/index.js', 'core/renderer/charts.js',
     'core/schema/deck.schema.json', 'core/qa/secure_deps.py',
-    'scripts/security_preflight.py', 'skill/scripts/build_deck.js',
+    'skill/scripts/build_deck.js',
 }
 NEW_PATCH_FILES = {
     'core/__init__.py', 'core/qa/__init__.py', 'skill/__init__.py',
@@ -64,9 +64,21 @@ NEW_PATCH_FILES = {
     'scripts/runtime_smoke.py', 'tests/validate_examples.py',
     'distribution/runtime-manifest.json', 'distribution/runtime-package.json',
 }
+# V1.3.2 moves release packaging/security-preflight tools to Source only.
+SOURCE_TOOLS = {'scripts/security_preflight.py', 'scripts/package_runtime.py'}
 RUNTIME_REQUIRED = COMMON_REQUIRED | NEW_PATCH_FILES
-SOURCE_REQUIRED = COMMON_REQUIRED | NEW_PATCH_FILES | {'tests/test_security_preflight.py'}
-LEGACY_REQUIRED = COMMON_REQUIRED | {'tests/test_security_preflight.py'}
+SOURCE_REQUIRED = COMMON_REQUIRED | NEW_PATCH_FILES | SOURCE_TOOLS | {'tests/test_security_preflight.py'}
+LEGACY_REQUIRED = COMMON_REQUIRED | SOURCE_TOOLS | {'tests/test_security_preflight.py'}
+# Version is read from the bound package.json, never from a caller profile.
+RUNTIME_SOURCE_ONLY_COMMANDS = ('package', 'preflight')
+SOURCE_REQUIRED_COMMANDS = ('preflight', 'package', 'package:source', 'security:scan',
+                            'security:verify', 'test:pdf', 'test:runtime', 'benchmark')
+HISTORICAL_RUNTIME_SCHEMAS = {'1.3.0', '1.3.1'}
+HISTORICAL_SOURCE_COMMANDS = {
+    '1.3.0': ('preflight', 'package', 'benchmark'),
+    '1.3.1': ('preflight', 'package', 'package:source', 'security:scan',
+              'security:verify', 'test:runtime', 'benchmark'),
+}
 # Historical public name retained for callers that do not pass a profile.
 REQUIRED_FILES = SOURCE_REQUIRED
 
@@ -933,6 +945,17 @@ def runtime_metadata_violations(profile, contents, allow_showcase=False, strict_
                         'RUNTIME_MANIFEST',
                         'manifest package mapping must map package.json to distribution/runtime-package.json',
                         PREFIX + 'distribution/runtime-manifest.json'))
+                schema_version = manifest.get('schema_version')
+                if schema_version != package.get('version'):
+                    problems.append(violation(
+                        'RUNTIME_METADATA',
+                        'runtime manifest schema_version must equal the package.json version',
+                        PREFIX + 'distribution/runtime-manifest.json'))
+                historical = schema_version in HISTORICAL_RUNTIME_SCHEMAS
+                if historical:
+                    notes.append(
+                        f'historical runtime schema {schema_version}: the v1.3.2 Source-only command '
+                        'split and omitted_commands declarations are not required for this frozen package')
                 runtime_files = manifest.get('runtime_files') or []
                 declared = {PREFIX + name for name in runtime_files}
                 missing = sorted(name for name in declared if name not in contents)
@@ -949,11 +972,24 @@ def runtime_metadata_violations(profile, contents, allow_showcase=False, strict_
                     else:
                         notes.append(detail)
                 scripts = package.get('scripts') or {}
-                for command in ('test', 'test:core', 'validate:all', 'preflight', 'package'):
+                for command in ('test', 'test:core', 'validate:all'):
                     if command not in scripts:
                         problems.append(violation('RUNTIME_METADATA',
                                                   f'runtime package is missing command {command}',
                                                   PREFIX + 'package.json'))
+                omitted = set(manifest.get('omitted_commands') or [])
+                if not historical:
+                    for command in RUNTIME_SOURCE_ONLY_COMMANDS:
+                        if command in scripts:
+                            problems.append(violation(
+                                'RUNTIME_METADATA',
+                                f'runtime package must omit the Source-only command {command}',
+                                PREFIX + 'package.json'))
+                        if command not in omitted:
+                            problems.append(violation(
+                                'RUNTIME_MANIFEST',
+                                f'runtime manifest must declare the Source-only command as omitted: {command}',
+                                PREFIX + 'distribution/runtime-manifest.json'))
                 if ('runtime_smoke.py' not in str(scripts.get('test', ''))
                         or '--tier auto' not in str(scripts.get('test', ''))):
                     problems.append(violation('RUNTIME_METADATA',
@@ -969,16 +1005,18 @@ def runtime_metadata_violations(profile, contents, allow_showcase=False, strict_
                                               PREFIX + 'package.json'))
     elif profile == 'source':
         scripts = package.get('scripts') or {}
-        if 'package:source' not in scripts:
-            problems.append(violation('SOURCE_METADATA', 'source package is missing package:source',
-                                      PREFIX + 'package.json'))
-        if 'test:runtime' not in scripts:
-            problems.append(violation('SOURCE_METADATA', 'source package is missing test:runtime',
-                                      PREFIX + 'package.json'))
-        if 'benchmark' not in scripts:
-            problems.append(violation('SOURCE_METADATA',
-                                      'source package must retain the full development benchmark command',
-                                      PREFIX + 'package.json'))
+        version = package.get('version')
+        historical = HISTORICAL_SOURCE_COMMANDS.get(version)
+        required = historical or SOURCE_REQUIRED_COMMANDS
+        if historical:
+            notes.append(
+                f'historical source {version}: later permanent-gate commands such as test:pdf '
+                'are not required for this frozen package')
+        for command in required:
+            if command not in scripts:
+                problems.append(violation('SOURCE_METADATA',
+                                          f'source package is missing command {command}',
+                                          PREFIX + 'package.json'))
     return problems, notes
 
 

@@ -77,6 +77,41 @@ def _step_block(text, name):
     return text[start:nxt if nxt != -1 else len(text)]
 
 
+PUBLISH_RENDER_APT_BLOCK = (
+    'sudo apt-get install -y fontconfig fonts-noto-core fonts-noto-cjk '
+    'libreoffice-impress poppler-utils imagemagick'
+)
+PUBLISH_RENDER_EXECUTABLES = ('soffice', 'libreoffice', 'pdftoppm', 'fc-list', 'fc-match')
+
+
+def _publish_render_prerequisite_errors(publisher):
+    errors = []
+    try:
+        install = _step_block(publisher, 'Install declared Linux render prerequisites')
+        guard = _step_block(
+            publisher, 'Verify render executables are available before publishing')
+        fresh = _step_block(
+            publisher,
+            'Verify a fresh clone of the published tag and a clean runtime install')
+    except ValueError:
+        return ['missing a required publisher render-prerequisite step']
+    if PUBLISH_RENDER_APT_BLOCK not in install:
+        errors.append('publisher must install the validated Linux render package set')
+    loop_line = 'for tool in ' + ' '.join(PUBLISH_RENDER_EXECUTABLES) + '; do'
+    for label, block in (('publisher guard', guard),
+                         ('post-clone verification', fresh)):
+        if loop_line not in block:
+            errors.append(f'{label} must check all render executables')
+        if 'command -v "$tool"' not in block:
+            errors.append(f'{label} must probe render executables with command -v')
+    install_at = publisher.index(
+        '- name: Install declared Linux render prerequisites')
+    for anchor in ('git tag -a', 'gh release create'):
+        if publisher.index(anchor) < install_at:
+            errors.append(f'render prerequisites must be installed before {anchor}')
+    return errors
+
+
 def _manifest_python_block(text):
     step = _step_block(text, 'Write external release manifest beside the checksums')
     lines = step.splitlines()
@@ -180,6 +215,16 @@ class WorkflowStructureTests(unittest.TestCase):
         self.assertIn("security['status'] == 'PASS'", publisher)
         self.assertIn("security['evidence_index']", publisher)
         self.assertIn('security-evidence.json', publisher)
+
+    def test_publish_installs_render_prerequisites_before_publishing(self):
+        publisher = self.release.split('\n  publish:\n', 1)[1]
+        self.assertEqual(_publish_render_prerequisite_errors(publisher), [])
+        required = _step_block(
+            publisher, 'Install declared Linux render prerequisites')
+        stripped = publisher.replace(required, '')
+        self.assertTrue(
+            _publish_render_prerequisite_errors(stripped),
+            'removing the publisher render prerequisite install must fail this guard')
 
     def test_release_manifest_holds_hash_bound_security_evidence(self):
         self.assertIn('Bind hash-bound security evidence into the external release manifest',

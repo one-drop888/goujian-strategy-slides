@@ -1474,6 +1474,19 @@ jobs:
           ref: ${{ env.EXPECTED_SHA }}
           fetch-depth: 0
           persist-credentials: false
+      - name: Install declared Linux render prerequisites
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y fontconfig fonts-noto-core fonts-noto-cjk libreoffice-impress poppler-utils imagemagick
+      - name: Verify render executables are available before publishing
+        run: |
+          set -euo pipefail
+          for tool in soffice libreoffice pdftoppm fc-list fc-match; do
+            command -v "$tool" >/dev/null 2>&1 || {
+              echo "missing required render executable before publishing: $tool" >&2
+              exit 1
+            }
+          done
       - name: Download this run's validated archives and security receipts
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
@@ -1681,6 +1694,12 @@ jobs:
           git clone --depth 1 --branch "v$VERSION" "https://github.com/$GITHUB_REPOSITORY.git" "$RUNNER_TEMP/goujian-remote-verify"
           cd "$RUNNER_TEMP/goujian-remote-verify"
           test "$(git rev-parse HEAD)" = "$EXPECTED_SHA"
+          for tool in soffice libreoffice pdftoppm fc-list fc-match; do
+            command -v "$tool" >/dev/null 2>&1 || {
+              echo "missing required render executable in post-clone verification: $tool" >&2
+              exit 1
+            }
+          done
           npm ci
           python3 -m pip install -r requirements-render.txt
           npm test

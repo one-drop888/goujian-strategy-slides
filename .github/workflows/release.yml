@@ -965,6 +965,8 @@ jobs:
           cp out/release-runtime-clean-install.json dist/release-runtime-clean-install.json
           cp out/release-runtime-acceptance.json dist/release-runtime-acceptance.json
           cp out/release-source-archive-acceptance.json dist/release-source-archive-acceptance.json
+          # Replay the permanent manifest regression against this same-run dist before writing it.
+          GOUJIAN_REHEARSAL_DIST="$GITHUB_WORKSPACE/dist" python3 tests/test_workflow_security.py
           python3 - <<'PY'
           import hashlib, json, os
           from pathlib import Path
@@ -1011,8 +1013,55 @@ jobs:
           assert runtime_acceptance['contract']['locked_baseline_zip_sha256'] == \
               '7ee0d15488368a876ac2624546f72a13de8bdf01f322ed1055bb8c099d67b3dd'
           assert runtime_acceptance['installed_runtime']['candidate']['evidence']['version'] == version
-          assert set(runtime_acceptance['comparisons']) == {'q4-generated', 'executive-review'}
-          assert all(case['status'] == 'PASS' for case in runtime_acceptance['comparisons'].values())
+          expected_comparisons = {
+              'q4-generated', 'executive-review',
+              'matrix-light', 'matrix-dark', 'matrix-rejections',
+              'multimodal-integration',
+              'analytic-business-performance', 'analytic-project-analytics',
+              'analytic-sales-conversion',
+              'reasoning-q4-six-actions', 'reasoning-multimodal-consolidation',
+              'reasoning-executive-incomplete-business',
+              'relationship-dated-timeline-light', 'relationship-dated-timeline-dark',
+              'relationship-dated-timeline-close-light', 'relationship-dated-timeline-close-dark',
+              'relationship-branch-swimlane-light', 'relationship-branch-swimlane-dark',
+              'relationship-roadmap-light', 'relationship-roadmap-dark',
+          }
+          assert set(runtime_acceptance['comparisons']) == expected_comparisons, \
+              sorted(set(runtime_acceptance['comparisons']) ^ expected_comparisons)
+          assert all(case['status'] == 'PASS' and not case.get('failures')
+                     for case in runtime_acceptance['comparisons'].values()), \
+              {name: case.get('failures') for name, case in runtime_acceptance['comparisons'].items()
+               if case['status'] != 'PASS' or case.get('failures')}
+          coverage = runtime_acceptance['coverage']
+          assert coverage['status'] == 'PASS', coverage
+          matrix = coverage['matrix']
+          assert matrix['status'] == 'PASS', matrix
+          assert (matrix['cells'], matrix['accepted'], matrix['rejected']) == (96, 72, 24), matrix
+          assert set(matrix['families']) == {
+              'area', 'bar', 'column', 'doughnut', 'line', 'pie'}, matrix['families']
+          assert set(matrix['themes']) == {'light', 'dark'}, matrix['themes']
+          rejections = matrix['rejections']
+          assert rejections['status'] == 'PASS', rejections
+          assert rejections['attempted'] == 24 and rejections['matched'] == 24, rejections
+          assert rejections['by_code'] == {
+              'CATEGORY_PALETTE_CAPACITY': 8, 'AREA_SINGLE_POINT': 2, 'AREA_MISSING': 2,
+              'PIE_SINGLE_SERIES': 4, 'PIE_NONNEGATIVE': 4, 'PIE_MISSING': 4,
+          }, rejections['by_code']
+          multimodal = coverage['multimodal']
+          assert multimodal['status'] == 'PASS', multimodal
+          assert multimodal['embedded_images'] == 9, multimodal
+          analytics = coverage['analytics']
+          assert analytics['status'] == 'PASS', analytics
+          assert {item['recipe'] for item in analytics['recipes']} == {
+              'business-performance', 'project-analytics', 'sales-conversion'}, analytics
+          reasoning = coverage['reasoning']
+          assert reasoning['status'] == 'PASS', reasoning
+          assert {item['plan'] for item in reasoning['plans']} == {
+              'q4-six-actions', 'multimodal-consolidation',
+              'executive-incomplete-business'}, reasoning
+          relationships = coverage['relationships']
+          assert relationships['status'] == 'PASS', relationships
+          assert relationships['outputs'] == 8, relationships
           assert runtime_acceptance['visual_qa'] == 'NOT_RUN'
           assert runtime_acceptance['company_platform_security'] == 'NOT_VERIFIED'
           assert source_acceptance['status'] == 'PASS', source_acceptance.get('failures')

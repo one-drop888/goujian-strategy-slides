@@ -27,6 +27,20 @@ RELEASE = ROOT / '.github/workflows/release.yml'
 CAPTURE_ANCHOR = 'npm test 2>&1 | tee "$RUNNER_TEMP/source-archive-test.log"'
 PIPESTATUS_CAPTURE = 'npm_test_status=("${PIPESTATUS[@]}")'
 
+EXPECTED_COMPARISONS = (
+    'q4-generated', 'executive-review',
+    'matrix-light', 'matrix-dark', 'matrix-rejections',
+    'multimodal-integration',
+    'analytic-business-performance', 'analytic-project-analytics',
+    'analytic-sales-conversion',
+    'reasoning-q4-six-actions', 'reasoning-multimodal-consolidation',
+    'reasoning-executive-incomplete-business',
+    'relationship-dated-timeline-light', 'relationship-dated-timeline-dark',
+    'relationship-dated-timeline-close-light', 'relationship-dated-timeline-close-dark',
+    'relationship-branch-swimlane-light', 'relationship-branch-swimlane-dark',
+    'relationship-roadmap-light', 'relationship-roadmap-dark',
+)
+
 
 def _capture_snippet(text):
     lines = text.splitlines()
@@ -61,6 +75,38 @@ def _step_block(text, name):
     start = text.index(marker)
     nxt = text.find('\n      - name: ', start + len(marker))
     return text[start:nxt if nxt != -1 else len(text)]
+
+
+def _manifest_python_block(text):
+    step = _step_block(text, 'Write external release manifest beside the checksums')
+    lines = step.splitlines()
+    heredoc = next(i for i, line in enumerate(lines) if "<<'PY'" in line)
+    end = next(i for i in range(heredoc + 1, len(lines)) if lines[i].strip() == 'PY')
+    return textwrap.dedent('\n'.join(lines[heredoc + 1:end])) + '\n'
+
+
+def _is_rehearsal_dist(candidate):
+    return (candidate / 'release-runtime-acceptance.json').is_file() and \
+        (candidate / 'goujian-strategy-slides-v1.3.2.zip').is_file()
+
+
+def _rehearsal_dist():
+    override = os.environ.get('GOUJIAN_REHEARSAL_DIST')
+    if override:
+        candidate = Path(override)
+        if not _is_rehearsal_dist(candidate):
+            raise AssertionError(
+                f'GOUJIAN_REHEARSAL_DIST={override!r} must contain '
+                'release-runtime-acceptance.json and the v1.3.2 runtime ZIP')
+        return candidate
+    base = ROOT / 'out/enterprise-package-control'
+    if base.is_dir():
+        for candidate in sorted(
+                base.glob('rehearsal-*/dist'), key=lambda path: path.stat().st_mtime,
+                reverse=True):
+            if _is_rehearsal_dist(candidate):
+                return candidate
+    return None
 
 
 class WorkflowStructureTests(unittest.TestCase):
@@ -330,10 +376,45 @@ class WorkflowStructureTests(unittest.TestCase):
         ):
             self.assertIn(relative, release_upload)
 
+    def test_release_manifest_uses_the_exact_twenty_case_and_coverage_contract(self):
+        block = _manifest_python_block(self.release)
+        self.assertNotIn("== {'q4-generated', 'executive-review'}", block)
+        for name in EXPECTED_COMPARISONS:
+            self.assertIn(f"'{name}'", block)
+        for token in (
+            "(96, 72, 24)",
+            "'CATEGORY_PALETTE_CAPACITY': 8",
+            "'PIE_MISSING': 4",
+            "embedded_images'] == 9",
+            "outputs'] == 8",
+            "coverage['status'] == 'PASS'",
+        ):
+            self.assertIn(token, block)
+
+    def test_release_manifest_step_replays_the_current_dist_before_writing(self):
+        step = _step_block(
+            self.release, 'Write external release manifest beside the checksums')
+        invocation = (
+            'GOUJIAN_REHEARSAL_DIST="$GITHUB_WORKSPACE/dist" '
+            'python3 tests/test_workflow_security.py')
+        self.assertIn(invocation, step)
+        manifest_block = step.index("python3 - <<'PY'")
+        self.assertLess(
+            step.index(invocation), manifest_block,
+            'the same-run replay must run before the manifest is written')
+        for report in (
+            'release-runtime-acceptance.json',
+            'release-source-archive-acceptance.json',
+            'release-runtime-preflight.json',
+        ):
+            self.assertLess(
+                step.index(f'dist/{report}'), step.index(invocation),
+                f'{report} must be copied into dist before the replay')
+
     def test_actual_workflow_run_blocks_parse_as_bash(self):
         if shutil.which('bash') is None:
             self.skipTest('bash is required to check workflow shell syntax')
-        for path, text in ((CI, self.ci), (RELEASE, self.release)):
+        for path, text in ((CI, self.ci), (SECURITY, self.security), (RELEASE, self.release)):
             lines = text.splitlines()
             checked = 0
             for index, line in enumerate(lines):
@@ -674,6 +755,138 @@ class RuntimeAcceptanceFailureCaptureTests(unittest.TestCase):
             json.loads(payload))
         self.assertTrue((self.out / 'stdout.json').is_file())
         self.assertTrue((self.out / 'stderr.log').is_file())
+
+
+class ReleaseManifestReplayTests(unittest.TestCase):
+    """Execute the embedded manifest block against real rehearsal evidence."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.manifest = _manifest_python_block(RELEASE.read_text(encoding='utf-8'))
+
+    def setUp(self):
+        self._tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self._tmp.cleanup)
+        self.tmp = Path(self._tmp.name)
+        self.rehearsal = _rehearsal_dist()
+        if self.rehearsal is None:
+            self.skipTest(
+                'set GOUJIAN_REHEARSAL_DIST or download rehearsal-*/dist evidence '
+                'to replay the release manifest contract')
+        self.dist = self.tmp / 'dist'
+        self.dist.mkdir()
+        for source in self.rehearsal.iterdir():
+            target = self.dist / source.name
+            if source.suffix == '.json':
+                shutil.copy2(source, target)
+            else:
+                try:
+                    target.symlink_to(source)
+                except OSError:
+                    shutil.copy2(source, target)
+        manifest = self.dist / 'release-manifest.json'
+        if manifest.is_symlink() or manifest.exists():
+            manifest.unlink()
+
+    def _acceptance(self):
+        return self.dist / 'release-runtime-acceptance.json'
+
+    def _mutate(self, mutate):
+        report = json.loads(self._acceptance().read_text(encoding='utf-8'))
+        self.assertEqual(report['status'], 'PASS')
+        mutate(report)
+        self.assertEqual(report['status'], 'PASS', 'negatives keep the top level PASS')
+        self._acceptance().write_text(json.dumps(report, indent=2) + '\n', encoding='utf-8')
+
+    def _run_manifest(self):
+        script = self.tmp / 'manifest.py'
+        script.write_text(self.manifest, encoding='utf-8')
+        env = dict(os.environ)
+        env.update({
+            'VERSION': '1.3.2',
+            'EXPECTED_SHA': 'c46025e0d66c9ce0a9912092a505f0a22d4a4e1b',
+            'V13_BASELINE_TAG_OBJECT': 'test-v1.3.0-tag-object',
+            'V13_BASELINE_COMMIT': 'test-v1.3.0-commit',
+            'V131_BASELINE_TAG_OBJECT': '72df06c921a80bbe1128a0964f22e187811943c6',
+            'V131_BASELINE_COMMIT': '25f269f8db333e27f23915ecb472eed6cb2709c6',
+            'V12_BASELINE_TAG_OBJECT': 'test-v1.2.1-tag-object',
+            'V12_BASELINE_COMMIT': 'test-v1.2.1-commit',
+        })
+        return subprocess.run(
+            [sys.executable, str(script)], cwd=self.tmp, env=env,
+            capture_output=True, text=True)
+
+    def _assert_rejected(self, result):
+        self.assertNotEqual(result.returncode, 0, result.stdout)
+        self.assertIn('AssertionError', result.stderr)
+        self.assertFalse((self.dist / 'release-manifest.json').exists())
+
+    def _expected_comparisons(self):
+        return sorted(EXPECTED_COMPARISONS)
+
+    def test_actual_rehearsal_evidence_satisfies_the_manifest_contract(self):
+        result = self._run_manifest()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        manifest_path = self.dist / 'release-manifest.json'
+        self.assertTrue(manifest_path.is_file())
+        manifest = json.loads(manifest_path.read_text(encoding='utf-8'))
+        acceptance = manifest['runtime_acceptance']
+        self.assertEqual(manifest['version'], '1.3.2')
+        self.assertEqual(manifest['commit'], 'c46025e0d66c9ce0a9912092a505f0a22d4a4e1b')
+        self.assertEqual(acceptance['comparisons'], self._expected_comparisons())
+        self.assertEqual(acceptance['coverage']['status'], 'PASS')
+        self.assertEqual(acceptance['coverage']['matrix_cells'], 96)
+        self.assertEqual(acceptance['coverage']['matrix_accepted'], 72)
+        self.assertEqual(acceptance['coverage']['matrix_rejected'], 24)
+        self.assertEqual(acceptance['coverage']['matrix_themes'], ['dark', 'light'])
+        self.assertEqual(acceptance['coverage']['multimodal_embedded_images'], 9)
+        self.assertEqual(len(acceptance['coverage']['analytics_recipes']), 3)
+        self.assertEqual(len(acceptance['coverage']['reasoning_plans']), 3)
+        self.assertEqual(acceptance['coverage']['relationship_outputs'], 8)
+        self.assertEqual(
+            acceptance['report_sha256'],
+            hashlib.sha256(self._acceptance().read_bytes()).hexdigest())
+        self.assertEqual(
+            acceptance['candidate_runtime_sha256'],
+            hashlib.sha256(
+                (self.dist / 'goujian-strategy-slides-v1.3.2.zip').read_bytes()).hexdigest())
+
+    def test_manifest_block_rejects_a_missing_required_comparison(self):
+        def mutate(report):
+            del report['comparisons']['relationship-roadmap-dark']
+        self._mutate(mutate)
+        self._assert_rejected(self._run_manifest())
+
+    def test_manifest_block_rejects_a_failed_comparison_under_top_level_pass(self):
+        def mutate(report):
+            report['comparisons']['matrix-light']['status'] = 'FAIL'
+            report['comparisons']['matrix-light']['failures'] = ['forced failure']
+        self._mutate(mutate)
+        self._assert_rejected(self._run_manifest())
+
+    def test_manifest_block_rejects_altered_matrix_coverage_under_top_level_pass(self):
+        def mutate(report):
+            report['coverage']['matrix']['accepted'] = 71
+        self._mutate(mutate)
+        self._assert_rejected(self._run_manifest())
+
+    def test_manifest_block_rejects_altered_named_rejections_under_top_level_pass(self):
+        def mutate(report):
+            report['coverage']['matrix']['rejections']['by_code']['PIE_MISSING'] = 3
+        self._mutate(mutate)
+        self._assert_rejected(self._run_manifest())
+
+    def test_manifest_block_rejects_altered_image_coverage_under_top_level_pass(self):
+        def mutate(report):
+            report['coverage']['multimodal']['embedded_images'] = 8
+        self._mutate(mutate)
+        self._assert_rejected(self._run_manifest())
+
+    def test_manifest_block_rejects_altered_relationship_outputs_under_top_level_pass(self):
+        def mutate(report):
+            report['coverage']['relationships']['outputs'] = 7
+        self._mutate(mutate)
+        self._assert_rejected(self._run_manifest())
 
 
 if __name__ == '__main__':
